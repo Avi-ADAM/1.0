@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>השותף שנעלם</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family: 'Sababa'; src: url('../../../static/fonts/NbmSababaHL1-Bold.otf'); }
+  :root {
+    --barbi: #ff0092; --gold: #fbbf24; --green: #34d399; --violet: #8b5cf6;
+    --night: #0f0b24; --night2: #1d1442; --panel: #171233; --line: #2f2760; --muted: #9b93c9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--night); }
+  body { font-family: 'Heebo', sans-serif; color: #fff; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden;
+    background: radial-gradient(120% 80% at 50% 30%, var(--night2), var(--night)); }
+  .layer { position: absolute; inset: 0; }
+  .center { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .w { display: inline-block; opacity: 0; white-space: pre; }
+  .mono { font-family: 'JetBrains Mono', monospace; direction: ltr; unicode-bidi: isolate; }
+
+  /* S1: the chat nobody answers */
+  #c1 { position: absolute; top: 130px; width: 100%; text-align: center; font-size: 68px; font-weight: 800; padding: 0 70px; line-height: 1.2; }
+  #phone { position: absolute; top: 400px; left: 140px; width: 800px; height: 1000px; border-radius: 50px; background: #0b0820; border: 2px solid var(--line);
+    overflow: hidden; box-shadow: 0 40px 120px rgba(0,0,0,.6); }
+  #ph { height: 150px; display: flex; align-items: center; gap: 24px; padding: 0 36px; background: #1a1438; border-bottom: 2px solid var(--line); }
+  #ph .av { width: 96px; height: 96px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #4f46e5); display: flex; align-items: center; justify-content: center; font-size: 58px; }
+  #ph .n { font-size: 46px; font-weight: 800; }
+  #ph .s { font-size: 32px; color: var(--muted); margin-top: 2px; }
+  #msgs { position: absolute; top: 190px; right: 36px; left: 36px; display: flex; flex-direction: column; gap: 22px; align-items: flex-start; }
+  .m { max-width: 600px; padding: 22px 32px; border-radius: 36px 36px 8px 36px; background: #3a2a7a; font-size: 42px; opacity: 0; }
+  .m .ck { font-size: 30px; color: #8d86b8; margin-right: 14px; }
+  #lost { position: absolute; bottom: 40px; right: 36px; left: 36px; display: flex; gap: 20px; justify-content: center; }
+  .lp { padding: 20px 34px; border-radius: 40px; background: rgba(255,0,146,.14); border: 2px solid rgba(255,0,146,.5); font-size: 40px; font-weight: 700; opacity: 0; }
+
+  /* S2: stops contributing -> stops accruing */
+  #s2 { opacity: 0; }
+  #h2 { position: absolute; top: 140px; width: 100%; text-align: center; font-size: 64px; font-weight: 800; line-height: 1.25; padding: 0 60px; }
+  #chart { position: absolute; top: 420px; left: 90px; width: 900px; height: 780px; border-radius: 44px; background: var(--panel); border: 2px solid var(--line); }
+  #chart .tt { position: absolute; top: 34px; right: 50px; font-size: 38px; color: var(--muted); font-weight: 500; }
+  #plot { position: absolute; top: 110px; left: 40px; width: 820px; height: 560px; }
+  #months { position: absolute; bottom: 30px; left: 80px; right: 60px; display: flex; justify-content: space-between; font-size: 32px; color: var(--muted); direction: rtl; }
+  .tag { position: absolute; padding: 10px 24px; border-radius: 30px; font-size: 34px; font-weight: 800; opacity: 0; white-space: nowrap; }
+  #tD { background: var(--barbi); }
+  #tR { background: var(--violet); }
+  #gone { position: absolute; font-size: 32px; color: var(--gold); font-weight: 700; opacity: 0; white-space: nowrap; }
+  #shares { position: absolute; top: 1250px; left: 90px; width: 900px; display: flex; gap: 30px; }
+  .sh { flex: 1; padding: 30px 36px; border-radius: 36px; background: var(--panel); border: 2px solid var(--line); opacity: 0; }
+  .sh .k { font-size: 36px; color: var(--muted); }
+  .sh .sv { font-size: 92px; font-weight: 700; margin-top: 4px; }
+  #keep { position: absolute; top: 1540px; width: 100%; text-align: center; font-size: 40px; color: #e3dcff; padding: 0 80px; line-height: 1.35; opacity: 0; }
+
+  /* S3: nothing gets stuck */
+  #s3 { opacity: 0; }
+  #h3 { position: absolute; top: 140px; width: 100%; text-align: center; font-size: 66px; font-weight: 800; }
+  .card { position: absolute; left: 90px; width: 900px; padding: 40px 50px; border-radius: 44px; background: #fff; color: #1a1333; box-shadow: 0 30px 80px rgba(0,0,0,.5); opacity: 0; }
+  #dec { top: 300px; }
+  #mis { top: 1000px; }
+  .pill { display: inline-block; padding: 8px 26px; border-radius: 34px; font-size: 32px; font-weight: 700; }
+  .card .ti { font-size: 54px; font-weight: 900; margin-top: 16px; }
+  .vs { display: flex; gap: 22px; margin-top: 30px; }
+  .v { flex: 1; display: flex; align-items: center; gap: 16px; padding: 16px 20px; border-radius: 26px; background: #f3f0ff; font-size: 36px; font-weight: 700; }
+  .v .a { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 42px; flex: none; }
+  .ok { width: 56px; height: 56px; border-radius: 50%; background: var(--green); color: #052e1f; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 900; flex: none; margin-right: auto; }
+  .rg { width: 56px; height: 56px; flex: none; margin-right: auto; }
+  #rnote, #mnote { font-size: 34px; color: #6b6290; margin-top: 22px; }
+  #mstate { margin-top: 26px; display: flex; align-items: center; gap: 20px; font-size: 38px; font-weight: 700; }
+  #mpill { background: #fff3d6; color: #8a5a00; }
+
+  /* S4: the line */
+  #s4 { opacity: 0; }
+  #l1 { font-size: 84px; font-weight: 900; line-height: 1.2; }
+  #l2 { font-size: 120px; font-weight: 900; color: var(--barbi); margin-top: 40px; }
+
+  /* S5: brand */
+  #s5 { background: radial-gradient(110% 70% at 50% 40%, #3a1257, var(--night)); opacity: 0; }
+  #mark { font-family: 'Sababa', 'Heebo'; font-size: 250px; direction: ltr; letter-spacing: 4px; }
+  #mark .h { color: var(--barbi); display: inline-block; }
+  #tagline { font-size: 80px; font-weight: 800; margin-top: 40px; }
+  #sub { font-size: 46px; color: #d7cff9; margin-top: 26px; padding: 0 80px; line-height: 1.4; }
+  #cta { margin-top: 90px; padding: 34px 90px; border-radius: 90px; background: var(--barbi); font-size: 66px; font-weight: 800;
+    direction: ltr; box-shadow: 0 0 60px rgba(255,0,146,.55); }
+  #s5 > * { opacity: 0; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- S1 -->
+  <div class="layer" id="s1">
+    <div id="c1">לכל אחד יש סיפור על שותף שנעלם</div>
+    <div id="phone">
+      <div id="ph"><div class="av">🧑🏻</div><div><div class="n">רון (שותף)</div><div class="s" id="seen">מקליד…</div></div></div>
+      <div id="msgs">
+        <div class="m">רון, הלקוח מחכה לעיצוב<span class="ck">✓✓</span></div>
+        <div class="m">נו? 🙏<span class="ck">✓✓</span></div>
+        <div class="m">אתה בכלל שם?<span class="ck">✓</span></div>
+        <div class="m">רון???<span class="ck">✓</span></div>
+      </div>
+      <div id="lost"><div class="lp">💸 עם הכסף</div><div class="lp">🎨 עם העבודה</div></div>
+    </div>
+  </div>
+
+  <!-- S2 -->
+  <div class="layer" id="s2">
+    <div id="h2">ברקמה, מי שמפסיק לתרום<br>מפסיק לצבור חלק</div>
+    <div id="chart">
+      <div class="tt">שווי התרומה שאושרה, מצטבר</div>
+      <svg id="plot" viewBox="0 0 820 560">
+        <g stroke="#2a2160" stroke-width="2">
+          <line x1="40" y1="500" x2="800" y2="500"/><line x1="40" y1="350" x2="800" y2="350"/><line x1="40" y1="200" x2="800" y2="200"/><line x1="40" y1="50" x2="800" y2="50"/>
+        </g>
+        <path id="pD" d="M800 500 L648 420 L496 340 L344 250 L192 160 L40 70" stroke="#ff0092" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+        <path id="pR" d="M800 500 L648 440 L496 380" stroke="#8b5cf6" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+        <path id="pR2" d="M496 380 L40 380" stroke="#8b5cf6" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="4 26" opacity="0"/>
+        <circle id="dot" cx="496" cy="380" r="16" fill="#fbbf24" opacity="0"/>
+      </svg>
+      <div class="tag" id="tD">דנה</div>
+      <div class="tag" id="tR">רון</div>
+      <div id="gone">כאן רון נעלם</div>
+      <div id="months"><span>ינו׳</span><span>פבר׳</span><span>מרץ</span><span>אפר׳</span><span>מאי</span><span>יוני</span></div>
+    </div>
+    <div id="shares">
+      <div class="sh" id="shR"><div class="k">החלק של רון</div><div class="sv mono" id="vR" style="color:#a78bfa">43%</div></div>
+      <div class="sh" id="shD"><div class="k">החלק של דנה</div><div class="sv mono" id="vD" style="color:#ff4fb3">57%</div></div>
+    </div>
+    <div id="keep">מה שרון כבר צבר נשאר שלו. הוא פשוט לא גדל.</div>
+  </div>
+
+  <!-- S3 -->
+  <div class="layer" id="s3">
+    <div id="h3">וההחלטות לא נתקעות</div>
+    <div class="card" id="dec">
+      <span class="pill" style="background:#ffe3f3;color:#c4006f">החלטה ברקמה</span>
+      <div class="ti">להשיק את האתר החדש</div>
+      <div class="vs">
+        <div class="v"><div class="a" style="background:#ffd1ea">👩🏽</div>דנה<div class="ok">✓</div></div>
+        <div class="v"><div class="a" style="background:#ddd6fe">🧑🏻</div>רון
+          <svg class="rg" id="rg1" viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" stroke="#ddd6fe" stroke-width="6" fill="none"/>
+            <circle id="ra1" cx="24" cy="24" r="18" stroke="#f59e0b" stroke-width="6" fill="none" stroke-linecap="round" transform="rotate(-90 24 24)" stroke-dasharray="113.1" stroke-dashoffset="0"/></svg>
+          <div class="ok" id="ok1">✓</div></div>
+      </div>
+      <div id="rnote">רון לא ענה. כשזמן התגובה של הרקמה נגמר, שתיקה נספרת כהסכמה.</div>
+    </div>
+    <div class="card" id="mis">
+      <span class="pill" id="mpill">משימה בתהליך · רון</span>
+      <div class="ti">עיצוב הלוגו</div>
+      <div id="mnote">30 יום בלי פעילות → נפתחה הצעה לשחרר את המשימה</div>
+      <div id="mstate">
+        <svg class="rg" id="rg2" viewBox="0 0 48 48" style="margin-right:0"><circle cx="24" cy="24" r="18" stroke="#eee" stroke-width="6" fill="none"/>
+          <circle id="ra2" cx="24" cy="24" r="18" stroke="#f59e0b" stroke-width="6" fill="none" stroke-linecap="round" transform="rotate(-90 24 24)" stroke-dasharray="113.1" stroke-dashoffset="0"/></svg>
+        <span id="mtext">מחכה לתגובה של רון…</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- S4 -->
+  <div class="layer center" id="s4">
+    <div id="l1">השותפות לא הייתה רעה.</div>
+    <div id="l2">החוזה היה.</div>
+  </div>
+
+  <!-- S5 -->
+  <div class="layer center" id="s5">
+    <div id="mark">1<span class="h">lev</span>1</div>
+    <div id="tagline">שותפות שלא נתקעת</div>
+    <div id="sub">כל תרומה נספרת, שתיקה היא הסכמה,<br>ומשימה נטושה חוזרת לרקמה</div>
+    <div id="cta">1lev1.com</div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const p = (t, s, d) => cl((t - s) / d);
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const win = (t, a, b, f = .35) => Math.min(eo(p(t, a, f)), 1 - p(t, b - f, f));
+function split(el) {
+  el.innerHTML = el.textContent.split(/(\s+)/).filter(Boolean)
+    .map(s => /^\s+$/.test(s) ? s : `<span class="w">${s}</span>`).join('');
+}
+['c1', 'h3', 'l1', 'l2'].forEach(id => split($(id)));
+function words(el, t, start, per, dy = 34) {
+  el.querySelectorAll('.w').forEach((w, i) => {
+    const q = eo(p(t, start + i * per, .3));
+    w.style.opacity = q; w.style.transform = `translateY(${(1 - q) * dy}px)`;
+  });
+}
+const fadeIn = (el, t, s, d = .4, dy = 30) => { const q = eo(p(t, s, d)); el.style.opacity = q; el.style.transform = `translateY(${(1 - q) * dy}px)`; return q; };
+const popIn = (el, t, s, d = .45) => { const q = p(t, s, d); el.style.opacity = Math.min(1, q * 3); el.style.transform = `scale(${q === 0 ? .4 : back(q)})`; return q; };
+const place = (el, x, y) => { el.style.left = x + 'px'; el.style.top = y + 'px'; };
+
+const DURATION = 28.5;
+window.DURATION = DURATION;
+// narration: narrate.py (Adam / ElevenLabs v3); scenes timed to the words
+window.AUDIO = [
+  { src: 'assets/narration/n1.mp3', in: 0, dur: 5.2, at: 0.4 },
+  { src: 'assets/narration/n2.mp3', in: 0, dur: 3.84, at: 6.6 },
+  { src: 'assets/narration/n3.mp3', in: 0, dur: 5.6, at: 12.2 },
+  { src: 'assets/narration/n4.mp3', in: 0, dur: 2.72, at: 19.3 },
+  { src: 'assets/narration/n5.mp3', in: 0, dur: 3.92, at: 23.1 },
+];
+
+window.seek = function (t) {
+  // ---------- S1 (0 - 6.5) ----------
+  // n1 at 0.4: "לכל אחד יש סיפור על שותף שנעלם" 0.5–2.7 · "עם הכסף" 3.1–3.6 · "או עם העבודה" 4.4–5.6
+  $('s1').style.opacity = 1 - eio(p(t, 6.1, .45));
+  words($('c1'), t, .45, .3);
+  fadeIn($('phone'), t, .2, .5, 60);
+  document.querySelectorAll('.m').forEach((m, i) => fadeIn(m, t, .9 + i * .6, .3, 24));
+  $('seen').textContent = t < 1.0 ? 'מקליד…' : 'נראה לאחרונה לפני 3 חודשים';
+  document.querySelectorAll('.lp').forEach((l, i) => popIn(l, t, [3.1, 4.5][i], .4));
+
+  // ---------- S2 (6.3 - 12.1) ----------
+  // n2 at 6.6: "ברקמה" 6.7–7.3 · "מי שמפסיק לתרום" 7.6–8.8 · "מפסיק לצבור חלק" 9.1–10.3
+  $('s2').style.opacity = win(t, 6.3, 12.15, .35);
+  fadeIn($('h2'), t, 6.6, .45);
+  fadeIn($('chart'), t, 6.9, .45, 60);
+  // both lines rise together for two months, then Ron's stops while Dana's keeps climbing
+  const lq = p(t, 7.3, 3.0);                // 0..1 across the six months
+  $('pD').setAttribute('stroke-dashoffset', 1 - eio(lq));
+  $('pR').setAttribute('stroke-dashoffset', 1 - cl(eio(lq) / .4));
+  const after = p(t, 7.3 + 3.0 * .42, .3);
+  $('pR2').setAttribute('opacity', after * .8);
+  $('pR2').setAttribute('stroke-dasharray', `4 26`);
+  $('pR2').style.clipPath = `inset(0 0 0 ${100 * (1 - cl((lq - .4) / .6))}%)`;
+  $('dot').setAttribute('opacity', eo(p(t, 8.5, .3)));
+  // labels ride the line tips (plot sits at 40,110 inside the chart; svg is 1:1)
+  const dx = 800 - 760 * eio(lq), dy = 500 - 430 * eio(lq);
+  place($('tD'), 40 + dx - 120, 110 + dy - 70);
+  $('tD').style.opacity = eo(p(t, 7.5, .3));
+  place($('tR'), 40 + 40 - 10, 110 + 380 + 24);
+  $('tR').style.opacity = eo(p(t, 9.2, .3));
+  place($('gone'), 40 + 496 - 215, 110 + 380 + 22);
+  $('gone').style.opacity = eo(p(t, 8.6, .3)) * (1 - p(t, 9.1, .2));
+  fadeIn($('shR'), t, 9.1, .35, 20); fadeIn($('shD'), t, 9.25, .35, 20);
+  // shares: equal while both worked, then Ron's slice shrinks as Dana's grows (value fixed, total grows)
+  const r = 43 - 21 * eio(p(t, 9.4, 1.3));
+  $('vR').textContent = Math.round(r) + '%'; $('vD').textContent = Math.round(100 - r) + '%';
+  fadeIn($('keep'), t, 10.6, .45, 16);
+
+  // ---------- S3 (12.0 - 19.1) ----------
+  // n3 at 12.2: "וההחלטות לא נתקעות" 12.3–13.5 · "מי ששותק מסכים" 14.1–15.4 · "והמשימה שלו חוזרת להיות פתוחה" 15.8–17.8
+  $('s3').style.opacity = win(t, 12.0, 19.15, .35);
+  words($('h3'), t, 12.3, .3);
+  fadeIn($('dec'), t, 12.6, .45, 60);
+  const a1 = eio(p(t, 13.6, 1.5));
+  $('ra1').setAttribute('stroke-dashoffset', 113.1 * a1);
+  $('rg1').style.display = t < 15.15 ? 'block' : 'none';
+  $('ok1').style.display = t < 15.15 ? 'none' : 'flex';
+  popIn($('ok1'), t, 15.15, .4);
+  fadeIn($('mis'), t, 15.4, .45, 60);
+  const a2 = eio(p(t, 15.9, 1.3));
+  $('ra2').setAttribute('stroke-dashoffset', 113.1 * a2);
+  const freed = t >= 17.25;
+  $('rg2').style.display = freed ? 'none' : 'block';
+  $('mtext').textContent = freed ? '✓ שוחררה. מישהו אחר יכול לקחת אותה' : 'מחכה לתגובה של רון…';
+  $('mtext').style.color = freed ? '#059669' : '';
+  const mp = $('mpill');
+  mp.textContent = freed ? 'משימה פתוחה' : 'משימה בתהליך · רון';
+  mp.style.background = freed ? '#d1fae5' : '#fff3d6';
+  mp.style.color = freed ? '#065f46' : '#8a5a00';
+  mp.style.transform = `scale(${freed ? back(p(t, 17.25, .4)) : 1})`;
+
+  // ---------- S4 (19.0 - 22.9) ----------
+  // n4 at 19.3: "השותפות לא הייתה רעה" 19.4–20.7 · "החוזה היה" 21.2–22.0
+  $('s4').style.opacity = win(t, 19.0, 22.95, .3);
+  words($('l1'), t, 19.4, .3);
+  words($('l2'), t, 21.2, .35, 50);
+
+  // ---------- S5 (22.8 - 28.5) ----------
+  // n5 at 23.1: "שותפות שלא נתקעת" 23.2–24.6 · "אחד-לב-אחד" 25.1–26.8
+  $('s5').style.opacity = eo(p(t, 22.8, .35));
+  fadeIn($('tagline'), t, 23.15, .4);
+  fadeIn($('sub'), t, 24.0, .4);
+  const mq = p(t, 25.0, .45);
+  $('mark').style.opacity = mq; $('mark').style.transform = `scale(${mq === 0 ? .5 : back(mq)})`;
+  const beat = t > 25.6 ? 1 + .12 * Math.max(0, Math.sin((t - 25.6) * Math.PI * 1.6)) ** 6 : 1;
+  document.querySelector('#mark .h').style.transform = `scale(${beat})`;
+  const ctq = fadeIn($('cta'), t, 26.3, .4);
+  if (ctq >= 1) $('cta').style.transform = `scale(${1 + .04 * Math.sin((t - 26.7) * 6)})`;
+};
+
+const qs = new URLSearchParams(location.search);
+if (!qs.has('render')) {
+  document.fonts.ready.then(() => {
+    if (qs.has('t')) return window.seek(+qs.get('t'));
+    const t0 = performance.now();
+    const loop = () => { window.seek(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); };
+    loop();
+  });
+}
+</script>
+</body>
+</html>

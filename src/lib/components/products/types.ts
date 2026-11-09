@@ -1,4 +1,5 @@
 import type { CostShape } from '$lib/pooling/priceCurve';
+import type { EditorRecipeLine } from '$lib/shop/productEditor';
 
 export type PricingMode = 'fixed' | 'estimated' | 'quote';
 
@@ -165,6 +166,13 @@ export type RecipeResourceRow = {
   costShape?: CostShape | null;
   /** Participants per unit when costShape = stepped. */
   stepCapacity?: number | null;
+};
+
+/** A stored recipe line while it is being edited. */
+export type BomLineRow = Omit<EditorRecipeLine, 'amount' | 'unit'> & {
+  amount: number | null;
+  unit: number | null;
+  removed: boolean;
 };
 
 export type ComposeProductPayload = {

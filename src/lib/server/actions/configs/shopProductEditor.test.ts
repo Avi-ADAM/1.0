@@ -8,6 +8,9 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 const proposals: any[] = [];
 let termsLive = true;
+let bomLive = true;
+let linksBelong = true;
+const bomApplied: any[] = [];
 
 vi.mock('$lib/server/archive/variantTerms.js', () => ({
   variantTermsLive: async () => termsLive,
@@ -19,6 +22,17 @@ vi.mock('$lib/server/actions/index.js', () => ({
       proposals.push({ key, params });
       return { success: true, data: { decisionId: '900', deadline: '2026-10-20T10:00:00.000Z', immediate: false } };
     }
+  }
+}));
+
+vi.mock('$lib/server/archive/bomTerms.js', () => ({
+  bomTermsLive: async () => bomLive,
+  bomLinksBelong: async () => linksBelong,
+  withAssignees: async (_e: unknown, _p: unknown, terms: unknown) => terms,
+  withResourcePicks: async (_e: unknown, terms: unknown) => terms,
+  applyBomTerms: async (_exec: unknown, target: unknown, terms: unknown) => {
+    bomApplied.push({ target, terms });
+    return { added: [], changed: [], removed: [], skipped: 0 };
   }
 }));
 
@@ -40,7 +54,7 @@ function productNode(id: string) {
     attributes: {
       name: p.name,
       price: p.price,
-      pricingMode: 'fixed',
+      pricingMode: p.pricingMode ?? 'fixed',
       quant: null,
       origin: p.origin ?? 'project',
       hasVariants: true,
@@ -66,6 +80,18 @@ const strapi = {
       case 'shopEditorProduct': {
         const p = products.get(vars.id);
         return { data: { matanots: { data: p && p.project === vars.pid ? [productNode(vars.id)] : [] } } };
+      }
+      case 'shopEditorProductExtras': {
+        const p = products.get(vars.id);
+        return {
+          data: {
+            matanots: {
+              data: p?.recipe
+                ? [{ id: vars.id, attributes: { ratson: { data: p.ratson ? { id: p.ratson } : null }, matanot_recipe_missions: { data: p.recipe }, matanot_recipe_resources: { data: [] } } }]
+                : []
+            }
+          }
+        };
       }
       case 'shopEditorRikmaSkus':
         return {
@@ -125,6 +151,10 @@ const strapi = {
             }
           }
         };
+      case 'stockWriteMatanot':
+      case 'updateMatanotQuant':
+        writes.push(`product-stock ${vars.id}=${vars.quant}`);
+        return { data: { updateMatanot: { data: { id: vars.id, attributes: { quant: vars.quant, unlimited: vars.unlimited } } } } };
       case 'stockWriteVariant':
       case 'rikmaApiVariantQuant':
         Object.assign(variants.get(vars.id)!, { quant: vars.quant, unlimited: vars.unlimited });
@@ -155,6 +185,9 @@ const rowM = (over: Record<string, unknown> = {}) => ({
 beforeEach(() => {
   proposals.length = 0;
   termsLive = true;
+  bomLive = true;
+  linksBelong = true;
+  bomApplied.length = 0;
   flagsLive = false;
   nextId = 1000;
   writes = [];
@@ -287,5 +320,84 @@ describe('saveProductVariants', () => {
     products.get('10')!.origin = 'personal';
     await run({ pricingMode: 'quote' });
     expect(writes).toContain('product:options,pricingMode');
+  });
+
+  it('a count on the product is written at once, only while it has no variants', async () => {
+    variants.clear();
+    await run({ variants: [], stock: { quant: 7, unlimited: false } });
+    expect(writes.some((w) => w === 'product-stock 10=7')).toBe(true);
+    expect(proposals).toEqual([]);
+  });
+
+  it('a product with variants ignores a count on the product', async () => {
+    await run({ variants: [rowM()], stock: { quant: 7, unlimited: false } });
+    expect(writes.some((w) => w.startsWith('product-stock'))).toBe(false);
+  });
+
+  it('refuses a negative count before writing anything', async () => {
+    variants.clear();
+    await expect(run({ variants: [], stock: { quant: -2, unlimited: false } })).rejects.toMatchObject({ code: 'INVALID_STOCK' });
+    expect(writes).toEqual([]);
+  });
+
+  it('the location is operational: saved at once, nothing proposed', async () => {
+    await run({ variants: [rowM()], location: { location_mode: 'onsite', lat: 32, lng: 34, radius: 12.4, location_hint: 'חיפה' } });
+    expect(writes.some((w) => w.startsWith('product:') && w.includes('location'))).toBe(true);
+    expect(proposals).toEqual([]);
+  });
+});
+
+describe('saveProductVariants — the recipe (PLAN_PRODUCT_FORM_UNIFIED phase 3)', () => {
+  const line = { id: 1, attributes: { hoursPerUnit: 2, unitsPerProduct: 1, ratePerHour: 100, pendm: { data: { attributes: { name: 'עיצוב' } } } } };
+  const moved = { lines: [{ id: 'm1', amount: 2, unit: 150, removed: false }], add: [] };
+
+  beforeEach(() => {
+    Object.assign(products.get('10')!, { pricingMode: 'estimated', recipe: [line] });
+  });
+
+  it('goes to the rikma on the same round as the price, and writes no line', async () => {
+    const r = await run({ axes: sizeAxis, variants: [rowM()], basePrice: 300, bom: moved });
+    expect(bomApplied).toHaveLength(0);
+    expect(proposals[0].params.newValues).toMatchObject({
+      price: 300,
+      bom: [{ kind: 'change', line: 'mission', id: '1', fromUnit: 100, toUnit: 150 }]
+    });
+    expect(r).toMatchObject({ proposed: 2, blocked: null });
+  });
+
+  it('a product nobody else has a say in applies it at once', async () => {
+    products.get('10')!.members = ['7'];
+    const r = await run({ axes: sizeAxis, variants: [rowM()], bom: moved });
+    expect(proposals).toHaveLength(0);
+    expect(bomApplied[0]).toMatchObject({ target: { id: '10', projectId: '57' }, terms: [{ kind: 'change', toUnit: 150 }] });
+    expect(r.proposed).toBe(0);
+  });
+
+  it('waits for the schema without losing the rest of the save', async () => {
+    bomLive = false;
+    const r = await run({ axes: sizeAxis, variants: [rowM({ quant: 9 })], bom: moved });
+    expect(r.blocked).toBe('BOM_TERMS_NOT_READY');
+    expect(proposals).toHaveLength(0);
+    expect(writes).toContain('stock 77=9');
+  });
+
+  it('a wish product goes through a proposal even in a rikma of one, and its price waits too', async () => {
+    Object.assign(products.get('10')!, { ratson: '4', members: ['7'] });
+    await run({ axes: sizeAxis, variants: [rowM()], basePrice: 400, bom: moved });
+    expect(bomApplied).toHaveLength(0);
+    expect(proposals[0].params.newValues).toMatchObject({ price: 400 });
+    expect(products.get('10')!.price).toBe(280);
+  });
+
+  it('a fixed-price product has no recipe to change', async () => {
+    products.get('10')!.pricingMode = 'fixed';
+    await expect(run({ axes: sizeAxis, variants: [rowM()], bom: moved })).rejects.toMatchObject({ code: 'BOM_NEEDS_COST_PRICING' });
+  });
+
+  it('refuses an invalid recipe, and a link outside the rikma, before anything is written', async () => {
+    await expect(run({ axes: sizeAxis, variants: [rowM()], bom: { lines: [{ id: 'm1', removed: true }], add: [] } })).rejects.toMatchObject({ code: 'INVALID_BOM' });
+    linksBelong = false;
+    await expect(run({ axes: sizeAxis, variants: [rowM()], bom: moved })).rejects.toMatchObject({ code: 'INVALID_BOM' });
+    expect(writes).toEqual([]);
   });
 });

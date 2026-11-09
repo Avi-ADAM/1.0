@@ -37,6 +37,8 @@ import {
 } from './pendingOffers.js';
 import { applyVariantTerms, type VariantTermsResult } from './variantTerms.js';
 import type { VariantTerm } from '$lib/shop/variantEditor.js';
+import { applyBomTerms, type BomTermsResult } from './bomTerms.js';
+import type { BomTerm } from '$lib/shop/bomEditor.js';
 
 export type RoundMode = 'archive' | 'keep';
 export type HoursOutcome = 'credit' | 'waive' | 'transfer' | 'endOfCycle';
@@ -75,6 +77,12 @@ export interface StandingRound {
    * is deployed (`./variantTerms.ts`).
    */
   variants?: VariantTerm[] | null;
+  /**
+   * What a product is made of (PLAN_PRODUCT_FORM_UNIFIED, phase 3): lines
+   * added, changed or removed. Only on a `matanot` target, only once
+   * `negoarch.bom` is deployed (`./bomTerms.ts`).
+   */
+  bom?: BomTerm[] | null;
 }
 
 export interface ApplyResult {
@@ -111,6 +119,8 @@ export interface ApplyResult {
   membershipEnded?: { userId: string; projectId: string; remainingMembers: number };
   /** The product variants an approved edit created or re-priced (./variantTerms.ts). */
   variantTerms?: VariantTermsResult;
+  /** The recipe lines an approved edit added, changed or removed (./bomTerms.ts). */
+  bomTerms?: BomTermsResult;
 }
 
 /** Set `lifecycle` (and optionally `archiveEffectiveFrom`) on any target. */
@@ -434,6 +444,10 @@ export interface ApplyInput {
    * used to sign the counter rounds a `keep` sends to pending candidates.
    */
   actorId?: string | null;
+  /** Who signed this version; the question to a new resource's owner carries them. */
+  signerIds?: string[];
+  /** The rikma's members; a resource's acceptance writes them back. */
+  memberIds?: string[];
   /** Request-scoped fetch for the candidate mail; falls back to the global. */
   fetchFn?: typeof globalThis.fetch;
 }
@@ -445,7 +459,7 @@ export interface ApplyInput {
  */
 export async function applyObjectChange(
   exec: Exec,
-  { target, round, scope = 'archive', why, actorId = null, fetchFn }: ApplyInput,
+  { target, round, scope = 'archive', why, actorId = null, signerIds, memberIds, fetchFn }: ApplyInput,
 ): Promise<ApplyResult> {
   const base: ApplyResult = {
     targetKind: target.kind,
@@ -491,6 +505,15 @@ export async function applyObjectChange(
       variantTerms = await applyVariantTerms(exec, target, round.variants);
     }
 
+    let bomTerms: BomTermsResult | undefined;
+    if (target.kind === 'matanot' && round.bom?.length) {
+      bomTerms = await applyBomTerms(exec, target, round.bom, {
+        fetchFn,
+        signerIds: signerIds ?? (actorId ? [actorId] : []),
+        memberIds: memberIds ?? target.memberIds,
+      });
+    }
+
     // The rikma agreed among itself; the people who applied did not. Hand each
     // of them the new terms as a counter round so their earlier yes — and their
     // silence — cannot be read as consent to something they never saw.
@@ -506,6 +529,7 @@ export async function applyObjectChange(
       renegotiatedOffers,
       ...(rateFlush?.flushed ? { rateFlush } : {}),
       ...(variantTerms ? { variantTerms } : {}),
+      ...(bomTerms ? { bomTerms } : {}),
     };
   }
 

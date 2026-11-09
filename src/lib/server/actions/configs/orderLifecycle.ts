@@ -13,6 +13,7 @@ import {
   type RefundDecision,
   type StockChange
 } from '$lib/server/ordersApi.js';
+import { cleanTracking, readTracking, sameTracking, withTracking } from '$lib/shop/tracking.js';
 import { moveStock, type StockFields } from '$lib/shop/stock.js';
 import { readStockFlags, writeStock } from '$lib/server/shop/stockFlags.js';
 import type { ProbeRun } from '$lib/server/apiPublic/schemaProbe.js';
@@ -69,10 +70,54 @@ function markHandler(target: Extract<OrderStatus, 'shipped' | 'fulfilled'>): Act
     const data: Record<string, unknown> = { status: target };
     if (target === 'shipped') data.shippedAt = now;
     if (target === 'fulfilled') data.fulfilledAt = now;
+    // A tracking number given with the shipment is written in the same update,
+    // so the buyer's "shipped" mail already carries it.
+    if (target === 'shipped') {
+      const tracking = cleanTracking({
+        carrier: params.trackingCarrier,
+        number: params.trackingNumber,
+        url: params.trackingUrl
+      });
+      if (tracking) data.note = withTracking(node.attributes?.note ?? null, tracking);
+    }
     await strapi.execute('rikmaApiOrderUpdate', { id: node.id, data }, context.jwt, context.fetch);
     return { orderRef, orderId: String(node.id), status: target, changed: true, from: t.from };
   };
 }
+
+/**
+ * Add, change or remove the tracking number of an order (any member). It lives
+ * in the order's note (`$lib/shop/tracking`), so nothing new is deployed. For
+ * an order that already left, the buyer is mailed the number; for one that has
+ * not, it waits and rides in the "shipped" mail.
+ */
+const trackingHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
+  const projectId = String(params.projectId);
+  const orderRef = String(params.orderRef);
+  const clear = params.clear === true;
+  const next = clear ? null : cleanTracking({ carrier: params.carrier, number: params.number, url: params.url });
+  if (!clear && !next) {
+    throw new ActionError('VALIDATION_FAILED', 'number is required — or send clear: true to remove the tracking number');
+  }
+
+  const node = await loadOrder(strapi, context, projectId, orderRef);
+  const a = node.attributes ?? {};
+  if (a.status === 'cancelled') throw new ActionError('ORDER_CANCELLED', 'A cancelled order has no shipment to track');
+  if (a.status === 'pendingPayment') {
+    throw new ActionError('PAYMENT_PENDING', 'This order has not been paid yet — there is no shipment to track');
+  }
+
+  if (sameTracking(readTracking(a.note), next)) {
+    return { orderRef, orderId: String(node.id), status: a.status, changed: false, tracking: next };
+  }
+  await strapi.execute(
+    'rikmaApiOrderUpdate',
+    { id: node.id, data: { note: withTracking(a.note ?? null, next) } },
+    context.jwt,
+    context.fetch
+  );
+  return { orderRef, orderId: String(node.id), status: a.status, changed: true, tracking: next };
+};
 
 const cancelHandler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const projectId = String(params.projectId);
@@ -242,7 +287,7 @@ const cancelHandler: ActionExecutionHandler = async (params, context, { strapi, 
                 }
           },
           intent: unsettled ? 'review' : 'outcome',
-          metadata: { type: 'orderCancelled', url: `moach/${projectId}/sales`, priority: unsettled ? 'high' : 'normal' }
+          metadata: { type: 'orderCancelled', url: `moach/${projectId}/sales/manage/orders/${node.id}`, priority: unsettled ? 'high' : 'normal' }
         },
         { projectId },
         null,
@@ -291,9 +336,31 @@ const orderScopes = (p: Record<string, any>, r: any) => {
 
 export const markOrderShippedConfig: ActionConfig = {
   key: 'markOrderShipped',
-  description: 'Mark a paid order as shipped (any rikma member). Idempotent; never backwards.',
+  description:
+    'Mark a paid order as shipped (any rikma member). Idempotent; never backwards. Optionally record the parcel\'s tracking number in the same step; the buyer is mailed that it left.',
   graphqlOperation: markHandler('shipped'),
-  paramSchema: ORDER_PARAMS,
+  paramSchema: {
+    ...ORDER_PARAMS,
+    trackingNumber: { type: 'string', required: false, description: "The carrier's tracking number" },
+    trackingCarrier: { type: 'string', required: false, description: 'The carrier, e.g. DHL' },
+    trackingUrl: { type: 'string', required: false, description: 'A tracking page (http/https)' }
+  },
+  authRules: memberRules('update an order'),
+  realtime: { scopes: orderScopes }
+};
+
+export const setOrderTrackingConfig: ActionConfig = {
+  key: 'setOrderTracking',
+  description:
+    "Add, change or remove an order's tracking number (any rikma member). For an order that already shipped the buyer is mailed the number. Refused for a cancelled or unpaid order. Idempotent.",
+  graphqlOperation: trackingHandler,
+  paramSchema: {
+    ...ORDER_PARAMS,
+    number: { type: 'string', required: false, description: "The carrier's tracking number (required unless clear)" },
+    carrier: { type: 'string', required: false, description: 'The carrier, e.g. DHL' },
+    url: { type: 'string', required: false, description: 'A tracking page (http/https)' },
+    clear: { type: 'boolean', required: false, description: 'Remove the tracking number' }
+  },
   authRules: memberRules('update an order'),
   realtime: { scopes: orderScopes }
 };

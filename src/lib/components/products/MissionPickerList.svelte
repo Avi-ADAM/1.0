@@ -26,6 +26,11 @@
     groupPricing?: boolean;
     /** The currency the rates are typed in (the composer's picker). */
     currency?: string;
+    /**
+     * Adding to a product that exists: the line goes through the product's own
+     * proposal, so there is no second vote to warn of. An owner is still offered it.
+     */
+    adding?: boolean;
   };
 
   let {
@@ -36,7 +41,8 @@
     missionTemplates = [],
     multiMember = false,
     groupPricing = false,
-    currency
+    currency,
+    adding = false
   }: Props = $props();
 
   const t = $derived(
@@ -255,11 +261,13 @@
 </script>
 
 <div class="picker">
-  {#if rows.length === 0}
+  {#if rows.length === 0 && !adding}
     <div class="empty">{t.empty}</div>
   {/if}
 
-  {#if multiMember}
+  {#if adding}
+    <!-- The product's proposal says what happens to the line. -->
+  {:else if multiMember}
     <div class="flow-note flow-multi">{t.pendmFlow}</div>
   {:else}
     <div class="flow-note flow-single">{t.singleFlow}</div>
@@ -268,7 +276,7 @@
   {#each rows as r, i (i)}
     <div
       class="row"
-      class:warn={r.mode === 'createNew' && !r.assignedMemberId}
+      class:warn={!adding && r.mode === 'createNew' && !r.assignedMemberId}
     >
       <div class="row-head">
         <div class="mode-seg" role="tablist">
@@ -363,6 +371,7 @@
           </select>
         </label>
 
+        {#if !adding}
         <div class="badges">
           <span class="badge badge-info" title={t.onlyPartOfHelp}>
             🏷 {t.onlyPartOfTag}
@@ -384,18 +393,21 @@
         {#if !r.assignedMemberId}
           <div class="warning">⚠ {t.unassignedWarning}</div>
         {/if}
+        {/if}
       {:else if r.mesimabetahalichId}
         <div class="info-line">👤 {memberLabel(r.assignedMemberId)} - {t.ownerFromExisting}</div>
       {/if}
 
       <div class="row-foot">
-        <span class="tag" class:warn-tag={r.mode === 'createNew' && !r.assignedMemberId}>
-          {#if r.assignedMemberId}
-            👤 {memberLabel(r.assignedMemberId)}
-          {:else}
-            ⚡ {t.unassigned}
-          {/if}
-        </span>
+        {#if !adding}
+          <span class="tag" class:warn-tag={r.mode === 'createNew' && !r.assignedMemberId}>
+            {#if r.assignedMemberId}
+              👤 {memberLabel(r.assignedMemberId)}
+            {:else}
+              ⚡ {t.unassigned}
+            {/if}
+          </span>
+        {/if}
         <span class="row-total">
           {t.rowTotal}:
           <strong><Money amount={rowTotal(r)} {currency} /></strong>

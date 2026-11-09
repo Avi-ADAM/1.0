@@ -1,0 +1,26 @@
+[
+  {
+    "scene": "n1",
+    "ok": true,
+    "error": null,
+    "duration": null
+  },
+  {
+    "scene": "n2",
+    "ok": true,
+    "error": null,
+    "duration": null
+  },
+  {
+    "scene": "n3",
+    "ok": true,
+    "error": null,
+    "duration": null
+  },
+  {
+    "scene": "n4",
+    "ok": true,
+    "error": null,
+    "duration": null
+  }
+]

@@ -42,6 +42,8 @@ async function pendingEdit(decisionId: string, jwt: string | undefined, fetchFn?
       decisionId: decision.id,
       basePrice: round.price ?? null,
       terms: round.variants ?? [],
+      bom: round.bom ?? [],
+      signedIds: signersOf(decision, standingOrder(decision)),
       details: {
         name: round.name ?? null,
         kindOf: round.kindOf ?? null,
@@ -59,6 +61,31 @@ async function pendingEdit(decisionId: string, jwt: string | undefined, fetchFn?
   }
 }
 
+/** The rikma's axes and SKUs, for a product that does not exist yet (the new-product form). */
+export async function loadRikmaVariantContext(
+  projectId: string,
+  opts: { fetch?: FetchFn } = {}
+): Promise<Pick<ProductEditorResult, 'rikmaAxes' | 'takenSkus'>> {
+  const run = (qid: string, vars: Record<string, unknown>) => strapiClient.execute(qid, vars, undefined, opts.fetch);
+  const [optionsRes, skusRes] = await Promise.all([
+    run('shopEditorRikmaOptions', { pid: projectId }).catch(() => null),
+    run('shopEditorRikmaSkus', { pid: projectId }).catch(() => null)
+  ]);
+  return { rikmaAxes: liveAxes(optionsRes), takenSkus: skusOf(skusRes, null) };
+}
+
+const liveAxes = (res: any): EditorAxis[] =>
+  axesOfNodes(
+    (res?.data?.productOptions?.data ?? []).filter((o: any) => o?.attributes?.active !== false && o?.attributes?.archived !== true)
+  );
+
+/** Every SKU of the rikma, leaving out this product's own. */
+const skusOf = (res: any, productId: string | null): string[] =>
+  (res?.data?.productVariants?.data ?? [])
+    .filter((v: any) => productId === null || String(v?.attributes?.matanot?.data?.id ?? '') !== String(productId))
+    .map((v: any) => String(v?.attributes?.sku ?? ''))
+    .filter(Boolean);
+
 export async function loadProductEditor(
   projectId: string,
   productId: string,
@@ -75,11 +102,15 @@ export async function loadProductEditor(
   }
   if (!node) return { product: null, rikmaAxes: [], takenSkus: [] };
 
-  const [optionsRes, skusRes, lowRes] = await Promise.all([
+  const [optionsRes, skusRes, lowRes, extrasRes] = await Promise.all([
     run('shopEditorRikmaOptions', { pid: projectId }).catch(() => null),
     run('shopEditorRikmaSkus', { pid: projectId }).catch(() => null),
     // `lowStockAt` deploys on its own day; until it does nothing reads "low".
-    run('moachShopLowStock', { pid: projectId }).catch(() => null)
+    run('moachShopLowStock', { pid: projectId }).catch(() => null),
+    run('shopEditorProductExtras', { pid: projectId, id: productId }).catch((e: unknown) => {
+      console.warn('[productEditor] extras not read:', (e as Error)?.message ?? e);
+      return null;
+    })
   ]);
 
   const low = (lowRes?.data?.matanots?.data ?? []).find((p: any) => String(p.id) === String(productId));
@@ -87,23 +118,19 @@ export async function loadProductEditor(
   // The `unlimited` flag rides beside each variant once it is deployed
   // ($lib/server/shop/stockFlags.ts); until then `-1` reads the legacy way.
   const variantIds = (node.attributes?.variants?.data ?? []).map((v: any) => String(v.id));
-  const flags = await readStockFlags(run, { variantIds }).catch(() => null);
+  const flags = await readStockFlags(run, { variantIds, productIds: [String(productId)] }).catch(() => null);
   if (flags?.live) {
     for (const v of node.attributes?.variants?.data ?? []) v.attributes = withFlag(v.attributes, flags.variants.get(String(v.id)));
+    node.attributes = withFlag(node.attributes, flags.products.get(String(productId)));
   }
   const decisionId = node.attributes?.archive_decisions?.data?.[0]?.id;
   const pending = decisionId ? await pendingEdit(String(decisionId), opts.jwt, opts.fetch) : null;
 
-  const product = toEditorProduct(node, { lowStockAt: num(low?.attributes?.lowStockAt), pending });
-  const rikmaAxes = axesOfNodes(
-    (optionsRes?.data?.productOptions?.data ?? []).filter(
-      (o: any) => o?.attributes?.active !== false && o?.attributes?.archived !== true
-    )
-  );
-  const takenSkus = (skusRes?.data?.productVariants?.data ?? [])
-    .filter((v: any) => String(v?.attributes?.matanot?.data?.id ?? '') !== String(productId))
-    .map((v: any) => String(v?.attributes?.sku ?? ''))
-    .filter(Boolean);
+  const product = toEditorProduct(node, {
+    lowStockAt: num(low?.attributes?.lowStockAt),
+    pending,
+    recipeNode: extrasRes?.data?.matanots?.data?.[0] ?? null
+  });
 
-  return { product, rikmaAxes, takenSkus };
+  return { product, rikmaAxes: liveAxes(optionsRes), takenSkus: skusOf(skusRes, productId) };
 }

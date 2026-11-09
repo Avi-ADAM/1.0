@@ -18,6 +18,7 @@ import {
   nextStock,
   orderCounts,
   orderTaskOf,
+  ordersCsvRows,
   primaryActionOf,
   priceRangeOfRow,
   salesInSplit,
@@ -361,5 +362,59 @@ describe('payment by arrangement (PLAN_SHOP_OPERATIONS §5)', () => {
     expect(whatsappNumberOf('00972501234567')).toBe('972501234567');
     expect(whatsappNumberOf('123')).toBeNull();
     expect(whatsappHref('0501234567', 'שלום')).toBe('https://wa.me/972501234567?text=%D7%A9%D7%9C%D7%95%D7%9D');
+  });
+});
+
+describe('the orders export', () => {
+  const words = {
+    head: ['הזמנה', 'תאריך', 'מצב', 'קונה', 'טלפון', 'מייל', 'משלוח', 'כתובת', 'מה הוזמן', 'סכום', 'מטבע', 'תשלום', 'מעקב', 'הכסף אצל'],
+    task: { toCollect: 'ממתינה', toShip: 'לשליחה', toHandOver: 'למסירה', shipped: 'נשלחה', done: 'הושלמה', cancelled: 'בוטלה' },
+    delivery: { delivery: 'משלוח', pickup: 'איסוף עצמי', digital: 'דיגיטלי', contact: 'בתיאום' }
+  };
+
+  it('is a heading row, then one row per order, in the order given', () => {
+    const rows = ordersCsvRows([order(), order({ id: '2', number: '1043', status: 'shipped' })], words);
+    expect(rows).toHaveLength(3);
+    expect(rows[0]).toEqual(words.head);
+    expect(rows[1].length).toBe(words.head.length);
+    expect(rows[2][0]).toBe('1043');
+    expect(rows[2][2]).toBe('נשלחה');
+  });
+
+  it('writes the buyer, where it goes, what was ordered, and what was paid', () => {
+    const [, row] = ordersCsvRows([order({ tracking: { carrier: 'DHL', number: 'AB123', url: null } })], words);
+    expect(row).toEqual([
+      '1042',
+      '2026-10-18',
+      'לשליחה',
+      'דנה כהן',
+      '050-123 4567',
+      'dana@example.com',
+      'משלוח',
+      'הרצל 1, נתניה',
+      '2× שרפרף · M',
+      660,
+      'ILS',
+      'card · pi_1',
+      'DHL AB123',
+      'נועה'
+    ]);
+  });
+
+  it('leaves blanks, not "null", for what is missing', () => {
+    const [, row] = ordersCsvRows(
+      [order({ buyer: { name: null, email: null, phone: null }, paidAt: null, createdAt: null, total: null, currency: null, paymentMethod: null, paymentRef: null, holderName: null, delivery: { preference: 'pickup', address: null } })],
+      words
+    );
+    expect(row.slice(1)).toEqual(['', 'למסירה', '', '', '', 'איסוף עצמי', '', '2× שרפרף · M', '', '', '', '', '']);
+  });
+
+  it('survives toCsv: quotes, commas and a formula-looking name stay text', () => {
+    const rows = ordersCsvRows([order({ buyer: { name: '=HYPERLINK("x")', email: null, phone: null }, lines: [{ ...order().lines[0], name: 'a, b' }] })], words);
+    const csv = toCsv(rows);
+    expect(csv.charCodeAt(0)).toBe(0xfeff);
+    expect(csv).toContain("'=HYPERLINK");
+    expect(csv).toContain('"2× a, b · M"');
+    expect(csv.split('\r\n')).toHaveLength(3);
   });
 });

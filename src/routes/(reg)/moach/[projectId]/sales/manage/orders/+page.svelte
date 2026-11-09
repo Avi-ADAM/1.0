@@ -17,11 +17,15 @@
     filterOrders,
     orderCounts,
     orderFilterOf,
+    ordersCsvRows,
     primaryActionOf,
     sortOrders,
+    toCsv,
     type OrderFilter,
+    type OrdersCsvWords,
     type ShopOrder
   } from '$lib/shop/manage';
+  import { downloadCsv } from '$lib/shop/download';
   import { scheduleMark, shownStatus, isPending } from '$lib/shop/pendingMarks.svelte';
   import { TASK_CHIP, buyerName, deliveryText, itemsText, markMessages, shortTag, taskOfShown } from '$lib/shop/display';
   import OrderDetail from '$lib/components/shop/OrderDetail.svelte';
@@ -64,6 +68,25 @@
 
   const COUNTED: OrderFilter[] = ['toCollect', 'toShip', 'toHandOver'];
 
+  // The export's columns and the words it needs (`ordersCsvRows`).
+  const CSV_COLUMNS = ['number', 'date', 'status', 'buyer', 'phone', 'email', 'delivery', 'address', 'items', 'total', 'currency', 'payment', 'tracking', 'holder'];
+  const TASKS = ['toCollect', 'toShip', 'toHandOver', 'shipped', 'done', 'cancelled'];
+  const KINDS = ['delivery', 'pickup', 'digital', 'contact'];
+
+  /**
+   * The orders on screen — the filter and the search as they are — as a
+   * spreadsheet. One row per order; the words are the seller's own language.
+   */
+  function exportCsv() {
+    const words: OrdersCsvWords = {
+      head: CSV_COLUMNS.map((k) => $t(`shop.orders.csv.${k}`)),
+      task: Object.fromEntries(TASKS.map((k) => [k, $t(`shop.status.${k}`)])) as OrdersCsvWords['task'],
+      delivery: Object.fromEntries(KINDS.map((k) => [k, $t(`shop.order.${k}`)])) as OrdersCsvWords['delivery']
+    };
+    const slug = (data.projectBase?.projectName ?? 'rikma').replace(/[^\p{L}\p{N}]+/gu, '-');
+    downloadCsv(`${slug}-orders.csv`, toCsv(ordersCsvRows(list, words)));
+  }
+
   /** An order waiting for an arranged payment: the quick action is the call. */
   const telOf = (o: ShopOrder) => (o.buyer.phone ? `tel:${o.buyer.phone.replace(/[^\d+]/g, '')}` : null);
 </script>
@@ -93,6 +116,7 @@
       <span class="sr-only">{$t('shop.orders.searchLabel')}</span>
       <input type="search" bind:value={query} placeholder={$t('shop.orders.search')} />
     </label>
+    <button type="button" class="sh-btn sh-btn-outline ol-export" onclick={exportCsv}>{$t('shop.orders.export')}</button>
   </div>
 
   {#if list.length === 0}
@@ -340,6 +364,9 @@
     }
     .ol-search {
       width: min(360px, 40%);
+    }
+    .ol-export {
+      flex: 0 0 auto;
     }
     .ol-cards {
       display: none;

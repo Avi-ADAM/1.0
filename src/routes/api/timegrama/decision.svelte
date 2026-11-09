@@ -4,7 +4,7 @@
   import { env } from '$env/dynamic/private';
   import { execFromAdmin } from '$lib/server/archive/exec.js';
   import { fetchObjectChangeDecision, standingOrder, standingRound } from '$lib/server/archive/read.js';
-  import { applyStandingVersion } from '$lib/server/archive/vote.js';
+  import { applyStandingVersion, requiredSigners } from '$lib/server/archive/vote.js';
   import { strapiClient } from '$lib/server/actions';
   import { moveStock } from '$lib/shop/stock.js';
   import { readStockFlags, writeStock } from '$lib/server/shop/stockFlags.js';
@@ -23,6 +23,7 @@
   import { applyStandingPromoDecision, fetchPromoDecision } from '$lib/server/promotions/decision';
   import {
     decisionAwaitsCustomer,
+    decisionAwaitsOwner,
     fulfillmentRuleMatured,
     dealReceiptMatured,
     objectChangeApplied,
@@ -226,8 +227,21 @@
           return;
         }
         const round = standingRound(decision);
-        const pendingClients =
-          extra && extra.needed(round) ? clientsPendingOn(decision.vots, standingOrder(decision), extra.ids) : [];
+        const pendingSigners = clientsPendingOn(decision.vots, standingOrder(decision), requiredSigners(extra, round));
+        const pendingOwners = pendingSigners.filter((u) => decision.memberIds.includes(String(u)));
+        const pendingClients = pendingSigners.filter((u) => !decision.memberIds.includes(String(u)));
+        if (pendingOwners.length > 0) {
+          await tellMatured(
+            decisionAwaitsOwner({
+              projectId: decision.projectId,
+              decisionId: id,
+              decisionName: decision.decisionName,
+              ownerIds: pendingOwners
+            }),
+            fetch
+          );
+        }
+        if (pendingSigners.length > 0 && pendingClients.length === 0) return markDone();
         if (pendingClients.length > 0) {
           console.log('[timegrama/decision] the rikma matured on silence; the version waits for the customer', {
             decisionId: id

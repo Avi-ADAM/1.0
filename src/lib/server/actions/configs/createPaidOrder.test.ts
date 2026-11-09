@@ -27,10 +27,12 @@ import { confirmOrderPaymentConfig } from './confirmOrderPayment.js';
 import {
   cancelOrderConfig,
   markOrderFulfilledConfig,
+  setOrderTrackingConfig,
   markOrderShippedConfig
 } from './orderLifecycle.js';
 import { validateOrderPayload, type OrderPayload } from '$lib/server/ordersApi.js';
 import { resetStockFlagsVerdict } from '$lib/server/shop/stockFlags.js';
+import { readTracking } from '$lib/shop/tracking';
 
 type Row = Record<string, any>;
 
@@ -711,5 +713,97 @@ describe('promotions (PLAN_SHOP_PROMOTIONS §5.3)', () => {
     promo.fetchOrderLinePromotions.mockImplementation(async () => new Map([[0, '5']]));
     await act(confirmOrderPaymentConfig, { orderRef: '57:arr_p', method: 'cash' });
     expect(promo.recordPromoUsage).toHaveBeenCalledWith('57', new Map([['5', { units: 2, orders: 1 }]]));
+  });
+});
+
+// ─── the members' notice: who bought, and a link to the order ───────────────
+
+describe("the members' notice", () => {
+  const delivery = { preference: 'delivery', address: { city: 'נתניה', street: 'הרצל', house: '1' } };
+
+  it('names the buyer, the phone and the address, and links straight to the order', async () => {
+    const r = await run(order({ buyer: { name: 'דנה', phone: '050-1234567' }, delivery }));
+    expect(notices[0].templates.body.he).toContain('הקונה: דנה · 050-1234567 · הרצל 1, נתניה');
+    expect(notices[0].templates.body.en).toContain('Buyer: דנה · 050-1234567 · הרצל 1, נתניה');
+    expect(notices[0].metadata.url).toBe(`moach/57/sales/manage/orders/${r.orderId}`);
+  });
+
+  it('adds nothing when the storefront sent no buyer', async () => {
+    await run(order());
+    expect(notices[0].templates.body.he).not.toContain('הקונה:');
+  });
+
+  it('an arranged order says who to call, and links to the order too', async () => {
+    const r = await run(order({ externalId: 'arr_1', payment: 'arranged', buyer: { name: 'דנה', phone: '050-1234567' }, delivery }));
+    expect(notices[0].templates.body.he).toContain('הקונה: דנה · 050-1234567');
+    expect(notices[0].metadata.url).toBe(`moach/57/sales/manage/orders/${r.orderId}`);
+  });
+
+  it('the payment and the cancellation link to the order as well', async () => {
+    const arranged = await run(order({ externalId: 'arr_2', payment: 'arranged', buyer: { name: 'דנה', phone: '050-1234567' }, delivery: { preference: 'pickup' } }));
+    notices.length = 0;
+    await act(confirmOrderPaymentConfig, { orderRef: '57:arr_2', method: 'cash' });
+    expect(notices[0].metadata.url).toBe(`moach/57/sales/manage/orders/${arranged.orderId}`);
+    notices.length = 0;
+    await act(cancelOrderConfig, { orderRef: '57:arr_2' });
+    expect(notices[0].metadata.url).toBe(`moach/57/sales/manage/orders/${arranged.orderId}`);
+  });
+});
+
+// ─── tracking numbers ───────────────────────────────────────────────────────
+
+describe('tracking numbers', () => {
+  it('ride with the shipment, in the same update', async () => {
+    await run(order({ note: 'להשאיר ליד הדלת' }));
+    const r = await act(markOrderShippedConfig, { trackingNumber: 'AB123', trackingCarrier: 'DHL' });
+    expect(r).toMatchObject({ status: 'shipped', changed: true });
+    expect(readTracking(db.orders[0].data.note)).toEqual({ carrier: 'DHL', number: 'AB123', url: null });
+    expect(db.orders[0].data.note).toContain('להשאיר ליד הדלת');
+  });
+
+  it('a shipment without one leaves the note as it was', async () => {
+    await run(order({ note: 'להשאיר ליד הדלת' }));
+    await act(markOrderShippedConfig, {});
+    expect(db.orders[0].data.note).toBe('להשאיר ליד הדלת');
+  });
+
+  it('can be added, changed and removed; asking twice changes nothing', async () => {
+    await run(order());
+    const added = await act(setOrderTrackingConfig, { number: 'AB1', carrier: 'DHL' });
+    expect(added).toMatchObject({ changed: true, status: 'paid', tracking: { carrier: 'DHL', number: 'AB1' } });
+    expect(await act(setOrderTrackingConfig, { number: 'AB1', carrier: 'DHL' })).toMatchObject({ changed: false });
+
+    await act(setOrderTrackingConfig, { number: 'AB2', url: 'https://t.example/AB2' });
+    expect(readTracking(db.orders[0].data.note)).toEqual({ carrier: null, number: 'AB2', url: 'https://t.example/AB2' });
+
+    const cleared = await act(setOrderTrackingConfig, { clear: true });
+    expect(cleared).toMatchObject({ changed: true, tracking: null });
+    expect(readTracking(db.orders[0].data.note)).toBeNull();
+    expect(await act(setOrderTrackingConfig, { clear: true })).toMatchObject({ changed: false });
+  });
+
+  it("keeps the buyer's own note, and tells the mail hook the parcel already left", async () => {
+    await run(order({ note: 'להשאיר ליד הדלת' }));
+    await act(markOrderShippedConfig, {});
+    const r = await act(setOrderTrackingConfig, { number: 'AB9' });
+    expect(r).toMatchObject({ changed: true, status: 'shipped' });
+    expect(db.orders[0].data.note).toContain('להשאיר ליד הדלת');
+  });
+
+  it('needs a number unless it is being removed', async () => {
+    await run(order());
+    await expect(act(setOrderTrackingConfig, {})).rejects.toMatchObject({ code: 'VALIDATION_FAILED' });
+    await expect(act(setOrderTrackingConfig, { number: '   ' })).rejects.toMatchObject({ code: 'VALIDATION_FAILED' });
+  });
+
+  it('are refused for a cancelled order, an unpaid one and an unknown one', async () => {
+    await run(order());
+    await act(cancelOrderConfig, {});
+    await expect(act(setOrderTrackingConfig, { number: '1' })).rejects.toMatchObject({ code: 'ORDER_CANCELLED' });
+
+    await run(order({ externalId: 'arr_3', payment: 'arranged', buyer: { name: 'דנה', phone: '050-1234567' }, delivery: { preference: 'pickup' } }));
+    await expect(act(setOrderTrackingConfig, { orderRef: '57:arr_3', number: '1' })).rejects.toMatchObject({ code: 'PAYMENT_PENDING' });
+
+    await expect(act(setOrderTrackingConfig, { orderRef: '57:nope', number: '1' })).rejects.toMatchObject({ code: 'NOT_FOUND' });
   });
 });

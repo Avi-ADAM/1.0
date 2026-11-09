@@ -132,7 +132,8 @@
     "projectList": "Tus rikmas",
     "noProjects": "Todavía no hay rikmas para elegir",
     "noProjectsHint": "Debes ser miembro de una rikma para crear algo en ella.",
-    "browseProjects": "Ver rikmas",
+    "createProject": "Crear una rikma",
+    "findProject": "Buscar una rikma a la que unirse",
     "loadError": "No pudimos cargar tus rikmas",
     "loadErrorHint": "Comprueba la conexión e inténtalo de nuevo.",
     "retry": "Intentar de nuevo",
@@ -148,7 +149,9 @@
       "mission": "Misión",
       "missionHint": "Publica trabajo que puedan realizar los miembros",
       "resource": "Solicitud de recursos",
-      "resourceHint": "Pide dinero, equipo o ayuda"
+      "resourceHint": "Pide dinero, equipo o ayuda",
+      "product": "Producto",
+      "productHint": "Un producto o servicio que vende la rikma"
     }
   },
   "status": {

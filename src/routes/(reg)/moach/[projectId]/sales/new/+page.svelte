@@ -34,8 +34,8 @@
     goto(backHref);
   }
 
-  /** Saving opens the full editor — more pictures, variants and stock are added there. */
-  function handleDone({ matana }: { matana: unknown }) {
+  /** Saving opens the product's own page; what did not save waits there, open. */
+  function handleDone({ matana, stagedFailed }: { matana: unknown; stagedFailed?: boolean }) {
     if (fromQuick && typeof localStorage !== 'undefined') {
       try {
         localStorage.removeItem(DRAFT_KEY);
@@ -44,7 +44,11 @@
       }
     }
     const id = (matana as { id?: string | number } | null)?.id;
-    goto(id != null ? `/moach/${data.projectId}/sales/manage/products/${id}` : backHref);
+    goto(
+      id != null
+        ? `/moach/${data.projectId}/sales/manage/products/${id}${stagedFailed ? '?open=variants' : ''}`
+        : backHref
+    );
   }
 </script>
 
@@ -69,6 +73,8 @@
     projectMembers={data.projectMembers}
     missionTemplates={data.missionTemplates}
     resourceTemplates={data.resourceTemplates}
+    rikmaAxes={data.rikmaAxes}
+    takenSkus={data.takenSkus}
     onDone={handleDone}
     onCancel={backToSales}
   />

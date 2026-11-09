@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>קיבלתי צוות</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family: 'Sababa'; src: url('../../../static/fonts/NbmSababaHL1-Bold.otf'); }
+  :root {
+    --barbi: #ff0092; --gold: #fbbf24; --green: #34d399;
+    --night: #0f0b24; --night2: #1d1442; --panel: #171233; --line: #2f2760; --muted: #9b93c9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--night); }
+  body { font-family: 'Heebo', sans-serif; color: #fff; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden;
+    background: radial-gradient(120% 80% at 50% 30%, var(--night2), var(--night)); }
+  .layer { position: absolute; inset: 0; }
+  .center { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .w { display: inline-block; opacity: 0; white-space: pre; }
+  .mono { font-family: 'JetBrains Mono', monospace; direction: ltr; unicode-bidi: isolate; }
+
+  /* S0: the claim */
+  #c1 { font-size: 100px; font-weight: 900; }
+  #c2 { font-size: 100px; font-weight: 900; color: var(--barbi); margin-top: 20px; }
+  #faces { display: flex; gap: 22px; margin-top: 90px; }
+  .fc { width: 150px; height: 150px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 90px; opacity: 0; }
+
+  /* the steps share one caption + one screen */
+  #steps { opacity: 0; }
+  #cap { position: absolute; top: 110px; left: 90px; right: 90px; display: flex; align-items: center; gap: 30px; }
+  #num { width: 130px; height: 130px; border-radius: 50%; background: var(--barbi); display: flex; align-items: center; justify-content: center;
+    font-size: 84px; font-weight: 900; flex: none; box-shadow: 0 0 50px rgba(255,0,146,.5); }
+  #capt { font-size: 66px; font-weight: 900; line-height: 1.15; }
+  #screen { position: absolute; top: 300px; left: 90px; width: 900px; height: 1380px; border-radius: 50px; background: #fff; color: #1a1333; overflow: hidden;
+    box-shadow: 0 40px 120px rgba(0,0,0,.55); }
+  #bar { height: 110px; background: #faf7ff; border-bottom: 2px solid #eee8fb; display: flex; align-items: center; padding: 0 44px; font-size: 36px; font-weight: 800; color: #6b6290; }
+  .pane { position: absolute; top: 110px; left: 0; right: 0; bottom: 0; padding: 44px; opacity: 0; }
+  /* step 1 */
+  .ph { font-size: 34px; color: #8b84a8; font-weight: 700; }
+  #inp { margin-top: 20px; min-height: 360px; padding: 34px 38px; border-radius: 32px; border: 3px solid #e7defd; font-size: 54px; font-weight: 700; line-height: 1.35; }
+  #caret { display: inline-block; width: 5px; height: 58px; background: var(--barbi); vertical-align: -10px; margin-right: 4px; }
+  #send { margin-top: 30px; display: inline-block; padding: 22px 60px; border-radius: 50px; background: var(--barbi); color: #fff; font-size: 44px; font-weight: 800; }
+  /* steps 2 + 3 */
+  .row { display: flex; align-items: center; gap: 22px; padding: 26px 0; border-bottom: 2px solid #f1ecfd; opacity: 0; }
+  .row .ic { font-size: 60px; width: 80px; text-align: center; flex: none; }
+  .row .t { flex: 1; font-size: 44px; font-weight: 800; }
+  .row .t small { display: block; font-size: 30px; color: #8b84a8; font-weight: 500; margin-top: 2px; }
+  .of { display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-radius: 26px; background: #f6f3ff; opacity: 0; flex: none; }
+  .of .a { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; flex: none; }
+  .of .x { font-size: 28px; font-weight: 800; white-space: nowrap; }
+  .of .x small { display: block; font-size: 24px; color: #6b6290; font-weight: 500; }
+  .ok { width: 64px; height: 64px; border-radius: 50%; background: var(--green); color: #052e1f; display: flex; align-items: center; justify-content: center;
+    font-size: 38px; font-weight: 900; flex: none; opacity: 0; }
+  #team { position: absolute; left: 44px; right: 44px; bottom: 44px; padding: 34px; border-radius: 36px; background: #1a1333; color: #fff; text-align: center; opacity: 0; }
+  #team .h { font-size: 46px; font-weight: 900; }
+  #tf { display: flex; justify-content: center; gap: 18px; margin-top: 22px; }
+  #tf div { width: 110px; height: 110px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 66px; border: 4px solid #1a1333; }
+  #choose { font-size: 30px; color: #8b84a8; text-align: center; margin-top: 18px; opacity: 0; }
+
+  /* brand */
+  #s5 { background: radial-gradient(110% 70% at 50% 40%, #3a1257, var(--night)); opacity: 0; }
+  #mark { font-family: 'Sababa', 'Heebo'; font-size: 250px; direction: ltr; letter-spacing: 4px; }
+  #mark .h { color: var(--barbi); display: inline-block; }
+  #tagline { font-size: 84px; font-weight: 800; margin-top: 40px; }
+  #sub { font-size: 48px; color: #d7cff9; margin-top: 26px; padding: 0 80px; line-height: 1.35; }
+  #cta { margin-top: 80px; padding: 34px 90px; border-radius: 90px; background: var(--barbi); font-size: 66px; font-weight: 800;
+    direction: ltr; box-shadow: 0 0 60px rgba(255,0,146,.55); }
+  #s5 > * { opacity: 0; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- S0 -->
+  <div class="layer center" id="s0">
+    <div id="c1">כתבתי מה אני צריך.</div>
+    <div id="c2">וקיבלתי צוות.</div>
+    <div id="faces"></div>
+  </div>
+
+  <!-- steps 1-3 -->
+  <div class="layer" id="steps">
+    <div id="cap"><div id="num">1</div><div id="capt">כותבים מה צריך</div></div>
+    <div id="screen">
+      <div id="bar">נעשה בשבילך · 1lev1</div>
+      <div class="pane" id="p1">
+        <div class="ph">מה היית רוצה שיקרה?</div>
+        <div id="inp"><span id="tx"></span><span id="caret"></span></div>
+        <div id="send">שליחה</div>
+      </div>
+      <div class="pane" id="p2">
+        <div class="ph">הבקשה שלך: אתר לקליניקה</div>
+        <div id="rows"></div>
+        <div id="choose">ההצעה מתקבלת רק כשאתה מאשר אותה</div>
+        <div id="team"><div class="h">הצוות שלך ✨</div><div id="tf"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- brand -->
+  <div class="layer center" id="s5">
+    <div id="mark">1<span class="h">lev</span>1</div>
+    <div id="tagline">נעשה בשבילך</div>
+    <div id="sub">כותבים מה צריך, ומקבלים צוות</div>
+    <div id="cta">1lev1.com</div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const p = (t, s, d) => cl((t - s) / d);
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const win = (t, a, b, f = .35) => Math.min(eo(p(t, a, f)), 1 - p(t, b - f, f));
+function split(el) {
+  el.innerHTML = el.textContent.split(/(\s+)/).filter(Boolean)
+    .map(s => /^\s+$/.test(s) ? s : `<span class="w">${s}</span>`).join('');
+}
+['c1', 'c2'].forEach(id => split($(id)));
+function words(el, t, start, per, dy = 34) {
+  el.querySelectorAll('.w').forEach((w, i) => {
+    const q = eo(p(t, start + i * per, .3));
+    w.style.opacity = q; w.style.transform = `translateY(${(1 - q) * dy}px)`;
+  });
+}
+const fadeIn = (el, t, s, d = .4, dy = 30) => { const q = eo(p(t, s, d)); el.style.opacity = q; el.style.transform = `translateY(${(1 - q) * dy}px)`; return q; };
+const popIn = (el, t, s, d = .45) => { const q = p(t, s, d); el.style.opacity = Math.min(1, q * 3); el.style.transform = `scale(${q === 0 ? .4 : back(q)})`; return q; };
+
+const WISH = 'אני צריך אתר לקליניקה שלי, עם זימון תורים אונליין.';
+const TEAM = [
+  ['🎨', 'עיצוב האתר', 'משימה', '👩🏻‍🎨', '#ffd1ea', 'נועה', '₪1,800 · שבוע'],
+  ['💻', 'פיתוח וזימון', 'משימה', '🧑🏽‍💻', '#ddd6fe', 'עידו', '₪3,200 · שבועיים'],
+  ['📷', 'צילום הקליניקה', 'משימה', '👨🏻‍🦱', '#fde68a', 'אורי', '₪600 · יום אחד'],
+  ['✍️', 'כתיבת תוכן', 'משימה', '👩🏾', '#bbf7d0', 'שני', '₪900 · 5 ימים'],
+];
+$('rows').innerHTML = TEAM.map(([ic, t, k, e, bg, n, terms]) =>
+  `<div class="row"><div class="ic">${ic}</div><div class="t">${t}<small>${k}</small></div>
+   <div class="of"><div class="a" style="background:${bg}">${e}</div><div class="x">${n}<small>${terms}</small></div></div><div class="ok">✓</div></div>`).join('');
+$('tf').innerHTML = TEAM.map(r => `<div style="background:${r[4]}">${r[3]}</div>`).join('');
+$('faces').innerHTML = TEAM.map(r => `<div class="fc" style="background:${r[4]}">${r[3]}</div>`).join('');
+
+const DURATION = 20.5;
+window.DURATION = DURATION;
+// narration: narrate.py (Adam / ElevenLabs v3); scenes timed to the words
+window.AUDIO = [
+  { src: 'assets/narration/n1.mp3', in: 0, dur: 2.96, at: 0.3 },
+  { src: 'assets/narration/n2.mp3', in: 0, dur: 3.04, at: 3.8 },
+  { src: 'assets/narration/n3.mp3', in: 0, dur: 5.12, at: 7.2 },
+  { src: 'assets/narration/n4.mp3', in: 0, dur: 3.52, at: 12.6 },
+  { src: 'assets/narration/n5.mp3', in: 0, dur: 2.48, at: 16.6 },
+];
+
+const STEPS = [[3.7, '1', 'כותבים מה צריך'], [7.1, '2', 'מתפרק למשימות,<br>ומגיעות הצעות'], [12.5, '3', 'אתה בוחר']];
+
+window.seek = function (t) {
+  // ---------- S0 (0 - 3.7) ----------
+  // n1 at 0.3: "כתבתי מה אני צריך" 0.3–1.5 · "וקיבלתי צוות" 2.0–3.2
+  $('s0').style.opacity = 1 - eio(p(t, 3.4, .35));
+  words($('c1'), t, .3, .28);
+  words($('c2'), t, 2.0, .35, 40);
+  document.querySelectorAll('.fc').forEach((f, i) => popIn(f, t, 2.4 + i * .12, .4));
+
+  // ---------- steps (3.6 - 16.5) ----------
+  // n2 at 3.8: "אחת" 3.8–4.2 · "כותבים במילים פשוטות מה צריך" 4.9–6.8
+  // n3 at 7.2: "שתיים" 7.2–7.6 · "הבקשה מתפרקת למשימות" 8.1–9.9 · "ואנשי מקצוע שולחים הצעות" 10.3–12.2
+  // n4 at 12.6: "שלוש" 12.6–13.0 · "אתה בוחר" 13.8–14.4 · "וזה הצוות שלך" 15.1–16.0
+  $('steps').style.opacity = win(t, 3.6, 16.55, .35);
+  let k = 0; STEPS.forEach((s, i) => { if (t >= s[0]) k = i; });
+  $('num').textContent = STEPS[k][1];
+  $('capt').innerHTML = STEPS[k][2];
+  const sq = p(t, STEPS[k][0], .4);
+  $('num').style.transform = `scale(${sq === 0 ? .5 : back(sq)})`;
+  $('capt').style.opacity = eo(sq); $('capt').style.transform = `translateX(${(1 - eo(sq)) * -40}px)`;
+  const scq = p(t, 3.7, .5);
+  $('screen').style.transform = `translateY(${(1 - eo(scq)) * 200}px)`;
+  // step 1: typing
+  $('p1').style.opacity = 1 - p(t, 7.3, .3);
+  $('p1').style.opacity = Math.min(+$('p1').style.opacity, eo(p(t, 3.8, .3)));
+  const n = Math.round(WISH.length * p(t, 4.8, 2.0));
+  $('tx').textContent = WISH.slice(0, n);
+  $('caret').style.opacity = t < 6.9 ? (Math.floor(t * 3) % 2 ? 1 : .2) : 0;
+  const press = t > 6.9 && t < 7.15 ? Math.sin((t - 6.9) / .25 * Math.PI) : 0;
+  $('send').style.transform = `scale(${1 - .08 * press})`;
+  // step 2: the parts, then the offers
+  $('p2').style.opacity = eo(p(t, 7.5, .3));
+  document.querySelectorAll('.row').forEach((r, i) => {
+    fadeIn(r, t, 8.1 + i * .4, .35, 30);
+    const o = r.querySelector('.of');
+    popIn(o, t, 10.3 + i * .4, .35);
+    // step 3: he approves each one
+    const okq = p(t, 13.8 + i * .2, .3);
+    popIn(r.querySelector('.ok'), t, 13.8 + i * .2, .3);
+    o.style.background = okq > 0 ? '#d1fae5' : '#f6f3ff';
+  });
+  fadeIn($('choose'), t, 12.9, .35, 10);
+  $('choose').style.opacity = Math.min(+$('choose').style.opacity, 1 - p(t, 14.9, .2));
+  const tq = p(t, 15.0, .45);
+  $('team').style.opacity = Math.min(1, tq * 3);
+  $('team').style.transform = `translateY(${(1 - eo(tq)) * 200}px)`;
+  document.querySelectorAll('#tf div').forEach((d, i) => popIn(d, t, 15.25 + i * .1, .35));
+
+  // ---------- brand (16.4 - 20.5) ----------
+  // n5 at 16.6: "נעשה בשבילך" 16.6–17.5 · "אחד-לב-אחד" 18.0–19.0
+  $('s5').style.opacity = eo(p(t, 16.4, .3));
+  fadeIn($('tagline'), t, 16.6, .4);
+  fadeIn($('sub'), t, 17.3, .4);
+  const mq = p(t, 17.9, .45);
+  $('mark').style.opacity = mq; $('mark').style.transform = `scale(${mq === 0 ? .5 : back(mq)})`;
+  const beat = t > 18.4 ? 1 + .12 * Math.max(0, Math.sin((t - 18.4) * Math.PI * 1.6)) ** 6 : 1;
+  document.querySelector('#mark .h').style.transform = `scale(${beat})`;
+  const ctq = fadeIn($('cta'), t, 18.7, .4);
+  if (ctq >= 1) $('cta').style.transform = `scale(${1 + .04 * Math.sin((t - 19.1) * 6)})`;
+};
+
+const qs = new URLSearchParams(location.search);
+if (!qs.has('render')) {
+  document.fonts.ready.then(() => {
+    if (qs.has('t')) return window.seek(+qs.get('t'));
+    const t0 = performance.now();
+    const loop = () => { window.seek(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); };
+    loop();
+  });
+}
+</script>
+</body>
+</html>

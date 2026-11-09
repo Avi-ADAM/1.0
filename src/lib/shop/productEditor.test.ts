@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { detailChanges, galleryOfNode, productAxesOf, toEditorProduct } from './productEditor';
+import { detailChanges, galleryOfNode, isRecipeDeal, isRecipeLocked, locationOf, productAxesOf, recipeOfNode, sameLocation, toEditorProduct } from './productEditor';
 
 const pic = (id: number, url = `https://x/${id}.jpg`) => ({ id, attributes: { url, formats: { small: { url: `${url}?s` } } } });
 
@@ -95,5 +95,71 @@ describe('detailChanges', () => {
 
   it('an unknown kind reads as per unit', () => {
     expect(detailChanges({ kindOf: 'weekly' }, { ...product, kindOf: 'monthly' })).toEqual({ kindOf: 'total' });
+  });
+});
+
+describe('locationOf', () => {
+  it('nothing set is null, whatever the picker carries beside it', () => {
+    expect(locationOf({ location_mode: 'unspecified', isOnline: false, lat: null, lng: null, radius: 15, location_hint: '' })).toBeNull();
+    expect(locationOf(null)).toBeNull();
+  });
+
+  it('a radius with no point means nothing, and an unknown mode is unspecified', () => {
+    expect(locationOf({ location_mode: 'moon', location_hint: 'חיפה', radius: 15 })).toEqual({
+      location_mode: 'unspecified',
+      lat: null,
+      lng: null,
+      radius: null,
+      location_hint: 'חיפה'
+    });
+  });
+
+  it('the picker opening on a stored place is not a change', () => {
+    const stored = { location_mode: 'onsite', lat: 32, lng: 34, radius: 12, location_hint: 'חיפה' };
+    expect(sameLocation({ ...stored, isOnline: false }, stored)).toBe(true);
+    expect(sameLocation({ ...stored, radius: 20 }, stored)).toBe(false);
+    expect(sameLocation({ location_mode: 'unspecified', radius: 15, location_hint: '' }, null)).toBe(true);
+  });
+});
+
+describe('recipeOfNode', () => {
+  const node = {
+    attributes: {
+      matanot_recipe_missions: {
+        data: [
+          { id: 1, attributes: { hoursPerUnit: 2, unitsPerProduct: 3, ratePerHour: 50, pendm: { data: { attributes: { name: 'הצעה' } } }, mesimabetahalich: { data: { id: 9, attributes: { name: 'בעבודה' } } } } },
+          { id: 2, attributes: { hoursPerUnit: 1, ratePerHour: 40, pendm: { data: { attributes: { name: 'פתוחה' } } } } }
+        ]
+      },
+      matanot_recipe_resources: {
+        data: [
+          { id: 3, attributes: { quantityPerUnit: 2, pricePerUnit: 10, pmash: { data: { attributes: { name: 'חימר' } } }, assignedMember: { data: { id: 7 } } } },
+          { id: 4, attributes: { archived: true, quantityPerUnit: 1, pricePerUnit: 99 } }
+        ]
+      }
+    }
+  };
+
+  it('prices each line for one unit and leaves out an archived resource', () => {
+    expect(recipeOfNode(node)).toEqual([
+      { id: 'm1', kind: 'mission', name: 'בעבודה', amount: 2, units: 3, unit: 50, cost: 300, open: false, linkedId: '9' },
+      { id: 'm2', kind: 'mission', name: 'פתוחה', amount: 1, units: 1, unit: 40, cost: 40, open: true, linkedId: null },
+      { id: 'r3', kind: 'resource', name: 'חימר', amount: 2, units: 1, unit: 10, cost: 20, open: false, linkedId: null }
+    ]);
+  });
+
+  it('a recipe nobody could read is not one to rewrite', () => {
+    expect(isRecipeLocked(node)).toBe(false);
+    expect(isRecipeLocked(null)).toBe(true);
+  });
+
+  it('a wish product is known by its origin or its wish', () => {
+    expect(isRecipeDeal('project', node)).toBe(false);
+    expect(isRecipeDeal('wish', node)).toBe(true);
+    expect(isRecipeDeal('project', { attributes: { ratson: { data: { id: 3 } } } })).toBe(true);
+  });
+
+  it('no extras read means an empty recipe', () => {
+    expect(recipeOfNode(null)).toEqual([]);
   });
 });

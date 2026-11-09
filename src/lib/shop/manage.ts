@@ -19,6 +19,7 @@
  * and hand over that one meaning; nothing here ever reads `-1` as a sentinel.
  */
 import type { OrderShipping } from './shipping';
+import type { Tracking } from './tracking';
 import { countedWrite, unlimitedWrite, type StockWrite } from './stock';
 
 export type OrderStatus = 'pendingPayment' | 'paid' | 'shipped' | 'fulfilled' | 'cancelled';
@@ -81,6 +82,8 @@ export interface ShopOrder {
   delivery: { preference: DeliveryPreference; address: ShopAddress | null };
   /** How it travels, priced by the rikma's shipping settings — null for older orders. */
   shipping: OrderShipping | null;
+  /** The parcel's tracking number, kept in the note (`$lib/shop/tracking`). */
+  tracking: Tracking | null;
   note: string | null;
   paymentRef: string | null;
   paymentMethod: string | null;
@@ -652,6 +655,45 @@ export function csvCell(value: unknown): string {
 /** BOM + CRLF: what Excel needs to open Hebrew as Hebrew. */
 export function toCsv(rows: unknown[][]): string {
   return '﻿' + rows.map((r) => r.map(csvCell).join(',')).join('\r\n') + '\r\n';
+}
+
+/** What the orders export says, in the seller's language — the screen passes its own words. */
+export interface OrdersCsvWords {
+  /** One heading per column, in {@link ordersCsvRows}'s order. */
+  head: string[];
+  /** What is left to do with an order (`shop.status.*`). */
+  task: Record<OrderTask, string>;
+  /** How it travels (`shop.order.delivery|pickup|digital|contact`). */
+  delivery: Record<DeliveryPreference, string>;
+}
+
+/**
+ * The orders as a spreadsheet — one row per order, in the order given (the
+ * screen passes the list as filtered and sorted). Columns: number, date,
+ * status, buyer, phone, email, delivery, address, items, total, currency,
+ * payment, tracking, whose till.
+ *
+ * Buyers' contact leaves the server only to members, and this runs in the
+ * member's own browser on data they already see, so nothing new is exposed.
+ */
+export function ordersCsvRows(orders: ShopOrder[], words: OrdersCsvWords): unknown[][] {
+  const rows = orders.map((o) => [
+    o.number,
+    (o.paidAt ?? o.createdAt ?? '').slice(0, 10),
+    words.task[orderTaskOf(o)],
+    o.buyer.name ?? '',
+    o.buyer.phone ?? '',
+    o.buyer.email ?? '',
+    words.delivery[o.delivery.preference],
+    addressLine(o.delivery.address),
+    o.lines.map((l) => `${l.quantity}× ${l.name}${l.optionLabel ? ` · ${l.optionLabel}` : ''}`).join('; '),
+    o.total ?? '',
+    o.currency ?? '',
+    [o.paymentMethod, o.paymentRef].filter(Boolean).join(' · '),
+    o.tracking ? [o.tracking.carrier, o.tracking.number].filter(Boolean).join(' ') : '',
+    o.holderName ?? ''
+  ]);
+  return [words.head, ...rows];
 }
 
 /** "סדנת קרמיקה" → "סדנת-קרמיקה-1842": unique, readable, never empty. */

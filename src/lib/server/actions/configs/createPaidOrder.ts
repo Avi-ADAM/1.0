@@ -3,6 +3,7 @@ import { ActionError } from '../errors.js';
 import { readStockFlags, withFlag, type StockRowFlags } from '$lib/server/shop/stockFlags.js';
 import { recordOrderSales } from '$lib/server/shop/orderSales.js';
 import { shippingRecordOf } from '$lib/server/shop/orderShipping.js';
+import { buyerFactsOf } from '$lib/shop/orderMail';
 import { formatMoney } from '$lib/money/format.js';
 import { rikmaCurrency } from '$lib/money/resolve.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
@@ -224,6 +225,12 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
     ? (existing.attributes?.displayNumber ?? null)
     : payload.displayNumber;
   const number = orderNumberOf(displayNumber, orderId);
+  // Who bought and where it goes — for the members' notice, beside a link
+  // straight to this order. Names a stranger typed: data, in a sentence of ours.
+  const buyerFacts = buyerFactsOf(payload.buyer, payload.delivery.address);
+  const factsHe = buyerFacts ? ` הקונה: ${buyerFacts}.` : '';
+  const factsEn = buyerFacts ? ` Buyer: ${buyerFacts}.` : '';
+  const orderUrl = `moach/${projectId}/sales/manage/orders/${orderId}`;
 
   // 5. The lines that are not there yet.
   const storedPositions = new Set(
@@ -268,12 +275,12 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
             templates: {
               title: { he: '📞 הזמנה מהאתר — לתאם תשלום', en: '📞 Order from your site — arrange the payment' },
               body: {
-                he: `הזמנה ${number} ב-${formatMoney(plan.total, currency, 'he')} מ${payload.buyer.name ?? 'קונה'} באתר של "${projectName}". הקונה ביקש לשלם בתיאום — מי שמתקשר וגובה, מאשר במסך ההזמנות כשהכסף אצלו.`,
-                en: `Order ${number} for ${formatMoney(plan.total, currency, 'en')} from ${payload.buyer.name ?? 'a buyer'} on "${projectName}"'s site. The buyer asked to arrange the payment — whoever calls and collects confirms it in the orders screen once the money is with them.`
+                he: `הזמנה ${number} ב-${formatMoney(plan.total, currency, 'he')} מ${payload.buyer.name ?? 'קונה'} באתר של "${projectName}". הקונה ביקש לשלם בתיאום — מי שמתקשר וגובה, מאשר במסך ההזמנות כשהכסף אצלו.${factsHe}`,
+                en: `Order ${number} for ${formatMoney(plan.total, currency, 'en')} from ${payload.buyer.name ?? 'a buyer'} on "${projectName}"'s site. The buyer asked to arrange the payment — whoever calls and collects confirms it in the orders screen once the money is with them.${factsEn}`
               }
             },
             intent: 'review',
-            metadata: { type: 'arrangedOrder', url: `moach/${projectId}/sales/manage/orders?f=toCollect`, projectName, priority: 'high' }
+            metadata: { type: 'arrangedOrder', url: orderUrl, projectName, priority: 'high' }
           },
           { projectId },
           null,
@@ -380,14 +387,14 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
               ? { he: '🛒 הזמנה מהאתר — חסר במלאי', en: '🛒 Order from your site — short on stock' }
               : { he: '🛒 הזמנה חדשה מהאתר', en: '🛒 New order from your site' },
             body: {
-              he: `הזמנה ${number} ב-${amount}, ${itemsHe}, שולמה באתר של "${projectName}".${oversold ? ` ${shortHe}. אפשר להכין אותן או לתאם עם הקונה מועד אחר.` : ''}${gapHe}`,
-              en: `Order ${number} for ${amountEn}, ${itemsEn}, was paid on "${projectName}"'s site.${oversold ? ` ${shortEn}. You can make them or agree a later date with the buyer.` : ''}${gapEn}`
+              he: `הזמנה ${number} ב-${amount}, ${itemsHe}, שולמה באתר של "${projectName}".${factsHe}${oversold ? ` ${shortHe}. אפשר להכין אותן או לתאם עם הקונה מועד אחר.` : ''}${gapHe}`,
+              en: `Order ${number} for ${amountEn}, ${itemsEn}, was paid on "${projectName}"'s site.${factsEn}${oversold ? ` ${shortEn}. You can make them or agree a later date with the buyer.` : ''}${gapEn}`
             }
           },
           intent: oversold || promo?.overArranged ? 'review' : 'outcome',
           metadata: {
             type: 'paidOrder',
-            url: `moach/${projectId}/sales`,
+            url: orderUrl,
             projectName,
             priority: oversold || promo?.overArranged ? 'high' : 'normal'
           }

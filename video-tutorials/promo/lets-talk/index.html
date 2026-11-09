@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>בוא נדבר</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family: 'Sababa'; src: url('../../../static/fonts/NbmSababaHL1-Bold.otf'); }
+  :root {
+    --barbi: #ff0092; --gold: #fbbf24; --green: #34d399; --violet: #8b5cf6;
+    --night: #0f0b24; --night2: #1d1442; --panel: #171233; --line: #2f2760; --muted: #9b93c9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--night); }
+  body { font-family: 'Heebo', sans-serif; color: #fff; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden;
+    background: radial-gradient(120% 80% at 50% 30%, var(--night2), var(--night)); }
+  .layer { position: absolute; inset: 0; }
+  .center { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .w { display: inline-block; opacity: 0; white-space: pre; }
+  .mono { font-family: 'JetBrains Mono', monospace; direction: ltr; unicode-bidi: isolate; }
+
+  .half { position: absolute; left: 0; right: 0; height: 960px; overflow: hidden; }
+  #top { top: 0; }
+  #bot { top: 960px; }
+  #div { position: absolute; top: 957px; left: 60px; right: 60px; height: 6px; border-radius: 3px; background: linear-gradient(90deg, transparent, #3d3482, transparent); }
+  .tag { position: absolute; top: 40px; right: 90px; padding: 10px 30px; border-radius: 40px; font-size: 40px; font-weight: 800; }
+  #top .tag { background: rgba(255,255,255,.08); color: #d7cff9; }
+  #bot .tag { background: rgba(255,0,146,.18); color: #ff6cbc; }
+
+  .card { position: absolute; left: 90px; width: 900px; padding: 34px 44px; border-radius: 40px; background: #fff; color: #1a1333; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+  .card .who { display: flex; align-items: center; gap: 18px; font-size: 34px; color: #6b6290; font-weight: 700; }
+  .card .who .a { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+  .card .ti { font-size: 54px; font-weight: 900; margin-top: 14px; }
+  .card .terms { font-size: 46px; font-weight: 700; margin-top: 6px; color: #3b335c; }
+  .card .terms b { color: #c4006f; }
+
+  /* top: the usual */
+  #c1 { top: 160px; }
+  #no { position: absolute; top: 260px; left: 260px; padding: 20px 50px; border: 10px solid #dc2626; border-radius: 26px; color: #dc2626; font-size: 110px; font-weight: 900;
+    transform: rotate(-10deg); background: #fff; opacity: 0; }
+  #end { position: absolute; top: 620px; width: 100%; text-align: center; font-size: 76px; font-weight: 900; color: #8d86b8; }
+  #dots { position: absolute; top: 760px; width: 100%; text-align: center; font-size: 40px; color: #5c5486; opacity: 0; }
+
+  /* bottom: the rikma */
+  #c2 { top: 130px; padding: 26px 40px; }
+  #c2 .ti { font-size: 46px; margin-top: 8px; }
+  #c2 .terms { font-size: 40px; }
+  #ver { position: absolute; top: 26px; left: 44px; padding: 6px 20px; border-radius: 20px; background: #f3f0ff; color: #5b21b6; font-size: 30px; font-weight: 800; }
+  #pp { position: absolute; top: 430px; left: 90px; right: 90px; display: flex; align-items: center; justify-content: space-between; }
+  .chip { width: 250px; padding: 18px 16px; border-radius: 28px; text-align: center; font-size: 30px; font-weight: 700; opacity: 0; border: 3px solid transparent; }
+  .chip b { display: block; font-size: 38px; font-family: 'JetBrains Mono', monospace; direction: ltr; }
+  .chip.y { background: rgba(139,92,246,.2); border-color: rgba(139,92,246,.6); }
+  .chip.d { background: rgba(255,0,146,.16); border-color: rgba(255,0,146,.55); }
+  .arr { font-size: 44px; color: var(--muted); opacity: 0; }
+  #btns { position: absolute; top: 640px; left: 90px; right: 90px; display: flex; gap: 18px; opacity: 0; }
+  #btns div { flex: 1; text-align: center; padding: 22px 0; border-radius: 50px; font-size: 40px; font-weight: 800; background: #221b4a; border: 2px solid #3d3482; color: #e3dcff; }
+  #btns #ctr { background: var(--barbi); border-color: var(--barbi); color: #fff; }
+  #signed { position: absolute; top: 790px; width: 100%; text-align: center; }
+  #signed span { display: inline-block; padding: 22px 50px; border-radius: 60px; background: var(--green); color: #052e1f; font-size: 48px; font-weight: 900; opacity: 0;
+    box-shadow: 0 0 60px rgba(52,211,153,.5); }
+
+  /* brand */
+  #s5 { background: radial-gradient(110% 70% at 50% 40%, #3a1257, var(--night)); opacity: 0; }
+  #p1 { font-size: 84px; font-weight: 900; }
+  #p2 { font-size: 84px; font-weight: 900; color: var(--barbi); margin-top: 24px; line-height: 1.2; }
+  #mark { font-family: 'Sababa', 'Heebo'; font-size: 220px; direction: ltr; letter-spacing: 4px; margin-top: 80px; opacity: 0; }
+  #mark .h { color: var(--barbi); display: inline-block; }
+  #cta { margin-top: 50px; padding: 30px 90px; border-radius: 90px; background: var(--barbi); font-size: 64px; font-weight: 800; direction: ltr;
+    box-shadow: 0 0 60px rgba(255,0,146,.55); opacity: 0; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="layer" id="main">
+    <div class="half" id="top">
+      <div class="tag">במקום אחר</div>
+      <div class="card" id="c1">
+        <div class="who"><div class="a" style="background:#ddd6fe">🧔🏽</div>יוסי מציע</div>
+        <div class="ti">עיצוב האתר</div>
+        <div class="terms"><b class="mono">₪8,000</b> · 4 שבועות</div>
+      </div>
+      <div id="no">✕ נדחה</div>
+      <div id="end">וזה סוף השיחה.</div>
+      <div id="dots">· · ·</div>
+    </div>
+    <div id="div"></div>
+    <div class="half" id="bot">
+      <div class="tag">ברקמה</div>
+      <div class="card" id="c2">
+        <div id="ver">גרסה <span class="mono" id="vn">1</span></div>
+        <div class="who"><div class="a" id="wa" style="background:#ddd6fe">🧔🏽</div><span id="wn">יוסי מציע</span></div>
+        <div class="ti">עיצוב האתר</div>
+        <div class="terms" id="terms"><b class="mono">₪8,000</b> · 4 שבועות</div>
+      </div>
+      <div id="pp">
+        <div class="chip y">יוסי<b>₪8,000</b>4 שבועות</div><div class="arr">←</div>
+        <div class="chip d">דנה<b>₪6,500</b>4 שבועות</div><div class="arr">←</div>
+        <div class="chip y">יוסי<b>₪7,000</b>3 שבועות</div>
+      </div>
+      <div id="btns"><div>אישור</div><div>שיחה</div><div id="ctr">הצעה נגדית</div></div>
+      <div id="signed"><span>✓ יוסי ✓ דנה · חתמו על גרסה 3</span></div>
+    </div>
+  </div>
+
+  <div class="layer center" id="s5">
+    <div id="p1">אין כאן כפתור דחייה.</div>
+    <div id="p2">יש כפתור<br>שממשיך את השיחה.</div>
+    <div id="mark">1<span class="h">lev</span>1</div>
+    <div id="cta">1lev1.com</div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const p = (t, s, d) => cl((t - s) / d);
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+function split(el) {
+  el.innerHTML = el.textContent.split(/(\s+)/).filter(Boolean)
+    .map(s => /^\s+$/.test(s) ? s : `<span class="w">${s}</span>`).join('');
+}
+['end', 'p1'].forEach(id => split($(id)));
+function words(el, t, start, per, dy = 34) {
+  el.querySelectorAll('.w').forEach((w, i) => {
+    const q = eo(p(t, start + i * per, .3));
+    w.style.opacity = q; w.style.transform = `translateY(${(1 - q) * dy}px)`;
+  });
+}
+const fadeIn = (el, t, s, d = .4, dy = 30) => { const q = eo(p(t, s, d)); el.style.opacity = q; el.style.transform = `translateY(${(1 - q) * dy}px)`; return q; };
+const popIn = (el, t, s, d = .45) => { const q = p(t, s, d); el.style.opacity = Math.min(1, q * 3); el.style.transform = `scale(${q === 0 ? .4 : back(q)})`; return q; };
+
+// the versions on the table, in order; each counter resets the rikma's clock
+const VERS = [
+  [0, '🧔🏽', '#ddd6fe', 'יוסי מציע', '₪8,000', '4 שבועות'],
+  [8.6, '👩🏻', '#ffd1ea', 'דנה מציעה גרסה נגדית', '₪6,500', '4 שבועות'],
+  [10.8, '🧔🏽', '#ddd6fe', 'יוסי מציע גרסה נגדית', '₪7,000', '3 שבועות'],
+];
+
+const DURATION = 24;
+window.DURATION = DURATION;
+// narration: narrate.py (Adam / ElevenLabs v3); scenes timed to the words
+window.AUDIO = [
+  { src: 'assets/narration/n1.mp3', in: 0, dur: 3.95, at: 0.3 },
+  { src: 'assets/narration/n2.mp3', in: 0, dur: 1.04, at: 4.8 },
+  { src: 'assets/narration/n3.mp3', in: 0, dur: 6.4, at: 6.3 },
+  { src: 'assets/narration/n4.mp3', in: 0, dur: 2.96, at: 12.9 },
+  { src: 'assets/narration/n5.mp3', in: 0, dur: 6.48, at: 16.4 },
+];
+
+window.seek = function (t) {
+  $('main').style.opacity = 1 - eio(p(t, 16.1, .35));
+
+  // ---------- top: the usual (0 - 6) ----------
+  // n1 at 0.3: "במקומות אחרים" 0.4–1.3 · "להצעה יש תשובה אחת" 1.7–3.2 · "לא" 4.0–4.2 · n2 at 4.8: "וזה סוף השיחה" 4.8–5.8
+  fadeIn($('top').querySelector('.tag'), t, .3, .3, 10);
+  fadeIn($('c1'), t, .6, .45, 50);
+  const nq = p(t, 4.0, .3);
+  $('no').style.opacity = Math.min(1, nq * 3);
+  $('no').style.transform = `rotate(-10deg) scale(${nq === 0 ? 2.2 : 1 + (1 - eo(nq)) * 1.2})`;
+  const shake = t > 4.05 && t < 4.35 ? Math.sin(t * 90) * 8 : 0;
+  $('c1').style.transform += ` translateX(${shake}px)`;
+  words($('end'), t, 4.8, .3, 24);
+  fadeIn($('dots'), t, 5.8, .4, 0);
+  // the whole thing goes cold once the bottom starts
+  $('top').style.filter = `grayscale(${p(t, 5.2, 1)}) brightness(${1 - .45 * p(t, 6.2, .6)})`;
+
+  // ---------- bottom: the rikma (6 - 16.2) ----------
+  // n3 at 6.3: "ברקמה, במקום לא" 6.4–7.9 · "מציעים גרסה מדויקת יותר" 8.2–10.1 · "הלוך" 10.8–11.2 · "ושוב" 12.0–12.5
+  // n4 at 12.9: "עד ששני הצדדים חותמים על אותה גרסה" 12.9–15.8
+  const bq = p(t, 6.1, .5);
+  $('bot').style.opacity = eo(bq);
+  $('bot').style.transform = `translateY(${(1 - eo(bq)) * 80}px)`;
+  fadeIn($('btns'), t, 7.0, .35, 16);
+  // "הצעה נגדית" pressed as the next version lands
+  const pr = [8.4, 10.6].map(s => (t > s && t < s + .22) ? Math.sin((t - s) / .22 * Math.PI) : 0).reduce((a, b) => Math.max(a, b), 0);
+  $('ctr').style.transform = `scale(${1 - .08 * pr})`;
+  let k = 0; VERS.forEach((v, i) => { if (t >= v[0]) k = i; });
+  const [, e, bg, who, amt, dur] = VERS[k];
+  $('vn').textContent = k + 1;
+  $('wa').textContent = e; $('wa').style.background = bg; $('wn').textContent = who;
+  $('terms').innerHTML = `<b class="mono">${amt}</b> · ${dur}`;
+  const flip = k > 0 ? p(t, VERS[k][0], .4) : 1;
+  $('c2').style.transform = `translateX(${(1 - eo(flip)) * (k % 2 ? -260 : 260)}px) rotate(${(1 - eo(flip)) * (k % 2 ? -4 : 4)}deg)`;
+  // the ping-pong trail
+  const CT = [6.6, 8.6, 10.8];
+  document.querySelectorAll('#pp .chip').forEach((c, i) => popIn(c, t, CT[i], .35));
+  document.querySelectorAll('#pp .arr').forEach((a, i) => { a.style.opacity = eo(p(t, CT[i + 1] - .2, .3)); });
+  document.querySelectorAll('#pp .chip').forEach((c, i) => { c.style.boxShadow = i === k && t < 14.9 ? '0 0 30px rgba(255,255,255,.25)' : 'none'; });
+  // both sign version 3
+  const sq = popIn($('signed').firstElementChild, t, 14.9, .45);
+  $('c2').style.boxShadow = t > 14.9 ? `0 0 0 ${8 * eo(p(t, 14.9, .4))}px #34d399, 0 30px 80px rgba(0,0,0,.5)` : '0 30px 80px rgba(0,0,0,.5)';
+
+  // ---------- brand (16.1 - 24) ----------
+  // n5 at 16.4: "אין כאן כפתור דחייה" 16.4–17.8 · "יש כפתור שממשיך את השיחה" 18.2–20.0 · "אחד-לב-אחד" 20.3–22.8
+  $('s5').style.opacity = eo(p(t, 16.1, .35));
+  words($('p1'), t, 16.4, .3);
+  fadeIn($('p2'), t, 18.2, .45, 40);
+  const mq = p(t, 20.2, .45);
+  $('mark').style.opacity = mq; $('mark').style.transform = `scale(${mq === 0 ? .5 : back(mq)})`;
+  const beat = t > 20.8 ? 1 + .12 * Math.max(0, Math.sin((t - 20.8) * Math.PI * 1.6)) ** 6 : 1;
+  document.querySelector('#mark .h').style.transform = `scale(${beat})`;
+  const ctq = fadeIn($('cta'), t, 21.4, .4);
+  if (ctq >= 1) $('cta').style.transform = `scale(${1 + .04 * Math.sin((t - 21.8) * 6)})`;
+};
+
+const qs = new URLSearchParams(location.search);
+if (!qs.has('render')) {
+  document.fonts.ready.then(() => {
+    if (qs.has('t')) return window.seek(+qs.get('t'));
+    const t0 = performance.now();
+    const loop = () => { window.seek(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); };
+    loop();
+  });
+}
+</script>
+</body>
+</html>

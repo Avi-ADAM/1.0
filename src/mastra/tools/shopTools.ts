@@ -1061,9 +1061,12 @@ export const updateRikmaOrderStatusTool = createTool({
     orderRef: z.string().describe('Order ref (`<rikma>:<externalId>` as POST /orders answered) or orderId.'),
     action: z.enum(['shipped', 'fulfilled', 'cancel']).describe('shipped → parcel left, fulfilled → delivered/picked up, cancel → refund.'),
     reason: z.string().max(500).optional().describe('Cancel reason shown on the order and in sale notes.'),
-    restock: z.boolean().optional().describe('On cancel: put items back in stock. Default: only when not yet shipped.')
+    restock: z.boolean().optional().describe('On cancel: put items back in stock. Default: only when not yet shipped.'),
+    trackingNumber: z.string().max(60).optional().describe('On shipped: the carrier’s tracking number. The buyer is mailed that it left, with this number.'),
+    trackingCarrier: z.string().max(40).optional().describe('On shipped: the carrier, e.g. DHL.'),
+    trackingUrl: z.string().max(300).optional().describe('On shipped: a tracking page (http/https).')
   }),
-  execute: async ({ projectId, orderRef, action, reason, restock }) => {
+  execute: async ({ projectId, orderRef, action, reason, restock, trackingNumber, trackingCarrier, trackingUrl }) => {
     const pid = String(projectId);
     const ref = String(orderRef).trim();
     const keyByAction: Record<string, string> = { shipped: 'markOrderShipped', fulfilled: 'markOrderFulfilled', cancel: 'cancelOrder' };
@@ -1073,6 +1076,11 @@ export const updateRikmaOrderStatusTool = createTool({
     if (action === 'cancel') {
       if (reason) (params as any).reason = String(reason);
       if (restock !== undefined) (params as any).restock = !!restock;
+    }
+    if (action === 'shipped') {
+      if (trackingNumber) (params as any).trackingNumber = String(trackingNumber);
+      if (trackingCarrier) (params as any).trackingCarrier = String(trackingCarrier);
+      if (trackingUrl) (params as any).trackingUrl = String(trackingUrl);
     }
     const out = await runAction(key, params);
     if (!out.ok) return { success: false, message: out.error };

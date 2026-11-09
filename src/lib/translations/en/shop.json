@@ -72,7 +72,24 @@
       "state": "Status",
       "action": "Action"
     },
-    "selectHint": "Pick an order from the list to see its details."
+    "selectHint": "Pick an order from the list to see its details.",
+    "export": "Export CSV",
+    "csv": {
+      "number": "Order",
+      "date": "Date",
+      "status": "Status",
+      "buyer": "Buyer",
+      "phone": "Phone",
+      "email": "Email",
+      "delivery": "Delivery",
+      "address": "Address",
+      "items": "Items",
+      "total": "Total",
+      "currency": "Currency",
+      "payment": "Payment",
+      "tracking": "Tracking",
+      "holder": "Money held by"
+    }
   },
   "order": {
     "number": "Order {{number}}",
@@ -141,6 +158,10 @@
       "zone": "Zone {{name}}",
       "fee": "Delivery {{amount}}",
       "dispatch": "Goes out {{date}}"
+    },
+    "tracking": {
+      "title": "Shipment tracking",
+      "link": "Track the shipment"
     }
   },
   "status": {
@@ -1162,6 +1183,31 @@
     "ordersOne": "One order",
     "orders": "{{count}} orders",
     "fromLead": "Came from an enquiry",
-    "last": "last {{when}}"
+    "last": "last {{when}}",
+    "detail": {
+      "back": "Back to customers",
+      "notFound": "This customer was not found. The order may have been cancelled or its details changed.",
+      "paid": "Paid so far",
+      "orders": "Paid orders",
+      "since": "Customer since",
+      "lead": "Open the original enquiry",
+      "history": "All orders",
+      "noOrders": "No orders from this customer yet — only an enquiry."
+    }
+  },
+  "tracking": {
+    "action": "Tracking number",
+    "title": "Tracking number for order {{number}}",
+    "body": "The number is saved on the order. If the buyer left an email they get it: right away if the order has already shipped, otherwise with the shipping email.",
+    "number": "Tracking number",
+    "carrier": "Carrier (optional)",
+    "url": "Tracking page link (optional)",
+    "save": "Save",
+    "remove": "Remove the number",
+    "close": "Close",
+    "missing": "Enter a tracking number.",
+    "failed": "Could not save. Check your connection and try again.",
+    "saved": "Tracking number saved for order {{number}}",
+    "removed": "Tracking number removed from order {{number}}"
   }
 }

@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>המפית</title>
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Heebo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family: 'Sababa'; src: url('../../../static/fonts/NbmSababaHL1-Bold.otf'); }
+  :root {
+    --barbi: #ff0092; --gold: #fbbf24; --green: #34d399;
+    --night: #0f0b24; --night2: #1d1442; --panel: #171233; --line: #2f2760; --muted: #9b93c9;
+    --ink: #1f3a8a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--night); }
+  body { font-family: 'Heebo', sans-serif; color: #fff; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden;
+    background: radial-gradient(120% 80% at 50% 30%, var(--night2), var(--night)); }
+  .layer { position: absolute; inset: 0; }
+  .center { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .w { display: inline-block; opacity: 0; white-space: pre; }
+  .mono { font-family: 'JetBrains Mono', monospace; direction: ltr; unicode-bidi: isolate; }
+  .hand { font-family: 'Amatic SC', cursive; color: var(--ink); font-weight: 700; }
+
+  /* S1/S2: the napkin */
+  #cap { position: absolute; top: 160px; width: 100%; text-align: center; font-size: 84px; font-weight: 900; }
+  #cap2 { position: absolute; top: 280px; width: 100%; text-align: center; font-size: 70px; font-weight: 800; color: var(--barbi); }
+  #nap { position: absolute; top: 520px; left: 170px; width: 740px; height: 740px; }
+  .half { position: absolute; inset: 0; border-radius: 10px;
+    background: linear-gradient(135deg, #fbfaf6 0%, #f1efe6 49.6%, #e6e3d7 50%, #f6f4ec 50.4%, #fbfaf6 100%);
+    box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+  #hr { clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%, 53% 88%, 48% 76%, 52% 63%, 47% 50%, 53% 38%, 48% 25%, 52% 12%); }
+  #hl { clip-path: polygon(0 0, 50% 0, 52% 12%, 48% 25%, 53% 38%, 47% 50%, 52% 63%, 48% 76%, 53% 88%, 50% 100%, 0 100%); }
+  .notes { position: absolute; inset: 0; padding: 70px 40px; display: flex; flex-direction: column; gap: 8px; align-items: center; text-align: center; justify-content: center; }
+  .notes div { font-size: 104px; line-height: 1.05; clip-path: inset(0 0 0 100%); }
+  .notes .big { font-size: 150px; color: #b4005f; }
+  /* memories, a year later */
+  #yr { position: absolute; top: 200px; width: 100%; text-align: center; font-size: 84px; font-weight: 900; opacity: 0; }
+  .mem { position: absolute; top: 1330px; width: 440px; padding: 30px 34px; border-radius: 40px; font-size: 44px; font-weight: 700; line-height: 1.3; opacity: 0; }
+  #mA { right: 60px; background: #3a2a7a; border-radius: 40px 40px 8px 40px; }
+  #mB { left: 60px; background: #5b1d4a; border-radius: 40px 40px 40px 8px; }
+  .mem .who { font-size: 34px; color: #d7cff9; font-weight: 500; margin-bottom: 8px; }
+
+  /* S3: the same agreement, recorded */
+  #s3 { opacity: 0; }
+  #h3 { position: absolute; top: 150px; width: 100%; text-align: center; font-size: 70px; font-weight: 800; }
+  #log { position: absolute; top: 320px; left: 90px; width: 900px; display: flex; flex-direction: column; gap: 30px; }
+  .row { padding: 36px 44px; border-radius: 40px; background: #fff; color: #1a1333; box-shadow: 0 24px 70px rgba(0,0,0,.45); opacity: 0; }
+  .row .top { display: flex; align-items: center; gap: 22px; }
+  .row .ic { font-size: 62px; }
+  .row .t { font-size: 48px; font-weight: 900; flex: 1; }
+  .row .t small { display: block; font-size: 34px; color: #6b6290; font-weight: 500; margin-top: 2px; }
+  .sig { display: flex; gap: 16px; margin-top: 22px; }
+  .sig span { padding: 10px 26px; border-radius: 30px; background: #d1fae5; color: #065f46; font-size: 34px; font-weight: 800; opacity: 0; }
+  #trail { position: absolute; top: 1340px; width: 100%; text-align: center; font-size: 40px; color: var(--muted); opacity: 0; padding: 0 90px; line-height: 1.35; }
+
+  /* S4: keep the friendship */
+  #s4 { opacity: 0; }
+  #pair { display: flex; align-items: center; gap: 30px; margin-bottom: 90px; }
+  .av { width: 200px; height: 200px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 120px; }
+  #heart { font-size: 110px; }
+  #k1 { font-size: 92px; font-weight: 900; }
+  #k2 { font-size: 92px; font-weight: 900; color: var(--barbi); margin-top: 30px; }
+
+  /* S5: brand */
+  #s5 { background: radial-gradient(110% 70% at 50% 40%, #3a1257, var(--night)); opacity: 0; }
+  #mark { font-family: 'Sababa', 'Heebo'; font-size: 250px; direction: ltr; letter-spacing: 4px; }
+  #mark .h { color: var(--barbi); display: inline-block; }
+  #tagline { font-size: 80px; font-weight: 800; margin-top: 40px; }
+  #sub { font-size: 50px; color: #d7cff9; margin-top: 26px; padding: 0 80px; line-height: 1.35; }
+  #cta { margin-top: 90px; padding: 34px 90px; border-radius: 90px; background: var(--barbi); font-size: 66px; font-weight: 800;
+    direction: ltr; box-shadow: 0 0 60px rgba(255,0,146,.55); }
+  #s5 > * { opacity: 0; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- S1 + S2: the napkin, then a year later -->
+  <div class="layer" id="s1">
+    <div id="cap">שני חברים. מפית אחת.</div>
+    <div id="yr">שנה אחרי…</div>
+    <div id="nap">
+      <div class="half" id="hr"><div class="notes hand" id="nr"></div></div>
+      <div class="half" id="hl"><div class="notes hand" id="nl"></div></div>
+    </div>
+    <div class="mem" id="mA"><div class="who">אבי זוכר:</div>"סיכמנו חצי מהרווח. נקודה."</div>
+    <div class="mem" id="mB"><div class="who">יוסי זוכר:</div>"חצי? אני עשיתי 80% מהעבודה!"</div>
+  </div>
+
+  <!-- S3 -->
+  <div class="layer" id="s3">
+    <div id="h3">כאן, הכול נרשם</div>
+    <div id="log">
+      <div class="row"><div class="top"><span class="ic">⏱</span><div class="t">14 שעות קוד · יוסי<small>שעות על משימה</small></div></div>
+        <div class="sig"><span>✓ יוסי</span><span>✓ אבי</span></div></div>
+      <div class="row"><div class="top"><span class="ic">💰</span><div class="t">מכירה <span class="mono">₪3,200</span> · אבי<small>הכסף אצל אבי</small></div></div>
+        <div class="sig"><span>✓ אבי</span><span>✓ יוסי</span></div></div>
+      <div class="row"><div class="top"><span class="ic">🗳</span><div class="t">להעלות מחיר ל-<span class="mono">₪49</span><small>החלטה ברקמה</small></div></div>
+        <div class="sig"><span>✓ יוסי</span><span>✓ אבי</span></div></div>
+    </div>
+    <div id="trail">מה שנרשם לא תלוי בזיכרון של אף אחד</div>
+  </div>
+
+  <!-- S4 -->
+  <div class="layer center" id="s4">
+    <div id="pair"><div class="av" style="background:linear-gradient(135deg,#7c3aed,#4f46e5)">🧔🏻</div><div id="heart">🤝</div>
+      <div class="av" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">👨🏽</div></div>
+    <div id="k1">תשמרו על החברות.</div>
+    <div id="k2">תרשמו את השותפות.</div>
+  </div>
+
+  <!-- S5 -->
+  <div class="layer center" id="s5">
+    <div id="mark">1<span class="h">lev</span>1</div>
+    <div id="tagline">הכול רשום. הכול חתום.</div>
+    <div id="sub">שותפות בין חברים, בלי מפית</div>
+    <div id="cta">1lev1.com</div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const p = (t, s, d) => cl((t - s) / d);
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const win = (t, a, b, f = .35) => Math.min(eo(p(t, a, f)), 1 - p(t, b - f, f));
+function split(el) {
+  el.innerHTML = el.textContent.split(/(\s+)/).filter(Boolean)
+    .map(s => /^\s+$/.test(s) ? s : `<span class="w">${s}</span>`).join('');
+}
+['cap', 'h3', 'k1', 'k2'].forEach(id => split($(id)));
+function words(el, t, start, per, dy = 34) {
+  el.querySelectorAll('.w').forEach((w, i) => {
+    const q = eo(p(t, start + i * per, .3));
+    w.style.opacity = q; w.style.transform = `translateY(${(1 - q) * dy}px)`;
+  });
+}
+const fadeIn = (el, t, s, d = .4, dy = 30) => { const q = eo(p(t, s, d)); el.style.opacity = q; el.style.transform = `translateY(${(1 - q) * dy}px)`; return q; };
+const popIn = (el, t, s, d = .45) => { const q = p(t, s, d); el.style.opacity = Math.min(1, q * 3); el.style.transform = `scale(${q === 0 ? .4 : back(q)})`; return q; };
+
+// the same handwriting is drawn on both halves, so the tear splits it
+const NOTES = ['אבי + יוסי', 'אני – שיווק', 'אתה – קוד', '<span class="big">50/50</span> ✌️'];
+['nr', 'nl'].forEach(id => $(id).innerHTML = NOTES.map(n => `<div>${n}</div>`).join(''));
+
+const DURATION = 27;
+window.DURATION = DURATION;
+// narration: narrate.py (Adam / ElevenLabs v3); scenes timed to the words
+window.AUDIO = [
+  { src: 'assets/narration/n1.mp3', in: 0, dur: 3.76, at: 0.4 },
+  { src: 'assets/narration/n2.mp3', in: 0, dur: 3.2, at: 5.2 },
+  { src: 'assets/narration/n3.mp3', in: 0, dur: 5.7, at: 9.8 },
+  { src: 'assets/narration/n4.mp3', in: 0, dur: 2.96, at: 17.2 },
+  { src: 'assets/narration/n5.mp3', in: 0, dur: 4.72, at: 21.2 },
+];
+
+window.seek = function (t) {
+  // ---------- S1 + S2 (0 - 9.6) ----------
+  // n1 at 0.4: "שני חברים" 0.5–1.1 · "מפית אחת" 1.6–2.2 · "נתחלק חצי-חצי" 2.9–4.1
+  // n2 at 5.2: "שנה אחרי" 5.3–6.0 · "כל אחד זוכר את המפית אחרת" 6.6–8.3
+  $('s1').style.opacity = 1 - eio(p(t, 9.2, .45));
+  words($('cap'), t, .45, .45);
+  $('cap').style.opacity = 1 - p(t, 4.9, .3);
+  fadeIn($('yr'), t, 5.25, .4);
+  const nq = p(t, .3, .6);
+  $('nap').style.opacity = Math.min(1, nq * 3);
+  // written line by line, the way a pen goes (right to left)
+  const LT = [0.9, 1.6, 2.2, 2.9];
+  ['nr', 'nl'].forEach(id => $(id).querySelectorAll('div').forEach((d, i) => {
+    const q = eio(p(t, LT[i], i === 3 ? .9 : .55));
+    d.style.clipPath = `inset(0 0 0 ${100 * (1 - q)}%)`;
+  }));
+  // a year later: the napkin tears and the halves drift apart
+  const tq = eio(p(t, 5.9, .9));
+  const shake = t > 5.6 && t < 5.95 ? Math.sin(t * 90) * 6 : 0;
+  $('hr').style.transform = `translate(${tq * 70 + shake}px, ${tq * 24}px) rotate(${tq * 7}deg)`;
+  $('hl').style.transform = `translate(${-tq * 70 + shake}px, ${tq * 40}px) rotate(${-tq * 9}deg)`;
+  $('nap').style.transform = `rotate(${-3 + 3 * nq}deg) scale(${1 - .08 * tq})`;
+  fadeIn($('mA'), t, 6.6, .4, 30);
+  fadeIn($('mB'), t, 7.5, .4, 30);
+
+  // ---------- S3 (9.5 - 17.0) ----------
+  // n3 at 9.8: "כאן, כל שעה" 9.9–11.0 · "כל מכירה וכל החלטה נרשמות" 11.3–13.4 · "ושניכם חותמים עליהן" 14.0–15.3
+  $('s3').style.opacity = win(t, 9.5, 17.05, .35);
+  words($('h3'), t, 9.8, .3);
+  const RT = [10.5, 11.5, 12.5];
+  document.querySelectorAll('.row').forEach((r, i) => {
+    const q = p(t, RT[i], .45);
+    r.style.opacity = Math.min(1, q * 3);
+    r.style.transform = `translateX(${(1 - eo(q)) * 260}px)`;
+    r.querySelectorAll('.sig span').forEach((s, j) => popIn(s, t, 14.0 + i * .3 + j * .15, .35));
+  });
+  fadeIn($('trail'), t, 15.6, .45, 16);
+
+  // ---------- S4 (16.9 - 21.0) ----------
+  // n4 at 17.2: "תשמרו על החברות" 17.3–18.3 · "תרשמו את השותפות" 18.8–20.0
+  $('s4').style.opacity = win(t, 16.9, 21.05, .3);
+  fadeIn($('pair'), t, 17.0, .45, 40);
+  $('heart').style.transform = `scale(${1 + .15 * Math.max(0, Math.sin((t - 17.4) * 5)) ** 4})`;
+  words($('k1'), t, 17.3, .3);
+  words($('k2'), t, 18.8, .3, 40);
+
+  // ---------- S5 (20.9 - 27) ----------
+  // n5 at 21.2: "הכול רשום" 21.3–22.0 · "הכול חתום" 22.5–23.4 · "אחד-לב-אחד" 23.8–25.7
+  $('s5').style.opacity = eo(p(t, 20.9, .35));
+  fadeIn($('tagline'), t, 21.25, .4);
+  fadeIn($('sub'), t, 22.6, .4);
+  const mq = p(t, 23.7, .45);
+  $('mark').style.opacity = mq; $('mark').style.transform = `scale(${mq === 0 ? .5 : back(mq)})`;
+  const beat = t > 24.3 ? 1 + .12 * Math.max(0, Math.sin((t - 24.3) * Math.PI * 1.6)) ** 6 : 1;
+  document.querySelector('#mark .h').style.transform = `scale(${beat})`;
+  const ctq = fadeIn($('cta'), t, 25.0, .4);
+  if (ctq >= 1) $('cta').style.transform = `scale(${1 + .04 * Math.sin((t - 25.4) * 6)})`;
+};
+
+const qs = new URLSearchParams(location.search);
+if (!qs.has('render')) {
+  document.fonts.ready.then(() => {
+    if (qs.has('t')) return window.seek(+qs.get('t'));
+    const t0 = performance.now();
+    const loop = () => { window.seek(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); };
+    loop();
+  });
+}
+</script>
+</body>
+</html>

@@ -739,6 +739,7 @@ export const qidsAccess = {
   'ordersApiVariants': { allow: ['serviceAdmin'] },
   'rikmaApiOrdersSchema': { allow: ['serviceAdmin'] },
   'rikmaApiOrderByRef': { allow: ['serviceAdmin'] },
+  'orderMailByRef': { allow: ['serviceAdmin'] },
   'rikmaApiOrderCreate': { allow: ['serviceAdmin'] },
   'rikmaApiOrderLineCreate': { allow: ['serviceAdmin'] },
   'rikmaApiOrderUpdate': { allow: ['serviceAdmin'] },
@@ -768,6 +769,9 @@ export const qidsAccess = {
   // The seller's product editor (S4, qidsShopEditor.js): the editor's loader and
   // the saveProductVariants / saveProductOptions actions only.
   'shopEditorProduct': { allow: ['serviceAdmin'] },
+  'shopEditorProductExtras': { allow: ['serviceAdmin'] },
+  'productLiveDeals': { allow: ['serviceAdmin'] },
+  'dealRecipeEdits': { allow: ['user', 'serviceAdmin'] }, // read: like 400dealEdits; the deal page checks the role
   'shopEditorRikmaOptions': { allow: ['serviceAdmin'] },
   'shopEditorRikmaSkus': { allow: ['serviceAdmin'] },
   'shopOptionCreate': { allow: ['serviceAdmin'] },

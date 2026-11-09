@@ -9,6 +9,7 @@
   import CostPanel from '$lib/components/deals/CostPanel.svelte';
   import DealDuePanel from '$lib/components/deals/DealDuePanel.svelte';
   import DealEditsPanel from '$lib/components/deals/DealEditsPanel.svelte';
+  import DealRecipePanel from '$lib/components/deals/DealRecipePanel.svelte';
   import DealOffersPanel from '$lib/components/deals/DealOffersPanel.svelte';
   import DealPartsPanel from '$lib/components/deals/DealPartsPanel.svelte';
   import DealReceiptPanel from '$lib/components/deals/DealReceiptPanel.svelte';
@@ -268,6 +269,7 @@
 
   /** C-14: requests for more hours on the deal's parts — the customer approves or counters. */
   const edits = $derived(data.edits ?? []);
+  const recipeEdits = $derived(data.recipeEdits ?? []);
   let editBusy = $state(false);
 
   async function signEdit(decisionId: string) {
@@ -290,6 +292,21 @@
     editBusy = true;
     try {
       await runAction('counterDealEdit', { decisionId, ...terms });
+      toast.success($t('deals.edit.counteredToast'));
+      await invalidateAll();
+    } catch (err) {
+      console.error(err);
+      toast.error($t('deals.edit.error'));
+    } finally {
+      editBusy = false;
+    }
+  }
+
+  async function counterRecipe(decisionId: string, keep: number[], why: string) {
+    if (editBusy) return;
+    editBusy = true;
+    try {
+      await runAction('counterDealRecipe', { decisionId, keep, why });
       toast.success($t('deals.edit.counteredToast'));
       await invalidateAll();
     } catch (err) {
@@ -435,6 +452,18 @@
               busy={editBusy}
               onSign={signEdit}
               onCounter={counterEdit}
+            />
+          </div>
+        {/if}
+
+        {#if recipeEdits.length > 0}
+          <div class="anim anim-d2">
+            <DealRecipePanel
+              edits={recipeEdits}
+              isCustomer={kind === 'purchase'}
+              busy={editBusy}
+              onSign={signEdit}
+              onCounter={counterRecipe}
             />
           </div>
         {/if}

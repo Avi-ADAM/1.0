@@ -108,6 +108,15 @@ export function suggestSku(productId: string | null, pairs: OptionPair[]): strin
   return `${productId ? `P${productId}` : 'NEW'}${tail ? `-${tail}` : ''}`.slice(0, 60);
 }
 
+/**
+ * A variant drawn before its product existed carries the placeholder SKU
+ * (`NEW-M`), which every new product would share. Once the product has an id,
+ * the SKUs still on the placeholder get its real one; a SKU the seller typed stays.
+ */
+export function stampNewSkus<T extends { sku: string; optionValues: OptionPair[] }>(rows: T[], productId: string): T[] {
+  return rows.map((r) => (r.sku.trim() === suggestSku(null, r.optionValues) ? { ...r, sku: suggestSku(productId, r.optionValues) } : r));
+}
+
 // ─── axes ───────────────────────────────────────────────────────────────────
 
 export type AxisError = 'axisName' | 'axisDuplicate' | 'axisNoValues' | 'tooManyAxes' | 'tooManyValues';

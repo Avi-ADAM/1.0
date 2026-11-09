@@ -252,6 +252,22 @@ export function decisionAwaitsCustomer(p: { projectId: Id; decisionName: string;
   };
 }
 
+/** A new line of a product is on this member's name only with their explicit yes. */
+export function decisionAwaitsOwner(p: { projectId: Id; decisionId: Id; decisionName: string; ownerIds: Id[] }): MaturedNotice {
+  return {
+    kind: 'decision',
+    intent: 'consent',
+    to: { userIds: p.ownerIds },
+    title: L('השינוי במוצר מחכה לאישור שלך', 'The product change waits for your approval', 'تغيير المنتج ينتظر موافقتك'),
+    body: L(
+      `הרקמה לא התנגדה ל"${p.decisionName}", אבל הוא מטיל עליך עבודה, ולכן בלי אישור מפורש שלך הוא לא יוחל. אפשר לאשר, או להשאיר את המשימה בלי שתהיה עליך.`,
+      `The rikma raised no objection to "${p.decisionName}", but it puts work on you, so it does not apply without your explicit approval. Approve it, or keep the work without it being yours.`,
+      `لم تعترض الريكما على «${p.decisionName}»، لكنه يضع عليك عملًا، لذا لا يُطبق دون موافقتك الصريحة. وافق، أو أبقِ العمل دون أن يكون عليك.`
+    ),
+    url: `/moach/${p.projectId}/votes/decision/${p.decisionId}`
+  };
+}
+
 /** Everyone else's silence counts; the funder's would be paying by saying nothing. */
 export function stipendAwaitsFunder(p: { projectId: Id; decisionName: string; funderId: Id }): MaturedNotice {
   return {

@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>דווקא יש לו</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family: 'Sababa'; src: url('../../../static/fonts/NbmSababaHL1-Bold.otf'); }
+  @font-face { font-family: 'Frank'; src: local('FrankRuehl'), local('Frank Ruehl'), local('FrankRuehl Regular'); }
+  :root {
+    --barbi: #ff0092; --gold: #fbbf24; --gold-d: #d8a64b;
+    --night: #0f0b24; --night2: #1d1442; --ink: #2b1d0e; --parch: #f4e7c9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--night); }
+  body { font-family: 'Heebo', sans-serif; color: #fff; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden;
+    background: radial-gradient(120% 80% at 50% 30%, var(--night2), var(--night)); }
+  .layer { position: absolute; inset: 0; }
+  .slot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
+  .center { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .w { display: inline-block; opacity: 0; white-space: pre; }
+
+  /* S1 */
+  #l1, #l2 { white-space: nowrap; }
+  /* the café clip sits under everything; the shade keeps the top readable */
+  #vid1 { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  #s1shade { background: linear-gradient(180deg, rgba(15,11,36,.75) 0%, rgba(15,11,36,.2) 32%, rgba(15,11,36,0) 60%, rgba(15,11,36,.55) 100%); }
+  #tag { position: absolute; top: 90px; width: 100%; text-align: center; font-size: 44px; font-weight: 500; color: #e3dcff; letter-spacing: 1px; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
+  #bubble { position: absolute; top: 190px; right: 70px; left: 70px; padding: 50px 40px 56px;
+    background: #fff; color: #1a1333; border-radius: 60px; font-size: 66px; font-weight: 800; line-height: 1.22;
+    box-shadow: 0 30px 80px rgba(0,0,0,.45); text-align: center; transform-origin: 70% 100%; }
+  #bubble::after { content: ''; position: absolute; bottom: -70px; right: 170px; border: 40px solid transparent;
+    border-top: 50px solid #fff; border-right: 50px solid #fff; transform: skewX(-12deg); }
+  #strike { position: absolute; top: 50%; right: 40px; height: 22px; width: 0; background: var(--barbi);
+    border-radius: 11px; transform: rotate(-8deg); box-shadow: 0 0 30px var(--barbi); }
+  #who { position: absolute; top: 1720px; width: 100%; text-align: center; font-size: 52px; font-weight: 500; color: #fff; opacity: 0; text-shadow: 0 2px 14px rgba(0,0,0,.8); }
+  #img3 { filter: blur(5px) sepia(.25); }
+  #flash { background: var(--barbi); opacity: 0; mix-blend-mode: screen; }
+  #wait { font-family: 'Sababa', 'Heebo'; font-size: 330px; color: var(--barbi); opacity: 0;
+    text-shadow: 0 0 60px rgba(255,0,146,.6); }
+
+  /* parchment */
+  #parch { background:
+      radial-gradient(60% 40% at 30% 20%, rgba(255,255,255,.55), transparent 70%),
+      radial-gradient(80% 60% at 80% 90%, rgba(150,100,40,.22), transparent 70%),
+      radial-gradient(140% 100% at 50% 50%, #f7ecd2, #e6cf9d);
+    color: var(--ink); transform: translateY(100%); }
+  #parch::before { content: ''; position: absolute; inset: 40px; border: 4px double rgba(120,80,30,.45); border-radius: 18px; }
+  .frank { font-family: 'Frank', 'David', serif; }
+  #q1title { position: absolute; top: 250px; width: 100%; text-align: center; font-size: 118px; font-weight: 700; }
+  #q1tr { position: absolute; top: 430px; width: 100%; text-align: center; font-size: 46px; color: #7a5a2c; opacity: 0; }
+  #diagram { position: absolute; top: 560px; left: 90px; width: 900px; height: 820px; }
+  #diagram text { font-family: 'Heebo'; font-weight: 800; text-anchor: middle; dominant-baseline: central; }
+  .src { position: absolute; width: 100%; text-align: center; opacity: 0; }
+  .src span { display: inline-block; padding: 16px 40px; border-radius: 60px; background: rgba(120,80,30,.12);
+    border: 2px solid rgba(120,80,30,.35); font-size: 40px; color: #6b4a1e; font-weight: 500; }
+  #q1src { top: 1460px; }
+  #q2 { position: absolute; top: 380px; width: 100%; text-align: center; }
+  #q2 .ln { display: block; font-size: 104px; line-height: 1.45; font-weight: 700; }
+  #partner { position: relative; display: inline-block; color: #8a4b00; }
+  #uline { position: absolute; bottom: 6px; right: 0; height: 14px; width: 0; background: var(--gold); border-radius: 7px; opacity: .85; z-index: -1; }
+  #q2tr { position: absolute; top: 950px; width: 100%; text-align: center; font-size: 50px; color: #7a5a2c; opacity: 0; padding: 0 110px; line-height: 1.4; }
+  #q2src { top: 1190px; }
+
+  /* S5 */
+  #s5 .ln { position: absolute; width: 100%; text-align: center; font-weight: 800; }
+  #a1 { top: 250px; font-size: 96px; }
+  #a2 { top: 395px; font-size: 64px; color: #d7cff9; }
+  #a3 { top: 495px; font-size: 64px; color: var(--barbi); }
+  #ring { position: absolute; top: 760px; left: 90px; width: 900px; height: 900px; }
+  #ringtxt { position: absolute; top: 1135px; width: 100%; text-align: center; font-size: 54px; font-weight: 700; line-height: 1.3; opacity: 0; }
+  .chip { position: absolute; padding: 26px 40px; border-radius: 80px; background: #fff; color: #1a1333;
+    font-size: 50px; font-weight: 800; box-shadow: 0 16px 40px rgba(0,0,0,.4); white-space: nowrap; }
+  .chip b { display: inline-block; margin-right: 18px; padding: 4px 18px; border-radius: 40px; background: var(--barbi); color: #fff; font-size: 42px; opacity: 0; }
+
+  /* S6 */
+  #s6 { background: radial-gradient(110% 70% at 50% 40%, #3a1257, var(--night)); opacity: 0; }
+  #mark { font-family: 'Sababa', 'Heebo'; font-size: 250px; direction: ltr; letter-spacing: 4px; }
+  #mark .h { color: var(--barbi); display: inline-block; }
+  #tagline { font-size: 70px; font-weight: 800; margin-top: 40px; }
+  #sub { font-size: 50px; color: #d7cff9; margin-top: 26px; }
+  #cta { margin-top: 90px; padding: 34px 90px; border-radius: 90px; background: var(--barbi); font-size: 66px; font-weight: 800;
+    direction: ltr; box-shadow: 0 0 60px rgba(255,0,146,.55); }
+  #s6 > * { opacity: 0; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- S1: the saying -->
+  <div class="layer" id="s1">
+    <video id="vid1" src="assets/s1.mp4" muted playsinline preload="auto" onerror="this.remove()"></video>
+    <div class="layer" id="s1shade"></div>
+    <div id="tag">משפט שכולם מכירים</div>
+    <div id="bubble"><div id="l1">אם שותפות הייתה טובה,</div><div id="l2">גם לאלוהים היה שותף.</div><div id="strike"></div></div>
+    <div id="who">— כולם, תמיד</div>
+  </div>
+  <div class="layer" id="flash"></div>
+  <div class="layer center"><div id="wait">רגע.</div></div>
+
+  <!-- S3/S4: the sources -->
+  <div class="layer" id="parch">
+    <img class="slot" id="img3" src="assets/s3.jpg" onerror="this.remove()">
+    <div class="layer" id="q1">
+      <div id="q1title" class="frank">שלשה שותפין הן באדם</div>
+      <div id="q1tr">שלושה שותפים יש לכל אדם</div>
+      <svg id="diagram" viewBox="0 0 900 820">
+        <g id="lines" stroke="#8a5a20" stroke-width="8" stroke-linecap="round" fill="none">
+          <line id="ln0" x1="450" y1="150" x2="450" y2="430"/>
+          <line id="ln1" x1="150" y1="660" x2="450" y2="430"/>
+          <line id="ln2" x1="750" y1="660" x2="450" y2="430"/>
+        </g>
+        <g id="nc"><circle cx="450" cy="430" r="120" fill="#2b1d0e"/><text x="450" y="430" fill="#f7ecd2" font-size="70">אדם</text></g>
+        <g id="n0"><circle cx="450" cy="150" r="115" fill="#fbbf24" stroke="#8a5a20" stroke-width="6"/><text x="450" y="150" fill="#2b1d0e" font-size="58">הקב״ה</text></g>
+        <g id="n1"><circle cx="150" cy="660" r="115" fill="#fff6e0" stroke="#8a5a20" stroke-width="6"/><text x="150" y="660" fill="#2b1d0e" font-size="62">אביו</text></g>
+        <g id="n2"><circle cx="750" cy="660" r="115" fill="#fff6e0" stroke="#8a5a20" stroke-width="6"/><text x="750" y="660" fill="#2b1d0e" font-size="62">אמו</text></g>
+      </svg>
+      <div class="src" id="q1src"><span>תלמוד בבלי, קידושין ל ע״ב</span></div>
+    </div>
+    <div class="layer" id="q2g" style="opacity:0">
+      <div id="q2" class="frank">
+        <span class="ln" id="q2a">כל דיין שדן דין אמת לאמיתו</span>
+        <span class="ln" id="q2b">נעשה <span id="partner">שותף<span id="uline"></span></span> להקב״ה</span>
+        <span class="ln" id="q2c">במעשה בראשית</span>
+      </div>
+      <div id="q2tr">שופט שפוסק בצדק — נעשה שותף של אלוהים בבריאת העולם</div>
+      <div class="src" id="q2src"><span>תלמוד בבלי, שבת י ע״א</span></div>
+    </div>
+  </div>
+
+  <!-- S5: the point -->
+  <div class="layer" id="s5" style="opacity:0">
+    <div class="ln" id="a1">הוא לא בלי שותפים.</div>
+    <div class="ln" id="a2">הוא פשוט בוחר אותם בקפידה,</div>
+    <div class="ln" id="a3">וקובע מראש מה כל אחד מביא.</div>
+    <svg id="ring" viewBox="0 0 900 900">
+      <circle id="r1" cx="450" cy="450" r="250" fill="none" stroke="#ff0092" stroke-width="22" stroke-linecap="round" transform="rotate(-90 450 450)"/>
+      <circle id="r2" cx="450" cy="450" r="220" fill="none" stroke="#fbbf24" stroke-width="12" stroke-linecap="round" stroke-dasharray="40 26" transform="rotate(90 450 450)"/>
+    </svg>
+    <div id="ringtxt">כל אחד מקבל<br>לפי מה שהביא</div>
+    <div class="chip" id="c0">⏱ 120 שעות<b>45%</b></div>
+    <div class="chip" id="c1">🚐 טנדר<b>20%</b></div>
+    <div class="chip" id="c2">₪ 5,000<b>35%</b></div>
+  </div>
+
+  <!-- S6: brand -->
+  <div class="layer center" id="s6">
+    <div id="mark">1<span class="h">lev</span>1</div>
+    <div id="tagline">רקמה: שותפות עם כללים</div>
+    <div id="sub">מה שכל אחד מביא — הופך לחלק שלו</div>
+    <div id="cta">1lev1.com</div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const p = (t, s, d) => cl((t - s) / d);
+const eo = x => 1 - Math.pow(1 - x, 3);
+const back = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+// visible between a and b, fading f seconds at each edge
+const win = (t, a, b, f = .35) => Math.min(eo(p(t, a, f)), 1 - p(t, b - f, f));
+
+function split(el) {
+  el.innerHTML = el.textContent.split(/(\s+)/).filter(Boolean)
+    .map(s => /^\s+$/.test(s) ? s : `<span class="w">${s}</span>`).join('');
+}
+['l1', 'l2', 'a1', 'a2', 'a3', 'q1title', 'q2a', 'q2c'].forEach(id => split($(id)));
+// q2b keeps its inner markup: wrap its parts by hand
+$('q2b').innerHTML = '<span class="w">נעשה</span> <span class="w"><span id="partner">שותף<span id="uline"></span></span></span> <span class="w">להקב״ה</span>';
+
+function words(el, t, start, per, dy = 34) {
+  el.querySelectorAll('.w').forEach((w, i) => {
+    const q = eo(p(t, start + i * per, .3));
+    w.style.opacity = q;
+    w.style.transform = `translateY(${(1 - q) * dy}px)`;
+  });
+}
+const fadeIn = (el, t, s, d = .4, dy = 30) => { const q = eo(p(t, s, d)); el.style.opacity = q; el.style.transform = `translateY(${(1 - q) * dy}px)`; return q; };
+function pop(g, t, s, cx, cy) { const q = p(t, s, .45); const k = q === 0 ? 0 : back(q); g.setAttribute('transform', `translate(${cx} ${cy}) scale(${k}) translate(${-cx} ${-cy})`); }
+function draw(line, t, s, d = .45) { const L = line.getTotalLength(); line.style.strokeDasharray = L; line.style.strokeDashoffset = L * (1 - eo(p(t, s, d))); }
+
+const DURATION = 25;
+const CLIP_IN = 2.0;   // skip the clip's silent first 2s; its audio is muxed from the same point
+window.DURATION = DURATION;
+window.CLIP_IN = CLIP_IN;
+// soundtrack for the renderer (render.mjs mixes these). Times in seconds:
+// in/dur = the slice of the source, at = where it lands in the video.
+window.AUDIO = [
+  // his line from the café clip; he finishes at ~4.1
+  { src: 'assets/s1.mp4', in: CLIP_IN, dur: 4.2, at: 0, fadeOut: .1 },
+  // record scratch (onset 6.68s in the file) on the strike-through, cut dead as "רגע." pops
+  { src: 'assets/scratch.mp3', in: 6.65, dur: .5, at: 4.15, vol: .85 },
+  // music from 5.4: 25.5s in the file is the quiet theme, its big entrance at 35.5s lands on
+  // "הוא לא בלי שותפים" (15.5); faded out under the logo
+  { src: 'assets/music.mp3', in: 25.5, dur: 19.6, at: 5.4, fadeIn: .5, fadeOut: 1.8, vol: .9 },
+];
+
+window.seek = function (t) {
+  // ---------- S1: the saying (0 - 4.7) ----------
+  const s1 = $('s1');
+  s1.style.opacity = 1 - p(t, 4.6, .3);
+  fadeIn($('tag'), t, .1, .5);
+  const bq = p(t, 0.75, .4);
+  const shake = t > 4.25 && t < 4.7 ? Math.sin(t * 90) * 14 * (1 - p(t, 4.25, .45)) : 0;
+  $('bubble').style.transform = `translateX(${shake}px) scale(${bq === 0 ? 0 : back(bq)}) rotate(${-2 + 2 * eo(bq)}deg)`;
+  // the clip starts CLIP_IN seconds in: he says line 1 at ~1.0–2.4 and line 2 at ~2.8–4.1
+  words($('l1'), t, 1.0, .3);
+  words($('l2'), t, 2.8, .3);
+  fadeIn($('who'), t, 3.6, .4);
+  $('strike').style.width = (eo(p(t, 4.15, .3)) * 92) + '%';
+
+  // ---------- S2: "wait." (4.6 - 5.6) ----------
+  $('flash').style.opacity = t >= 4.6 ? .55 * (1 - p(t, 4.6, .35)) : 0;
+  const wq = p(t, 4.62, .35);
+  const wj = t > 4.62 && t < 5.2 ? Math.sin(t * 70) * 8 * (1 - p(t, 4.62, .6)) : 0;
+  $('wait').style.opacity = Math.min(wq * 3, 1) * (1 - p(t, 5.35, .25));
+  $('wait').style.transform = `translateX(${wj}px) scale(${wq === 0 ? .2 : back(wq)})`;
+
+  // ---------- parchment (5.3 - 15.8) ----------
+  const pin = eo(p(t, 5.3, .6));
+  $('parch').style.transform = `translateY(${(1 - pin) * 100}%)`;
+  $('parch').style.opacity = 1 - p(t, 15.3, .45);
+  const img3 = $('img3'); if (img3) { img3.style.opacity = .35; img3.style.transform = `scale(${1.1 - .08 * p(t, 5.3, 10)})`; }
+
+  // S3: Kiddushin (5.9 - 11)
+  $('q1').style.opacity = 1 - p(t, 10.6, .4);
+  words($('q1title'), t, 5.9, .3, 40);
+  fadeIn($('q1tr'), t, 7.0, .5);
+  pop($('nc'), t, 7.2, 450, 430);
+  [7.7, 8.2, 8.7].forEach((s, i) => { draw($('ln' + i), t, s - .15); pop($('n' + i), t, s, [450, 150, 750][i], [150, 660, 660][i]); });
+  fadeIn($('q1src'), t, 9.3, .5);
+
+  // S4: Shabbat (11 - 15.5)
+  $('q2g').style.opacity = eo(p(t, 10.9, .4));
+  words($('q2a'), t, 11.1, .2, 40);
+  words($('q2b'), t, 12.3, .25, 40);
+  words($('q2c'), t, 13.0, .25, 40);
+  $('uline').style.width = (eo(p(t, 13.4, .5)) * 100) + '%';
+  fadeIn($('q2tr'), t, 13.8, .5);
+  fadeIn($('q2src'), t, 14.3, .5);
+
+  // ---------- S5: the point (15.6 - 20.9) ----------
+  $('s5').style.opacity = win(t, 15.55, 20.9, .35);
+  words($('a1'), t, 15.8, .18);
+  words($('a2'), t, 16.7, .15);
+  words($('a3'), t, 17.6, .15);
+  const r1 = $('r1'), C = 2 * Math.PI * 250;
+  r1.style.strokeDasharray = C; r1.style.strokeDashoffset = C * (1 - eo(p(t, 18.3, 1.0)));
+  $('r2').style.opacity = eo(p(t, 18.7, .6));
+  $('r2').setAttribute('transform', `rotate(${90 + (t - 18.7) * 25} 450 450)`);
+  fadeIn($('ringtxt'), t, 19.3, .5, 20);
+  // chips fly in from the sides to sit on the ring
+  const chips = [
+    { el: $('c0'), from: [-500, 900], to: [540, 790], s: 18.5 },
+    { el: $('c1'), from: [1500, 1300], to: [810, 1580], s: 18.75 },
+    { el: $('c2'), from: [-500, 1700], to: [270, 1580], s: 19.0 },
+  ];
+  chips.forEach(c => {
+    const q = eo(p(t, c.s, .6));
+    const w = c.el.offsetWidth, h = c.el.offsetHeight;
+    const x = c.from[0] + (c.to[0] - c.from[0]) * q, y = c.from[1] + (c.to[1] - c.from[1]) * q;
+    c.el.style.left = (x - w / 2) + 'px'; c.el.style.top = (y - h / 2) + 'px';
+    c.el.style.opacity = q;
+    const b = c.el.querySelector('b'); const bq = p(t, c.s + 1.0, .35);
+    b.style.opacity = bq; b.style.transform = `scale(${bq === 0 ? .3 : back(bq)})`;
+  });
+
+  // ---------- S6: brand (20.8 - 25) ----------
+  $('s6').style.opacity = eo(p(t, 20.75, .4));
+  const mq = p(t, 21.0, .5);
+  $('mark').style.opacity = mq; $('mark').style.transform = `scale(${mq === 0 ? .5 : back(mq)})`;
+  const beat = t > 21.6 ? 1 + .12 * Math.max(0, Math.sin((t - 21.6) * Math.PI * 1.6)) ** 6 : 1;
+  document.querySelector('#mark .h').style.transform = `scale(${beat})`;
+  fadeIn($('tagline'), t, 21.6, .5);
+  fadeIn($('sub'), t, 22.2, .5);
+  const cq = fadeIn($('cta'), t, 22.8, .5);
+  if (cq >= 1) $('cta').style.transform = `scale(${1 + .04 * Math.sin((t - 23.3) * 6)})`;
+
+  // café clip: frame-exact seek (the renderer awaits the returned promise)
+  const v = $('vid1');
+  if (v && t < 5) {
+    const want = Math.min(CLIP_IN + t, (v.duration || 99) - .05);
+    if (Math.abs(v.currentTime - want) > .001) {
+      v.currentTime = want;
+      return new Promise(r => v.addEventListener('seeked', r, { once: true }));
+    }
+  }
+};
+
+// live preview when opened in a browser: ?t=12 freezes, otherwise loops
+const qs = new URLSearchParams(location.search);
+if (!qs.has('render')) {
+  document.fonts.ready.then(() => {
+    if (qs.has('t')) return window.seek(+qs.get('t'));
+    const t0 = performance.now();
+    const loop = () => { window.seek(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); };
+    loop();
+  });
+}
+</script>
+</body>
+</html>

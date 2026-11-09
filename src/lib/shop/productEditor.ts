@@ -14,6 +14,7 @@ import {
   type VariantTerm
 } from './variantEditor';
 import { countOf, isUnlimited } from './stock';
+import type { BomStoredLine, BomTerm } from './bomEditor';
 
 export interface EditorPicture {
   id: string;
@@ -34,6 +35,10 @@ export interface PendingEdit {
   /** null when the proposal does not move the base price. */
   basePrice: number | null;
   terms: VariantTerm[];
+  /** Recipe lines on the table. */
+  bom?: BomTerm[];
+  /** Who has signed the version on the table. */
+  signedIds?: string[];
   /** Detail terms on the table (null = not moved); the description only says that it moves. */
   details?: {
     name: string | null;
@@ -72,6 +77,120 @@ export interface EditorProduct {
   /** An archive/edit proposal already open — a second one is refused until it is answered. */
   openDecisionId: string | null;
   pending: PendingEdit | null;
+  /** Nothing to count on the product itself (`$lib/shop/stock.ts`). */
+  unlimited: boolean;
+  oneForeProject: boolean;
+  /** The margin an older product was saved with; the form never adds one. */
+  marginPct: number;
+  location: EditorLocation | null;
+  /** The product's missions and resources. */
+  recipe: EditorRecipeLine[];
+  /** The recipe could not be read, so it is not one to rewrite. */
+  recipeLocked: boolean;
+  /** A wish product: a version that asks for more waits for its customer's signature. */
+  recipeIsDeal: boolean;
+}
+
+/** One mission or resource of the product, as the price section lists it. */
+export interface EditorRecipeLine extends BomStoredLine {
+  /** What the line adds to one unit, in the rikma's currency. */
+  cost: number;
+  /** Nobody holds it yet. */
+  open: boolean;
+  /** The running mission or the pmash the line stands for, so it is not offered twice. */
+  linkedId: string | null;
+}
+
+/** The price is the sum of the lines: the mode whose recipe can be edited. */
+export const isCostPriced = (p: Pick<EditorProduct, 'pricingMode' | 'recipe'>): boolean =>
+  p.pricingMode === 'estimated' || (p.pricingMode === 'quote' && p.recipe.length > 0);
+
+export const LOCATION_MODES = ['online', 'onsite', 'hybrid', 'unspecified'] as const;
+export type LocationMode = (typeof LOCATION_MODES)[number];
+
+export interface EditorLocation {
+  location_mode: LocationMode;
+  lat: number | null;
+  lng: number | null;
+  radius: number | null;
+  location_hint: string | null;
+}
+
+/**
+ * A location from anywhere — the stored component, or what the picker sends —
+ * rebuilt field by field. Nothing set at all reads as `null`.
+ */
+export function locationOf(raw: unknown): EditorLocation | null {
+  const l = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
+  const mode = (LOCATION_MODES as readonly unknown[]).includes(l.location_mode) ? (l.location_mode as LocationMode) : 'unspecified';
+  const lat = num(l.lat);
+  const lng = num(l.lng);
+  const hasPoint = lat !== null && lng !== null;
+  const radius = num(l.radius);
+  const hint = str(l.location_hint);
+  if (mode === 'unspecified' && !hasPoint && !hint) return null;
+  return {
+    location_mode: mode,
+    lat: hasPoint ? lat : null,
+    lng: hasPoint ? lng : null,
+    radius: hasPoint && radius !== null ? Math.round(radius) : null,
+    location_hint: hint ? hint.slice(0, 200) : null
+  };
+}
+
+/** The two say the same place. */
+export function sameLocation(a: unknown, b: unknown): boolean {
+  return JSON.stringify(locationOf(a)) === JSON.stringify(locationOf(b));
+}
+
+/** The product's bill of materials, for the price section. An archived resource is not part of it. */
+export function recipeOfNode(node: any): EditorRecipeLine[] {
+  const a = node?.attributes ?? {};
+  const nameOf = (...rels: any[]) => rels.map((r) => str(r?.data?.attributes?.name)).find(Boolean) ?? '';
+  const missions = (a.matanot_recipe_missions?.data ?? []).map((m: any): EditorRecipeLine => {
+    const x = m?.attributes ?? {};
+    const amount = num(x.hoursPerUnit) ?? 0;
+    const units = num(x.unitsPerProduct) ?? 1;
+    const unit = num(x.ratePerHour) ?? 0;
+    return {
+      id: `m${m?.id}`,
+      kind: 'mission',
+      name: nameOf(x.mesimabetahalich, x.pendm),
+      amount,
+      units,
+      unit,
+      cost: amount * units * unit,
+      open: !x.assignedMember?.data?.id && !x.mesimabetahalich?.data?.id,
+      linkedId: x.mesimabetahalich?.data?.id != null ? String(x.mesimabetahalich.data.id) : null
+    };
+  });
+  const resources = (a.matanot_recipe_resources?.data ?? [])
+    .filter((r: any) => r?.attributes?.archived !== true)
+    .map((r: any): EditorRecipeLine => {
+      const x = r?.attributes ?? {};
+      const amount = num(x.quantityPerUnit) ?? 0;
+      const unit = num(x.pricePerUnit) ?? 0;
+      return {
+        id: `r${r?.id}`,
+        kind: 'resource',
+        name: nameOf(x.mashabetahalich, x.pmash),
+        amount,
+        units: 1,
+        unit,
+        cost: amount * unit,
+        open: !x.assignedMember?.data?.id && !x.mashabetahalich?.data?.id,
+        linkedId: x.pmash?.data?.id != null ? String(x.pmash.data.id) : null
+      };
+    });
+  return [...missions, ...resources];
+}
+
+/** Unread extras: a recipe nobody could read is not one to rewrite. */
+export const isRecipeLocked = (recipeNode: any): boolean => !recipeNode;
+
+/** A wish product's lines are what its customer is billed by (`loadDealDue`). */
+export function isRecipeDeal(origin: string | null | undefined, recipeNode: any): boolean {
+  return origin === 'wish' || recipeNode?.attributes?.ratson?.data?.id != null;
 }
 
 export const PRODUCT_KINDS = ['total', 'monthly', 'yearly', 'unlimited'] as const;
@@ -247,7 +366,7 @@ export function rowOfNode(node: any): EditorRow | null {
 
 export function toEditorProduct(
   node: any,
-  extras: { lowStockAt?: number | null; pending?: PendingEdit | null } = {}
+  extras: { lowStockAt?: number | null; pending?: PendingEdit | null; recipeNode?: any } = {}
 ): EditorProduct | null {
   const a = node?.attributes;
   if (!a || node?.id == null) return null;
@@ -278,6 +397,13 @@ export function toEditorProduct(
     variants: rows,
     lowStockAt: extras.lowStockAt ?? null,
     openDecisionId: decisions.length ? String(decisions[0].id) : null,
-    pending: extras.pending ?? null
+    pending: extras.pending ?? null,
+    unlimited: isUnlimited({ quant: a.quant, unlimited: typeof a.unlimited === 'boolean' ? a.unlimited : null }),
+    oneForeProject: a.oneForeProject === true,
+    marginPct: num(extras.recipeNode?.attributes?.marginPct) ?? 0,
+    location: locationOf(extras.recipeNode?.attributes?.location),
+    recipe: recipeOfNode(extras.recipeNode),
+    recipeLocked: isRecipeLocked(extras.recipeNode),
+    recipeIsDeal: isRecipeDeal(origin, extras.recipeNode)
   };
 }

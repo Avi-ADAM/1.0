@@ -317,5 +317,14 @@
     "noName": "a customer",
     "openLead": "Open the lead",
     "chip": "Customer off the site"
+  },
+  "recipe": {
+    "title": "Making what you asked for takes more work",
+    "explain": "The rikma asks to change what the product is made of. A change that adds to the cost is not added to your bill without your signature. Approve, or choose which of it you need.",
+    "add": "Added: {{name}}",
+    "change": "Changed: {{name}}",
+    "remove": "Removed: {{name}}",
+    "raise": "Added to the cost:",
+    "keepHint": "Mark what you need. Anything you leave unmarked stays out of your proposal."
   }
 }

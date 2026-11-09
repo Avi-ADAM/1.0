@@ -11,6 +11,7 @@
     Plus,
     RotateCw,
     Search,
+    ShoppingBag,
     Sparkles,
     X
   } from '@lucide/svelte';
@@ -350,6 +351,8 @@
                   <ClipboardList size={20} strokeWidth={1.8} />
                 {:else if action.id === 'mission'}
                   <Sparkles size={20} strokeWidth={1.8} />
+                {:else if action.id === 'product'}
+                  <ShoppingBag size={20} strokeWidth={1.8} />
                 {:else}
                   <Package size={20} strokeWidth={1.8} />
                 {/if}
@@ -468,12 +471,24 @@
               <strong>{$t('common.quickCreate.noProjects')}</strong>
               <p>{$t('common.quickCreate.noProjectsHint')}</p>
             </div>
-            <a class="browse-link" href="/moach" onclick={closeDialog}>
-              {$t('common.quickCreate.browseProjects')}<ArrowRight
-                size={14}
-                aria-hidden="true"
-              />
-            </a>
+            <div class="empty-actions">
+              <a
+                class="browse-link"
+                href="/me?action=createproject"
+                onclick={closeDialog}
+              >
+                <Plus size={14} aria-hidden="true" />
+                {$t('common.quickCreate.createProject')}
+              </a>
+              <a
+                class="browse-link"
+                href="/availableMission"
+                onclick={closeDialog}
+              >
+                <Search size={14} aria-hidden="true" />
+                {$t('common.quickCreate.findProject')}
+              </a>
+            </div>
           </div>
         {:else if !loading && filteredProjects.length === 0}
           <div class="no-results" role="status">
@@ -777,7 +792,7 @@
   }
   .kind-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.65rem;
   }
   .kind-card {
@@ -1094,6 +1109,15 @@
   .retry-button:hover,
   .browse-link:hover {
     background: rgb(230 194 113 / 9%);
+  }
+  .empty-actions {
+    grid-column: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+  .empty-actions .browse-link {
+    min-height: 2.25rem;
   }
   .no-results {
     margin-top: 0.6rem;

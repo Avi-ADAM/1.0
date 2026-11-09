@@ -72,7 +72,24 @@
       "state": "Estado",
       "action": "Acción"
     },
-    "selectHint": "Elige un pedido de la lista para ver sus detalles."
+    "selectHint": "Elige un pedido de la lista para ver sus detalles.",
+    "export": "Exportar CSV",
+    "csv": {
+      "number": "Pedido",
+      "date": "Fecha",
+      "status": "Estado",
+      "buyer": "Comprador",
+      "phone": "Teléfono",
+      "email": "Correo",
+      "delivery": "Entrega",
+      "address": "Dirección",
+      "items": "Artículos",
+      "total": "Importe",
+      "currency": "Moneda",
+      "payment": "Pago",
+      "tracking": "Seguimiento",
+      "holder": "Dinero en poder de"
+    }
   },
   "order": {
     "number": "Pedido {{number}}",
@@ -141,6 +158,10 @@
       "zone": "Zona {{name}}",
       "fee": "Envío {{amount}}",
       "dispatch": "Sale el {{date}}"
+    },
+    "tracking": {
+      "title": "Seguimiento del envío",
+      "link": "Seguir el envío"
     }
   },
   "status": {
@@ -1162,6 +1183,31 @@
     "ordersOne": "Un pedido",
     "orders": "{{count}} pedidos",
     "fromLead": "Vino de una consulta",
-    "last": "último {{when}}"
+    "last": "último {{when}}",
+    "detail": {
+      "back": "Volver a clientes",
+      "notFound": "No se encontró este cliente. Puede que el pedido se cancelara o que cambiaran sus datos.",
+      "paid": "Pagado hasta hoy",
+      "orders": "Pedidos pagados",
+      "since": "Cliente desde",
+      "lead": "Abrir la consulta original",
+      "history": "Todos los pedidos",
+      "noOrders": "Este cliente aún no tiene pedidos, solo una consulta."
+    }
+  },
+  "tracking": {
+    "action": "Número de seguimiento",
+    "title": "Número de seguimiento del pedido {{number}}",
+    "body": "El número se guarda en el pedido. Si el comprador dejó su correo, lo recibirá: enseguida si el pedido ya se envió; si no, junto con el correo del envío.",
+    "number": "Número de seguimiento",
+    "carrier": "Transportista (opcional)",
+    "url": "Enlace a la página de seguimiento (opcional)",
+    "save": "Guardar",
+    "remove": "Quitar el número",
+    "close": "Cerrar",
+    "missing": "Escribe el número de seguimiento.",
+    "failed": "No se pudo guardar. Revisa la conexión e inténtalo de nuevo.",
+    "saved": "Número de seguimiento guardado para el pedido {{number}}",
+    "removed": "Número de seguimiento quitado del pedido {{number}}"
   }
 }

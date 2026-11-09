@@ -445,6 +445,33 @@ export class ActionService {
           });
       }
 
+      // Step 5c': the buyer's mail (received / paid / shipped / tracking) —
+      // $lib/server/shop/orderMail. Same fire-and-forget rule: a mail that does
+      // not go out is a log line, never a failed order.
+      if (
+        actionKey === 'createPaidOrder' ||
+        actionKey === 'confirmOrderPayment' ||
+        actionKey === 'markOrderShipped' ||
+        actionKey === 'setOrderTracking'
+      ) {
+        import('../shop/orderMailHook.js')
+          .then(({ onOrderMail }) =>
+            onOrderMail({
+              actionKey,
+              params,
+              result: strapiResult,
+              context,
+              strapi: this.strapiClient
+            })
+          )
+          .catch((err) => {
+            this.logger.warn('Order mail error', {
+              actionKey,
+              error: err instanceof Error ? err.message : String(err)
+            });
+          });
+      }
+
       // Step 5d: Order automation (PLAN_SHOP_OPERATIONS §3, A1) — a paid
       // order opens the acts the rikma's agreed steps ask for; a cancelled one
       // closes the open ones. After the order and sales are written, and

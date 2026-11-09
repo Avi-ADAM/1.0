@@ -228,7 +228,7 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
             }
           },
           intent: 'outcome',
-          metadata: { type: 'paidOrder', url: `moach/${projectId}/sales/manage/orders`, priority: 'normal' }
+          metadata: { type: 'paidOrder', url: `moach/${projectId}/sales/manage/orders/${orderId}`, priority: 'normal' }
         },
         { projectId },
         null,

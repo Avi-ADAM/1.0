@@ -59,7 +59,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     round: { mode: 'keep', why, hm: hours, price: rate },
     extraFor: async (decision) => {
       signers = (await signersOf(decision)) as DealSigners | null;
-      if (!signers || !signers.ids.includes(me)) {
+      if (!signers?.deal || !signers.ids.includes(me)) {
         throw new Error('Only the customer of this deal counters its requests for more hours here');
       }
       return signers;

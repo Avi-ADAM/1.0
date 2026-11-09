@@ -11,7 +11,7 @@
  */
 
 import { loadDealDue, type LoadedDealDue, type QidRunner } from '$lib/server/sheirut/dealDue';
-import { readDealEdits, type DealEditView } from '$lib/sheirut/dealEdit';
+import { readDealEdits, readDealRecipeEdits, type DealEditView, type DealRecipeView } from '$lib/sheirut/dealEdit';
 import { readDealOffers } from '$lib/server/deal/dealOffers';
 import type { DealOffersView } from '$lib/sheirut/dealOffers';
 import { loadParts } from '$lib/server/deal/partsReceived';
@@ -25,6 +25,8 @@ import { receiptView, type ReceiptView } from '$lib/sheirut/dealReceipt';
 export interface DealPieces {
   due: LoadedDealDue | null;
   edits: DealEditView[];
+  /** Open changes to what the deal's product is made of. */
+  recipeEdits: DealRecipeView[];
   /** null when no part of the deal is open. */
   offers: DealOffersView | null;
   parts: PartsView | null;
@@ -34,7 +36,7 @@ export interface DealPieces {
   receipt: ReceiptView | null;
 }
 
-export const NO_PIECES: DealPieces = { due: null, edits: [], offers: null, parts: null, missionIds: [], receipt: null };
+export const NO_PIECES: DealPieces = { due: null, edits: [], recipeEdits: [], offers: null, parts: null, missionIds: [], receipt: null };
 
 /** The unassigned lines of qid 417's answer — the ones a mark (§3.4) can apply to. */
 function openLinesOf(res: any): Array<{ kind: LineKind; id: string }> {
@@ -94,6 +96,16 @@ export async function readDealPieces(run: QidRunner, sheirutId: string, viewerId
     }
   }
 
+  let recipeEdits: DealRecipeView[] = [];
+  if (due) {
+    try {
+      const res = await run('dealRecipeEdits', { id: sheirutId });
+      recipeEdits = readDealRecipeEdits(res, (await track) === 'fixed' ? [] : due.customerIds, String(viewerId));
+    } catch (e) {
+      warn('the changes to the recipe')(e);
+    }
+  }
+
   let receipt: ReceiptView | null = null;
   if ((await track) === 'fixed') {
     try {
@@ -104,5 +116,5 @@ export async function readDealPieces(run: QidRunner, sheirutId: string, viewerId
     }
   }
 
-  return { due: due ?? null, edits, offers: offers ?? null, parts: parts ?? null, missionIds, receipt };
+  return { due: due ?? null, edits, recipeEdits, offers: offers ?? null, parts: parts ?? null, missionIds, receipt };
 }

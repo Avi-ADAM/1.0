@@ -19,13 +19,15 @@ import { openObjectChangeDecision } from '$lib/server/archive/decision.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { shiftsEnabled } from '$lib/server/shifts/mode.js';
 import { fetchTarget, TARGET_KINDS, type TargetKind } from '$lib/server/archive/targets.js';
-import { loadMissionDeal, notifyDealClientsOfEdit, syncDealLine } from '$lib/server/sheirut/dealEdit.js';
+import { loadMissionDeal, loadProductDeals, notifyDealClientsOfEdit, notifyDealClientsOfRecipe, signersFromProductDeals, syncDealLine } from '$lib/server/sheirut/dealEdit.js';
 import { raisesPart } from '$lib/sheirut/dealEdit.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 import { objectScope } from '../../realtime/objectScope.js';
 import { ActionError } from '../errors.js';
 import { noticeSubject } from '$lib/notices/links';
 import { parseVariantTerms, variantTermsLive, variantTermsSummary } from '$lib/server/archive/variantTerms.js';
+import { bomTermsLive, bomTermsSummary, parseBomTerms } from '$lib/server/archive/bomTerms.js';
+import { bomAssignees } from '$lib/shop/bomEditor.js';
 
 const KIND_OFS = ['total', 'monthly', 'yearly', 'perUnit', 'rent', 'unlimited', 'daily'];
 
@@ -68,7 +70,7 @@ function buildRound(values: Record<string, any>, why: string): StandingRound {
 }
 
 function hasAnyChange(round: StandingRound): boolean {
-  if (round.variants?.length) return true;
+  if (round.variants?.length || round.bom?.length) return true;
   return [
     round.name, round.descrip, round.hm, round.price, round.kindOf, round.sqadualed, round.sqadualedf,
     round.shiftsMin, round.shiftsMax, round.howMany,
@@ -116,6 +118,17 @@ const handler: ActionExecutionHandler = async (params, context, { notifier, stra
     const summary = variantTermsSummary(variantTerms, 'he');
     round.why = [why, summary].filter(Boolean).join('\n');
   }
+
+  // What the product is made of (PLAN_PRODUCT_FORM_UNIFIED, phase 3), refused
+  // the same way until `negoarch.bom` is deployed.
+  const bomTerms = targetKind === 'matanot' ? parseBomTerms(values.bom) : [];
+  if (bomTerms.length) {
+    if (!(await bomTermsLive(exec))) {
+      throw new ActionError('BOM_TERMS_NOT_READY', 'A product recipe cannot be proposed until the schema is deployed');
+    }
+    round.bom = bomTerms;
+    round.why = [round.why, bomTermsSummary(bomTerms, 'he')].filter(Boolean).join('\n');
+  }
   if (!hasAnyChange(round)) throw new Error('Nothing to change - send at least one new value');
 
   const otherMembers = target.memberIds.filter((id) => id !== userId);
@@ -128,8 +141,12 @@ const handler: ActionExecutionHandler = async (params, context, { notifier, stra
   // On a fixed price nobody besides the rikma signs (clientIds is empty there, P3).
   const needsCustomer = !!deal && deal.clientIds.length > 0 && raisesPart(round, deal);
 
+  // More work on a wish product is more on its customer's bill: she signs that too.
+  const recipeSigners = bomTerms.length && target.projectId ? signersFromProductDeals(run, await loadProductDeals(run, targetId), target.name) : null;
+  const recipeNeedsCustomer = !!recipeSigners && recipeSigners.needed(round as any);
+
   // A rikma of one is unanimous by definition — unless the customer has to sign.
-  if (otherMembers.length === 0 && !needsCustomer) {
+  if (otherMembers.length === 0 && !needsCustomer && !recipeNeedsCustomer) {
     const result = await applyObjectChange(exec, {
       target,
       round,
@@ -138,6 +155,11 @@ const handler: ActionExecutionHandler = async (params, context, { notifier, stra
       actorId: userId,
       fetchFn: context.fetch,
     });
+    if (recipeSigners?.onApplied) {
+      await recipeSigners.onApplied(round as any).catch((e: unknown) =>
+        console.error('[proposeObjectEdit] applied, but the deals did not follow:', e),
+      );
+    }
     if (deal) {
       await syncDealLine(run, deal, round).catch((e: unknown) =>
         console.error('[proposeObjectEdit] applied, but the deal did not follow:', e),
@@ -165,10 +187,39 @@ const handler: ActionExecutionHandler = async (params, context, { notifier, stra
   );
 
   if (deal && needsCustomer) await notifyDealClientsOfEdit(notifier, context, deal, round);
+  if (recipeSigners && recipeNeedsCustomer) await notifyDealClientsOfRecipe(notifier, context, recipeSigners, round.bom ?? []);
+
+  // Whoever this version puts work on is asked differently: their silence does not count.
+  const owners = bomAssignees(round.bom).filter((id) => id !== userId);
 
   // Only the customer may be left to sign — an empty list would fall back to
   // the whole rikma (N4).
-  if (notifier && target.projectId && otherMembers.length) {
+  const silentMembers = otherMembers.filter((id) => !owners.includes(id));
+  if (notifier && target.projectId && owners.length) {
+    notifier
+      .notify(
+        {
+          recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
+          templates: {
+            title: { he: `הוצע שתיקח/י חלק ב"${target.name}"`, en: `You were proposed for part of "${target.name}"` },
+            body: {
+              he: `${round.why || ''} - זה לא יוחל בלי אישור מפורש שלך, ושתיקה לא נחשבת הסכמה. אפשר לאשר הכול, או לאשר את העבודה בלי שתהיה עליך.`,
+              en: `${round.why || ''} - This does not apply without your explicit approval; silence is not consent. Approve it all, or keep the work without it being yours.`,
+            },
+          },
+          intent: 'consent',
+          subject: () => noticeSubject('decision', opened.decisionId, target.projectId, 'archObject'),
+          subjectText: 'before',
+          metadata: { type: 'voteUpdate', url: `/moach/${target.projectId}/sales/manage/products/${target.id}`, priority: 'high' },
+        },
+        { recipients: owners, projectId: target.projectId },
+        { projectId: target.projectId, decisionId: opened.decisionId },
+        context,
+      )
+      .catch((e: unknown) => console.warn('[proposeObjectEdit] owner notification failed:', e));
+  }
+
+  if (notifier && target.projectId && silentMembers.length) {
     notifier
       .notify(
         {
@@ -180,7 +231,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier, stra
             },
             body: {
               he: `${round.why || 'ללא נימוק'} -האובייקט נשאר, רק הפרטים משתנים. אפשר לאשר, להציע נוסחה אחרת או לפתוח שיחה.`,
-              en: `${[why, round.variants?.length ? variantTermsSummary(round.variants, 'en') : ''].filter(Boolean).join('\n') || 'No reason given'} -the object stays, only its terms change. Approve, propose different terms, or open a discussion. No response within ${restimeLabel(target.projectRestime, 'en')} approves it.`,
+              en: `${[why, round.variants?.length ? variantTermsSummary(round.variants, 'en') : '', round.bom?.length ? bomTermsSummary(round.bom, 'en') : ''].filter(Boolean).join('\n') || 'No reason given'} -the object stays, only its terms change. Approve, propose different terms, or open a discussion. No response within ${restimeLabel(target.projectRestime, 'en')} approves it.`,
             },
           },
           // Silence approves it — every member has to hear that the clock is running.
@@ -194,7 +245,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier, stra
             priority: 'high',
           },
         },
-        { recipients: otherMembers, projectId: target.projectId },
+        { recipients: silentMembers, projectId: target.projectId },
         { projectId: target.projectId, decisionId: opened.decisionId },
         context,
       )
@@ -224,7 +275,7 @@ export const proposeObjectEditConfig: ActionConfig = {
   paramSchema: {
     targetKind: { type: 'string', required: true, description: 'openMission | missionInProgress | openResource | resourceInProgress | matanot' },
     targetId: { type: 'string', required: true, description: 'Id of the object' },
-    newValues: { type: 'object', required: true, description: 'Proposed values: { name, descrip, hm, price, kindOf, sqadualed, sqadualedf }; on a product also `variants` (new variants / variant prices, $lib/shop/variantEditor VariantTerm[])' },
+    newValues: { type: 'object', required: true, description: 'Proposed values: { name, descrip, hm, price, kindOf, sqadualed, sqadualedf }; on a product also `variants` (new variants / variant prices, $lib/shop/variantEditor VariantTerm[]) and `bom` (recipe lines, $lib/shop/bomEditor BomTerm[])' },
     why: { type: 'string', required: false, description: 'Why the change is proposed' },
   },
 

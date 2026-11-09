@@ -20,12 +20,14 @@
    * @property {string} [name] - the need's name
    * @property {number} [value] - the need's value, the default for a new resource
    * @property {number} [round] - the round you were shown
+   * @property {(pick: { spId?: string, create?: { myp: number } }) => void} [onChoose] - the choice is part of a
+   *   signature made elsewhere: hand it over instead of answering an Askm, and offer all your resources
    * @property {(r: { materialized: boolean }) => void} [onDone]
    * @property {() => void} [onCancel]
    */
 
   /** @type {Props} */
-  let { askmId, projectId, mashaabimId = null, name = '', value = 0, round = 0, onDone, onCancel } = $props();
+  let { askmId, projectId, mashaabimId = null, name = '', value = 0, round = 0, onChoose, onDone, onCancel } = $props();
 
   /** @type {Array<{id: string, attributes: {name: string}}>} */
   let mine = $state([]);
@@ -37,12 +39,14 @@
   let myValue = $state(Number(value) || 0);
 
   onMount(async () => {
-    if (!mashaabimId) {
+    if (!mashaabimId && !onChoose) {
       loading = false;
       return;
     }
     try {
-      const res = await sendToSer({ idL: '0', mashaabimId: String(mashaabimId) }, 'getUserSpByMashaabim', 0, 0, false, fetch);
+      const res = mashaabimId
+        ? await sendToSer({ idL: '0', mashaabimId: String(mashaabimId) }, 'getUserSpByMashaabim', 0, 0, false, fetch)
+        : await sendToSer({ idL: '0' }, 'getUserSpsAvailable', 0, 0, false, fetch);
       mine = res?.data?.usersPermissionsUser?.data?.attributes?.sps?.data ?? [];
       if (mine.length > 0) choice = String(mine[0].id);
     } catch (e) {
@@ -53,6 +57,10 @@
   });
 
   async function submit() {
+    if (onChoose) {
+      onChoose(choice ? { spId: choice } : { create: { myp: Math.max(0, Number(myValue) || 0) } });
+      return;
+    }
     if (sending) return;
     sending = true;
     try {

@@ -16,6 +16,7 @@
   import { isMobileOrTablet } from '$lib/utilities/device';
   import CardHeader from './CardHeader.svelte';
   import NegoArchive from '../negoArchive.svelte';
+  import BomApproval from '$lib/components/products/BomApproval.svelte';
   import { buildTermRows } from '$lib/archive/decisionView.js';
 
   /**
@@ -170,7 +171,20 @@
     }
   }
 
+  // A new resource assigned to me: my yes says which of mine it is.
+  let bomApproval = $state();
+  const mustPick = $derived((archive?.myResourcesToPick?.length ?? 0) > 0);
+
+  function bomSigned(data) {
+    toast.success(data?.consensus ? $t('archive.toast.matured') : $t('archive.toast.approved'));
+    onDone?.();
+  }
+
   async function approve() {
+    if (mustPick) {
+      bomApproval?.start();
+      return;
+    }
     if (approving) return;
     approving = true;
     try {
@@ -409,6 +423,17 @@
     {/if}
   </div>
 </div>
+
+{#if mustPick}
+  <BomApproval
+    bind:this={bomApproval}
+    terms={standing.bom ?? []}
+    indexes={archive.myResourcesToPick}
+    {projectId}
+    decisionId={archive.decisionId}
+    onSigned={bomSigned}
+  />
+{/if}
 
 <NegoArchive bind:open={negoOpen} {archive} {projectId} onSent={onDone} />
 

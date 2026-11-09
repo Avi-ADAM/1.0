@@ -36,6 +36,28 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   }, params.expectRound);
 
   const deal = (signers as DealSigners | null)?.deal;
+  const recipe = (signers as DealSigners | null)?.recipe;
+  if (notifier && recipe?.projectId) {
+    notifier
+      .notify(
+        {
+          recipients: { type: 'projectMembers', config: { projectIdParam: 'projectId', excludeSender: true } },
+          templates: {
+            title: { he: 'הלקוח חתם על השינוי בהרכב', en: 'The customer signed the recipe change' },
+            body: {
+              he: `הלקוח חתם על ההרכב החדש של "${recipe.productName}".${outcome.consensus ? ' הוא אושר והוחל.' : ' הוא יוחל כשהרקמה תאשר אותו או כשהשעון ייגמר.'}`,
+              en: `The customer signed the new recipe of "${recipe.productName}".${outcome.consensus ? ' It was approved and applied.' : ' It applies once the rikma approves it or its clock runs out.'}`
+            }
+          },
+          intent: outcome.consensus ? 'outcome' : 'ambient',
+          metadata: { type: 'voteUpdate', url: `/moach/${recipe.projectId}/votes/decision/${decisionId}`, priority: 'normal' }
+        },
+        { projectId: recipe.projectId },
+        { projectId: recipe.projectId, decisionId },
+        context
+      )
+      .catch((e: unknown) => console.warn('[signDealEdit] notification failed:', e));
+  }
   if (notifier && deal?.projectId) {
     notifier
       .notify(
@@ -74,10 +96,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
       consensus: outcome.consensus,
       awaiting: outcome.awaiting,
       // Where the screens are (realtime): the rikma, the deal, its mission and customers.
-      projectId: deal?.projectId ?? null,
-      sheirutId: deal?.sheirutId ?? null,
+      projectId: deal?.projectId ?? recipe?.projectId ?? null,
+      sheirutId: deal?.sheirutId ?? recipe?.sheirutId ?? null,
       missionId: deal?.missionId ?? null,
-      clientIds: deal?.clientIds ?? []
+      clientIds: deal?.clientIds ?? (signers as DealSigners | null)?.ids ?? []
     },
     updateStrategy: { type: 'none' as const }
   };

@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>מטיימר לאחוזים</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family: 'Sababa'; src: url('../../../static/fonts/NbmSababaHL1-Bold.otf'); }
+  :root {
+    --barbi: #ff0092; --gold: #fbbf24; --green: #34d399;
+    --night: #0f0b24; --night2: #1d1442; --panel: #171233; --line: #2f2760; --muted: #9b93c9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--night); }
+  body { font-family: 'Heebo', sans-serif; color: #fff; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden;
+    background: radial-gradient(120% 80% at 50% 30%, var(--night2), var(--night)); }
+  .layer { position: absolute; inset: 0; }
+  .center { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .w { display: inline-block; opacity: 0; white-space: pre; }
+  .mono { font-family: 'JetBrains Mono', monospace; direction: ltr; unicode-bidi: isolate; }
+
+  /* S1: the question */
+  #q1 { font-size: 100px; white-space: nowrap; font-weight: 900; line-height: 1.15; padding: 0 70px; }
+  #q2 { font-size: 84px; font-weight: 800; color: var(--barbi); margin-top: 40px; line-height: 1.2; }
+  #chat { margin-top: 120px; display: flex; flex-direction: column; gap: 26px; align-items: flex-start; width: 820px; }
+  .bub { padding: 26px 40px; border-radius: 44px 44px 44px 10px; background: #2a2160; font-size: 46px; font-weight: 500; opacity: 0; color: #e3dcff; }
+  .bub:nth-child(2) { align-self: flex-end; border-radius: 44px 44px 10px 44px; background: #3a2a7a; }
+
+  /* S2: mission + timer */
+  #s2 { opacity: 0; }
+  #h2 { position: absolute; top: 140px; width: 100%; text-align: center; font-size: 70px; font-weight: 800; }
+  #card { position: absolute; top: 300px; left: 90px; width: 900px; padding: 50px 60px 54px; border-radius: 44px; background: #fff; color: #1a1333;
+    box-shadow: 0 40px 100px rgba(0,0,0,.5); }
+  #pill { display: inline-block; padding: 10px 30px; border-radius: 40px; background: #ffe3f3; color: #c4006f; font-size: 36px; font-weight: 700; }
+  #mt { font-size: 66px; font-weight: 900; margin-top: 22px; }
+  .row { display: flex; align-items: center; gap: 22px; font-size: 44px; font-weight: 500; margin-top: 24px; color: #3b335c; }
+  .row b { color: #1a1333; font-weight: 900; }
+  #timer { position: absolute; top: 880px; left: 90px; width: 900px; height: 640px; border-radius: 44px; background: var(--panel);
+    border: 2px solid var(--line); box-shadow: 0 30px 80px rgba(0,0,0,.55); }
+  #dial { position: absolute; top: 60px; right: 60px; width: 380px; height: 380px; }
+  #read { position: absolute; top: 130px; left: 40px; width: 460px; text-align: center; }
+  #read .lbl { font-size: 40px; color: var(--muted); font-weight: 500; }
+  #clockv { font-size: 84px; font-weight: 700; margin-top: 10px; letter-spacing: -2px; }
+  #ff { margin-top: 18px; font-size: 38px; color: var(--gold); font-weight: 700; opacity: 0; }
+  #play { position: absolute; top: 175px; right: 175px; width: 150px; height: 150px; border-radius: 50%; background: var(--barbi);
+    display: flex; align-items: center; justify-content: center; box-shadow: 0 0 50px rgba(255,0,146,.55); }
+  #play svg { width: 64px; height: 64px; }
+  #log { position: absolute; top: 470px; left: 60px; right: 60px; display: flex; gap: 18px; }
+  .seg { flex: 1; padding: 18px 0; border-radius: 26px; background: #221b4a; border: 2px solid #3d3482; text-align: center; font-size: 34px;
+    color: #e3dcff; opacity: 0; }
+  .seg b { display: block; font-size: 42px; color: #fff; }
+  #cursor { position: absolute; left: 0; top: 0; width: 90px; height: 90px; filter: drop-shadow(0 6px 10px rgba(0,0,0,.6)); opacity: 0; }
+
+  /* S3: approval */
+  #s3 { opacity: 0; }
+  #h3 { position: absolute; top: 160px; width: 100%; text-align: center; font-size: 70px; font-weight: 800; }
+  #req { position: absolute; top: 330px; left: 90px; width: 900px; padding: 46px 56px; border-radius: 44px; background: #fff; color: #1a1333;
+    box-shadow: 0 40px 100px rgba(0,0,0,.5); }
+  #req .t { font-size: 38px; color: #6b6290; font-weight: 700; }
+  #req .v { font-size: 74px; font-weight: 900; margin-top: 8px; }
+  #req .v span { color: #c4006f; }
+  #votes { position: absolute; top: 760px; left: 90px; width: 900px; display: flex; flex-direction: column; gap: 30px; }
+  .vote { display: flex; align-items: center; gap: 30px; padding: 30px 40px; border-radius: 36px; background: var(--panel); border: 2px solid var(--line); opacity: 0; }
+  .av { width: 110px; height: 110px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 66px; flex: none; }
+  .vote .n { flex: 1; font-size: 48px; font-weight: 800; }
+  .vote .n small { display: block; font-size: 34px; color: var(--muted); font-weight: 500; margin-top: 2px; }
+  .mark { width: 96px; height: 96px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 58px; font-weight: 900;
+    background: var(--green); color: #052e1f; opacity: 0; flex: none; }
+  #ring { width: 96px; height: 96px; flex: none; }
+  #stamp { position: absolute; top: 1480px; width: 100%; text-align: center; }
+  #stamp span { display: inline-block; padding: 26px 60px; border-radius: 60px; background: var(--green); color: #052e1f;
+    font-size: 56px; font-weight: 900; opacity: 0; box-shadow: 0 0 60px rgba(52,211,153,.5); }
+  #rest { position: absolute; top: 1650px; width: 100%; text-align: center; font-size: 40px; color: var(--muted); opacity: 0; }
+
+  /* S4: hours -> percent */
+  #s4 { opacity: 0; }
+  #h4 { position: absolute; top: 150px; width: 100%; text-align: center; font-size: 70px; font-weight: 800; }
+  #calc { position: absolute; top: 300px; width: 100%; text-align: center; font-size: 76px; font-weight: 800; }
+  #calc .eq { color: var(--gold); }
+  #pie { position: absolute; top: 520px; left: 190px; width: 700px; height: 700px; }
+  #pct { position: absolute; top: 700px; left: 190px; width: 700px; text-align: center; }
+  #pct .big { font-size: 190px; font-weight: 900; color: var(--barbi); line-height: 1; }
+  #pct .s { font-size: 44px; color: #e3dcff; font-weight: 700; margin-top: 6px; }
+  #legend { position: absolute; top: 1300px; left: 120px; right: 120px; display: flex; flex-wrap: wrap; justify-content: center; gap: 18px 36px; font-size: 40px; color: #e3dcff; }
+  #legend div { display: flex; align-items: center; gap: 14px; opacity: 0; }
+  #legend i { width: 30px; height: 30px; border-radius: 8px; display: inline-block; }
+  #note { position: absolute; top: 1500px; width: 100%; text-align: center; font-size: 36px; color: var(--muted); padding: 0 90px; opacity: 0; line-height: 1.4; }
+
+  /* S5: brand */
+  #s5 { background: radial-gradient(110% 70% at 50% 40%, #3a1257, var(--night)); opacity: 0; }
+  #mark { font-family: 'Sababa', 'Heebo'; font-size: 250px; direction: ltr; letter-spacing: 4px; }
+  #mark .h { color: var(--barbi); display: inline-block; }
+  #tagline { font-size: 80px; font-weight: 800; margin-top: 40px; }
+  #sub { font-size: 50px; color: #d7cff9; margin-top: 26px; padding: 0 80px; line-height: 1.35; }
+  #cta { margin-top: 90px; padding: 34px 90px; border-radius: 90px; background: var(--barbi); font-size: 66px; font-weight: 800;
+    direction: ltr; box-shadow: 0 0 60px rgba(255,0,146,.55); }
+  #s5 > * { opacity: 0; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- S1: what is an hour worth? -->
+  <div class="layer center" id="s1">
+    <div id="q1">כמה שווה שעה שלך</div>
+    <div id="q2">בסטארט־אפ של חברים?</div>
+    <div id="chat">
+      <div class="bub">נסתדר על זה אחר כך 😉</div>
+      <div class="bub">אחר כך מתי?</div>
+    </div>
+  </div>
+
+  <!-- S2: a mission and its timer -->
+  <div class="layer" id="s2">
+    <div id="h2">פותחים משימה ברקמה</div>
+    <div id="card">
+      <div id="pill">משימה בתהליך</div>
+      <div id="mt">בניית דף הנחיתה</div>
+      <div class="row" id="r1">💎<span>שווי שעה שסוכם: <b class="mono">₪150</b></span></div>
+      <div class="row" id="r2">👩🏽‍💻<span>מבצעת: את</span></div>
+    </div>
+    <div id="timer">
+      <svg id="dial" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="86" stroke="#2a2160" stroke-width="14" fill="none"/>
+        <circle id="arc" cx="100" cy="100" r="86" stroke="#ff0092" stroke-width="14" fill="none" stroke-linecap="round"
+          transform="rotate(-90 100 100)" stroke-dasharray="540.4" stroke-dashoffset="540.4"/>
+      </svg>
+      <div id="play"><svg id="pic" viewBox="0 0 24 24"><path d="M7 4 L20 12 L7 20 Z" fill="#fff"/></svg></div>
+      <div id="read"><div class="lbl">נרשם במשימה</div><div id="clockv" class="mono">00:00:00</div><div id="ff">⏩ שבועיים אחרי</div></div>
+      <div id="log">
+        <div class="seg">ראשון<b class="mono">3:30</b></div>
+        <div class="seg">שלישי<b class="mono">4:00</b></div>
+        <div class="seg">חמישי<b class="mono">2:30</b></div>
+        <div class="seg">ראשון<b class="mono">2:00</b></div>
+      </div>
+    </div>
+    <svg id="cursor" viewBox="0 0 24 24"><path d="M4 2 L4 20 L9 15.5 L12.5 22 L15.5 20.6 L12 14 L19 14 Z" fill="#fff" stroke="#0f0b24" stroke-width="1.4" stroke-linejoin="round"/></svg>
+  </div>
+
+  <!-- S3: the partners approve the hours -->
+  <div class="layer" id="s3">
+    <div id="h3">השותפים מאשרים את השעות</div>
+    <div id="req"><div class="t">בקשת אישור שעות · בניית דף הנחיתה</div><div class="v"><span class="mono">12</span> שעות</div></div>
+    <div id="votes">
+      <div class="vote" id="v1"><div class="av" style="background:linear-gradient(135deg,#7c3aed,#4f46e5)">🧔🏻</div><div class="n">יוסי<small>אישר</small></div><div class="mark">✓</div></div>
+      <div class="vote" id="v2"><div class="av" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">👩🏻‍🦰</div><div class="n">מיכל<small>אישרה</small></div><div class="mark">✓</div></div>
+      <div class="vote" id="v3"><div class="av" style="background:linear-gradient(135deg,#10b981,#0ea5e9)">👨🏾</div><div class="n">עומר<small id="v3s">לא ענה…</small></div>
+        <svg id="ring" viewBox="0 0 48 48"><circle cx="24" cy="24" r="19" stroke="#2f2760" stroke-width="6" fill="none"/>
+          <circle id="rarc" cx="24" cy="24" r="19" stroke="#fbbf24" stroke-width="6" fill="none" stroke-linecap="round" transform="rotate(-90 24 24)"
+            stroke-dasharray="119.4" stroke-dashoffset="0"/></svg>
+        <div class="mark" id="v3m">✓</div></div>
+    </div>
+    <div id="stamp"><span>✓ 12 שעות מאושרות</span></div>
+    <div id="rest">שקט = הסכמה, כשזמן התגובה של הרקמה נגמר</div>
+  </div>
+
+  <!-- S4: approved hours become your share -->
+  <div class="layer" id="s4">
+    <div id="h4">והשעות הופכות לאחוז שלך</div>
+    <div id="calc"><span class="mono">12</span> שעות × <span class="mono">₪150</span> <span class="eq">=</span> <span class="mono" id="sum">₪1,800</span></div>
+    <svg id="pie" viewBox="0 0 200 200"></svg>
+    <div id="pct"><div class="big mono" id="pv">0%</div><div class="s">החלק שלך ברקמה</div></div>
+    <div id="legend">
+      <div><i style="background:#ff0092"></i>את</div>
+      <div><i style="background:#7c3aed"></i>יוסי</div>
+      <div><i style="background:#f59e0b"></i>מיכל</div>
+      <div><i style="background:#10b981"></i>עומר</div>
+    </div>
+    <div id="note">שעות, כסף או ציוד: הכול נספר באותה שיטה</div>
+  </div>
+
+  <!-- S5: brand -->
+  <div class="layer center" id="s5">
+    <div id="mark">1<span class="h">lev</span>1</div>
+    <div id="tagline">שותפות לפי תרומה</div>
+    <div id="sub">כל שעה שאושרה הופכת לחלק שלך ברקמה</div>
+    <div id="cta">1lev1.com</div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const p = (t, s, d) => cl((t - s) / d);
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const win = (t, a, b, f = .35) => Math.min(eo(p(t, a, f)), 1 - p(t, b - f, f));
+
+function split(el) {
+  el.innerHTML = el.textContent.split(/(\s+)/).filter(Boolean)
+    .map(s => /^\s+$/.test(s) ? s : `<span class="w">${s}</span>`).join('');
+}
+['q1', 'q2', 'h2', 'h3', 'h4'].forEach(id => split($(id)));
+function words(el, t, start, per, dy = 34) {
+  el.querySelectorAll('.w').forEach((w, i) => {
+    const q = eo(p(t, start + i * per, .3));
+    w.style.opacity = q;
+    w.style.transform = `translateY(${(1 - q) * dy}px)`;
+  });
+}
+const fadeIn = (el, t, s, d = .4, dy = 30) => { const q = eo(p(t, s, d)); el.style.opacity = q; el.style.transform = `translateY(${(1 - q) * dy}px)`; return q; };
+const popIn = (el, t, s, d = .45) => { const q = p(t, s, d); el.style.opacity = Math.min(1, q * 3); el.style.transform = `scale(${q === 0 ? .4 : back(q)})`; return q; };
+const hms = sec => [sec / 3600, sec / 60 % 60, sec % 60].map(v => String(Math.floor(v)).padStart(2, '0')).join(':');
+
+// the rikma's split after the 12 hours are approved (illustration): you 18%, the others share the rest
+const SLICES = [['#7c3aed', 34], ['#f59e0b', 28], ['#10b981', 20]];
+const YOU = 18;
+function pie(you) {
+  // others scale to fill what you don't hold yet
+  const rest = 100 - you, base = SLICES.reduce((a, s) => a + s[1], 0);
+  const parts = [['#ff0092', you], ...SLICES.map(([c, v]) => [c, v / base * rest])];
+  const R = 80, C = 2 * Math.PI * R;
+  let acc = 0, out = '';
+  for (const [c, v] of parts) {
+    if (v <= 0) continue;
+    const len = v / 100 * C;
+    out += `<circle cx="100" cy="100" r="${R}" fill="none" stroke="${c}" stroke-width="${c === '#ff0092' ? 34 : 26}"
+      stroke-dasharray="${len} ${C - len}" stroke-dashoffset="${-acc}" transform="rotate(-90 100 100)"/>`;
+    acc += len;
+  }
+  $('pie').innerHTML = out;
+}
+
+const DURATION = 29.5;
+window.DURATION = DURATION;
+// narration: narrate.py (Adam / ElevenLabs v3), one line per scene; each scene is timed to its words
+window.AUDIO = [
+  { src: 'assets/narration/n1.mp3', in: 0, dur: 3.12, at: 0.4 },
+  { src: 'assets/narration/n2.mp3', in: 0, dur: 4.88, at: 5.0 },
+  { src: 'assets/narration/n3.mp3', in: 0, dur: 4.24, at: 12.6 },
+  { src: 'assets/narration/n4.mp3', in: 0, dur: 3.2, at: 18.6, fadeOut: .08 },
+  { src: 'assets/narration/n5.mp3', in: 0, dur: 3.04, at: 24.6 },
+];
+
+const PLAY = [740, 1130];   // centre of the play button on the stage
+const T_ON = 7.7;           // play pressed ("ומפעילים טיימר")
+const TOTAL = 12 * 3600;    // 12 hours by the end of the fast-forward
+
+window.seek = function (t) {
+  // ---------- S1: the question (0 - 4.7) ----------
+  // n1 at 0.4: "כמה שווה שעה שלך" 0.5–1.75 · "בסטארט-אפ של חברים?" 2.3–3.5
+  $('s1').style.opacity = 1 - eio(p(t, 4.4, .45));
+  words($('q1'), t, .45, .3);
+  words($('q2'), t, 2.3, .3, 40);
+  document.querySelectorAll('.bub').forEach((b, i) => fadeIn(b, t, 3.1 + i * .55, .35, 26));
+
+  // ---------- S2: mission + timer (4.5 - 12.4) ----------
+  // n2 at 5.0: "פותחים משימה ברקמה" 5.1–6.4 · "ומפעילים טיימר" 6.9–7.95 · "כל שעה נרשמת" 8.6–9.65
+  $('s2').style.opacity = win(t, 4.5, 12.45, .35);
+  words($('h2'), t, 5.1, .3);
+  const kq = p(t, 5.5, .55);
+  $('card').style.opacity = Math.min(1, kq * 3);
+  $('card').style.transform = `translateY(${(1 - eo(kq)) * 140}px) rotate(${(1 - eo(kq)) * -3}deg)`;
+  fadeIn($('r1'), t, 6.0, .4); fadeIn($('r2'), t, 6.35, .4);
+  fadeIn($('timer'), t, 6.6, .45, 80);
+  // cursor glides to play and presses it
+  const c = $('cursor');
+  const ap = eio(p(t, 6.85, .7));
+  const press = t > T_ON && t < T_ON + .2 ? Math.sin((t - T_ON) / .2 * Math.PI) : 0;
+  c.style.opacity = ap > 0 ? 1 - p(t, 8.4, .3) : 0;
+  c.style.transform = `translate(${960 + (PLAY[0] + 20 - 960) * ap}px, ${1800 + (PLAY[1] + 20 - 1800) * ap}px) scale(${1 - .14 * press})`;
+  const running = t >= T_ON;
+  $('play').style.transform = `scale(${1 - .08 * press})`;
+  $('pic').innerHTML = running ? '<rect x="6" y="5" width="4" height="14" rx="1" fill="#fff"/><rect x="14" y="5" width="4" height="14" rx="1" fill="#fff"/>'
+                               : '<path d="M7 4 L20 12 L7 20 Z" fill="#fff"/>';
+  // fast-forward: real seconds at first, then two weeks of sessions in ~3 s
+  const slow = cl(t - T_ON, 0, .9);                       // 00:00:00 → 00:00:01 ticking
+  const fast = eio(p(t, T_ON + .9, 3.2));                 // then up to 12:00:00
+  const sec = running ? Math.min(TOTAL, slow + fast * TOTAL) : 0;
+  $('clockv').textContent = hms(sec);
+  $('arc').setAttribute('stroke-dashoffset', 540.4 * (1 - (sec % 3600) / 3600 * (sec >= TOTAL ? 0 : 1) - (sec >= TOTAL ? 1 : 0)));
+  $('ff').style.opacity = fast > 0 && fast < 1 ? 1 : (fast >= 1 ? 1 - p(t, T_ON + 4.1, .3) : 0);
+  // sessions land in the log as the hours pile up
+  document.querySelectorAll('.seg').forEach((s, i) => popIn(s, t, T_ON + 1.2 + i * .7, .4));
+
+  // ---------- S3: approval (12.3 - 18.4) ----------
+  // n3 at 12.6: "השותפים מאשרים את השעות" 12.7–14.3 · "ומי ששותק" 14.9–15.65 · "מסכים" 16.2–16.7
+  $('s3').style.opacity = win(t, 12.3, 18.45, .35);
+  words($('h3'), t, 12.6, .28);
+  popIn($('req'), t, 12.9, .45);
+  ['v1', 'v2', 'v3'].forEach((id, i) => fadeIn($(id), t, 13.2 + i * .25, .35, 40));
+  popIn($('v1').querySelector('.mark'), t, 13.7, .4);
+  popIn($('v2').querySelector('.mark'), t, 14.2, .4);
+  // the silent partner: his clock (the rikma's restime) runs out, and silence counts as yes
+  const rq = eio(p(t, 14.8, 1.5));
+  $('rarc').setAttribute('stroke-dashoffset', 119.4 * rq);
+  $('ring').style.display = t < 16.3 ? 'block' : 'none';
+  $('v3m').style.display = t < 16.3 ? 'none' : 'flex';
+  popIn($('v3m'), t, 16.3, .4);
+  $('v3s').textContent = t < 16.3 ? 'לא ענה…' : 'שתק = הסכים';
+  $('v3s').style.color = t < 16.3 ? '' : '#34d399';
+  popIn($('stamp').firstElementChild, t, 16.8, .45);
+  fadeIn($('rest'), t, 15.2, .4, 16);
+
+  // ---------- S4: hours -> percent (18.3 - 24.4) ----------
+  // n4 at 18.6: "והשעות המאושרות הופכות לאחוז שלך ברקמה" 18.7–21.8
+  $('s4').style.opacity = win(t, 18.3, 24.45, .35);
+  words($('h4'), t, 18.55, .25);
+  fadeIn($('calc'), t, 19.3, .4);
+  const gq = eio(p(t, 20.1, 1.6));
+  fadeIn($('pie'), t, 19.8, .4, 0);
+  pie(YOU * gq);
+  $('pv').textContent = Math.round(YOU * gq) + '%';
+  $('pct').style.opacity = eo(p(t, 20.0, .3));
+  const bq = t > 21.7 && t < 22.2 ? Math.sin((t - 21.7) / .5 * Math.PI) : 0;
+  $('pv').style.transform = `scale(${1 + .1 * bq})`;
+  document.querySelectorAll('#legend div').forEach((d, i) => fadeIn(d, t, 21.0 + i * .15, .3, 16));
+  fadeIn($('note'), t, 22.3, .45, 16);
+
+  // ---------- S5: brand (24.3 - 29.5) ----------
+  // n5 at 24.6: "שותפות לפי תרומה" 24.7–25.75 · "אחד-לב-אחד" 26.3–27.35
+  $('s5').style.opacity = eo(p(t, 24.3, .35));
+  fadeIn($('tagline'), t, 24.6, .4);
+  fadeIn($('sub'), t, 25.4, .4);
+  const mq = p(t, 26.2, .45);
+  $('mark').style.opacity = mq; $('mark').style.transform = `scale(${mq === 0 ? .5 : back(mq)})`;
+  const beat = t > 26.8 ? 1 + .12 * Math.max(0, Math.sin((t - 26.8) * Math.PI * 1.6)) ** 6 : 1;
+  document.querySelector('#mark .h').style.transform = `scale(${beat})`;
+  const ctq = fadeIn($('cta'), t, 27.4, .4);
+  if (ctq >= 1) $('cta').style.transform = `scale(${1 + .04 * Math.sin((t - 27.8) * 6)})`;
+};
+
+const qs = new URLSearchParams(location.search);
+if (!qs.has('render')) {
+  document.fonts.ready.then(() => {
+    if (qs.has('t')) return window.seek(+qs.get('t'));
+    const t0 = performance.now();
+    const loop = () => { window.seek(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); };
+    loop();
+  });
+}
+</script>
+</body>
+</html>

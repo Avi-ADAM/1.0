@@ -61,6 +61,9 @@ import { createSheirutHalukaConfig } from './createSheirutHaluka.js';
 import { getDealDueConfig } from './getDealDue.js';
 import { signDealEditConfig } from './signDealEdit.js';
 import { counterDealEditConfig } from './counterDealEdit.js';
+import { counterDealRecipeConfig } from './counterDealRecipe.js';
+import { releaseBomAssignmentConfig } from './releaseBomAssignment.js';
+import { signBomAssignmentConfig } from './signBomAssignment.js';
 import { confirmSheirutHalukaConfig } from './confirmSheirutHaluka.js';
 import { updateSheirutConfig } from './updateSheirut.js';
 import { ensureHalukaForumConfig } from './ensureHalukaForum.js';
@@ -199,7 +202,7 @@ import { startOffsiteDealConfig } from './startOffsiteDeal.js';
 import { messageLeadOnSiteConfig } from './messageLeadOnSite.js';
 import { ensureLeadForumConfig } from './ensureLeadForum.js';
 import { confirmOrderPaymentConfig } from './confirmOrderPayment.js';
-import { cancelOrderConfig, markOrderShippedConfig, markOrderFulfilledConfig } from './orderLifecycle.js';
+import { cancelOrderConfig, markOrderShippedConfig, markOrderFulfilledConfig, setOrderTrackingConfig } from './orderLifecycle.js';
 import { setShopStockConfig } from './shopStock.js';
 import { saveProductVariantsConfig, saveProductOptionsConfig } from './shopProductEditor.js';
 import { reportRecurringSaleCycleConfig } from './reportRecurringSaleCycle.js';
@@ -345,6 +348,9 @@ export function registerAllActions(): void {
   registerAction(getDealDueConfig);
   registerAction(signDealEditConfig);
   registerAction(counterDealEditConfig);
+  registerAction(counterDealRecipeConfig);
+  registerAction(releaseBomAssignmentConfig);
+  registerAction(signBomAssignmentConfig);
   registerAction(confirmSheirutHalukaConfig);
   registerAction(ensureHalukaForumConfig);
 
@@ -558,6 +564,7 @@ export function registerAllActions(): void {
   registerAction(confirmOrderPaymentConfig);
   registerAction(cancelOrderConfig);
   registerAction(markOrderShippedConfig);
+  registerAction(setOrderTrackingConfig);
   registerAction(markOrderFulfilledConfig);
   // Stock from the moach's sales screens (PLAN_SHOP_CUSTOMER_EXPERIENCE S5)
   registerAction(setShopStockConfig);

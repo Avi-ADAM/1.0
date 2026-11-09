@@ -125,9 +125,14 @@ describe('QuickCreateLauncher', () => {
     );
     expect(
       view
-        .getByRole('link', { name: 'common.quickCreate.browseProjects' })
+        .getByRole('link', { name: 'common.quickCreate.createProject' })
         .getAttribute('href')
-    ).toBe('/moach');
+    ).toBe('/me?action=createproject');
+    expect(
+      view
+        .getByRole('link', { name: 'common.quickCreate.findProject' })
+        .getAttribute('href')
+    ).toBe('/availableMission');
     expect(
       (
         view.getByRole('button', {

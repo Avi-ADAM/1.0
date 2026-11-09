@@ -32,6 +32,7 @@ import { ENTRY_CURRENCY_PARAM, entryFields, normalizeEntry } from '$lib/server/m
 import { roundTo } from '$lib/money/currencies.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
 import { storedCostShape } from '$lib/pooling/priceCurve';
+import { resourceKindOf as mapResourceKindOf } from '$lib/shop/bomEditor';
 
 // Lazy: the action registry imports this config, so a static import would cycle.
 const runAction = async (key: string, params: Record<string, unknown>, context: any) => {
@@ -87,23 +88,6 @@ const idOf = (v: unknown): string | null => {
   const s = v == null ? '' : String(v).trim();
   return /^\d+$/.test(s) ? s : null;
 };
-
-const VALID_RESOURCE_KINDOF = new Set(['monthly', 'perUnit', 'rent', 'total', 'yearly']);
-
-function mapResourceKindOf(raw: string | undefined): string | null {
-  if (!raw) return null;
-  if (VALID_RESOURCE_KINDOF.has(raw)) return raw;
-  switch (raw) {
-    case 'subscription':
-      return 'monthly';
-    case 'good':
-      return 'perUnit';
-    case 'service':
-    case 'other':
-    default:
-      return 'total';
-  }
-}
 
 function buildLocationInput(
   isOnline?: boolean,

@@ -1,8 +1,6 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
-  import { Toaster } from 'svelte-sonner';
 
   import { lang } from '$lib/stores/lang.js';
   // import { getAnalytics } from "firebase/analytics";
@@ -60,14 +58,6 @@
 {#if $showFoot}
   <main class="h-screen min-w-screen absolute top-0 left-0">
     <Foot un={data?.un} idL={data?.uid} />
-    <Toaster
-      toastOptions={{
-        style: `dir: ${$isRtl ? 'rtl' : 'ltr'}; text-align: ${$isRtl ? 'right' : 'left'}; `
-      }}
-      richColors
-      closeButton
-      position="top-center"
-    />
   </main>
 {/if}
 {@render children?.()}

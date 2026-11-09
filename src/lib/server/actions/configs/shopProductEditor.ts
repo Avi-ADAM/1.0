@@ -3,7 +3,9 @@ import { ActionError } from '../errors.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { refreshDerived, variantTermsLive } from '$lib/server/archive/variantTerms.js';
-import { detailChanges, toEditorProduct, type EditorProduct } from '$lib/shop/productEditor.js';
+import { detailChanges, isCostPriced, isRecipeDeal, isRecipeLocked, locationOf, recipeOfNode, toEditorProduct, type EditorProduct } from '$lib/shop/productEditor.js';
+import { bomAssignees, planBomChanges, type BomTerm } from '$lib/shop/bomEditor.js';
+import { applyBomTerms, bomLinksBelong, bomTermsLive, withAssignees, withResourcePicks } from '$lib/server/archive/bomTerms.js';
 import { readStockFlags, withFlag, writeStock } from '$lib/server/shop/stockFlags.js';
 import {
   axisKeyOf,
@@ -63,6 +65,47 @@ async function loadProduct(run: Run, projectId: string, productId: string): Prom
 }
 
 const PRICING_MODES = ['fixed', 'estimated', 'quote'];
+
+/**
+ * The seller's recipe draft as terms, checked before anything is written. Only
+ * a product priced by its cost has a recipe to change. A wish product's goes
+ * through a proposal even in a rikma of one: its customer may have to sign.
+ */
+async function bomTermsFrom(
+  run: Run,
+  context: ActionContext,
+  raw: unknown,
+  projectId: string,
+  productId: string,
+  product: EditorProduct
+): Promise<{ terms: BomTerm[]; isDeal: boolean }> {
+  const res = await run('shopEditorProductExtras', { pid: projectId, id: productId });
+  const node = res?.data?.matanots?.data?.[0];
+  if (isRecipeLocked(node)) {
+    throw new ActionError('BOM_NOT_READ', "This product's recipe could not be read; nothing was changed");
+  }
+  const recipe = recipeOfNode(node);
+  if (!isCostPriced({ pricingMode: product.pricingMode, recipe })) {
+    throw new ActionError('BOM_NEEDS_COST_PRICING', 'Only a product priced by its cost has a recipe to change');
+  }
+  const plan = planBomChanges(recipe, raw);
+  if (plan.errors.length) {
+    throw new ActionError('INVALID_BOM', `The recipe is not valid: ${plan.errors.join(', ')}`, { errors: plan.errors });
+  }
+  if (!(await bomLinksBelong(execFromContext(context), projectId, plan.terms))) {
+    throw new ActionError('INVALID_BOM', 'A new line links to something outside this rikma');
+  }
+  const terms = await withAssignees(execFromContext(context), projectId, plan.terms);
+  if (!terms) throw new ActionError('INVALID_BOM', 'A new line is offered to someone outside this rikma');
+  // Proposing is their yes, so a resource they take on says here which of theirs it is.
+  let answered: BomTerm[];
+  try {
+    answered = await withResourcePicks(execFromContext(context), terms, String(context.userId), (raw as { picks?: unknown } | null)?.picks);
+  } catch (e) {
+    throw new ActionError('INVALID_BOM', (e as Error).message);
+  }
+  return { terms: answered, isDeal: isRecipeDeal(product.origin, node) };
+}
 
 /** The categories a product of this rikma may carry: its own and the platform-wide ones. */
 export async function allowedCategoryIds(run: Run, projectId: string): Promise<Set<string>> {
@@ -224,13 +267,20 @@ const saveVariantsHandler: ActionExecutionHandler = async (params, context, { st
     throw new ActionError('INVALID_PRICE', 'A price is 0 or more');
   }
   const priceMoves = basePrice !== undefined && basePrice !== null && !samePrice(basePrice, product.price);
-  const proposeBase = priceMoves && !product.sovereign;
 
   // Name, description, how the price is counted and its period are terms of
   // the product too — the same ones `newmatana` / `ComposeProduct` set on create.
   const details = detailChanges(params.details, product);
   const proposeDetails = !product.sovereign && Object.keys(details).length > 0;
-  const needsProposal = plan.terms.length > 0 || proposeBase || proposeDetails;
+  // What the product is made of is a term like its price.
+  const bom = params.bom == null ? { terms: [] as BomTerm[], isDeal: false } : await bomTermsFrom(run, context as ActionContext, params.bom, projectId, productId, product);
+  const bomTerms = bom.terms;
+  // Work put on someone else waits for their signature, even on a personal product.
+  const onSomeoneElse = bomAssignees(bomTerms).some((id) => id !== String(context.userId));
+  const proposeBom = bomTerms.length > 0 && (!product.sovereign || bom.isDeal || onSomeoneElse);
+  // A price that follows a recipe waiting for a customer waits with it.
+  const proposeBase = priceMoves && (!product.sovereign || proposeBom);
+  const needsProposal = plan.terms.length > 0 || proposeBase || proposeDetails || proposeBom;
 
   // How the price is counted (fixed / estimated / quote) decides whether the
   // product has a recipe at all — an `editObject` round cannot carry it. On a
@@ -263,12 +313,24 @@ const saveVariantsHandler: ActionExecutionHandler = async (params, context, { st
     }
   }
 
+  // A count on the product itself only means something while it has no variants
+  // (with variants it is derived from theirs). Checked before anything is written.
+  let productStock: { quant: number; unlimited: boolean } | null = null;
+  if (params.stock != null && !desired.length) {
+    const raw = params.stock as { quant?: unknown; unlimited?: unknown };
+    const unlimited = raw.unlimited === true;
+    const quant = unlimited ? -1 : num(raw.quant);
+    if (quant === null || (!unlimited && quant < 0)) throw new ActionError('INVALID_STOCK', 'A stock is 0 or more, or unlimited');
+    productStock = { quant, unlimited };
+  }
+
   // What stops the terms from going to the rikma never stops the rest: stock
   // and pictures are saved either way, and the result says why the terms wait.
-  let blocked: 'OPEN_PROPOSAL' | 'VARIANT_TERMS_NOT_READY' | null = null;
+  let blocked: 'OPEN_PROPOSAL' | 'VARIANT_TERMS_NOT_READY' | 'BOM_TERMS_NOT_READY' | null = null;
   if (needsProposal) {
     if (product.openDecisionId) blocked = 'OPEN_PROPOSAL';
     else if (plan.terms.length && !(await variantTermsLive(execFromContext(context)))) blocked = 'VARIANT_TERMS_NOT_READY';
+    else if (proposeBom && !(await bomTermsLive(execFromContext(context)))) blocked = 'BOM_TERMS_NOT_READY';
   }
 
   // ── operational, now ──────────────────────────────────────────────────
@@ -279,9 +341,13 @@ const saveVariantsHandler: ActionExecutionHandler = async (params, context, { st
     productData.pic = gallery[0] ?? null;
     productData.pics = gallery;
   }
-  if (priceMoves && product.sovereign) productData.price = basePrice;
+  if (priceMoves && !proposeBase) productData.price = basePrice;
   if (pricingModeMoves) productData.pricingMode = pricingMode;
   if (categoryIds) productData.categories = categoryIds;
+  // Where it is offered is how it is found, like its categories: operational.
+  if (params.location !== undefined) {
+    productData.location = locationOf(params.location) ?? { location_mode: 'unspecified', lat: null, lng: null, radius: null, location_hint: null };
+  }
   if (product.sovereign) {
     if (details.name !== undefined) productData.name = details.name;
     if (details.descrip !== undefined) productData.desc = details.descrip;
@@ -290,6 +356,15 @@ const saveVariantsHandler: ActionExecutionHandler = async (params, context, { st
     if (details.sqadualedf !== undefined) productData.finnishDate = details.sqadualedf;
   }
   await run('shopProductUpdate', { id: productId, data: productData });
+  if (productStock) await writeStock(run, { productId }, productStock);
+  // Sovereign: the same writes the rikma's approval would make.
+  const bomApplied =
+    bomTerms.length && !proposeBom
+      ? await applyBomTerms(execFromContext(context), { id: productId, projectId }, bomTerms, {
+          fetchFn: context.fetch as typeof fetch,
+          signerIds: [String(context.userId)]
+        })
+      : null;
 
   const created: string[] = [];
   for (const v of plan.creates) {
@@ -338,7 +413,8 @@ const saveVariantsHandler: ActionExecutionHandler = async (params, context, { st
         newValues: {
           ...(proposeBase ? { price: basePrice } : {}),
           ...(proposeDetails ? details : {}),
-          ...(plan.terms.length ? { variants: plan.terms } : {})
+          ...(plan.terms.length ? { variants: plan.terms } : {}),
+          ...(proposeBom ? { bom: bomTerms } : {})
         }
       },
       context as ActionContext
@@ -360,8 +436,9 @@ const saveVariantsHandler: ActionExecutionHandler = async (params, context, { st
     productId,
     created,
     updated,
-    proposed: blocked ? 0 : plan.terms.length + (proposeBase ? 1 : 0) + (proposeDetails ? 1 : 0),
+    proposed: blocked ? 0 : plan.terms.length + (proposeBase ? 1 : 0) + (proposeDetails ? 1 : 0) + (proposeBom ? bomTerms.length : 0),
     proposal,
+    bomApplied,
     /** Why the terms did not go to the rikma (the rest is saved). */
     blocked,
     openDecisionId: blocked === 'OPEN_PROPOSAL' ? product.openDecisionId : null,
@@ -382,10 +459,17 @@ export const saveProductVariantsConfig: ActionConfig = {
     gallery: { type: 'array', required: false, description: 'Upload ids in order; the first is the cover. Omit to leave the pictures as they are' },
     basePrice: { type: 'number', required: false, description: 'The product’s own price' },
     lowStockAt: { type: 'number', required: false, description: '“Low stock” below this, per variant; null = no mark' },
+    stock: { type: 'object', required: false, description: '{ quant, unlimited } on the product itself — operational, and only on a product with no variants' },
+    location: { type: 'object', required: false, description: '{ location_mode, lat, lng, radius, location_hint } — operational. Omit to leave it' },
     details: {
       type: 'object',
       required: false,
       description: '{ name?, descrip?, kindOf?: total|monthly|yearly|unlimited, startDate?, endDate? } — terms like the price: proposed unless the product is sovereign'
+    },
+    bom: {
+      type: 'object',
+      required: false,
+      description: '{ lines: [{ id, amount, unit, removed }], add: [{ line, name, amount, units, unit, notes?, resourceKind?, mesimabetahalichId?, pmashId?, openMashaabimId? }] } — a term like the price: proposed unless the product is sovereign. On a wish product its customer signs a version that asks for more'
     },
     why: { type: 'string', required: false, description: 'The reason, when something goes to the rikma' },
     categories: { type: 'array', required: false, description: 'Category ids (the rikma’s own or platform-wide) — operational, applied at once. Omit to leave them' },

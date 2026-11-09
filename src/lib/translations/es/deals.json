@@ -318,5 +318,14 @@
     "noName": "un cliente",
     "openLead": "Ver el contacto",
     "chip": "Cliente fuera del sitio"
+  },
+  "recipe": {
+    "title": "Hacer lo que pediste requiere más trabajo",
+    "explain": "La rikma pide cambiar la composición del producto. Un cambio que aumenta el coste no se suma a tu cuenta sin tu firma. Apruébalo o elige qué necesitas.",
+    "add": "Se añade: {{name}}",
+    "change": "Cambia: {{name}}",
+    "remove": "Se quita: {{name}}",
+    "raise": "Aumento del coste:",
+    "keepHint": "Marca lo que necesitas. Lo que no marques queda fuera de tu propuesta."
   }
 }

@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * One form for a new product (docs/tbd/PLAN_PRODUCT_FORM_UNIFIED.md, phase 1).
+   * One form for a product, new or existing (docs/inprogress/PLAN_PRODUCT_FORM_UNIFIED.md).
    *
    * Laid out like the mission form: numbered sections, "more options" rows,
    * and a summary beside it (below it on a phone, with a sticky save bar).
@@ -11,11 +11,22 @@
    *   - **fixed** — one number, optionally "priced per request" (`quote`).
    * The form never sends a margin: `marginPct` is always 0.
    *
-   * The payload is the one `createComplexMatanot` always took. Pictures,
-   * variants and stock are edited in the product editor that opens on save.
+   * New: the payload is the one `createComplexMatanot` always took; pictures,
+   * variants and stock are staged and written with the new id once it exists.
+   *
+   * Existing (`product` is set): one save, two speeds, exactly as
+   * `saveProductVariants` decides them. Stock, pictures, SKU and order apply at
+   * once; a moved price, a new variant or a changed detail is proposed to the
+   * partners, unless the product is sovereign. What the product is made of is
+   * such a term too (`$lib/shop/bomEditor`); how the price is determined stays
+   * as it was created.
    */
+  import '$lib/styles/shop.css';
   import { untrack } from 'svelte';
-  import { Calculator, Tag, MapPin, Users, Images } from '@lucide/svelte';
+  import { beforeNavigate, goto, invalidate } from '$app/navigation';
+  import { toast } from 'svelte-sonner';
+  import { Calculator, Tag, MapPin, Users, Images, Layers, Boxes, Archive } from '@lucide/svelte';
+  import { executeAction } from '$lib/client/actionClient';
   import { t, isRtl } from '$lib/translations';
   import Money from '$lib/components/money/Money.svelte';
   import CurrencyPicker from '$lib/components/money/CurrencyPicker.svelte';
@@ -31,10 +42,37 @@
   import { lbl, inp, segBtn } from '$lib/components/prPr/missionForm/classes.js';
   import MissionPickerList from './MissionPickerList.svelte';
   import ResourcePickerList from './ResourcePickerList.svelte';
+  import GalleryField from './GalleryField.svelte';
+  import VariantsField from './VariantsField.svelte';
+  import ProductChangesPanel from './ProductChangesPanel.svelte';
+  import BomLinesField from './BomLinesField.svelte';
+  import BomApproval from './BomApproval.svelte';
+  import { bomCostAfter, bomResourcesToPick, planBomChanges, type BomAddDraft, type BomPlan, type BomResourcePick } from '$lib/shop/bomEditor';
+  import ArchiveObjectButton from '$lib/components/archive/ArchiveObjectButton.svelte';
   import { hasGroupCurve, priceAt, risingPoints, toBomLines } from '$lib/pooling/priceCurve';
+  import { shopOrdersKey, shopProductsKey } from '$lib/shop/keys';
+  import {
+    buildMatrix,
+    normaliseAxes,
+    pendingByVariant,
+    planVariantSave,
+    stampNewSkus,
+    validateVariants,
+    type EditorAxis
+  } from '$lib/shop/variantEditor';
+  import {
+    detailChanges,
+    isCostPriced,
+    sameLocation,
+    type EditorPicture,
+    type EditorProduct,
+    type EditorRow,
+    type ProductKind
+  } from '$lib/shop/productEditor';
   import type {
     AvailableMission,
     AvailableResource,
+    BomLineRow,
     ComposeProductPayload,
     MissionTemplate,
     PricingMode,
@@ -45,7 +83,7 @@
   } from './types';
 
   type Pricing = 'cost' | 'fixed';
-  type Kind = 'total' | 'monthly' | 'yearly' | 'unlimited';
+  type Kind = ProductKind;
 
   type Props = {
     projectId: string;
@@ -66,7 +104,17 @@
       kindOf?: string;
       pricingMode?: string;
     } | null;
-    onDone?: (data: { matana: unknown; payload?: ComposeProductPayload }) => void;
+    /** The product being edited; absent on a new one. */
+    product?: EditorProduct | null;
+    /** The rikma's option axes, offered back when the seller adds one. */
+    rikmaAxes?: EditorAxis[];
+    /** SKUs of the rikma's other products. */
+    takenSkus?: string[];
+    /** The signed-in member: an open proposal may ask them something. */
+    viewerId?: string;
+    /** Which "more options" rows start open. */
+    initialOpen?: 'variants' | null;
+    onDone?: (data: { matana: unknown; payload?: ComposeProductPayload; stagedFailed?: boolean }) => void;
     onCancel?: () => void;
   };
 
@@ -80,6 +128,11 @@
     resourceTemplates = [],
     initialPricing = 'cost',
     initialDraft = null,
+    product = null,
+    rikmaAxes = [],
+    takenSkus = [],
+    viewerId = '',
+    initialOpen = null,
     onDone,
     onCancel
   }: Props = $props();
@@ -87,8 +140,11 @@
   // The draft and the opening pricing seed the form once; later prop changes do not reset it.
   const draft = untrack(() => initialDraft);
   const startPricing = untrack(() => initialPricing);
+  const startProduct = untrack(() => product);
+  const startOpen = untrack(() => initialOpen);
 
   const multiMember = $derived(projectMembers.length >= 2);
+  const sovereign = $derived(product ? product.sovereign : !multiMember);
   const fmtMoney = useFormatMoney();
 
   // ── 1 · what ─────────────────────────────────────────────────────────────
@@ -96,29 +152,35 @@
   let description = $state(draft?.descrip ?? '');
   let croppedImage = $state<unknown>(null);
   let nameTouched = $state(false);
+  // RichText is mounted once; a reset re-seeds it through this key.
+  let descripSeed = $state(0);
 
   // ── 2 · price ────────────────────────────────────────────────────────────
   let pricing = $state<Pricing>(startPricing);
-  let fixedPrice = $state(
+  let fixedPrice = $state<number | null>(
     draft?.price != null && Number(draft.price) > 0 ? Number(draft.price) : 0
   );
   let byQuote = $state(draft?.pricingMode === 'quote');
   const money = useMoney();
   const enclosingRikma = useRikmaCurrency();
-  // A blank form starts in the writer's currency; a draft arrives with its
-  // numbers already in the rikma's, so it starts there (PLAN_MULTI_CURRENCY C5).
+  // A blank form starts in the writer's currency; a draft or a stored product
+  // has its numbers in the rikma's already, so it starts there (PLAN_MULTI_CURRENCY C5).
   let currency = $state(
-    draft?.price != null ? (enclosingRikma() ?? DEFAULT_CURRENCY) : money.currency
+    draft?.price != null || startProduct ? (enclosingRikma() ?? DEFAULT_CURRENCY) : money.currency
   );
   let recipeMissions = $state<RecipeMissionRow[]>([]);
   let recipeResources = $state<RecipeResourceRow[]>([]);
+  // Editing: the stored lines. New lines of an existing product sit in the two lists above.
+  let bomLines = $state<BomLineRow[]>([]);
+  // The seller typed a price of their own; until then it follows the recipe.
+  let priceTyped = $state(false);
 
   // ── 3 · how it is sold ───────────────────────────────────────────────────
   const KINDS: Kind[] = ['total', 'monthly', 'yearly', 'unlimited'];
   let kindOf = $state<Kind>(
     KINDS.includes(draft?.kindOf as Kind) ? (draft!.kindOf as Kind) : 'total'
   );
-  let quant = $state(
+  let quant = $state<number>(
     draft?.quant != null && Number(draft.quant) > 0 ? Number(draft.quant) : 1
   );
   let unlimitedM = $state(false);
@@ -126,12 +188,19 @@
   let datef = $state<string | null>(null);
   let oneForeProject = $state(false);
   const periodic = $derived(kindOf === 'monthly' || kindOf === 'yearly');
-  const showQuant = $derived(kindOf !== 'unlimited' && !unlimitedM);
+  let rows = $state<EditorRow[]>([]);
+  const kindChoices = $derived<Kind[]>(product?.kindOf === 'daily' ? [...KINDS, 'daily'] : KINDS);
+  // With variants the count lives on each of them.
+  const showQuant = $derived(kindOf !== 'unlimited' && !unlimitedM && !rows.length);
+  const showUnlimitedM = $derived(periodic || (!!product?.unlimited && !rows.length));
 
   // ── more options ─────────────────────────────────────────────────────────
   let locationOpen = $state(false);
   let groupOpen = $state(false);
-  let laterOpen = $state(false);
+  let galleryOpen = $state(startOpen === 'variants');
+  let variantsOpen = $state(startOpen === 'variants');
+  let stockOpen = $state(false);
+  let removeOpen = $state(false);
   let locationScope = $state({
     location_mode: 'unspecified' as 'online' | 'onsite' | 'hybrid' | 'unspecified',
     isOnline: false,
@@ -164,6 +233,41 @@
     return hasPoint(l) ? `${hint} - ${l.radius || 15} km` : hint;
   });
 
+  // ── pictures, options, variants, stock — staged when new, saved when not ─
+  let gallery = $state<EditorPicture[]>([]);
+  let axes = $state<EditorAxis[]>([]);
+  let lowAt = $state('');
+  let why = $state('');
+  let uploading = $state(false);
+
+  const parseNum = (s: string): number | null => (s.trim() === '' ? null : Number(s.replace(',', '.')));
+  const clean = $derived(normaliseAxes(axes));
+  const storedCounts = $derived(
+    new Map((product?.variants ?? []).filter((v) => v.id && !v.unlimited).map((v) => [v.id as string, v.quant]))
+  );
+  const issues = $derived(validateVariants(rows, takenSkus, storedCounts));
+  const stagedTouched = $derived(
+    gallery.length > 0 || axes.length > 0 || rows.length > 0 || lowAt.trim() !== ''
+  );
+
+  function pictureRemoved(id: string) {
+    for (const r of rows) r.picIds = r.picIds.filter((x) => x !== id);
+  }
+
+  const variantPayload = (r: EditorRow, i: number) => ({
+    id: r.id,
+    optionValues: r.optionValues.map(({ key, value }) => ({ key, value })),
+    name: r.name,
+    sku: r.sku,
+    price: r.price,
+    compareAtPrice: r.compareAtPrice,
+    quant: r.quant,
+    unlimited: r.unlimited,
+    active: r.active,
+    position: i,
+    picIds: r.picIds
+  });
+
   // ── price math — all from $lib/pooling/priceCurve, never a margin ───────
   const isCost = $derived(pricing === 'cost');
   const bom = $derived(toBomLines(recipeMissions, recipeResources));
@@ -187,17 +291,66 @@
   });
 
   const pricingMode = $derived<PricingMode>(isCost ? 'estimated' : byQuote ? 'quote' : 'fixed');
-  const unitPrice = $derived(isCost ? costPrice : Number(fixedPrice) || 0);
+  // ── what the recipe of an existing product becomes ──────────────────────
+  const missionAdd = (m: RecipeMissionRow): BomAddDraft => ({
+    line: 'mission',
+    name: m.name,
+    amount: m.hoursPerUnit,
+    units: m.unitsPerProduct,
+    unit: m.ratePerHour,
+    notes: m.notes,
+    mesimabetahalichId: m.mesimabetahalichId,
+    assignedMemberId: m.mode === 'createNew' ? m.assignedMemberId : null
+  });
+  const resourceAdd = (r: RecipeResourceRow): BomAddDraft => ({
+    line: 'resource',
+    name: r.name,
+    amount: r.quantityPerUnit,
+    units: 1,
+    unit: r.pricePerUnit,
+    notes: r.notes,
+    resourceKind: r.kindOf,
+    pmashId: r.pmashId,
+    openMashaabimId: r.openMashaabimId,
+    assignedMemberId: r.mode === 'createNew' ? r.assignedMemberId : null
+  });
+  const bomEditable = $derived(!!product && isCost && !product.recipeLocked);
+  const bomDraft = $derived({
+    lines: bomLines.map(({ id, amount, unit, removed }) => ({ id, amount, unit, removed })),
+    add: [...recipeMissions.map(missionAdd), ...recipeResources.map(resourceAdd)]
+  });
+  const bomPlan = $derived<BomPlan>(product && bomEditable ? planBomChanges(product.recipe, bomDraft) : { terms: [], errors: [] });
+  const bomMoves = $derived(bomPlan.terms.length > 0);
+  const bomCost = $derived(product ? bomCostAfter(product.recipe, bomPlan.terms) : 0);
+  const priceFollows = $derived(bomMoves && !priceTyped);
+
+  // On an existing product the price is the stored number, whatever its mode,
+  // until the recipe it is the sum of moves.
+  const base = $derived(priceFollows ? bomCost : fixedPrice === null || String(fixedPrice) === '' ? null : Number(fixedPrice));
+  const unitPrice = $derived(product ? (base ?? 0) : isCost ? costPrice : Number(fixedPrice) || 0);
+  const plan = $derived(
+    planVariantSave({
+      existing: product?.variants ?? [],
+      desired: rows,
+      productPrice: product ? product.price : unitPrice,
+      sovereign
+    })
+  );
+  const storedCount = (kind: 'mission' | 'resource') => bomLines.filter((l) => l.kind === kind && !l.removed).length;
   const costFormula = $derived(
     $t('shopEditor.form.costFormula', {
-      missions: recipeMissions.length,
-      resources: recipeResources.length
+      missions: recipeMissions.length + storedCount('mission'),
+      resources: recipeResources.length + storedCount('resource')
     })
   );
 
   // ── summary ──────────────────────────────────────────────────────────────
   const kindLabel = (k: Kind) =>
-    k === 'total' ? $t('shopEditor.form.kindTotal') : $t(`offerings.compose.kind${k[0].toUpperCase()}${k.slice(1)}`);
+    k === 'total'
+      ? $t('shopEditor.form.kindTotal')
+      : k === 'daily'
+        ? $t('shopEditor.details.kind.daily')
+        : $t(`offerings.compose.kind${k[0].toUpperCase()}${k.slice(1)}`);
   const summaryMeta = $derived(
     [kindLabel(kindOf), showQuant ? `${quant} ×` : null].filter(Boolean).join(' · ')
   );
@@ -210,21 +363,130 @@
         : $t('shopEditor.form.fixedMeta')
   );
   const nameOk = $derived(name.trim().length > 0);
-  const priceOk = $derived(isCost ? lineCount > 0 : byQuote || Number(fixedPrice) > 0);
+  const priceOk = $derived(
+    product ? isCost || byQuote || unitPrice > 0 : isCost ? lineCount > 0 : byQuote || Number(fixedPrice) > 0
+  );
   const checks = $derived([
     { label: $t('shopEditor.form.checkName'), done: nameOk },
     { label: $t('shopEditor.form.checkPrice'), done: priceOk },
     { label: $t('shopEditor.form.checkSold'), done: kindOf === 'unlimited' || unlimitedM || quant > 0 },
-    { label: $t('shopEditor.form.checkMore'), done: false, optional: true }
+    { label: $t('shopEditor.form.checkMore'), done: gallery.length > 0 || rows.length > 0, optional: true }
   ]);
-  const note = $derived(multiMember ? $t('shopEditor.form.noteVote') : $t('shopEditor.form.noteSolo'));
-  const saveText = $derived(multiMember ? $t('shopEditor.form.saveVote') : $t('shopEditor.form.save'));
+  const note = $derived(
+    product ? '' : multiMember ? $t('shopEditor.form.noteVote') : $t('shopEditor.form.noteSolo')
+  );
+
+  // ── what an edit changes ─────────────────────────────────────────────────
+  const baseInvalid = $derived(base !== null && (!Number.isFinite(base) || base < 0));
+  const baseMoves = $derived(!!product && base !== null && Number.isFinite(base) && base !== product.price);
+  const detailsDraft = $derived({ name, descrip: description, kindOf, startDate: dates ?? '', endDate: datef ?? '' });
+  const details = $derived(product ? detailChanges(detailsDraft, product) : {});
+  const proposing = $derived(
+    !!product &&
+      ((!product.sovereign && (plan.terms.length > 0 || baseMoves || Object.keys(details).length > 0 || bomMoves)) ||
+        (product.recipeIsDeal && bomMoves))
+  );
+  const waiting = $derived(product?.pending ? pendingByVariant(product.pending.terms) : null);
+  const stockMoves = $derived(
+    !!product &&
+      !rows.length &&
+      kindOf !== 'unlimited' &&
+      (unlimitedM !== product.unlimited || (!unlimitedM && Number(quant) !== (product.quant ?? 0)))
+  );
+  const stockInvalid = $derived(stockMoves && !unlimitedM && !(Number(quant) >= 0));
+  const locationMoves = $derived(!!product && !sameLocation(locationScope, product.location));
+  // How a product with no recipe is priced is its owner's call on a sovereign
+  // product; on a rikma's it stays as it was created.
+  const quoteLocked = $derived(!!product && !product.sovereign);
+  const nextMode = $derived(byQuote ? 'quote' : 'fixed');
+  const modeMoves = $derived(
+    !!product && product.sovereign && !isCost && nextMode !== (product.pricingMode ?? 'fixed')
+  );
+
+  function snapshot(): string {
+    return JSON.stringify({
+      g: gallery.map((p) => p.id),
+      a: axes,
+      r: rows,
+      b: base,
+      bom: bomDraft,
+      lowAt,
+      d: details,
+      s: stockMoves,
+      l: locationMoves,
+      m: modeMoves
+    });
+  }
+  let saved = $state('');
+  const dirty = $derived(!!product && snapshot() !== saved);
+
+  const saveText = $derived(
+    product
+      ? proposing
+        ? $t('shopEditor.saveAndPropose')
+        : $t('shopEditor.save')
+      : multiMember
+        ? $t('shopEditor.form.saveVote')
+        : $t('shopEditor.form.save')
+  );
+  const moneyText = (n: number | null) => (n === null ? '—' : fmtMoney(n, currency));
 
   // ── save ─────────────────────────────────────────────────────────────────
   let loading = $state(false);
   let success = $state(false);
   let error = $state(false);
   let failMsg = $state('');
+
+  // ── seeding from a stored product ────────────────────────────────────────
+  const copy = <T,>(v: T): T => JSON.parse(JSON.stringify(v));
+
+  function seed(p: EditorProduct) {
+    name = p.name;
+    description = p.descrip;
+    descripSeed++;
+    pricing = isCostPriced(p) ? 'cost' : 'fixed';
+    fixedPrice = p.price;
+    priceTyped = false;
+    bomLines = p.recipe.map((l) => ({ ...l, removed: false }));
+    recipeMissions = [];
+    recipeResources = [];
+    byQuote = p.pricingMode === 'quote';
+    kindOf = p.kindOf;
+    unlimitedM = p.unlimited;
+    quant = p.unlimited ? 1 : (p.quant ?? 0);
+    dates = p.startDate?.slice(0, 10) ?? '';
+    datef = p.endDate?.slice(0, 10) ?? '';
+    oneForeProject = p.oneForeProject;
+    const l = p.location;
+    locationScope = {
+      location_mode: l?.location_mode ?? 'unspecified',
+      isOnline: l?.location_mode === 'online',
+      lat: l?.lat ?? null,
+      lng: l?.lng ?? null,
+      radius: l?.radius ?? 15,
+      location_hint: l?.location_hint ?? ''
+    };
+    gallery = copy(p.gallery);
+    axes = copy(p.axes);
+    rows = copy(p.variants);
+    lowAt = p.lowStockAt === null ? '' : String(p.lowStockAt);
+    why = '';
+    saved = snapshot();
+  }
+
+  if (startProduct) seed(startProduct);
+  // A fresh load (after a save, or the rikma approving) starts from what is stored.
+  let seeded = startProduct;
+  $effect(() => {
+    const p = product;
+    if (!p || p === seeded) return;
+    seeded = p;
+    untrack(() => seed(p));
+  });
+
+  beforeNavigate((nav) => {
+    if (dirty && !loading && !confirm($t('shopEditor.leave'))) nav.cancel();
+  });
 
   async function uploadPicIfAny(): Promise<string | null> {
     if (!croppedImage) return null;
@@ -271,12 +533,150 @@
     stepCapacity: r.costShape === 'stepped' ? (r.stepCapacity ?? null) : null
   });
 
+  /** Pictures, variants and stock of a product that has just been created. */
+  async function saveStaged(productId: string, coverId: string | null): Promise<boolean> {
+    if (!stagedTouched) return true;
+    const res: any = await executeAction(
+      'saveProductVariants' as any,
+      {
+        projectId,
+        productId,
+        axes: clean.axes,
+        variants: stampNewSkus(rows, productId).map(variantPayload),
+        gallery: [coverId, ...gallery.map((p) => p.id)].filter(Boolean),
+        ...(lowAt.trim() ? { lowStockAt: parseNum(lowAt) } : {}),
+        why: ''
+      },
+      { showErrorToast: false }
+    ).catch(() => null);
+    if (!res?.success) return false;
+    if (res.data?.blocked === 'VARIANT_TERMS_NOT_READY') toast.warning($t('shopEditor.err.notReady'));
+    else if (res.data?.blocked === 'OPEN_PROPOSAL') toast.warning($t('shopEditor.err.openProposal'));
+    else if (res.data?.proposed) toast.success($t('shopEditor.savedProposed'));
+    return true;
+  }
+
+  let selfApproval = $state<ReturnType<typeof BomApproval>>();
+
+  async function saveEdit(p: EditorProduct, picks?: BomResourcePick[]) {
+    nameTouched = true;
+    if (!dirty || uploading) return;
+    if (!nameOk || issues.length || clean.errors.length || baseInvalid || stockInvalid) {
+      if (issues.length || clean.errors.length) variantsOpen = true;
+      toast.error($t('shopEditor.err.fix'));
+      return;
+    }
+    if (bomPlan.errors.length) {
+      document.getElementById('pf-bom')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      toast.error($t(bomPlan.errors.includes('bomEmpty') ? 'shopEditor.err.bomEmpty' : 'shopEditor.err.bomFix'));
+      return;
+    }
+    // Saving is my yes, so a resource I take on says here which of mine it is.
+    if (!picks && bomResourcesToPick(bomPlan.terms, viewerId).length) {
+      selfApproval?.start();
+      return;
+    }
+    loading = true;
+    const res: any = await executeAction(
+      'saveProductVariants' as any,
+      {
+        projectId,
+        productId: p.id,
+        axes: clean.axes,
+        variants: rows.map(variantPayload),
+        gallery: gallery.map((x) => x.id),
+        ...(baseMoves ? { basePrice: base } : {}),
+        lowStockAt: parseNum(lowAt),
+        ...(Object.keys(details).length ? { details: detailsDraft } : {}),
+        ...(stockMoves ? { stock: { quant: Number(quant), unlimited: unlimitedM } } : {}),
+        ...(locationMoves ? { location: locationScope } : {}),
+        ...(modeMoves ? { pricingMode: nextMode } : {}),
+        ...(bomMoves ? { bom: { ...bomDraft, picks: picks ?? [] } } : {}),
+        why: why.trim()
+      },
+      { showErrorToast: false }
+    ).catch(() => null);
+    loading = false;
+    if (!res?.success) {
+      toast.error($t('shopEditor.err.generic'));
+      return;
+    }
+    const d = res.data ?? {};
+    if (d.blocked === 'OPEN_PROPOSAL') toast.warning($t('shopEditor.err.openProposal'));
+    else if (d.blocked === 'VARIANT_TERMS_NOT_READY') toast.warning($t('shopEditor.err.notReady'));
+    else if (d.blocked === 'BOM_TERMS_NOT_READY') toast.warning($t('shopEditor.err.bomNotReady'));
+    else toast.success(d.proposed ? $t('shopEditor.savedProposed') : $t('shopEditor.saved'));
+    if (d.lowStockSaved === false) toast.message($t('shopEditor.stock.lowNotSaved'));
+    saved = snapshot();
+    await refreshShop();
+  }
+
+  const refreshShop = () =>
+    Promise.all([invalidate(shopProductsKey(projectId)), invalidate(shopOrdersKey(projectId))]);
+
+  // ── removing from the shop ───────────────────────────────────────────────
+  // Never a delete (sales, orders and halukas point at the product): it is
+  // archived. A personal product is its owner's call; a rikma product goes
+  // through proposeObjectArchive, at once in a rikma of one.
+  let removing = $state(false);
+  const removalOpen = $derived(!!product?.openDecisionId && !product?.pending);
+
+  async function afterRemoved() {
+    await refreshShop();
+    // A proposal leaves the product live until it matures — stay on it.
+    if (product?.sovereign) {
+      saved = snapshot();
+      await goto(`/moach/${projectId}/sales/manage/products`);
+    }
+  }
+
+  async function removePersonal(p: EditorProduct) {
+    if (removing || !confirm($t('shopEditor.remove.confirm', { name: p.name }))) return;
+    removing = true;
+    const res: any = await executeAction('archivePersonalMatanot' as any, { matanotId: p.id }, { showErrorToast: false }).catch(
+      () => null
+    );
+    removing = false;
+    if (!res?.success) {
+      toast.error($t('shopEditor.remove.failed'));
+      return;
+    }
+    toast.success($t('shopEditor.remove.done'));
+    await afterRemoved();
+  }
+
+  function openGallery() {
+    galleryOpen = true;
+    document.getElementById('pf-more')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   async function handleSubmit() {
+    if (product) return saveEdit(product);
+    if (uploading) return;
     nameTouched = true;
     if (!nameOk) {
       error = true;
       failMsg = $t('shopEditor.form.nameMissing');
       document.getElementById('pf-name')?.focus();
+      return;
+    }
+    // Options named but the table never generated: the seller meant those variants.
+    if (!clean.errors.length && axes.length) {
+      const matrix = buildMatrix({ axes: clean.axes, existing: rows, productId: null });
+      if (matrix.added > 0) rows = matrix.variants.map((v) => ({ ...v, pictures: (v as EditorRow).pictures ?? [] }));
+    }
+    if (issues.length || clean.errors.length) {
+      variantsOpen = true;
+      error = true;
+      failMsg = $t('shopEditor.err.fix');
+      return;
+    }
+    // The save writes a variant's price as typed, in the rikma's own currency.
+    const rikmaCurrency = enclosingRikma();
+    if (rikmaCurrency && currency !== rikmaCurrency && rows.some((r) => r.price !== null)) {
+      variantsOpen = true;
+      error = true;
+      failMsg = $t('shopEditor.form.variantsCurrency', { currency: rikmaCurrency });
       return;
     }
     loading = true;
@@ -320,8 +720,12 @@
         throw new Error(result?.error || 'Failed to create product');
       }
       const data = result?.data ?? result;
+      const matana = data?.matanot ?? data;
+      const newId = data?.matanotId ?? matana?.id;
+      const stagedOk = newId != null ? await saveStaged(String(newId), picId) : !stagedTouched;
+      if (!stagedOk) toast.error($t('shopEditor.form.stagedFailed'));
       success = true;
-      onDone?.({ matana: data?.matanot ?? data, payload: params as ComposeProductPayload });
+      onDone?.({ matana, payload: params as ComposeProductPayload, stagedFailed: !stagedOk });
     } catch (e) {
       console.error('[ProductForm] submit failed', e);
       error = true;
@@ -354,18 +758,57 @@
           {$t('offerings.compose.cancel')}
         </button>
       {/if}
-      <Button text={saveText} onClick={handleSubmit} {loading} {success} {error} />
+      <Button text={saveText} onClick={handleSubmit} {loading} {success} {error} disabled={!!product && !dirty} />
     </div>
   </div>
 {/snippet}
 
+{#snippet changes()}
+  {#if product}
+    <div class="shop-ui pf-fields flex flex-col gap-3">
+      <ProductChangesPanel
+        {projectId}
+        {product}
+        {plan}
+        {details}
+        bom={bomPlan.terms}
+        {viewerId}
+        onChanged={refreshShop}
+        {base}
+        {baseMoves}
+        {proposing}
+        bind:why
+        money={moneyText}
+      />
+    </div>
+  {/if}
+{/snippet}
+
+{#if product}
+  {@const edited = product}
+  <BomApproval bind:this={selfApproval} terms={bomPlan.terms} {viewerId} {projectId} onPicked={(picks) => saveEdit(edited, picks)} />
+{/if}
+
 <div class="mx-auto flex w-full max-w-[1180px] flex-col gap-5 text-start" dir={$isRtl ? 'rtl' : 'ltr'}>
   <header class="flex flex-col gap-2">
-    {#if projectName}
-      <span class="self-start rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-[#f1c47a]">{projectName}</span>
+    {#if product}
+      <a class="self-start text-sm font-semibold text-[#f1c47a]" href="/moach/{projectId}/sales/manage/products">{$t('shopEditor.back')}</a>
     {/if}
-    <h1 class="m-0 text-3xl font-extrabold leading-tight text-white sm:text-4xl">{$t('shopEditor.form.title')}</h1>
-    <p class="m-0 max-w-2xl text-base text-[#e9dfe4]">{$t('shopEditor.form.intro')}</p>
+    <div class="flex flex-wrap items-center gap-2">
+      {#if projectName}
+        <span class="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-[#f1c47a]">{projectName}</span>
+      {/if}
+      {#if product}
+        <span class="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-[#f1c47a]">
+          {product.origin === 'personal' ? $t('shopEditor.badge.personal') : $t('shopEditor.badge.rikma')}
+        </span>
+      {/if}
+    </div>
+    <h1 class="m-0 break-words text-3xl font-extrabold leading-tight text-white sm:text-4xl">{product ? product.name : $t('shopEditor.form.title')}</h1>
+    <p class="m-0 max-w-2xl text-base text-[#e9dfe4]">{product ? $t('shopEditor.form.editIntro') : $t('shopEditor.form.intro')}</p>
+    {#if product}
+      <a class="self-start text-sm font-semibold text-[#f1c47a] underline" href="/gift/{product.id}">{$t('shopEditor.view')}</a>
+    {/if}
   </header>
 
   <!-- step rail (phone/tablet): jumps to a section, ✓ once it is complete -->
@@ -414,21 +857,35 @@
           <div>
             <span class={lbl}>{$t('offerings.compose.desc')}</span>
             <div class="min-h-[120px] rounded-xl border-[1.5px] border-[#e4d9c4] bg-[#fffdf8] p-2 text-[#2a1420]">
-              <RichText bind:outpot={description} editable={true} />
+              {#key descripSeed}
+                <RichText bind:outpot={description} editable={true} />
+              {/key}
             </div>
           </div>
           <div>
             <span class={lbl}>{$t('shopEditor.form.image')}</span>
-            <div class="max-w-md overflow-hidden rounded-xl bg-[#1f1c24] p-2">
-              <UploadPic
-                aspect={16 / 9}
-                cropShape="rect"
-                onMessage={(e: { files: unknown }) => (croppedImage = e.files)}
-                color={true}
-                noHeader={true}
-                current={'/cover.png'}
-              />
-            </div>
+            {#if product}
+              <div class="flex flex-wrap items-center gap-3">
+                {#if gallery[0]}
+                  <img src={gallery[0].thumb} alt={gallery[0].alt ?? ''} class="h-20 w-32 rounded-xl object-cover" />
+                {/if}
+                <div class="flex min-w-0 flex-col items-start gap-1">
+                  <p class="m-0 text-sm text-[#6b5560]">{$t('shopEditor.form.coverHint')}</p>
+                  <button type="button" class="min-h-10 text-sm font-bold text-[#c8155f] underline" onclick={openGallery}>{$t('shopEditor.form.openGallery')}</button>
+                </div>
+              </div>
+            {:else}
+              <div class="max-w-md overflow-hidden rounded-xl bg-[#1f1c24] p-2">
+                <UploadPic
+                  aspect={16 / 9}
+                  cropShape="rect"
+                  onMessage={(e: { files: unknown }) => (croppedImage = e.files)}
+                  color={true}
+                  noHeader={true}
+                  current={'/cover.png'}
+                />
+              </div>
+            {/if}
           </div>
         </FormSection>
       </div>
@@ -437,7 +894,7 @@
       <div id="pf-s2" class="scroll-mt-16">
         <FormSection step={2} title={$t('shopEditor.form.step2Title')} subtitle={$t('shopEditor.form.step2Sub')}>
           <div class="grid grid-cols-1 gap-3 sm:grid-cols-2" role="radiogroup" aria-label={$t('shopEditor.form.step2Title')}>
-            <button type="button" role="radio" aria-checked={isCost} class={choice(isCost)} onclick={() => (pricing = 'cost')}>
+            <button type="button" role="radio" aria-checked={isCost} disabled={!!product} class="{choice(isCost)} disabled:cursor-default" onclick={() => (pricing = 'cost')}>
               <span class="flex items-center gap-2 text-base font-extrabold text-[#2a1420]">
                 <Calculator size={18} class="text-[#c8155f]" aria-hidden="true" />
                 {$t('shopEditor.form.byCost')}
@@ -445,7 +902,7 @@
               </span>
               <span class="text-sm text-[#6b5560]">{$t('shopEditor.form.byCostSub')}</span>
             </button>
-            <button type="button" role="radio" aria-checked={!isCost} class={choice(!isCost)} onclick={() => (pricing = 'fixed')}>
+            <button type="button" role="radio" aria-checked={!isCost} disabled={!!product} class="{choice(!isCost)} disabled:cursor-default" onclick={() => (pricing = 'fixed')}>
               <span class="flex items-center gap-2 text-base font-extrabold text-[#2a1420]">
                 <Tag size={18} class="text-[#c8155f]" aria-hidden="true" />
                 {$t('shopEditor.form.fixed')}
@@ -454,7 +911,59 @@
             </button>
           </div>
 
-          {#if isCost}
+          {#if product}
+            <p class="m-0 text-sm text-[#6b5560]">{$t('shopEditor.form.pricingLocked')}</p>
+            {#if isCost}
+              <BomLinesField
+                bind:lines={bomLines}
+                bind:missions={recipeMissions}
+                bind:resources={recipeResources}
+                {projectId}
+                {currency}
+                {availableMissions}
+                {availableResources}
+                {projectMembers}
+                {missionTemplates}
+                {resourceTemplates}
+                {multiMember}
+                locked={product.recipeLocked}
+                sovereign={product.sovereign}
+                isDeal={product.recipeIsDeal}
+              />
+              {#if bomMoves}
+                <div class="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#eee2a6] bg-[#fdf9ea] px-4 py-3">
+                  <span class="text-sm text-[#6b5560]" dir="auto">{costFormula}</span>
+                  <strong class="text-2xl font-extrabold text-[#2a1420]"><Money amount={bomCost} {currency} /></strong>
+                </div>
+              {/if}
+            {/if}
+            <div class="max-w-[280px]">
+              <label for="pf-base" class={lbl}>{$t('shopEditor.stock.basePrice')}</label>
+              <input
+                id="pf-base"
+                class={inp}
+                type="number"
+                min="0"
+                step="any"
+                inputmode="decimal"
+                bind:value={() => base, (v) => { priceTyped = true; fixedPrice = v; }}
+                aria-invalid={baseInvalid}
+              />
+              <p class="m-0 mt-1.5 text-xs text-[#6b5560]">{priceFollows ? $t('shopEditor.form.bomPriceFollows') : $t('shopEditor.stock.basePriceHint')}</p>
+            </div>
+            {#if product.marginPct > 0}
+              <p class="m-0 rounded-xl bg-[#fdf9ea] px-3 py-2 text-sm text-[#6b5560]">{$t('shopEditor.form.marginNote', { pct: product.marginPct })}</p>
+            {/if}
+            {#if !isCost}
+              <label class="flex items-start gap-2.5 text-[#2a1420] {quoteLocked ? 'opacity-70' : 'cursor-pointer'}">
+                <input type="checkbox" class="mt-1 h-4 w-4 accent-[#c8155f]" bind:checked={byQuote} disabled={quoteLocked} />
+                <span class="flex flex-col gap-0.5">
+                  <strong class="text-sm">{$t('offerings.compose.byQuote')}</strong>
+                  <small class="text-xs text-[#6b5560]">{quoteLocked ? $t('shopEditor.form.quoteLocked') : $t('offerings.compose.byQuoteHint')}</small>
+                </span>
+              </label>
+            {/if}
+          {:else if isCost}
             <div class="flex flex-wrap items-center justify-between gap-2">
               <p class="m-0 max-w-xl text-sm text-[#6b5560]">{$t('shopEditor.form.costHint')}</p>
               <CurrencyPicker bind:value={currency} compact class="!border-[#e4d9c4] !bg-[#fffdf8] !text-[#2a1420]" />
@@ -524,13 +1033,13 @@
       <div id="pf-s3" class="scroll-mt-16">
         <FormSection step={3} title={$t('shopEditor.form.step3Title')} subtitle={$t('shopEditor.form.step3Sub')}>
           <div class="inline-flex flex-wrap gap-1 self-start rounded-xl bg-[#f6f0e4] p-1" role="group" aria-label={$t('offerings.compose.kindOf')}>
-            {#each KINDS as k (k)}
+            {#each kindChoices as k (k)}
               <button type="button" aria-pressed={kindOf === k} class={segBtn(kindOf === k)} onclick={() => (kindOf = k)}>
                 {kindLabel(k)}
               </button>
             {/each}
           </div>
-          {#if periodic}
+          {#if showUnlimitedM}
             <label class="flex cursor-pointer items-center gap-2.5 text-sm text-[#2a1420]">
               <input type="checkbox" class="h-4 w-4 accent-[#c8155f]" bind:checked={unlimitedM} />
               {$t('offerings.compose.unlimitedQuant')}
@@ -541,6 +1050,8 @@
               <label for="pf-quant" class={lbl}>{$t('offerings.compose.quant')}</label>
               <input id="pf-quant" class={inp} type="number" min="0" step="1" bind:value={quant} />
             </div>
+          {:else if rows.length && kindOf !== 'unlimited'}
+            <p class="m-0 text-sm text-[#6b5560]">{$t('shopEditor.form.stockInVariants')}</p>
           {/if}
           {#if periodic}
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -548,19 +1059,28 @@
                 <label for="pf-start" class={lbl}>
                   {$t('offerings.compose.startDate')} <small class="font-normal text-[#6b5560]">{$t('offerings.compose.optional')}</small>
                 </label>
-                <input id="pf-start" class={inp} type="datetime-local" bind:value={dates} />
+                {#if product}
+                  <input id="pf-start" class={inp} type="date" bind:value={dates} />
+                {:else}
+                  <input id="pf-start" class={inp} type="datetime-local" bind:value={dates} />
+                {/if}
               </div>
               <div>
                 <label for="pf-end" class={lbl}>
                   {$t('offerings.compose.endDate')} <small class="font-normal text-[#6b5560]">{$t('offerings.compose.optional')}</small>
                 </label>
-                <input id="pf-end" class={inp} type="datetime-local" bind:value={datef} min={dates ?? undefined} />
+                {#if product}
+                  <input id="pf-end" class={inp} type="date" bind:value={datef} min={dates || undefined} />
+                {:else}
+                  <input id="pf-end" class={inp} type="datetime-local" bind:value={datef} min={dates ?? undefined} />
+                {/if}
               </div>
             </div>
           {/if}
-          <label class="flex cursor-pointer items-center gap-2.5 text-sm text-[#2a1420]">
-            <input type="checkbox" class="h-4 w-4 accent-[#c8155f]" bind:checked={oneForeProject} />
+          <label class="flex items-center gap-2.5 text-sm text-[#2a1420] {product ? 'opacity-70' : 'cursor-pointer'}">
+            <input type="checkbox" class="h-4 w-4 accent-[#c8155f]" bind:checked={oneForeProject} disabled={!!product} />
             {$t('offerings.compose.oneForeProject')}
+            {#if product}<small class="text-xs text-[#6b5560]">· {$t('shopEditor.form.fixedAtCreate')}</small>{/if}
           </label>
         </FormSection>
       </div>
@@ -578,7 +1098,7 @@
               />
             </OptionRow>
 
-            {#if isCost}
+            {#if isCost && !product}
               <OptionRow
                 icon={Users}
                 title={$t('shopEditor.form.group')}
@@ -624,15 +1144,95 @@
               </OptionRow>
             {/if}
 
-            <OptionRow icon={Images} title={$t('shopEditor.form.later')} status={$t('shopEditor.form.laterStatus')} bind:open={laterOpen}>
-              <p class="m-0 text-sm leading-relaxed text-[#6b5560]">{$t('shopEditor.form.laterBody')}</p>
+            <OptionRow
+              icon={Images}
+              title={$t('shopEditor.form.gallery')}
+              status={gallery.length ? $t('shopEditor.form.galleryCount', { count: gallery.length }) : $t('shopEditor.form.none')}
+              bind:open={galleryOpen}
+            >
+              <div class="shop-ui pf-fields">
+                <GalleryField bind:gallery bind:uploading onRemoved={pictureRemoved} />
+              </div>
             </OptionRow>
+
+            <OptionRow
+              icon={Layers}
+              title={$t('shopEditor.form.variants')}
+              status={rows.length ? $t('shopEditor.form.variantsCount', { axes: axes.length, variants: rows.length }) : $t('shopEditor.form.none')}
+              bind:open={variantsOpen}
+            >
+              <div class="shop-ui pf-fields">
+                <VariantsField
+                  bind:axes
+                  bind:rows
+                  {gallery}
+                  productId={product?.id ?? null}
+                  productPrice={product ? product.price : unitPrice}
+                  {sovereign}
+                  {rikmaAxes}
+                  {clean}
+                  {issues}
+                  {plan}
+                  {waiting}
+                  money={moneyText}
+                />
+              </div>
+            </OptionRow>
+
+            <OptionRow
+              icon={Boxes}
+              title={$t('shopEditor.form.stock')}
+              status={rows.length
+                ? $t('shopEditor.form.stockInVariantsShort')
+                : kindOf === 'unlimited' || unlimitedM
+                  ? $t('shopEditor.variants.unlimited')
+                  : $t('shopEditor.form.stockCount', { count: quant })}
+              bind:open={stockOpen}
+            >
+              <div class="max-w-[220px]">
+                <label for="pf-low" class={lbl}>{$t('shopEditor.stock.lowAt')}</label>
+                <input id="pf-low" class={inp} inputmode="numeric" bind:value={lowAt} />
+              </div>
+              <p class="m-0 mt-1.5 text-xs text-[#6b5560]">{$t('shopEditor.stock.lowHint')}</p>
+            </OptionRow>
+
+            {#if product}
+              <OptionRow icon={Archive} title={$t('shopEditor.remove.title')} bind:open={removeOpen}>
+                <div class="shop-ui pf-fields flex flex-col gap-2">
+                  {#if product.archived}
+                    <p class="m-0 text-sm">{$t('shopEditor.remove.archived')}</p>
+                  {:else if removalOpen}
+                    <p class="m-0 text-sm">{$t('shopEditor.remove.open')}</p>
+                    <a class="font-bold" href="/moach/{projectId}/votes/decision/{product.openDecisionId}">{$t('shopEditor.pending.vote')}</a>
+                  {:else}
+                    <p class="m-0 text-sm">{$t('shopEditor.remove.hint')}</p>
+                    {#if product.origin === 'personal'}
+                      <button type="button" class="sh-btn sh-btn-outline pf-remove" onclick={() => removePersonal(product)} disabled={removing} aria-busy={removing}>
+                        {$t('shopEditor.remove.button')}
+                      </button>
+                    {:else}
+                      <p class="m-0 text-sm">{product.sovereign ? $t('shopEditor.remove.alone') : $t('shopEditor.remove.rikma')}</p>
+                      <ArchiveObjectButton
+                        targetKind="matanot"
+                        targetId={product.id}
+                        targetName={product.name}
+                        soleMember={product.sovereign}
+                        label={$t('shopEditor.remove.button')}
+                        className="sh-btn sh-btn-outline pf-remove"
+                        onDone={afterRemoved}
+                      />
+                    {/if}
+                  {/if}
+                </div>
+              </OptionRow>
+            {/if}
           </div>
         </FormSection>
       </div>
     </div>
 
-    <aside class="hidden lg:sticky lg:top-4 lg:block lg:w-[340px] lg:flex-none">
+    <aside class="hidden lg:sticky lg:top-4 lg:flex lg:w-[340px] lg:flex-none lg:flex-col lg:gap-3">
+      {@render changes()}
       <MissionSummary
         heading={$t('shopEditor.form.summary')}
         {name}
@@ -650,7 +1250,8 @@
     </aside>
   </div>
 
-  <div class="lg:hidden">
+  <div class="flex flex-col gap-3 lg:hidden">
+    {@render changes()}
     <MissionSummary
       wide
       heading={$t('shopEditor.form.summary')}
@@ -676,6 +1277,26 @@
       <strong class="block truncate text-xl font-extrabold text-[#c8155f]" dir="auto">{totalText}</strong>
       <span class="block truncate text-xs text-[#6b5560]" dir="auto">{formulaText}</span>
     </div>
-    <Button text={saveText} onClick={handleSubmit} {loading} {success} {error} />
+    <Button text={saveText} onClick={handleSubmit} {loading} {success} {error} disabled={!!product && !dirty} />
   </div>
 </div>
+
+<style>
+  /* The shop's fields inside the form's cream cards: the same in every theme. */
+  :global(.shop-ui.shop-ui.pf-fields.pf-fields) {
+    --sh-page: #fffdf8;
+    --sh-card: #fffdf8;
+    --sh-card-2: #f6f0e4;
+    --sh-ink: #2a1420;
+    --sh-muted: #6b5560;
+    --sh-line: #e4d9c4;
+    --sh-gold: #7a5a0c;
+    --sh-gold-line: rgba(122, 90, 12, 0.3);
+    --sh-accent: #c8155f;
+    --sh-accent-ink: #c8155f;
+  }
+  :global(.pf-remove) {
+    align-self: flex-start;
+    color: var(--sh-accent-ink);
+  }
+</style>

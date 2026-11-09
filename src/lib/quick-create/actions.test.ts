@@ -21,6 +21,7 @@ describe('buildQuickCreateHref', () => {
     expect(buildQuickCreateHref('resource', '12')).toBe(
       '/moach/12/create?action=createresource'
     );
+    expect(buildQuickCreateHref('product', '12')).toBe('/moach/12/sales/new');
   });
 
   it('encodes the project identifier as one route segment', () => {

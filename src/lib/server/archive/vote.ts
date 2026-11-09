@@ -28,6 +28,8 @@ import {
 } from './read.js';
 import { fetchTarget } from './targets.js';
 import { assertStandingRound } from '$lib/server/nego/candidacyVote.js';
+import { bomTermsSummary } from './bomTerms.js';
+import { bomResourcesToPick, type BomTerm } from '$lib/shop/bomEditor.js';
 
 export interface VoteOutcome {
   decisionId: string;
@@ -51,8 +53,20 @@ export interface ExtraSigners {
   ids: string[];
   /** Whether this version needs them at all. */
   needed: (round: ArchRound) => boolean;
+  /**
+   * Who exactly must sign this version, when it is not simply all of `ids` or none:
+   * members a version puts work on sign it explicitly, and their silence does not count.
+   */
+  requiredIds?: (round: ArchRound) => string[];
   /** Runs after any version of this decision is applied (the deal follows the new terms). */
   onApplied?: (round: ArchRound) => Promise<unknown>;
+}
+
+/** The signatures this version waits for beyond the members' own rule. */
+export function requiredSigners(extra: ExtraSigners | null | undefined, round: ArchRound): string[] {
+  if (!extra) return [];
+  if (extra.requiredIds) return extra.requiredIds(round);
+  return extra.needed(round) ? extra.ids : [];
 }
 
 export type ExtraSignersFor = (decision: ObjectChangeDecision) => Promise<ExtraSigners | null>;
@@ -102,6 +116,10 @@ export async function signObjectChange(
   if (signersOf(decision, order).includes(uid)) {
     throw new Error('You already stand behind the current version');
   }
+  // Their yes to a resource says which of theirs it is (signBomAssignment).
+  if (bomResourcesToPick(standingRound(decision).bom, uid).length) {
+    throw new Error('Choose which of your resources this is before approving');
+  }
 
   // Votes from earlier rounds are kept: they are the record of how the
   // conversation got here, and dropping them would erase the negotiation.
@@ -113,7 +131,7 @@ export async function signObjectChange(
 
   const signed = new Set([...signersOf(decision, order), uid]);
   const round = standingRound(decision);
-  const needed = extra && extra.needed(round) ? extra.ids : [];
+  const needed = requiredSigners(extra, round);
   const membersSigned = decision.memberIds.every((id) => signed.has(id));
   // Only when someone outside the rikma has to sign does an expired clock count here: the
   // members' silence already matured, and the timegrama left the version open for them.
@@ -131,6 +149,16 @@ export async function signObjectChange(
     await extra.onApplied(round).catch((e) => console.error('[archive] applied, but the follow-up failed:', e));
   }
   return { decisionId, order, consensus: true, applied, awaiting: [] };
+}
+
+/** Write onto the version on the table, without opening a new round: only what its owner chose. */
+export async function setStandingBom(exec: Exec, decision: ObjectChangeDecision, userId: string, bom: BomTerm[]): Promise<void> {
+  const order = standingOrder(decision);
+  const nowISO = new Date().toISOString();
+  const negoarch = decision.rounds
+    .map((r) => roundFragment(r.ordern === order ? { ...r, bom } : r, r.proposedById ?? userId, r.zman ?? nowISO))
+    .join(', ');
+  await run(exec, `mutation { updateDecision(id: ${gqlStr(decision.id)}, data: { negoarch: [${negoarch}] }) { data { id } } }`, 'standingBom');
 }
 
 /**
@@ -155,6 +183,8 @@ export async function applyStandingVersion(
     // The standing round's author is the one whose version is being applied, so
     // the counter rounds it sends to pending candidates are signed by them.
     actorId: round.proposedById,
+    signerIds: signersOf(decision, standingOrder(decision)),
+    memberIds: decision.memberIds,
   });
 
   await closeDecision(exec, decision.id, decision.timegramaId);
@@ -167,6 +197,8 @@ export interface CounterInput {
   round: Omit<StandingRound, 'ordern'>;
   /** Extra signers may counter too — a customer puts her own hours / rate on the table. */
   extraFor?: ExtraSignersFor;
+  /** The version is stuck on someone's explicit signature: one who signed it may move it. */
+  evenIfSigned?: boolean;
 }
 
 /**
@@ -179,7 +211,7 @@ export interface CounterInput {
  */
 export async function counterObjectChange(
   exec: Exec,
-  { decisionId, userId, round, extraFor }: CounterInput,
+  { decisionId, userId, round, extraFor, evenIfSigned = false }: CounterInput,
 ): Promise<{
   decisionId: string;
   order: number;
@@ -200,20 +232,22 @@ export async function counterObjectChange(
   }
 
   const current = standingOrder(decision);
-  if (signersOf(decision, current).includes(uid)) {
+  if (!evenIfSigned && signersOf(decision, current).includes(uid)) {
     throw new Error("It's not your turn - you already stand behind the current version");
   }
 
   const newOrder = current + 1;
   const nowISO = new Date().toISOString();
   const previous = standingRound(decision);
+  const bom = round.bom ?? previous.bom ?? null;
 
   // Unspecified fields inherit the standing version rather than resetting to
   // null: a counter about the hours should not silently wipe the agreed dates.
   const merged: StandingRound = {
     ordern: newOrder,
     mode: round.mode,
-    why: round.why ?? null,
+    // The card shows `why`, and the recipe it inherits is still being signed.
+    why: [round.why, bom?.length ? bomTermsSummary(bom, 'he') : ''].filter(Boolean).join('\n') || null,
     name: round.name ?? previous.name ?? null,
     descrip: round.descrip ?? previous.descrip ?? null,
     hm: round.hm ?? previous.hm ?? null,
@@ -228,6 +262,7 @@ export async function counterObjectChange(
     // A product's variant terms ride the round too (./variantTerms.ts) — a
     // counter about the base price must not drop the variant prices.
     variants: round.variants ?? previous.variants ?? null,
+    bom,
   };
 
   const negoarch = [

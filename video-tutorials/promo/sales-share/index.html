@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>כמה מזה שלך?</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family: 'Sababa'; src: url('../../../static/fonts/NbmSababaHL1-Bold.otf'); }
+  :root {
+    --barbi: #ff0092; --gold: #fbbf24; --green: #34d399;
+    --night: #0f0b24; --night2: #1d1442; --panel: #171233; --line: #2f2760; --muted: #9b93c9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--night); }
+  body { font-family: 'Heebo', sans-serif; color: #fff; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden;
+    background: radial-gradient(120% 80% at 50% 30%, var(--night2), var(--night)); }
+  .layer { position: absolute; inset: 0; }
+  .center { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .w { display: inline-block; opacity: 0; white-space: pre; }
+  .mono { font-family: 'JetBrains Mono', monospace; direction: ltr; unicode-bidi: isolate; }
+
+  /* S1: sold vs yours */
+  #a1 { position: absolute; top: 230px; width: 100%; text-align: center; font-size: 80px; font-weight: 800; }
+  #big { position: absolute; top: 360px; width: 100%; text-align: center; font-size: 150px; font-weight: 700; color: var(--gold); letter-spacing: -4px; }
+  #a2 { position: absolute; top: 760px; width: 100%; text-align: center; font-size: 80px; font-weight: 800; color: var(--barbi); }
+  #small { position: absolute; top: 880px; width: 100%; text-align: center; font-size: 96px; font-weight: 700; color: #e3dcff; opacity: 0; }
+  #small small { font-size: 46px; color: var(--muted); }
+  #bars { position: absolute; top: 1200px; left: 120px; width: 840px; }
+  .bl { font-size: 38px; color: var(--muted); margin-bottom: 12px; display: flex; justify-content: space-between; }
+  .track { height: 70px; border-radius: 35px; background: #221b4a; overflow: hidden; margin-bottom: 44px; }
+  .fill { height: 100%; border-radius: 35px; width: 0; }
+  #f1 { background: linear-gradient(90deg, #f59e0b, var(--gold)); }
+  #f2 { background: var(--barbi); }
+
+  /* S2: what if */
+  #s2 { opacity: 0; }
+  #wi { font-size: 96px; font-weight: 900; line-height: 1.2; }
+  #swap { margin-top: 70px; font-size: 104px; font-weight: 900; position: relative; height: 140px; width: 900px; }
+  #swap span { position: absolute; inset: 0; text-align: center; }
+  #com { color: #a39cbf; text-decoration-color: var(--barbi); text-decoration-thickness: 10px; }
+  #part { color: var(--barbi); opacity: 0; }
+
+  /* S3: share + profit splits */
+  #s3 { opacity: 0; }
+  #h3 { position: absolute; top: 140px; width: 100%; text-align: center; font-size: 60px; font-weight: 800; white-space: nowrap; }
+  #rk { position: absolute; top: 300px; left: 90px; width: 900px; height: 560px; border-radius: 44px; background: var(--panel); border: 2px solid var(--line);
+    box-shadow: 0 30px 80px rgba(0,0,0,.55); }
+  #rk .t { position: absolute; top: 44px; right: 56px; font-size: 44px; font-weight: 800; }
+  #rk .t small { display: block; font-size: 34px; color: var(--muted); font-weight: 500; margin-top: 4px; }
+  #ring { position: absolute; top: 170px; left: 44px; width: 320px; height: 320px; }
+  #pv { position: absolute; top: 272px; left: 44px; width: 320px; text-align: center; font-size: 96px; font-weight: 700; color: var(--barbi); }
+  #hrs { position: absolute; top: 230px; right: 56px; width: 440px; }
+  #hrs .r { gap: 20px; font-size: 36px; color: #e3dcff; margin-bottom: 22px; display: flex; justify-content: space-between; opacity: 0; }
+  #hrs .r b { color: #fff; }
+  #splits { position: absolute; top: 920px; left: 90px; width: 900px; display: flex; flex-direction: column; gap: 26px; }
+  .sp { display: flex; align-items: center; gap: 26px; padding: 30px 40px; border-radius: 36px; background: #fff; color: #1a1333; opacity: 0;
+    box-shadow: 0 20px 60px rgba(0,0,0,.4); }
+  .sp .ic { font-size: 64px; }
+  .sp .d { flex: 1; font-size: 40px; font-weight: 700; }
+  .sp .d small { display: block; font-size: 32px; color: #6b6290; font-weight: 500; }
+  .sp .me { font-size: 56px; font-weight: 900; color: #c4006f; }
+  #fine { position: absolute; top: 1680px; width: 100%; text-align: center; font-size: 34px; color: var(--muted); opacity: 0; padding: 0 90px; }
+
+  /* S4: brand */
+  #s5 { background: radial-gradient(110% 70% at 50% 40%, #3a1257, var(--night)); opacity: 0; }
+  #mark { font-family: 'Sababa', 'Heebo'; font-size: 250px; direction: ltr; letter-spacing: 4px; }
+  #mark .h { color: var(--barbi); display: inline-block; }
+  #tagline { font-size: 80px; font-weight: 800; margin-top: 40px; }
+  #sub { font-size: 50px; color: #d7cff9; margin-top: 26px; padding: 0 80px; line-height: 1.35; }
+  #cta { margin-top: 90px; padding: 34px 90px; border-radius: 90px; background: var(--barbi); font-size: 66px; font-weight: 800;
+    direction: ltr; box-shadow: 0 0 60px rgba(255,0,146,.55); }
+  #s5 > * { opacity: 0; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- S1: how much did you sell, how much of it is yours -->
+  <div class="layer" id="s1">
+    <div id="a1">כמה מכרת השנה?</div>
+    <div id="big" class="mono">₪0</div>
+    <div id="a2">וכמה מזה שלך?</div>
+    <div id="small"><span class="mono">₪48,000</span> <small>עמלה</small></div>
+    <div id="bars">
+      <div class="bl" id="l1"><span>מכרת</span><span class="mono">₪2,400,000</span></div>
+      <div class="track"><div class="fill" id="f1"></div></div>
+      <div class="bl" id="l2"><span>שלך</span><span class="mono">2%</span></div>
+      <div class="track"><div class="fill" id="f2"></div></div>
+    </div>
+  </div>
+
+  <!-- S2: what if -->
+  <div class="layer center" id="s2">
+    <div id="wi">מה אם במקום</div>
+    <div id="swap"><span id="com">עמלה</span><span id="part">היית שותף במוצר?</span></div>
+  </div>
+
+  <!-- S3: your work is a share; every profit split includes you -->
+  <div class="layer" id="s3">
+    <div id="h3">העבודה שלך נספרת כחלק ברקמה</div>
+    <div id="rk">
+      <div class="t">רקמת "תה מהגליל"<small>החלק שלך</small></div>
+      <svg id="ring" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="80" stroke="#2a2160" stroke-width="26" fill="none"/>
+        <circle id="arc" cx="100" cy="100" r="80" stroke="#ff0092" stroke-width="26" fill="none" transform="rotate(-90 100 100)"
+          stroke-dasharray="502.7" stroke-dashoffset="502.7"/>
+      </svg>
+      <div id="pv" class="mono">0%</div>
+      <div id="hrs">
+        <div class="r"><span>שעות מכירה שאושרו</span><b class="mono">120</b></div>
+        <div class="r"><span>שווי שעה</span><b class="mono">₪200</b></div>
+        <div class="r"><span>לקוחות שהבאת</span><b class="mono">37</b></div>
+      </div>
+    </div>
+    <div id="splits">
+      <div class="sp"><span class="ic">🍃</span><div class="d">חלוקת רווח · מרץ<small>רווח הרקמה <span class="mono">₪20,000</span></small></div><div class="me mono">+₪3,000</div></div>
+      <div class="sp"><span class="ic">🍃</span><div class="d">חלוקת רווח · יוני<small>רווח הרקמה <span class="mono">₪32,000</span></small></div><div class="me mono">+₪4,800</div></div>
+      <div class="sp"><span class="ic">🍃</span><div class="d">חלוקת רווח · ספטמבר<small>רווח הרקמה <span class="mono">₪41,000</span></small></div><div class="me mono">+₪6,150</div></div>
+    </div>
+    <div id="fine">גם המכירות שתביא בשנה הבאה, ובזו שאחריה</div>
+  </div>
+
+  <!-- S4: brand -->
+  <div class="layer center" id="s5">
+    <div id="mark">1<span class="h">lev</span>1</div>
+    <div id="tagline">שותפות במקום עמלה</div>
+    <div id="sub">מכרת? את המוצר הזה בנית גם אתה</div>
+    <div id="cta">1lev1.com</div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const p = (t, s, d) => cl((t - s) / d);
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const win = (t, a, b, f = .35) => Math.min(eo(p(t, a, f)), 1 - p(t, b - f, f));
+function split(el) {
+  el.innerHTML = el.textContent.split(/(\s+)/).filter(Boolean)
+    .map(s => /^\s+$/.test(s) ? s : `<span class="w">${s}</span>`).join('');
+}
+['a1', 'a2', 'wi', 'h3'].forEach(id => split($(id)));
+function words(el, t, start, per, dy = 34) {
+  el.querySelectorAll('.w').forEach((w, i) => {
+    const q = eo(p(t, start + i * per, .3));
+    w.style.opacity = q; w.style.transform = `translateY(${(1 - q) * dy}px)`;
+  });
+}
+const fadeIn = (el, t, s, d = .4, dy = 30) => { const q = eo(p(t, s, d)); el.style.opacity = q; el.style.transform = `translateY(${(1 - q) * dy}px)`; return q; };
+const popIn = (el, t, s, d = .45) => { const q = p(t, s, d); el.style.opacity = Math.min(1, q * 3); el.style.transform = `scale(${q === 0 ? .4 : back(q)})`; return q; };
+const nis = v => '₪' + Math.round(v).toLocaleString('en-US');
+
+const DURATION = 24.5;
+window.DURATION = DURATION;
+// narration: narrate.py (Adam / ElevenLabs v3), one line per beat; scenes timed to the words
+window.AUDIO = [
+  { src: 'assets/narration/n1.mp3', in: 0, dur: 1.28, at: 0.4 },
+  { src: 'assets/narration/n2.mp3', in: 0, dur: 2.0, at: 3.4 },
+  { src: 'assets/narration/n3.mp3', in: 0, dur: 2.96, at: 8.0 },
+  { src: 'assets/narration/n4.mp3', in: 0, dur: 4.64, at: 12.2 },
+  { src: 'assets/narration/n5.mp3', in: 0, dur: 2.96, at: 19.4 },
+];
+
+window.seek = function (t) {
+  // ---------- S1 (0 - 7.9) ----------
+  // n1 at 0.4: "כמה מכרת השנה?" 0.4–1.6 · n2 at 3.4: "וכמה מזה" 3.4–4.4 · "שלך?" 4.8–5.2
+  $('s1').style.opacity = 1 - eio(p(t, 7.5, .45));
+  words($('a1'), t, .35, .22);
+  const rq = eio(p(t, .5, 2.2));
+  $('big').textContent = nis(2400000 * rq);
+  $('big').style.opacity = eo(p(t, .4, .3));
+  $('big').style.transform = `scale(${1 + .05 * Math.sin(p(t, 2.7, .4) * Math.PI)})`;
+  words($('a2'), t, 3.4, .32);
+  popIn($('small'), t, 4.8, .4);
+  fadeIn($('l1'), t, 5.4, .3, 12); fadeIn($('l2'), t, 6.0, .3, 12);
+  $('f1').style.width = 100 * eo(p(t, 5.5, .7)) + '%';
+  $('f2').style.width = 2 * eo(p(t, 6.1, .5)) + '%';
+  // the tiny bar blinks once, so nobody misses it
+  $('f2').style.boxShadow = t > 6.6 ? `0 0 ${30 * Math.max(0, Math.sin((t - 6.6) * 5))}px rgba(255,0,146,.9)` : 'none';
+
+  // ---------- S2 (7.7 - 12.1) ----------
+  // n3 at 8.0: "מה אם במקום עמלה" 8.0–9.2 · "היית שותף במוצר?" 9.6–10.9
+  $('s2').style.opacity = win(t, 7.7, 12.15, .35);
+  words($('wi'), t, 8.0, .28);
+  const com = $('com');
+  com.style.opacity = eo(p(t, 8.85, .3)) * (1 - p(t, 9.55, .25));
+  com.style.textDecorationLine = t > 9.3 ? 'line-through' : 'none';
+  const pq = p(t, 9.6, .45);
+  $('part').style.opacity = Math.min(1, pq * 3);
+  $('part').style.transform = `scale(${pq === 0 ? .5 : back(pq)})`;
+
+  // ---------- S3 (12.0 - 19.3) ----------
+  // n4 at 12.2: "העבודה שלך נספרת כחלק ברקמה" 12.3–14.4 · "וכל רווח מתחלק גם איתך" 14.8–16.7
+  $('s3').style.opacity = win(t, 12.0, 19.35, .35);
+  words($('h3'), t, 12.25, .25);
+  fadeIn($('rk'), t, 12.4, .45, 80);
+  document.querySelectorAll('#hrs .r').forEach((r, i) => fadeIn(r, t, 12.8 + i * .35, .3, 14));
+  const sq = eio(p(t, 13.0, 1.5)), SHARE = 15;
+  $('arc').setAttribute('stroke-dashoffset', 502.7 * (1 - SHARE / 100 * sq));
+  $('pv').textContent = Math.round(SHARE * sq) + '%';
+  document.querySelectorAll('.sp').forEach((s, i) => {
+    const q = p(t, 14.9 + i * .65, .45);
+    s.style.opacity = Math.min(1, q * 3);
+    s.style.transform = `translateX(${(1 - eo(q)) * -300}px)`;
+    const me = s.querySelector('.me');
+    me.style.transform = `scale(${1 + .15 * Math.sin(p(t, 15.15 + i * .65, .35) * Math.PI)})`;
+  });
+  fadeIn($('fine'), t, 17.2, .45, 16);
+
+  // ---------- S4: brand (19.2 - 24.5) ----------
+  // n5 at 19.4: "שותפות במקום עמלה" 19.5–20.7 · "אחד-לב-אחד" 21.1–22.3
+  $('s5').style.opacity = eo(p(t, 19.2, .35));
+  fadeIn($('tagline'), t, 19.45, .4);
+  fadeIn($('sub'), t, 20.3, .4);
+  const mq = p(t, 21.0, .45);
+  $('mark').style.opacity = mq; $('mark').style.transform = `scale(${mq === 0 ? .5 : back(mq)})`;
+  const beat = t > 21.6 ? 1 + .12 * Math.max(0, Math.sin((t - 21.6) * Math.PI * 1.6)) ** 6 : 1;
+  document.querySelector('#mark .h').style.transform = `scale(${beat})`;
+  const ctq = fadeIn($('cta'), t, 22.3, .4);
+  if (ctq >= 1) $('cta').style.transform = `scale(${1 + .04 * Math.sin((t - 22.7) * 6)})`;
+};
+
+const qs = new URLSearchParams(location.search);
+if (!qs.has('render')) {
+  document.fonts.ready.then(() => {
+    if (qs.has('t')) return window.seek(+qs.get('t'));
+    const t0 = performance.now();
+    const loop = () => { window.seek(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); };
+    loop();
+  });
+}
+</script>
+</body>
+</html>

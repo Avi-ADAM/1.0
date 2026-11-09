@@ -1,29 +1,18 @@
+import { redirect } from '@sveltejs/kit';
 import { sendToSer } from '$lib/send/sendToSer.js';
 
+/** A product is edited on one page, in its rikma (PLAN_PRODUCT_FORM_UNIFIED). */
 export async function load({ locals, params, fetch }) {
   const mId = params.id;
-  const lang = locals.lang;
-  const tok = locals.tok;
-  const uid = locals.uid;
-
-  const isSer = tok === false;
-
-  let alld = null;
+  let projectId = null;
 
   try {
-    const res = await sendToSer({ id: mId }, '48GetServiceById', null, null, isSer, fetch);
-    const dataNode = res?.data?.matanot?.data;
-    const node = dataNode?.attributes || null;
-    if (node) alld = { ...node, id: dataNode.id };
+    const res = await sendToSer({ id: mId }, '48GetServiceById', null, null, locals.tok === false, fetch);
+    projectId = res?.data?.matanot?.data?.attributes?.projectcreates?.data?.[0]?.id ?? null;
   } catch (e) {
     console.error('product edit load error', e);
   }
 
-  return {
-    uid,
-    lang,
-    mId,
-    tok: tok == false ? false : true,
-    alld
-  };
+  if (projectId) redirect(307, `/moach/${projectId}/sales/manage/products/${mId}`);
+  return { mId };
 }

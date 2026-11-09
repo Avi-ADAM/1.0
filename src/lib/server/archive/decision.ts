@@ -21,6 +21,7 @@ import {
 } from './gql.js';
 import { TARGET_META, type ArchiveTarget, type TargetKind } from './targets.js';
 import { variantsField } from './variantTerms.js';
+import { bomField } from './bomTerms.js';
 import type { ArchiveScope, HoursOutcome, RoundMode, StandingRound } from './apply.js';
 
 export type DecisionKind = 'archiveObject' | 'editObject';
@@ -69,6 +70,7 @@ export function roundFragment(round: StandingRound, proposedBy: string, zman: st
     numField('shiftsMax', round.shiftsMax),
     numField('howMany', round.howMany),
     variantsField(round.variants),
+    bomField(round.bom),
   )} }`;
 }
 

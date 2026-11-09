@@ -1,4 +1,4 @@
-export type QuickCreateKind = 'task' | 'mission' | 'resource';
+export type QuickCreateKind = 'task' | 'mission' | 'resource' | 'product';
 
 export type QuickCreateProject = {
   id: string;
@@ -21,6 +21,11 @@ export const QUICK_CREATE_ACTIONS = [
     id: 'resource',
     titleKey: 'common.quickCreate.kind.resource',
     descriptionKey: 'common.quickCreate.kind.resourceHint'
+  },
+  {
+    id: 'product',
+    titleKey: 'common.quickCreate.kind.product',
+    descriptionKey: 'common.quickCreate.kind.productHint'
   }
 ] as const;
 
@@ -40,6 +45,8 @@ export function buildQuickCreateHref(
       return `/moach/${id}/create?action=createmission`;
     case 'resource':
       return `/moach/${id}/create?action=createresource`;
+    case 'product':
+      return `/moach/${id}/sales/new`;
   }
 }
 

@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>40 שנה של ניסיון</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family: 'Sababa'; src: url('../../../static/fonts/NbmSababaHL1-Bold.otf'); }
+  :root {
+    --barbi: #ff0092; --gold: #fbbf24; --green: #34d399;
+    --night: #0f0b24; --night2: #1d1442; --panel: #171233; --line: #2f2760; --muted: #9b93c9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--night); }
+  body { font-family: 'Heebo', sans-serif; color: #fff; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden;
+    background: radial-gradient(120% 80% at 50% 30%, var(--night2), var(--night)); }
+  .layer { position: absolute; inset: 0; }
+  .center { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .w { display: inline-block; opacity: 0; white-space: pre; }
+  .mono { font-family: 'JetBrains Mono', monospace; direction: ltr; unicode-bidi: isolate; }
+
+  /* S1: forty years */
+  #forty { font-size: 380px; font-weight: 700; color: var(--gold); line-height: 1; }
+  #yrs { font-size: 80px; font-weight: 800; margin-top: 10px; }
+  #cv { display: flex; flex-direction: column; gap: 16px; margin-top: 60px; align-items: center; }
+  .cvr { font-size: 40px; color: #d7cff9; opacity: 0; }
+  .cvr b { color: var(--gold); font-weight: 700; margin-left: 16px; }
+  #now { font-size: 104px; font-weight: 900; color: var(--barbi); margin-top: 70px; }
+
+  /* S2: free advice */
+  #s2 { opacity: 0; }
+  #prof { position: absolute; top: 160px; left: 90px; right: 90px; display: flex; align-items: center; gap: 34px; }
+  #prof .a { width: 200px; height: 200px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #ef4444); display: flex; align-items: center; justify-content: center; font-size: 130px; flex: none; }
+  #prof .n { font-size: 80px; font-weight: 900; }
+  #prof .d { font-size: 42px; color: var(--muted); margin-top: 6px; }
+  #asks { position: absolute; top: 480px; left: 90px; right: 90px; display: flex; flex-direction: column; gap: 26px; }
+  .ask { align-self: flex-start; max-width: 780px; padding: 26px 36px; border-radius: 40px 40px 40px 8px; background: #2a2160; font-size: 46px; opacity: 0; }
+  .ask small { display: block; font-size: 30px; color: var(--muted); margin-bottom: 6px; }
+  #tally { position: absolute; top: 1280px; left: 90px; right: 90px; display: flex; gap: 26px; }
+  .tl { flex: 1; padding: 34px; border-radius: 36px; background: var(--panel); border: 2px solid var(--line); text-align: center; opacity: 0; }
+  .tl .k { font-size: 38px; color: var(--muted); }
+  .tl .v { font-size: 110px; font-weight: 700; margin-top: 4px; }
+  #free { position: absolute; top: 1580px; width: 100%; text-align: center; font-size: 84px; font-weight: 900; color: var(--barbi); }
+
+  /* S3: a rikma that needs exactly that */
+  #s3 { opacity: 0; }
+  #h3 { position: absolute; top: 130px; width: 100%; text-align: center; font-size: 60px; font-weight: 800; }
+  #rk { position: absolute; top: 260px; left: 90px; width: 900px; padding: 40px 50px; border-radius: 44px; background: var(--panel); border: 2px solid var(--line); opacity: 0; }
+  #rk .t { font-size: 50px; font-weight: 900; }
+  #rk .t small { display: block; font-size: 34px; color: var(--muted); font-weight: 500; margin-top: 4px; }
+  #young { display: flex; gap: 16px; margin-top: 24px; }
+  #young div { width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 60px; }
+  #mis { position: absolute; top: 700px; left: 90px; width: 900px; padding: 50px 56px; border-radius: 44px; background: #fff; color: #1a1333; box-shadow: 0 40px 100px rgba(0,0,0,.5); opacity: 0; }
+  #mis .pill { display: inline-block; padding: 10px 30px; border-radius: 40px; background: #ffe3f3; color: #c4006f; font-size: 36px; font-weight: 700; }
+  #mis .ti { font-size: 60px; font-weight: 900; margin-top: 20px; line-height: 1.15; }
+  .mr { display: flex; align-items: center; gap: 20px; font-size: 46px; font-weight: 700; margin-top: 26px; color: #3b335c; opacity: 0; }
+  .mr b { color: #c4006f; }
+  #match { position: absolute; top: 1420px; width: 100%; text-align: center; }
+  #match span { display: inline-block; padding: 24px 50px; border-radius: 60px; background: rgba(251,191,36,.16); border: 3px solid var(--gold); color: var(--gold);
+    font-size: 46px; font-weight: 800; opacity: 0; }
+
+  /* S4: she joins */
+  #s4 { opacity: 0; }
+  #ring { position: relative; width: 620px; height: 620px; }
+  .mem { position: absolute; width: 170px; height: 170px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 100px; }
+  #rach { border: 8px solid var(--green); box-shadow: 0 0 60px rgba(52,211,153,.5); }
+  #hub { position: absolute; inset: 215px; border-radius: 50%; background: rgba(255,0,146,.14); border: 3px solid rgba(255,0,146,.5); display: flex; align-items: center; justify-content: center;
+    font-size: 34px; font-weight: 800; text-align: center; line-height: 1.2; }
+  #joined { margin-top: 60px; padding: 26px 60px; border-radius: 60px; background: var(--green); color: #052e1f; font-size: 56px; font-weight: 900; opacity: 0; }
+  #part { margin-top: 40px; font-size: 48px; color: #e3dcff; font-weight: 700; opacity: 0; }
+  #part s { color: var(--muted); text-decoration-color: var(--barbi); text-decoration-thickness: 5px; }
+
+  /* S5: brand */
+  #s5 { background: radial-gradient(110% 70% at 50% 40%, #3a1257, var(--night)); opacity: 0; }
+  #p1 { font-size: 76px; font-weight: 900; }
+  #p2 { font-size: 86px; font-weight: 900; color: var(--barbi); margin-top: 20px; }
+  #mark { font-family: 'Sababa', 'Heebo'; font-size: 220px; direction: ltr; letter-spacing: 4px; margin-top: 90px; opacity: 0; }
+  #mark .h { color: var(--barbi); display: inline-block; }
+  #cta { margin-top: 50px; padding: 30px 90px; border-radius: 90px; background: var(--barbi); font-size: 64px; font-weight: 800; direction: ltr;
+    box-shadow: 0 0 60px rgba(255,0,146,.55); opacity: 0; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- S1 -->
+  <div class="layer center" id="s1">
+    <div id="forty" class="mono">0</div>
+    <div id="yrs">שנה של ניסיון.</div>
+    <div id="cv">
+      <div class="cvr"><b class="mono">1985</b>מהנדסת חשמל צעירה</div>
+      <div class="cvr"><b class="mono">1998</b>ראש צוות תכנון</div>
+      <div class="cvr"><b class="mono">2012</b>מנהלת פיתוח</div>
+      <div class="cvr"><b class="mono">2025</b>פנסיה</div>
+    </div>
+    <div id="now">ועכשיו… מה?</div>
+  </div>
+
+  <!-- S2 -->
+  <div class="layer" id="s2">
+    <div id="prof"><div class="a">👩🏻‍🦳</div><div><div class="n">רחל</div><div class="d">מהנדסת חשמל בפנסיה</div></div></div>
+    <div id="asks">
+      <div class="ask"><small>אחיין של חברה</small>רחל, שאלה קטנה על המעגל? 🙏</div>
+      <div class="ask"><small>שכן</small>אפשר להתייעץ איתך 5 דקות?</div>
+      <div class="ask"><small>סטודנט</small>תעזרי לנו עם הספק? רק הפעם</div>
+    </div>
+    <div id="tally">
+      <div class="tl"><div class="k">עצות השנה</div><div class="v mono" id="adv">0</div></div>
+      <div class="tl"><div class="k">שולם לה</div><div class="v mono" style="color:#ff4fb3">₪0</div></div>
+    </div>
+    <div id="free">בחינם.</div>
+  </div>
+
+  <!-- S3 -->
+  <div class="layer" id="s3">
+    <div id="h3">ואז היא מוצאת רקמה</div>
+    <div id="rk">
+      <div class="t">רקמת "חיישן השקיה חכם"<small>3 שותפים, בני 24–27</small></div>
+      <div id="young"><div style="background:#ddd6fe">🧑🏻</div><div style="background:#bbf7d0">👩🏽</div><div style="background:#bae6fd">🧔🏼</div></div>
+    </div>
+    <div id="mis">
+      <span class="pill">משימה פתוחה</span>
+      <div class="ti">ליווי תכנון המעגל<br>מהנדס/ת חשמל בכיר/ה</div>
+      <div class="mr" id="mr1">⏱ <span><b>10 שעות</b> בחודש</span></div>
+      <div class="mr" id="mr2">💎 <span>תמורה: <b>אחוזים ברקמה</b></span></div>
+    </div>
+    <div id="match"><span>✓ בדיוק מה שהיא יודעת</span></div>
+  </div>
+
+  <!-- S4 -->
+  <div class="layer center" id="s4">
+    <div id="ring">
+      <div id="hub">חיישן<br>השקיה חכם</div>
+      <div class="mem" style="left:225px;top:0;background:#ddd6fe">🧑🏻</div>
+      <div class="mem" style="left:0;top:225px;background:#bbf7d0">👩🏽</div>
+      <div class="mem" style="left:450px;top:225px;background:#bae6fd">🧔🏼</div>
+      <div class="mem" id="rach" style="left:225px;top:450px;background:linear-gradient(135deg,#f59e0b,#ef4444)">👩🏻‍🦳</div>
+    </div>
+    <div id="joined">✓ רחל: שותפה ברקמה</div>
+    <div id="part">10 שעות בחודש · <s>משרה מלאה</s></div>
+  </div>
+
+  <!-- S5 -->
+  <div class="layer center" id="s5">
+    <div id="p1">הניסיון שלך שווה אחוזים,</div>
+    <div id="p2">לא רק עצות.</div>
+    <div id="mark">1<span class="h">lev</span>1</div>
+    <div id="cta">1lev1.com</div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const p = (t, s, d) => cl((t - s) / d);
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const win = (t, a, b, f = .35) => Math.min(eo(p(t, a, f)), 1 - p(t, b - f, f));
+function split(el) {
+  el.innerHTML = el.textContent.split(/(\s+)/).filter(Boolean)
+    .map(s => /^\s+$/.test(s) ? s : `<span class="w">${s}</span>`).join('');
+}
+['yrs', 'now', 'free', 'h3', 'p1', 'p2'].forEach(id => split($(id)));
+function words(el, t, start, per, dy = 34) {
+  el.querySelectorAll('.w').forEach((w, i) => {
+    const q = eo(p(t, start + i * per, .3));
+    w.style.opacity = q; w.style.transform = `translateY(${(1 - q) * dy}px)`;
+  });
+}
+const fadeIn = (el, t, s, d = .4, dy = 30) => { const q = eo(p(t, s, d)); el.style.opacity = q; el.style.transform = `translateY(${(1 - q) * dy}px)`; return q; };
+const popIn = (el, t, s, d = .45) => { const q = p(t, s, d); el.style.opacity = Math.min(1, q * 3); el.style.transform = `scale(${q === 0 ? .4 : back(q)})`; return q; };
+
+const DURATION = 27;
+window.DURATION = DURATION;
+// narration: narrate.py (Adam / ElevenLabs v3); scenes timed to the words
+window.AUDIO = [
+  { src: 'assets/narration/n1.mp3', in: 0, dur: 3.95, at: 0.3 },
+  { src: 'assets/narration/n2.mp3', in: 0, dur: 5.28, at: 4.6 },
+  { src: 'assets/narration/n3.mp3', in: 0, dur: 6.88, at: 9.8 },
+  { src: 'assets/narration/n4.mp3', in: 0, dur: 3.28, at: 17.0 },
+  { src: 'assets/narration/n5.mp3', in: 0, dur: 5.36, at: 20.6 },
+];
+
+window.seek = function (t) {
+  // ---------- S1 (0 - 4.6) ----------
+  // n1 at 0.3: "ארבעים שנה של ניסיון" 0.3–1.9 · "ועכשיו" 2.4–3.0 · "מה?" 3.8–4.1
+  $('s1').style.opacity = 1 - eio(p(t, 4.3, .35));
+  $('forty').textContent = Math.round(40 * eio(p(t, .3, 1.4)));
+  $('forty').style.opacity = eo(p(t, .2, .3));
+  words($('yrs'), t, .9, .2);
+  document.querySelectorAll('.cvr').forEach((c, i) => fadeIn(c, t, .5 + i * .3, .3, 16));
+  words($('now'), t, 2.4, 1.3, 40);
+
+  // ---------- S2 (4.4 - 9.8) ----------
+  // n2 at 4.6: "רחל, מהנדסת בפנסיה" 4.7–6.2 · "כולם מבקשים ממנה עצות" 6.8–8.2 · "בחינם" 8.8–9.3
+  $('s2').style.opacity = win(t, 4.4, 9.85, .35);
+  fadeIn($('prof'), t, 4.6, .45, 30);
+  document.querySelectorAll('.ask').forEach((a, i) => fadeIn(a, t, 6.6 + i * .45, .3, 24));
+  document.querySelectorAll('.tl').forEach((a, i) => fadeIn(a, t, 7.8 + i * .4, .3, 20));
+  $('adv').textContent = Math.round(47 * eo(p(t, 7.9, .9)));
+  words($('free'), t, 8.8, .2, 40);
+
+  // ---------- S3 (9.6 - 17.0) ----------
+  // n3 at 9.8: "ברקמה של שלושה צעירים" 9.9–11.4 · "מחפשים בדיוק את מה שהיא יודעת" 11.4–13.5 · "עשר שעות בחודש" 14.1–15.4 · "תמורת אחוזים" 15.8–16.6
+  $('s3').style.opacity = win(t, 9.6, 17.05, .35);
+  words($('h3'), t, 9.7, .25);
+  fadeIn($('rk'), t, 9.9, .45, 40);
+  document.querySelectorAll('#young div').forEach((d, i) => popIn(d, t, 10.5 + i * .2, .35));
+  const mq0 = p(t, 11.5, .5);
+  $('mis').style.opacity = Math.min(1, mq0 * 3);
+  $('mis').style.transform = `translateY(${(1 - eo(mq0)) * 160}px)`;
+  popIn($('match').firstElementChild, t, 12.7, .4);
+  fadeIn($('mr1'), t, 14.1, .35, 16);
+  fadeIn($('mr2'), t, 15.8, .35, 16);
+
+  // ---------- S4 (16.9 - 20.6) ----------
+  // n4 at 17.0: "היא נכנסת כשותפה" 17.1–18.3 · "בלי לחזור למשרה מלאה" 18.8–20.2
+  $('s4').style.opacity = win(t, 16.9, 20.65, .3);
+  const rq = p(t, 17.2, .55);
+  $('rach').style.transform = `translateY(${(1 - eo(rq)) * 400}px) scale(${rq === 0 ? .5 : back(rq)})`;
+  $('rach').style.opacity = Math.min(1, rq * 3);
+  popIn($('joined'), t, 17.9, .4);
+  fadeIn($('part'), t, 18.8, .4, 20);
+  $('part').querySelector('s').style.textDecorationLine = t > 19.5 ? 'line-through' : 'none';
+
+  // ---------- S5 (20.5 - 27) ----------
+  // n5 at 20.6: "הניסיון שלך שווה אחוזים" 20.7–22.5 · "לא רק עצות" 22.7–23.4 · "אחד-לב-אחד" 23.9–25.6
+  $('s5').style.opacity = eo(p(t, 20.4, .3));
+  words($('p1'), t, 20.7, .35);
+  words($('p2'), t, 22.7, .25, 40);
+  const mq = p(t, 23.8, .45);
+  $('mark').style.opacity = mq; $('mark').style.transform = `scale(${mq === 0 ? .5 : back(mq)})`;
+  const beat = t > 24.4 ? 1 + .12 * Math.max(0, Math.sin((t - 24.4) * Math.PI * 1.6)) ** 6 : 1;
+  document.querySelector('#mark .h').style.transform = `scale(${beat})`;
+  const ctq = fadeIn($('cta'), t, 24.8, .4);
+  if (ctq >= 1) $('cta').style.transform = `scale(${1 + .04 * Math.sin((t - 25.2) * 6)})`;
+};
+
+const qs = new URLSearchParams(location.search);
+if (!qs.has('render')) {
+  document.fonts.ready.then(() => {
+    if (qs.has('t')) return window.seek(+qs.get('t'));
+    const t0 = performance.now();
+    const loop = () => { window.seek(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); };
+    loop();
+  });
+}
+</script>
+</body>
+</html>

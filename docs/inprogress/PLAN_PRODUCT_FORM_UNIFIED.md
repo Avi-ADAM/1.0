@@ -1,6 +1,6 @@
 # PLAN — One product form for create and edit
 
-**Status:** phase 1 built (`src/lib/components/products/ProductForm.svelte` on `/sales/new`); phases 2–3 open · **Model:** the mission/resource creation forms (`docs/tbd/PLAN_MISSION_FORM_REDESIGN.md`,
+**Status:** phases 1–3 built (`src/lib/components/products/ProductForm.svelte` on `/sales/new` and on `/sales/manage/products/[id]`); phase 3 waits for `negoarch.bom` in the `1.0b` deploy · **Model:** the mission/resource creation forms (`docs/tbd/PLAN_MISSION_FORM_REDESIGN.md`,
 `src/lib/components/prPr/missionForm/*`)
 
 ## Why
@@ -65,9 +65,8 @@ always editable.
   `toEditorProduct`. Saving keeps the "two speeds" of `shopProductEditor.ts` unchanged:
   pictures/stock/SKU/order at once, price and new variants through `editObject` (unless sovereign).
   The aside shows which of the pending changes go to the partners, as `pe-pending` does today.
-- **Open question — BOM in edit.** There is no action today that edits an existing product's
-  missions/resources. Phase 1 shows the BOM read-only in edit with "שינוי הרכב יוצע לשותפים"
-  disabled; Phase 3 adds a BOM round to `editObject` (`negoarch.bom`), same rules as price.
+- **BOM in edit.** Lines are changed, added or removed on the same form, and ride an `editObject`
+  round (`negoarch.bom`), same rules as price (phase 3 below).
 
 ## Entry points after the change
 
@@ -82,10 +81,39 @@ always editable.
 1. ✅ `ProductForm` in create mode on `/sales/new`, pricing two modes, margin removed, "עוד אפשרויות"
    with location + group pricing + a pointer to pictures/variants/stock. Strings in `shopEditor.form.*`.
    ComposeProduct stays for `/gift/[id]/edit` until phase 2 (shopEditor is route-gated to /sales).
-2. Edit mode: move ProductEditor's gallery / options / variants / stock / archive into `OptionRow`s
-   (the logic stays in `$lib/shop/variantEditor` + `productEditor`), staged rows in create mode,
-   entry points unified, `/gift/[id]/edit` redirect.
-3. BOM editing on an existing product through `editObject`.
+2. ✅ Edit mode: ProductEditor's gallery / options / variants / stock / archive are `OptionRow`s
+   (`GalleryField`, `VariantsField`, `ProductChangesPanel`; the logic stays in
+   `$lib/shop/variantEditor` + `productEditor`), staged rows in create mode, `/gift/[id]/edit`
+   redirects. ProductEditor and ComposeProduct are gone. Decided while building:
+   - `saveProductVariants` also takes `stock` (the product's own count, only with no variants) and
+     `location`. Both are operational, like pictures and categories.
+   - In edit the pricing mode is read-only. `byQuote` can change on a sovereign product only
+     (`PRICING_MODE_IS_TERM` refuses a rikma's). `oneForeProject` and the currency are read-only.
+   - Staged variant prices are written as typed, so a create in a currency other than the rikma's
+     is refused while a variant has its own price.
+   - A new variant's placeholder SKU (`NEW-M`) is stamped with the product id on save (`stampNewSkus`).
+3. ✅ BOM editing on an existing product through `editObject` (`$lib/shop/bomEditor`,
+   `$lib/server/archive/bomTerms`). Deploy needs `negoarch.bom` (json) from `1.0b`; until a probe
+   sees it, a multi-member rikma's recipe change answers `BOM_TERMS_NOT_READY` and the rest saves.
+   Decided while building:
+   - The vote on the round is the rikma's consent, so an added line opens at once, in the shape a
+     decided `pendm` / `pmash` leaves. No second vote. An owner can be picked: they sign the same round
+     explicitly (`requiredSigners`), the members' silence matures but theirs does not, so the one
+     vote approves the work and the assignment and the mission starts on their name. A counter can
+     take the owner off (`releaseBomAssignment`), and then the line just opens for anyone. A resource's
+     owner picks which of theirs it is, or creates one, in the modal their yes opens
+     (`signBomAssignment`, on the heart card, the vote page and the product page), so it
+     registers with the same vote. Proposing is agreeing: whoever takes a resource on themself picks
+     it in the same modal as they save, in a rikma of one too.
+   - Nothing is deleted. A removed line is detached from the product (`matanot: null`, a resource
+     also `archived`); the Decision keeps what it was. The mission or resource stays in the rikma.
+   - A wish product's lines are what its customer is billed by (`loadDealDue`). A version that asks
+     for more needs her signature on the deal page (`dealSignersFor`, `DealRecipePanel`), and her
+     silence is not her yes. She approves, or keeps only the changes she needs (`counterDealRecipe`).
+     On a fixed-price deal nobody but the rikma signs. The bill moves only for held lines; an open
+     line joins it when its candidacy matures (`offerDeal`).
+   - The price follows the new cost until the seller types one. It goes on the same round.
+   - The pricing mode stays read-only, and a group curve (`costShape`) is not edited here.
 
 ## i18n
 

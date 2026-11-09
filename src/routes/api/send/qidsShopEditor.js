@@ -33,6 +33,40 @@ export const shopEditorQids = {
     }
   }`,
 
+  // What only the form draws: the stored margin, the location and the bill of
+  // materials. Apart from `shopEditorProduct` because every save reads that one.
+  // A wish product's deals still running: whose signature a bigger recipe needs.
+  'productLiveDeals': `query ProductLiveDeals($id: ID!) {
+    sheiruts(filters: { and: [
+      { matanot: { id: { eq: $id } } },
+      { or: [{ archived: { null: true } }, { archived: { eq: false } }] }
+    ] }, pagination: { limit: 50 }) {
+      data { id attributes { moneyTransfered } }
+    }
+  }`,
+
+  'shopEditorProductExtras': `query ShopEditorProductExtras($pid: ID!, $id: ID!) {
+    matanots(filters: { id: { eq: $id }, projectcreates: { id: { eq: $pid } } }) {
+      data { id attributes {
+        marginPct
+        ratson { data { id } }
+        location { location_mode lat lng radius location_hint }
+        matanot_recipe_missions(pagination: { limit: 100 }) { data { id attributes {
+          hoursPerUnit unitsPerProduct ratePerHour
+          assignedMember { data { id } }
+          pendm { data { id attributes { name } } }
+          mesimabetahalich { data { id attributes { name } } }
+        } } }
+        matanot_recipe_resources(pagination: { limit: 100 }) { data { id attributes {
+          quantityPerUnit pricePerUnit archived
+          assignedMember { data { id } }
+          pmash { data { id attributes { name } } }
+          mashabetahalich { data { id attributes { name } } }
+        } } }
+      } }
+    }
+  }`,
+
   // The rikma's option vocabulary — an axis the seller already named on another
   // product is offered back instead of a second "מידה".
   'shopEditorRikmaOptions': `query ShopEditorRikmaOptions($pid: ID!) {

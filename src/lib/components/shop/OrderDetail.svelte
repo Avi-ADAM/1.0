@@ -12,6 +12,7 @@
   import { useFormatMoney } from '$lib/money/context.svelte';
   import { addressExtras, addressLine, type ShopOrder } from '$lib/shop/manage';
   import { shopOrdersKey } from '$lib/shop/keys';
+  import { withTracking } from '$lib/shop/tracking';
 
   let {
     order,
@@ -26,6 +27,8 @@
   let address = $derived(addressLine(order.delivery.address));
   let extras = $derived(addressExtras(order.delivery.address, (k, v) => $t(k, v)));
   let ship = $derived(order.shipping);
+  // The note without the tracking line — that has a place of its own, beside the address.
+  let noteText = $derived(withTracking(order.note, null));
   let shipEta = $derived(
     ship && (ship.etaMinDays !== null || ship.etaMaxDays !== null)
       ? ship.etaMinDays !== null && ship.etaMaxDays !== null && ship.etaMinDays !== ship.etaMaxDays
@@ -218,6 +221,17 @@
           {#if shipDispatch}<span class="od-small">{$t('shop.order.ship.dispatch', { date: shipDispatch })}</span>{/if}
         </div>
       {/if}
+      {#if order.tracking}
+        <div class="od-ship">
+          <span class="od-small">{$t('shop.order.tracking.title')}</span>
+          <span>
+            {#if order.tracking.carrier}<bdi>{order.tracking.carrier}</bdi> · {/if}<bdi class="od-mono">{order.tracking.number}</bdi>
+          </span>
+          {#if order.tracking.url}
+            <a href={order.tracking.url} target="_blank" rel="noopener noreferrer">{$t('shop.order.tracking.link')}</a>
+          {/if}
+        </div>
+      {/if}
       {#if address}
         <div class="od-address">{address}</div>
         {#if extras}<div class="od-small">{extras}</div>{/if}
@@ -229,10 +243,10 @@
     </section>
   </div>
 
-  {#if order.note}
+  {#if noteText}
     <section class="od-card" aria-labelledby="od-note-{order.id}">
       <h2 class="sh-section-label" id="od-note-{order.id}">{$t('shop.order.note.title')}</h2>
-      <p class="od-note">{order.note}</p>
+      <p class="od-note">{noteText}</p>
     </section>
   {/if}
 

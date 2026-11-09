@@ -20,6 +20,8 @@
  * Pure: the vote path, the silence path and the deal page read the same rules.
  */
 
+import { bomRaise, parseBomTerms, type BomTerm } from '$lib/shop/bomEditor';
+
 /** The terms a round may change — null means "as the mission stands". */
 export interface EditTerms {
   hm?: number | null;
@@ -79,6 +81,57 @@ export function clockRanOut(timegramaDate: string | null | undefined, now: Date 
   if (!timegramaDate) return false;
   const t = Date.parse(timegramaDate);
   return Number.isFinite(t) && t <= now.getTime();
+}
+
+// ── a bigger recipe on her product (qid dealRecipeEdits) ───────────────────
+
+export interface DealRecipeView {
+  decisionId: string;
+  terms: BomTerm[];
+  why: string | null;
+  raise: number;
+  needsCustomer: boolean;
+  customersPending: string[];
+  membersPending: string[];
+  deadline: string | null;
+  membersMatured: boolean;
+  viewerSigned: boolean;
+}
+
+/** Open recipe changes that touch this deal's product, as the deal page lists them. */
+export function readDealRecipeEdits(res: any, clientIds: string[], viewerId: string, now: Date = new Date()): DealRecipeView[] {
+  const out: DealRecipeView[] = [];
+  for (const node of (res?.data ?? res)?.decisions?.data ?? []) {
+    const a = node?.attributes ?? {};
+    const rounds = [...(a.negoarch ?? [])].sort((x: any, y: any) => Number(x.ordern ?? 1) - Number(y.ordern ?? 1));
+    const top = rounds[rounds.length - 1];
+    if (!top || top.mode !== 'keep') continue;
+    const terms = parseBomTerms(top.bom);
+    if (!terms.length) continue;
+    const order = Number(top.ordern ?? 1);
+    const votes: RoundVote[] = (a.vots ?? []).map((v: any) => ({
+      userId: String(v.users_permissions_user?.data?.id ?? ''),
+      order: Number(v.order ?? 1),
+      what: v.what !== false
+    }));
+    const signed = new Set(votes.filter((v) => v.what && v.order === order).map((v) => v.userId));
+    const members: string[] = (a.projects?.data?.[0]?.attributes?.user_1s?.data ?? []).map((u: any) => String(u.id));
+    const raise = Math.max(0, bomRaise(terms));
+    const deadline = a.timegrama?.data?.attributes?.date ?? null;
+    out.push({
+      decisionId: String(node.id),
+      terms,
+      why: top.why ?? null,
+      raise,
+      needsCustomer: raise > 0,
+      customersPending: raise > 0 ? clientsPendingOn(votes, order, clientIds) : [],
+      membersPending: members.filter((m) => !signed.has(m)),
+      deadline,
+      membersMatured: clockRanOut(deadline, now),
+      viewerSigned: signed.has(String(viewerId))
+    });
+  }
+  return out;
 }
 
 // ── the deal page's view of the open requests (qid 400) ────────────────────

@@ -14,6 +14,7 @@
  */
 import { shippingSchemaLive } from './shippingConfig.js';
 import { readOrderShipping } from '$lib/shop/shipping';
+import { readTracking } from '$lib/shop/tracking';
 import { productShips, type ManageFacts } from '$lib/shop/manageTabs';
 import { strapiClient } from '$lib/server/actions';
 import { ordersSchemaLive, strapiRun } from '$lib/server/apiPublic/catalog.js';
@@ -93,6 +94,7 @@ export function toShopOrder(node: any): ShopOrder | null {
     buyer: { name: str(a.buyerName), email: str(a.buyerEmail), phone: str(a.buyerPhone) },
     delivery: { preference: preferenceOf(a.deliveryPreference), address: addressOf(a.deliveryAddress) },
     shipping: null,
+    tracking: readTracking(str(a.note)),
     note: str(a.note),
     paymentRef: str(a.paymentRef),
     paymentMethod: str(a.paymentMethod),

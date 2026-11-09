@@ -13,6 +13,7 @@
 import type { ArchRound, ObjectChangeDecision } from '$lib/server/archive/read.js';
 import type { ExtraSigners, ExtraSignersFor } from '$lib/server/archive/vote.js';
 import { editedValue, raiseBy, raisesPart } from '$lib/sheirut/dealEdit.js';
+import { bomAssignees, bomBillDelta, bomRaise, type BomTerm } from '$lib/shop/bomEditor.js';
 import { loadDealDue, type QidRunner } from './dealDue.js';
 import { releaseHeldHours } from './overCap.js';
 import type { PricingTrack } from '$lib/sheirut/pricingTrack';
@@ -126,7 +127,119 @@ export async function syncDealLine(
 }
 
 /** Extra signers that remember which deal they came from. */
-export type DealSigners = ExtraSigners & { deal: MissionDeal };
+export type DealSigners = ExtraSigners & { deal?: MissionDeal; recipe?: RecipeDeals };
+
+/** Where a wish product's recipe is being sold right now. */
+export interface ProductDeal {
+  sheirutId: string;
+  projectId: string | null;
+  dealTotal: number;
+  quant: number;
+  track: PricingTrack;
+  customerIds: string[];
+}
+
+export interface RecipeDeals {
+  productName: string;
+  projectId: string | null;
+  sheirutId: string | null;
+  deals: ProductDeal[];
+}
+
+/** The product's deals still running. Only a wish product's have a bill by parts. */
+export async function loadProductDeals(run: QidRunner, productId: string): Promise<ProductDeal[]> {
+  const data = unwrap(await run('productLiveDeals', { id: String(productId) }), `product ${productId}`);
+  const out: ProductDeal[] = [];
+  for (const s of data?.sheiruts?.data ?? []) {
+    if (s?.attributes?.moneyTransfered === true) continue;
+    const due = await loadDealDue(run, String(s.id));
+    if (!due) continue;
+    out.push({
+      sheirutId: due.sheirutId,
+      projectId: due.projectId,
+      dealTotal: due.dealTotal,
+      quant: due.quant,
+      track: due.track,
+      customerIds: due.customerIds
+    });
+  }
+  return out;
+}
+
+/**
+ * The extra signers of a recipe change on a wish product: the customers of its
+ * at-cost deals, when the version asks them for more. It is how the rikma says
+ * "making what you asked for takes more work", and her silence is not her yes.
+ * On a fixed price she pays what she signed, so nobody but the rikma signs.
+ */
+export function signersFromProductDeals(run: QidRunner, deals: ProductDeal[], productName: string): DealSigners {
+  const atCost = deals.filter((d) => d.track === 'atCost');
+  return {
+    recipe: { productName, projectId: deals[0]?.projectId ?? null, sheirutId: deals[0]?.sheirutId ?? null, deals },
+    ids: [...new Set(atCost.flatMap((d) => d.customerIds))],
+    needed: (round: ArchRound) => atCost.length > 0 && round.mode === 'keep' && bomRaise(round.bom ?? []) > 0,
+    // The customers when it costs them more, and whoever it puts work on.
+    requiredIds: (round: ArchRound) => {
+      if (round.mode !== 'keep') return [];
+      const clients = atCost.length > 0 && bomRaise(round.bom ?? []) > 0 ? atCost.flatMap((d) => d.customerIds) : [];
+      return [...new Set([...clients, ...bomAssignees(round.bom)])];
+    },
+    onApplied: async (round: ArchRound) => {
+      if (round.mode !== 'keep') return;
+      const delta = bomBillDelta(round.bom ?? []);
+      if (Math.abs(delta) < 0.005) return;
+      for (const d of atCost) {
+        const total = round2(Math.max(0, d.dealTotal + delta * d.quant));
+        unwrap(
+          await run('213updateSheirut', {
+            id: d.sheirutId,
+            data: { total, price: round2(total / (d.quant || 1)), ...(delta > 0 ? { moneyTransfered: false } : {}) }
+          }),
+          'the deal total'
+        );
+      }
+    }
+  };
+}
+
+/** Tell the customers the rikma needs more work than agreed, and waits for their signature. */
+export async function notifyDealClientsOfRecipe(notifier: any, context: any, signers: DealSigners, terms: BomTerm[]): Promise<void> {
+  const recipe = signers.recipe;
+  const recipients = signers.ids.filter((c) => c !== String(context?.userId ?? ''));
+  if (!notifier || !recipe?.sheirutId || recipients.length === 0) return;
+  const more = bomRaise(terms);
+  const name = recipe.productName;
+  try {
+    await notifier.notify(
+      {
+        recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
+        templates: {
+          title: {
+            he: 'כדי ליצור את מה שביקשת צריך עוד עבודה',
+            en: 'Making what you asked for takes more work',
+            ar: 'صنع ما طلبته يحتاج إلى عمل إضافي',
+            ru: 'Для вашего заказа нужно больше работы',
+            es: 'Hacer lo que pediste requiere más trabajo'
+          },
+          body: {
+            he: `ב"${name}" מבקשים עד ${more} יותר ממה שסוכם. בלי החתימה שלך זה לא נכנס לחשבון. אפשר לאשר, לבחור מה מזה נחוץ, או לדבר על זה בעמוד העסקה.`,
+            en: `"${name}" asks for up to ${more} more than agreed. Without your signature it is not added to your bill. Approve, choose which of it you need, or talk it over on the deal page.`,
+            ar: `في "${name}" يُطلب حتى ${more} أكثر مما اتُّفق عليه. بدون توقيعك لا يُضاف إلى حسابك. وافق، أو اختر ما تحتاجه منه، أو ناقش ذلك في صفحة الصفقة.`,
+            ru: `В «${name}» просят до ${more} сверх согласованного. Без вашей подписи это не добавится к счёту. Одобрите, выберите, что из этого нужно, или обсудите на странице сделки.`,
+            es: `En «${name}» se piden hasta ${more} más de lo acordado. Sin tu firma no se suma a tu cuenta. Apruébalo, elige qué necesitas o conversa en la página del trato.`
+          }
+        },
+        intent: 'consent',
+        metadata: { type: 'dealEditToSign', url: `/deals/${recipe.sheirutId}`, priority: 'high' }
+      },
+      { recipients, projectId: recipe.projectId },
+      { data: { sheirutId: recipe.sheirutId } },
+      context
+    );
+  } catch (err) {
+    console.warn('[dealEdit] the customer was not notified of the recipe:', err);
+  }
+}
 
 /**
  * The extra signers of a version on a deal mission: its customers, when it raises her part
@@ -152,6 +265,10 @@ export function signersFromDeal(run: QidRunner, deal: MissionDeal): DealSigners 
 export function dealSignersFor(run: QidRunner): ExtraSignersFor {
   return async (decision: ObjectChangeDecision) => {
     if (decision.kind !== 'editObject' && decision.kind !== 'archiveObject') return null;
+    if (decision.targetKind === 'matanot' && decision.targetId) {
+      if (!decision.rounds.some((r) => r.bom?.length)) return null;
+      return signersFromProductDeals(run, await loadProductDeals(run, decision.targetId), decision.targetName);
+    }
     if (decision.targetKind !== 'missionInProgress' || !decision.targetId) return null;
     const deal = await loadMissionDeal(run, decision.targetId);
     return deal ? signersFromDeal(run, deal) : null;

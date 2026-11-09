@@ -41,17 +41,44 @@ export function getTransporter() {
 }
 
 /**
+ * A display name that cannot break out of the From header: one line, no
+ * quotes or angle brackets, bounded. Empty ⇒ send under the plain address.
+ *
+ * @param {unknown} value
+ */
+export function safeDisplayName(value) {
+  if (typeof value !== 'string') return '';
+  return value
+    .replace(/[\u0000-\u001f\u007f\u2028\u2029<>"\\]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 60);
+}
+
+/**
  * Send one email. Resolves to `{ ok: true }` or `{ ok: false, error }` — it
  * never rejects and never throws, so a caller looping over recipients cannot
  * be interrupted (or crash the process) because one address was refused.
  *
- * @param {{ to: string, subject?: string, html?: string, text?: string }} options
+ * `fromName` is only the name shown beside notifications@1lev1.com (a shop's
+ * mail to its buyer); the address — and so SPF/DKIM — stays ours. `replyTo`
+ * is where an answer goes.
+ *
+ * @param {{ to: string, subject?: string, html?: string, text?: string, fromName?: string, replyTo?: string }} options
  * @returns {Promise<{ ok: boolean, error?: unknown }>}
  */
-export async function sendMailSafe({ to, subject, html, text }) {
+export async function sendMailSafe({ to, subject, html, text, fromName, replyTo }) {
   if (!to) return { ok: false, error: 'missing recipient' };
   try {
-    await getTransporter().sendMail({ from: FROM, to, subject, html, text });
+    const name = safeDisplayName(fromName);
+    await getTransporter().sendMail({
+      from: name ? { name, address: FROM } : FROM,
+      to,
+      subject,
+      html,
+      text,
+      ...(replyTo ? { replyTo } : {})
+    });
     return { ok: true };
   } catch (error) {
     console.error(

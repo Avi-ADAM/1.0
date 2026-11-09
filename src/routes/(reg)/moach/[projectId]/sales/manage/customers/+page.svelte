@@ -10,7 +10,7 @@
   import { clock } from '$lib/stores/clock.svelte';
   import { formatWhen } from '$lib/time/formatWhen';
   import { useFormatMoney } from '$lib/money/context.svelte';
-  import { buildCustomers, matchesCustomer, type Customer } from '$lib/leads/customers';
+  import { buildCustomers, customerRefOf, matchesCustomer, type Customer } from '$lib/leads/customers';
   import { mailtoHref, telHref } from '$lib/leads/display';
   import type { ShopOrder } from '$lib/shop/manage';
   import ShopNotice from '$lib/components/shop/ShopNotice.svelte';
@@ -41,7 +41,11 @@
   let list = $derived(customers.filter((c) => matchesCustomer(c, query)));
 
   const when = (iso: string | null) => formatWhen(iso, clock.minutes, $locale || 'he');
-  const hrefOf = (c: Customer) => (c.leadIds[0] ? `${base}/leads/${c.leadIds[0]}` : `${base}/orders/${c.orderIds[0]}`);
+  // The person's own page — all their orders, and (when they came from one) their lead.
+  const hrefOf = (c: Customer) => {
+    const ref = customerRefOf(c);
+    return ref ? `${base}/customers/${ref}` : base;
+  };
   const spent = (c: Customer) => c.totals.map((x) => fmtMoney(x.amount, x.currency)).join(' · ') || '—';
 </script>
 

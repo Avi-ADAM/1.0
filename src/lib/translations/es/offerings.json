@@ -152,8 +152,6 @@
   },
   "compose": {
     "title": "Crear producto",
-    "modeSimple": "Simple",
-    "modeComplex": "Compuesto",
     "previewBadge": "Vista previa: el servidor aún no está conectado",
     "name": "Nombre del producto",
     "desc": "Descripción",
@@ -191,7 +189,9 @@
     "curveHint": "El ahorro llega a las participantes: el precio es siempre el costo dividido por el número de participantes.",
     "curveN": "Participantes",
     "curvePrice": "Precio por participante",
-    "curveRises": "La participante n.º {{count}} añade una unidad y el precio sube para todas."
+    "curveRises": "La participante n.º {{count}} añade una unidad y el precio sube para todas.",
+    "noRikma": "Este producto no pertenece a una rikma, así que no se puede editar.",
+    "backToProduct": "Volver al producto"
   },
   "resources": {
     "title": "Mis recursos",

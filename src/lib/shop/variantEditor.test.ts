@@ -10,6 +10,7 @@ import {
   parseVariantTerms,
   planVariantSave,
   slugOf,
+  stampNewSkus,
   validateVariants,
   type EditorAxis,
   type EditorVariant
@@ -231,5 +232,17 @@ describe('gallery', () => {
   it('moves a picture, and index 0 is the cover', () => {
     expect(movePicture(['a', 'b', 'c'], 2, 0)).toEqual(['c', 'a', 'b']);
     expect(movePicture(['a', 'b'], 5, 0)).toEqual(['a', 'b']);
+  });
+});
+
+describe('stampNewSkus', () => {
+  const pairs = [{ key: 'size', value: 'm', label: 'M' }];
+
+  it('gives a drawn-before-it-existed variant the real product id', () => {
+    expect(stampNewSkus([{ sku: 'NEW-M', optionValues: pairs }], '42')[0].sku).toBe('P42-M');
+  });
+
+  it('keeps a SKU the seller typed', () => {
+    expect(stampNewSkus([{ sku: 'KER-M', optionValues: pairs }], '42')[0].sku).toBe('KER-M');
   });
 });

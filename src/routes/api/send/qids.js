@@ -146,6 +146,7 @@ const ARCH_DECISION_FIELDS = `
                       shiftsMin
                       shiftsMax
                       howMany
+                      bom
                       proposedBy { data { id attributes { username } } }
                       transferTo { data { id attributes { name } } }
                     }
@@ -9227,6 +9228,29 @@ ${PROMO_DECISION_FIELDS}
     }
   }`,
 
+  // An open change to the recipe of this deal's product (PLAN_PRODUCT_FORM_UNIFIED P3).
+  // Best-effort: until `negoarch.bom` is deployed it errors and nothing is listed.
+  'dealRecipeEdits': `query DealRecipeEdits($id: ID!) {
+    decisions(
+      filters: { and: [
+        { kind: { eq: "editObject" } },
+        { archived: { eq: false } },
+        { archMatanot: { sheiruts: { id: { eq: $id } } } }
+      ] }
+      pagination: { limit: 10 }
+    ) {
+      data {
+        id
+        attributes {
+          vots { what order users_permissions_user { data { id } } }
+          negoarch { ordern mode why bom }
+          timegrama { data { attributes { date } } }
+          projects { data { attributes { user_1s { data { id } } } } }
+        }
+      }
+    }
+  }`,
+
   // The proposals the caller (idL, replaced with the signed-in user) has hidden on her own
   // wishes — a best-effort read: before 1.0b is deployed it errors and nothing is hidden.
   '394hiddenWishProposals': `query HiddenWishProposals($idL: ID!) {
@@ -18288,6 +18312,26 @@ ${PROMO_DECISION_FIELDS}
           externalId in unit note holderStatus splited
           users_permissions_user { data { id } }
           tosplits { data { id } }
+        } } }
+      } }
+    }
+  }`,
+
+  // What the buyer's mail needs (docs: the order mail, $lib/server/shop/orderMail):
+  // the buyer, where it goes, the shop's name and public links, and the holder's
+  // address for Reply-To. Carries the buyer's contact, so serviceAdmin only.
+  'orderMailByRef': `query OrderMailByRef($pid: ID!, $ref: String!) {
+    orders(
+      filters: { and: [ { project: { id: { eq: $pid } } }, { ref: { eq: $ref } } ] }
+      pagination: { limit: 1 }
+    ) {
+      data { id attributes {
+        displayNumber status total currencyCode note locale oversold
+        buyerName buyerEmail deliveryPreference deliveryAddress
+        holder { data { id attributes { email blocked } } }
+        project { data { id attributes { projectName linkToWebsite watsapplink } } }
+        lines(pagination: { limit: 100 }) { data { id attributes {
+          position quantity unitPrice lineTotal nameSnapshot optionLabelSnapshot
         } } }
       } }
     }

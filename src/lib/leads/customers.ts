@@ -161,3 +161,40 @@ export function matchesCustomer(c: Customer, query: string): boolean {
     (digits.length >= 3 && (c.phone ?? '').replace(/\D/g, '').includes(digits))
   );
 }
+
+// ─── one customer's page ────────────────────────────────────────────────────
+
+/**
+ * What a customer's page is addressed by: a lead (`l7`) or, failing that, a
+ * paid order (`o40`) behind them. The row's own `key` lists every id and would
+ * make a URL that grows with each purchase; any one anchor finds the person
+ * again, because the people are re-folded each time (`buildCustomers`).
+ */
+export function customerRefOf(c: Pick<Customer, 'leadIds' | 'orderIds'>): string | null {
+  if (c.leadIds[0]) return `l${c.leadIds[0]}`;
+  if (c.orderIds[0]) return `o${c.orderIds[0]}`;
+  return null;
+}
+
+/** The customer a {@link customerRefOf} anchor belongs to, or null (a cancelled order, a deleted lead). */
+export function findCustomerByRef<C extends Pick<Customer, 'leadIds' | 'orderIds'>>(customers: C[], ref: string): C | null {
+  const kind = ref.charAt(0);
+  const id = ref.slice(1);
+  if (!id || (kind !== 'l' && kind !== 'o')) return null;
+  return customers.find((c) => (kind === 'l' ? c.leadIds : c.orderIds).includes(id)) ?? null;
+}
+
+/**
+ * Every order of this person — **all** statuses, a cancelled one or one still
+ * waiting for its payment included: that is the history, where `Customer.orders`
+ * counts only what was paid. An order is theirs when it is one of the paid ones
+ * the fold found, or shares a phone or an email with them. Newest first.
+ */
+export function ordersOfCustomer<T extends CustomerOrderInput>(c: Customer, orders: T[]): T[] {
+  const own = new Set(c.orderIds);
+  const parts = new Set(contactParts(c.email, c.phone));
+  for (const o of orders) if (own.has(o.id)) for (const p of contactParts(o.email, o.phone)) parts.add(p);
+  return orders
+    .filter((o) => own.has(o.id) || contactParts(o.email, o.phone).some((p) => parts.has(p)))
+    .sort((a, b) => ms(b.at) - ms(a.at));
+}

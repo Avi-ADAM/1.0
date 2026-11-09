@@ -10,6 +10,8 @@
  *     membership of the rikma.
  */
 
+import { bomResourcesToPick, parseBomTerms, type BomTerm } from '$lib/shop/bomEditor';
+
 export type ArchTargetKind =
   | 'openMission'
   | 'missionInProgress'
@@ -86,6 +88,8 @@ export interface ArchRoundView extends ArchVersion {
   ordern: number;
   mode: ArchMode;
   why: string | null;
+  /** A product's recipe lines on this round. */
+  bom: BomTerm[];
   hoursOutcome: ArchHoursOutcome | null;
   hoursToCredit: number | null;
   transferToName: string | null;
@@ -128,6 +132,8 @@ export interface ArchiveDecisionView {
   signedIds: string[];
   awaitingIds: string[];
   myTurn: boolean;
+  /** New resources assigned to me: my yes says which of mine they are. */
+  myResourcesToPick: number[];
   memberCount: number;
 }
 
@@ -142,6 +148,7 @@ function roundOf(raw: any): ArchRoundView {
     ordern: Number(raw?.ordern ?? 1),
     mode: (raw?.mode ?? 'archive') as ArchMode,
     why: raw?.why ?? null,
+    bom: parseBomTerms(raw?.bom),
     name: raw?.name ?? null,
     descrip: raw?.descrip ?? null,
     hm: num(raw?.hm),
@@ -227,6 +234,7 @@ export function buildArchiveDecisionView(
     signedIds,
     awaitingIds: memberIds.filter((id) => !signedIds.includes(id)),
     myTurn: memberIds.includes(String(myId)) && !signedIds.includes(String(myId)),
+    myResourcesToPick: bomResourcesToPick(standing.bom, String(myId)),
     memberCount: memberIds.length,
   };
 }

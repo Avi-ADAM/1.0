@@ -151,8 +151,6 @@
   },
   "compose": {
     "title": "Create Product",
-    "modeSimple": "Simple",
-    "modeComplex": "Complex",
     "previewBadge": "Preview - server action not wired yet",
     "name": "Product name",
     "desc": "Description",
@@ -190,7 +188,9 @@
     "curveHint": "The saving goes to the participants: the price is always the cost divided by the number of participants.",
     "curveN": "Participants",
     "curvePrice": "Price per participant",
-    "curveRises": "Participant {{count}} adds a unit, and the price goes up for everyone."
+    "curveRises": "Participant {{count}} adds a unit, and the price goes up for everyone.",
+    "noRikma": "This product does not belong to a rikma, so it cannot be edited.",
+    "backToProduct": "Back to the product"
   },
   "resources": {
     "title": "My resources",

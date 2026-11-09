@@ -28,5 +28,14 @@ dev_output.log
 test-results/
 vite.config.js.timestamp-*.mjs
 
+# Video and MP3 files are heavy; keep them out of the repository
+*.mp4
+*.mov
+*.webm
+*.mkv
+*.avi
+*.m4v
+*.mp3
+
 # scheduler state — per-box runtime record, never shared between servers
 scripts/scheduler/scheduler-state.json

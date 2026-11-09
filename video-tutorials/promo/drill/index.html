@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>המקדחה במחסן</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family: 'Sababa'; src: url('../../../static/fonts/NbmSababaHL1-Bold.otf'); }
+  :root {
+    --barbi: #ff0092; --gold: #fbbf24; --green: #34d399;
+    --night: #0f0b24; --night2: #1d1442; --panel: #171233; --line: #2f2760; --muted: #9b93c9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--night); }
+  body { font-family: 'Heebo', sans-serif; color: #fff; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden;
+    background: radial-gradient(120% 80% at 50% 30%, var(--night2), var(--night)); }
+  .layer { position: absolute; inset: 0; }
+  .center { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .w { display: inline-block; opacity: 0; white-space: pre; }
+  .mono { font-family: 'JetBrains Mono', monospace; direction: ltr; unicode-bidi: isolate; }
+
+  /* S1: the drill in the shed */
+  #q { position: absolute; top: 150px; width: 100%; text-align: center; font-size: 76px; font-weight: 900; line-height: 1.2; padding: 0 70px; }
+  #shelf { position: absolute; top: 470px; left: 140px; width: 800px; height: 520px; border-radius: 30px; background: linear-gradient(#2a1f12, #1c140b);
+    border: 3px solid #3d2e1a; overflow: hidden; }
+  .plank { position: absolute; left: 0; right: 0; height: 22px; background: #5a4326; }
+  #drill { position: absolute; top: 120px; left: 250px; filter: saturate(.6) brightness(.85); }
+  .web { position: absolute; font-size: 70px; opacity: .55; }
+  #dust { position: absolute; inset: 0; background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.06) 0 2px, transparent 3px) 0 0/40px 40px; }
+  #year { position: absolute; top: 1080px; left: 90px; width: 900px; }
+  #year .k { font-size: 38px; color: var(--muted); margin-bottom: 18px; display: flex; justify-content: space-between; }
+  #days { display: grid; grid-template-columns: repeat(52, 1fr); gap: 4px; direction: ltr; }
+  #days i { height: 70px; border-radius: 4px; background: #221b4a; display: block; }
+  #days i.on { background: var(--gold); box-shadow: 0 0 14px rgba(251,191,36,.8); }
+  #used { position: absolute; top: 1330px; width: 100%; text-align: center; font-size: 64px; font-weight: 800; }
+  #used b { color: var(--gold); }
+
+  /* S2: a resource in the rikma */
+  #s2 { opacity: 0; }
+  #h2 { position: absolute; top: 140px; width: 100%; text-align: center; font-size: 70px; font-weight: 800; }
+  #res { position: absolute; top: 300px; left: 90px; width: 900px; display: flex; gap: 24px; }
+  .rc { flex: 1; padding: 34px 20px; border-radius: 36px; background: #fff; color: #1a1333; text-align: center; opacity: 0; box-shadow: 0 24px 70px rgba(0,0,0,.45); }
+  .rc .pill { display: inline-block; padding: 6px 22px; border-radius: 30px; background: #fff3d6; color: #8a5a00; font-size: 28px; font-weight: 800; }
+  .rc .ic { font-size: 110px; margin-top: 10px; }
+  .rc .t { font-size: 42px; font-weight: 900; margin-top: 4px; }
+  #rk { position: absolute; top: 820px; left: 90px; width: 900px; padding: 44px 50px; border-radius: 44px; background: var(--panel); border: 2px solid var(--line); opacity: 0; }
+  #rk .t { font-size: 46px; font-weight: 900; }
+  #rk .t small { display: block; font-size: 32px; color: var(--muted); font-weight: 500; margin-top: 4px; }
+  .line { display: flex; justify-content: space-between; align-items: center; font-size: 42px; margin-top: 30px; opacity: 0; }
+  .line b { font-size: 52px; }
+  #val { color: var(--gold); }
+  #pct { color: var(--barbi); font-size: 80px !important; }
+  #note { position: absolute; top: 1420px; width: 100%; text-align: center; font-size: 38px; color: #e3dcff; padding: 0 90px; line-height: 1.35; opacity: 0; }
+
+  /* S3 */
+  #s5 { background: radial-gradient(110% 70% at 50% 40%, #3a1257, var(--night)); opacity: 0; }
+  #p1 { font-size: 84px; font-weight: 900; }
+  #p2 { font-size: 84px; font-weight: 900; color: var(--barbi); margin-top: 20px; line-height: 1.2; }
+  #mark { font-family: 'Sababa', 'Heebo'; font-size: 220px; direction: ltr; letter-spacing: 4px; margin-top: 70px; opacity: 0; }
+  #mark .h { color: var(--barbi); display: inline-block; }
+  #tag { font-size: 54px; font-weight: 800; color: #d7cff9; margin-top: 10px; opacity: 0; }
+  #cta { margin-top: 50px; padding: 30px 90px; border-radius: 90px; background: var(--barbi); font-size: 64px; font-weight: 800; direction: ltr;
+    box-shadow: 0 0 60px rgba(255,0,146,.55); opacity: 0; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- S1 -->
+  <div class="layer" id="s1">
+    <div id="q">יש לך מקדחה שעובדת<br>כמה דקות בשנה.</div>
+    <div id="shelf">
+      <div id="dust"></div>
+      <div class="plank" style="top:370px"></div>
+      <div class="web" style="top:10px;left:20px">🕸️</div>
+      <div class="web" style="top:10px;right:20px">🕸️</div>
+      <div id="drill"><svg viewBox="0 0 120 100" width="300" style="display:inline-block"><rect x="96" y="40" width="22" height="6" rx="2" fill="#cbd5e1"/><path d="M118 43 l-6 -4 v8z" fill="#94a3b8"/><rect x="82" y="34" width="16" height="18" rx="3" fill="#475569"/><path d="M14 24 h66 a8 8 0 0 1 8 8 v22 a8 8 0 0 1 -8 8 h-30 l-6 30 h-26 l8 -30 h-12 a8 8 0 0 1 -8 -8 v-22 a8 8 0 0 1 8 -8z" fill="#f59e0b"/><rect x="6" y="30" width="20" height="26" rx="5" fill="#1f2937"/><rect x="18" y="80" width="30" height="14" rx="4" fill="#1f2937"/><rect x="44" y="64" width="8" height="10" rx="2" fill="#1f2937"/></svg></div>
+    </div>
+    <div id="year"><div class="k"><span>השנה שלה</span><span>52 שבועות</span></div><div id="days"></div></div>
+    <div id="used">שימוש השנה: <b class="mono" id="mins">0</b> דקות</div>
+  </div>
+
+  <!-- S2 -->
+  <div class="layer" id="s2">
+    <div id="h2">ברקמה, זה משאב</div>
+    <div id="res">
+      <div class="rc"><span class="pill">משאב</span><div class="ic"><svg viewBox="0 0 120 100" width="110" style="display:inline-block"><rect x="96" y="40" width="22" height="6" rx="2" fill="#cbd5e1"/><path d="M118 43 l-6 -4 v8z" fill="#94a3b8"/><rect x="82" y="34" width="16" height="18" rx="3" fill="#475569"/><path d="M14 24 h66 a8 8 0 0 1 8 8 v22 a8 8 0 0 1 -8 8 h-30 l-6 30 h-26 l8 -30 h-12 a8 8 0 0 1 -8 -8 v-22 a8 8 0 0 1 8 -8z" fill="#f59e0b"/><rect x="6" y="30" width="20" height="26" rx="5" fill="#1f2937"/><rect x="18" y="80" width="30" height="14" rx="4" fill="#1f2937"/><rect x="44" y="64" width="8" height="10" rx="2" fill="#1f2937"/></svg></div><div class="t">מקדחה</div></div>
+      <div class="rc"><span class="pill">משאב</span><div class="ic">🛻</div><div class="t">טנדר</div></div>
+      <div class="rc"><span class="pill">משאב</span><div class="ic">🚪</div><div class="t">חדר ריק</div></div>
+    </div>
+    <div id="rk">
+      <div class="t">רקמת "שיפוצים בשכונה"<small>4 שותפים · מה שאתה מביא</small></div>
+      <div class="line" id="l1"><span>שווי המשאבים שהבאת</span><b class="mono" id="val">₪0</b></div>
+      <div class="line" id="l2"><span>החלק שלך ברקמה</span><b class="mono" id="pct">0%</b></div>
+    </div>
+    <div id="note">והם כבר לא עומדים במחסן: השכנים עובדים איתם</div>
+  </div>
+
+  <!-- S3 -->
+  <div class="layer center" id="s5">
+    <div id="p1">מה שיש לך במחסן</div>
+    <div id="p2">יכול להיות<br>חלק משותפות.</div>
+    <div id="mark">1<span class="h">lev</span>1</div>
+    <div id="tag">שותפות במקום מחסן מלא</div>
+    <div id="cta">1lev1.com</div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const p = (t, s, d) => cl((t - s) / d);
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const win = (t, a, b, f = .35) => Math.min(eo(p(t, a, f)), 1 - p(t, b - f, f));
+function split(el) {
+  el.innerHTML = el.textContent.split(/(\s+)/).filter(Boolean)
+    .map(s => /^\s+$/.test(s) ? s : `<span class="w">${s}</span>`).join('');
+}
+['h2', 'p1'].forEach(id => split($(id)));
+function words(el, t, start, per, dy = 34) {
+  el.querySelectorAll('.w').forEach((w, i) => {
+    const q = eo(p(t, start + i * per, .3));
+    w.style.opacity = q; w.style.transform = `translateY(${(1 - q) * dy}px)`;
+  });
+}
+const fadeIn = (el, t, s, d = .4, dy = 30) => { const q = eo(p(t, s, d)); el.style.opacity = q; el.style.transform = `translateY(${(1 - q) * dy}px)`; return q; };
+const popIn = (el, t, s, d = .45) => { const q = p(t, s, d); el.style.opacity = Math.min(1, q * 3); el.style.transform = `scale(${q === 0 ? .4 : back(q)})`; return q; };
+const nis = v => '₪' + Math.round(v).toLocaleString('en-US');
+
+// 52 weeks, two of them lit
+const ON = [14, 37];
+$('days').innerHTML = Array.from({ length: 52 }, (_, i) => `<i data-i="${i}"></i>`).join('');
+
+const DURATION = 18;
+window.DURATION = DURATION;
+// narration: narrate.py (Adam / ElevenLabs v3); scenes timed to the words
+window.AUDIO = [
+  { src: 'assets/narration/n1.mp3', in: 0, dur: 2.64, at: 0.3 },
+  { src: 'assets/narration/n2.mp3', in: 0, dur: 6.88, at: 3.8 },
+  { src: 'assets/narration/n3.mp3', in: 0, dur: 5.92, at: 11.2 },
+];
+
+window.seek = function (t) {
+  // ---------- S1 (0 - 3.8) ----------
+  // n1 at 0.3: "יש לך מקדחה שעובדת כמה דקות בשנה" 0.3–2.9
+  $('s1').style.opacity = 1 - eio(p(t, 3.5, .35));
+  fadeIn($('q'), t, .2, .4, 20);
+  fadeIn($('shelf'), t, .1, .45, 40);
+  $('drill').style.transform = `rotate(${-20 + Math.sin(t * 1.5) * 2}deg)`;
+  // the year sweeps by; only two weeks light up
+  const sweep = p(t, .6, 2.0) * 52;
+  document.querySelectorAll('#days i').forEach((d, i) => {
+    d.style.opacity = i < sweep ? 1 : .25;
+    d.className = ON.includes(i) && i < sweep ? 'on' : '';
+  });
+  fadeIn($('used'), t, 2.0, .35, 20);
+  $('mins').textContent = Math.round(7 * eo(p(t, 2.1, .6)));
+
+  // ---------- S2 (3.6 - 11.1) ----------
+  // n2 at 3.8: "ברקמה" 3.8–4.4 · "מקדחה" 4.6–5.2 · "טנדר או חדר ריק" 5.6–7.0 · "הם משאב" 7.5–8.2 · "והשווי שלהם נספר כחלק שלך" 8.6–10.5
+  $('s2').style.opacity = win(t, 3.6, 11.15, .35);
+  words($('h2'), t, 3.8, .3);
+  document.querySelectorAll('.rc').forEach((c, i) => popIn(c, t, [4.6, 5.6, 6.4][i], .4));
+  document.querySelectorAll('.rc .pill').forEach((pl, i) => { pl.style.boxShadow = t > 7.5 && t < 8.6 ? '0 0 0 5px rgba(251,191,36,.45)' : 'none'; });
+  fadeIn($('rk'), t, 8.1, .45, 60);
+  fadeIn($('l1'), t, 8.6, .35, 16);
+  $('val').textContent = nis(9600 * eo(p(t, 8.7, .9)));
+  fadeIn($('l2'), t, 9.5, .35, 16);
+  const pq = eo(p(t, 9.6, .9));
+  $('pct').textContent = Math.round(8 * pq) + '%';
+  $('pct').style.transform = `scale(${1 + .15 * Math.sin(p(t, 10.5, .4) * Math.PI)})`;
+  fadeIn($('note'), t, 10.1, .4, 16);
+
+  // ---------- S3 (11.0 - 18) ----------
+  // n3 at 11.2: "מה שיש לך במחסן" 11.3–12.6 · "יכול להיות חלק משותפות" 13.0–14.4 · "אחד-לב-אחד" 14.9–16.8
+  $('s5').style.opacity = eo(p(t, 11.0, .3));
+  words($('p1'), t, 11.3, .3);
+  fadeIn($('p2'), t, 13.0, .45, 40);
+  const mq = p(t, 14.8, .45);
+  $('mark').style.opacity = mq; $('mark').style.transform = `scale(${mq === 0 ? .5 : back(mq)})`;
+  const beat = t > 15.4 ? 1 + .12 * Math.max(0, Math.sin((t - 15.4) * Math.PI * 1.6)) ** 6 : 1;
+  document.querySelector('#mark .h').style.transform = `scale(${beat})`;
+  fadeIn($('tag'), t, 15.4, .4, 16);
+  const ctq = fadeIn($('cta'), t, 16.0, .4);
+  if (ctq >= 1) $('cta').style.transform = `scale(${1 + .04 * Math.sin((t - 16.4) * 6)})`;
+};
+
+const qs = new URLSearchParams(location.search);
+if (!qs.has('render')) {
+  document.fonts.ready.then(() => {
+    if (qs.has('t')) return window.seek(+qs.get('t'));
+    const t0 = performance.now();
+    const loop = () => { window.seek(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); };
+    loop();
+  });
+}
+</script>
+</body>
+</html>

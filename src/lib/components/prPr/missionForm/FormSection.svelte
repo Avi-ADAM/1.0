@@ -23,7 +23,7 @@
       >
     {/if}
     <div class="min-w-0 flex-1">
-      <h2 class="m-0 text-lg font-extrabold leading-tight sm:text-xl">{title}</h2>
+      <h2 class="m-0 text-lg font-extrabold leading-tight text-[#2a1420] sm:text-xl">{title}</h2>
       {#if subtitle}
         <p class="m-0 mt-0.5 text-sm text-[#6b5560]">{subtitle}</p>
       {/if}

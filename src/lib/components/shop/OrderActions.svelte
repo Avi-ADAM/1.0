@@ -21,6 +21,7 @@
   import CancelOrderDialog from './CancelOrderDialog.svelte';
   import ConfirmPaymentDialog from './ConfirmPaymentDialog.svelte';
   import DeliveryNote from './DeliveryNote.svelte';
+  import TrackingDialog from './TrackingDialog.svelte';
 
   let {
     order,
@@ -35,6 +36,11 @@
   let canCancel = $derived(mayCancel({ status, holderId: order.holderId }, uid));
   let cancelOpen = $state(false);
   let payOpen = $state(false);
+  let trackOpen = $state(false);
+  // A parcel that goes by post, once it is paid for and until it is cancelled.
+  let canTrack = $derived(
+    order.delivery.preference === 'delivery' && (status === 'paid' || status === 'shipped' || status === 'fulfilled')
+  );
   let collecting = $derived(status === 'pendingPayment');
   let canConfirm = $derived(mayConfirmPayment({ status, holderId: order.holderId }, uid));
   let phoneHref = $derived(order.buyer.phone ? `tel:${order.buyer.phone.replace(/[^\d+]/g, '')}` : null);
@@ -49,6 +55,11 @@
   function print() {
     if (moreEl) moreEl.open = false;
     window.print();
+  }
+
+  function openTrack() {
+    if (moreEl) moreEl.open = false;
+    trackOpen = true;
   }
 
   function openCancel() {
@@ -101,6 +112,9 @@
       </summary>
       <div class="oa-menu sh-card">
         <button type="button" class="oa-item" onclick={print}>{$t('shop.order.print')}</button>
+        {#if canTrack}
+          <button type="button" class="oa-item" onclick={openTrack}>{$t('shop.tracking.action')}</button>
+        {/if}
         {#if canCancel}
           <button type="button" class="oa-item oa-danger" onclick={openCancel}>{$t('shop.cancel.action')}</button>
         {:else if collecting && order.holderName}
@@ -118,6 +132,9 @@
 {/if}
 {#if canConfirm}
   <ConfirmPaymentDialog bind:open={payOpen} {order} {projectId} />
+{/if}
+{#if canTrack}
+  <TrackingDialog bind:open={trackOpen} {order} {projectId} />
 {/if}
 <DeliveryNote {order} />
 

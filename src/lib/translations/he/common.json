@@ -131,7 +131,8 @@
     "projectList": "הרקמות שלך",
     "noProjects": "אין עדיין רקמות לבחירה",
     "noProjectsHint": "כדי ליצור פריט, צריך להיות חברים ברקמה.",
-    "browseProjects": "לרשימת הרקמות",
+    "createProject": "ליצור רקמה",
+    "findProject": "למצוא רקמה להצטרף אליה",
     "loadError": "לא הצלחנו לטעון את הרקמות",
     "loadErrorHint": "בדקו את החיבור ונסו לטעון שוב.",
     "retry": "לנסות שוב",
@@ -147,7 +148,9 @@
       "mission": "משימה",
       "missionHint": "פרסום משימה שחברי הרקמה יוכלו לבצע",
       "resource": "בקשת משאב",
-      "resourceHint": "בקשה לכסף, ציוד או עזרה"
+      "resourceHint": "בקשה לכסף, ציוד או עזרה",
+      "product": "מוצר",
+      "productHint": "מוצר או שירות שהרקמה מוכרת"
     }
   },
   "status": {
