@@ -45,6 +45,7 @@ param(
     [string]$Tag = "",                             # default: git short sha
     [switch]$BuildOnly,
     [switch]$SkipBuild,
+    [switch]$SkipPreflight,                        # build even if memory/disk look too low (it may crash Docker's VM)
     [switch]$Tarball,                              # ship via docker save/scp/load instead of GHCR push/pull
     [switch]$Logs                                  # tail container logs at the end
 )
@@ -74,10 +75,55 @@ function Invoke-Remote([string]$cmd) {
     if ($LASTEXITCODE -ne 0) { Fail "remote command failed: $cmd" }
 }
 
+# Docker's VM dies mid-build (rpc EOF, then a long wait for Docker to recover)
+# when Windows runs out of commit: the VM can claim half the RAM, ~12 GB here,
+# and the box is often near its limit before the build even starts. Refusing up
+# front costs seconds; crashing costs the build plus the recovery.
+function Test-BuildResources {
+    param(
+        [double]$MinCommitFreeGB = 14,
+        [double]$MinDockerDiskFreeGB = 5
+    )
+
+    $problems = @()
+
+    # A VM that is already up has already charged part of what the build needs.
+    $vmGB = (Get-Process vmmemWSL -ErrorAction SilentlyContinue | Measure-Object WorkingSet64 -Sum).Sum / 1GB
+    $neededGB = [math]::Max(2, $MinCommitFreeGB - $vmGB)
+    $commitFreeGB = (Get-CimInstance Win32_OperatingSystem).FreeVirtualMemory / 1MB
+    Ok ("virtual memory free: {0:N1} GB (need {1:N1} GB)" -f $commitFreeGB, $neededGB)
+    if ($commitFreeGB -lt $neededGB) {
+        $problems += ("Windows has {0:N1} GB of virtual memory free, the build needs {1:N1} GB. Close IDEs, agent sessions and browser tabs." -f $commitFreeGB, $neededGB)
+    }
+
+    # The VM's disk grows into this drive while the build writes its layers.
+    $dockerDir = $env:LOCALAPPDATA
+    $settingsFile = "$env:APPDATA\Docker\settings-store.json"
+    if (Test-Path $settingsFile) {
+        $customDir = (Get-Content $settingsFile -Raw | ConvertFrom-Json).CustomWslDistroDir
+        if ($customDir) { $dockerDir = $customDir }
+    }
+    $drive = (Split-Path $dockerDir -Qualifier).TrimEnd(':')
+    $diskFreeGB = (Get-PSDrive $drive).Free / 1GB
+    Ok ("Docker disk (${drive}:) free: {0:N1} GB (need {1:N1} GB)" -f $diskFreeGB, $MinDockerDiskFreeGB)
+    if ($diskFreeGB -lt $MinDockerDiskFreeGB) {
+        $problems += ("Drive ${drive}: has {0:N1} GB free, Docker's disk needs at least {1:N1} GB to grow into. Free space on that drive; 'docker builder prune' does not shrink the disk file." -f $diskFreeGB, $MinDockerDiskFreeGB)
+    }
+
+    if ($problems) {
+        Fail (($problems -join "`n       ") + "`n       Use -SkipPreflight to build anyway.")
+    }
+}
+
 # ---------- 1. local build ----------
 if (-not $SkipBuild) {
     if (-not (Test-Path "$RepoRoot\.env")) {
         Fail ".env not found in repo root — vite build needs it (VITE_* / `$env/static). Aborting."
+    }
+
+    if (-not $SkipPreflight) {
+        Step "Checking memory and disk before building"
+        Test-BuildResources
     }
 
     Step "Building image $FullImage (BuildKit, .env as secret)"
