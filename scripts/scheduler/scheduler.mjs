@@ -255,6 +255,20 @@ const JOBS = [
     }
   },
   {
+    name: 'signup-nudge',
+    description: 'one thank-you mail to who signed on the way in and stopped before an account',
+    // Reports only until SIGNUP_NUDGE_SEND=true. Idempotent: each row is
+    // claimed before its one mail goes out.
+    path: CRON_SECRET ? `/api/cron/signup-nudge?key=${encodeURIComponent(CRON_SECRET)}` : '/api/cron/signup-nudge',
+    timeoutMs: num('SCHEDULER_SIGNUP_NUDGE_TIMEOUT_SECONDS', 120) * 1000,
+    due(now, state) {
+      const every = num('SCHEDULER_SIGNUP_NUDGE_MINUTES', 60) * 60 * 1000;
+      if (!state.lastSuccess) return 'never run on this box';
+      const since = now.getTime() - Date.parse(state.lastSuccess);
+      return since >= every ? `${Math.round(since / 60000)}m since the last run` : null;
+    }
+  },
+  {
     name: 'orders',
     description: 'arranged-payment orders — cancel the ones past expiresAt',
     // PLAN_SHOP_OPERATIONS. A `pendingPayment` order past its `expiresAt` is

@@ -272,6 +272,13 @@ export const qidsAccess = {
   '67getMembersCount': { allow: ['serviceAdmin'] }, // server-only callers
   '279getChezinNames': { allow: ['serviceAdmin'] }, // server-only callers
   '280createChezin': { allow: ['serviceAdmin'] }, // server-only callers
+  // The "continue your signup" mail: /api/chezin, its continue route and the cron.
+  'chezinSetSource': { allow: ['serviceAdmin'] },
+  'chezinsAwaitingNudge': { allow: ['serviceAdmin'] },
+  'chezinClaimNudge': { allow: ['serviceAdmin'] },
+  'chezinEmailHasAccount': { allow: ['serviceAdmin'] },
+  'chezinForContinue': { allow: ['serviceAdmin'] },
+  'chezinSetNoMail': { allow: ['serviceAdmin'] },
   '281createTikunolam': { allow: ['serviceAdmin'] }, // server-only callers
   '282createTranslate': { allow: ['serviceAdmin'] }, // server-only callers
   '283getSkillsRolesWorkways': { allow: ['user', 'serviceAdmin'] },

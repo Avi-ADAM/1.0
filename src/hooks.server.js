@@ -468,6 +468,15 @@ async function handleRequest({ event, resolve }) {
       setCookie('country', con);
     }
 
+    // The same values in the URL, for a browser that drops these cookies:
+    // /signup's load seats them again, as it does for the /hascama form.
+    if (id && /^\d{1,12}$/.test(id)) {
+      const handoff = new URLSearchParams({ fp: id });
+      if (un) handoff.set('un', un);
+      if (con) handoff.set('con', con);
+      headers.set('Location', `/signup?${handoff}`);
+    }
+
     return pinTheme(new Response('Redirect', { status: 303, headers }));
   }
   if (event.url.pathname === '/' && event.locals.tok) {

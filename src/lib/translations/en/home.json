@@ -368,6 +368,13 @@
       "emailLabel": "My Email Address",
       "submit": "Register"
     },
+    "stopMail": {
+      "title": "Unsubscribe",
+      "body": "Press the button and we won't send any more mail to this address. Your signature on the agreement stays in force.",
+      "button": "Unsubscribe me",
+      "done": "You're off the list. We won't send any more mail to this address.",
+      "invalid": "This link isn't valid. Write to baruch@1lev1.com and we'll remove you."
+    },
     "errors": {
       "nameRequired": "Name is required",
       "nameTaken": "The chosen name is already taken",
@@ -375,6 +382,8 @@
       "locationRequired": "At least one location must be selected",
       "agreementRequired": "You must agree to the terms of use",
       "serverSleep": "The server fell asleep, we woke it up, trying again",
+      "alreadySigned": "This email has already signed the agreement. If you have already registered, you can log in. If not, write to us and we'll finish it together.",
+      "loginLink": "Log in",
       "contactSupport": "If the problem persists, you can contact"
     },
     "agreement": {

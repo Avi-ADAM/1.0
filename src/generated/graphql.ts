@@ -1047,10 +1047,14 @@ export type Chezin = {
   localizations?: Maybe<ChezinRelationResponseCollection>;
   myQuotes?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
+  noMail?: Maybe<Scalars['Boolean']['output']>;
   noOpHours?: Maybe<Scalars['Float']['output']>;
   phoneNumber?: Maybe<Scalars['String']['output']>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   shekelsPerHoure?: Maybe<Scalars['Float']['output']>;
+  signupLang?: Maybe<Scalars['String']['output']>;
+  signupNudgeAt?: Maybe<Scalars['DateTime']['output']>;
+  source?: Maybe<Scalars['String']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   users_permissions_user?: Maybe<UsersPermissionsUserEntityResponse>;
 };
@@ -1116,12 +1120,16 @@ export type ChezinFiltersInput = {
   localizations?: InputMaybe<ChezinFiltersInput>;
   myQuotes?: InputMaybe<StringFilterInput>;
   name?: InputMaybe<StringFilterInput>;
+  noMail?: InputMaybe<BooleanFilterInput>;
   noOpHours?: InputMaybe<FloatFilterInput>;
   not?: InputMaybe<ChezinFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<ChezinFiltersInput>>>;
   phoneNumber?: InputMaybe<StringFilterInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   shekelsPerHoure?: InputMaybe<FloatFilterInput>;
+  signupLang?: InputMaybe<StringFilterInput>;
+  signupNudgeAt?: InputMaybe<DateTimeFilterInput>;
+  source?: InputMaybe<StringFilterInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
   users_permissions_user?: InputMaybe<UsersPermissionsUserFiltersInput>;
 };
@@ -1134,10 +1142,14 @@ export type ChezinInput = {
   fullAgreement?: InputMaybe<Scalars['Boolean']['input']>;
   myQuotes?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  noMail?: InputMaybe<Scalars['Boolean']['input']>;
   noOpHours?: InputMaybe<Scalars['Float']['input']>;
   phoneNumber?: InputMaybe<Scalars['String']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   shekelsPerHoure?: InputMaybe<Scalars['Float']['input']>;
+  signupLang?: InputMaybe<Scalars['String']['input']>;
+  signupNudgeAt?: InputMaybe<Scalars['DateTime']['input']>;
+  source?: InputMaybe<Scalars['String']['input']>;
   users_permissions_user?: InputMaybe<Scalars['ID']['input']>;
 };
 

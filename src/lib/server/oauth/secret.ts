@@ -100,6 +100,14 @@ export function uploadSessionKey(): Buffer {
   return derive('1lev1-upload-session-v1');
 }
 
+/**
+ * HMAC key for the links in the "continue your signup" mail. Its own label, so
+ * such a link can never be replayed as any other signed link.
+ */
+export function signupContinueKey(): Buffer {
+  return derive('1lev1-signup-continue-v1');
+}
+
 export function b64url(buf: Buffer | string): string {
   return Buffer.from(buf).toString('base64url');
 }

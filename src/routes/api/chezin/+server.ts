@@ -16,6 +16,9 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { signupCookieOptions } from '$lib/server/signupCookies.js';
+import { extendedIdOf, extendedRowOf } from '$lib/server/assistant/extendedSignature.js';
+import { canResumeSignature, isUniqueViolation } from '$lib/server/chezinResume';
+import { normalizeLang, normalizeSource } from '$lib/server/signupNudge/source';
 
 // Credentials are allowed so the signature cookies below (`fpval`, `un`,
 // `email`, `country` on .1lev1.com) are stored when the agreement site signs
@@ -43,7 +46,8 @@ export const POST: RequestHandler = async ({ request, fetch, cookies, url }) => 
     if (!name || !email) {
       return json({ errors: [{ message: 'name and email are required' }] }, { status: 400, headers: corsHeaders });
     }
-    const result = await sendToSer(
+    let resumed = false;
+    let result: any = await sendToSer(
       { name, email, countries: countries ?? [], publishedAt, fullAgreement: fullAgreement === true },
       '280createChezin',
       0,
@@ -52,12 +56,41 @@ export const POST: RequestHandler = async ({ request, fetch, cookies, url }) => 
       fetch
     );
 
+    // This email has signed before. Carry on with that signature when this
+    // browser holds it; otherwise say so, keeping `errors` for existing callers.
+    if (isUniqueViolation(result)) {
+      const seated = extendedIdOf(cookies.get('fpval'));
+      const found = seated
+        ? await sendToSer({ id: seated }, '386getChezinForAgentSign', 0, 0, true, fetch).catch(() => null)
+        : null;
+      if (!canResumeSignature(extendedRowOf(found), { email, fullAgreement: fullAgreement === true })) {
+        return json({ ...result, alreadySigned: true }, { headers: corsHeaders });
+      }
+      result = { data: { createChezin: { data: { id: seated } } } };
+      resumed = true;
+    }
+
+    // Decides later whether this person gets the signup mail. Best effort: no
+    // source just means no mail, and must never cost anyone their signature.
+    const signedId = result?.data?.createChezin?.data?.id;
+    const source = normalizeSource(body.source);
+    if (signedId && source && !resumed) {
+      await sendToSer(
+        { id: String(signedId), source, signupLang: normalizeLang(body.lang) },
+        'chezinSetSource',
+        0,
+        0,
+        true,
+        fetch
+      ).catch(() => null);
+    }
+
     // Seat the /signup handshake from the server. A Set-Cookie survives where
     // the page's own document.cookie write does not (iOS Safari, in-app
     // browsers), and /signup's load redirects back to /hascama without
     // `fpval`. The agreement site (cross-origin, same site) stores them too
     // when it calls with credentials — see corsHeaders.
-    const chezinId = (result as any)?.data?.createChezin?.data?.id;
+    const chezinId = result?.data?.createChezin?.data?.id;
     if (chezinId) {
       const opts = signupCookieOptions(url);
       cookies.set('fpval', String(chezinId), { ...opts, httpOnly: true });

@@ -14,6 +14,7 @@ until this existed both ran only when somebody remembered to call them:
 | `availability` | `GET /api/cron/availability` | every 5 minutes | switches off meeting availability past its `availableUntil` (1h by default, up to 20h) and tells the member |
 | `events` | `GET /api/cron/events` | every 5 minutes | rikma events: reminders (tomorrow, in an hour, we've started), thanks / you-missed-it after (marks no-shows), moved and cancelled dates, waiting list → seat, new date → who asked. Needs `CRON_SECRET` (fails closed) |
 | `orders` | `GET /api/cron/orders` | every hour | cancels arranged-payment orders still `pendingPayment` past their `expiresAt` |
+| `signup-nudge` | `GET /api/cron/signup-nudge` | every hour | one thank-you mail, with a signed link to continue, to whoever signed on the way into the site and stopped before an account. Reports only until `SIGNUP_NUDGE_SEND=true`. Needs `CRON_SECRET` (fails closed) |
 | `assistant-cleanup` | `GET /api/cron/assistant-cleanup` | daily at 06:00 | deletes agent-prepared signups nobody claimed within 14 days |
 
 Every job is safe to run more often than needed: `timegrama` skips clocks that

@@ -2606,6 +2606,52 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }`,
 
+  // The signature's origin and language. Written apart from 280createChezin so
+  // that signing keeps working on a Strapi that does not have these fields yet.
+  "chezinSetSource": `mutation ChezinSetSource($id: ID!, $source: String, $signupLang: String) {
+    updateChezin(id: $id, data: { source: $source, signupLang: $signupLang }) { data { id } }
+  }`,
+
+  // Signatures that came here to join, have no account and were never mailed.
+  "chezinsAwaitingNudge": `query ChezinsAwaitingNudge($after: DateTime!, $before: DateTime!, $limit: Int!) {
+    chezins(
+      filters: { and: [
+        { createdAt: { gte: $after } },
+        { createdAt: { lte: $before } },
+        { source: { in: ["main", "agreement_from_main"] } },
+        { signupNudgeAt: { null: true } },
+        { users_permissions_user: { id: { null: true } } },
+        { or: [{ noMail: { null: true } }, { noMail: { eq: false } }] }
+      ] }
+      sort: "createdAt:asc"
+      pagination: { limit: $limit }
+    ) {
+      data { id attributes { name email signupLang } }
+    }
+  }`,
+
+  "chezinClaimNudge": `mutation ChezinClaimNudge($id: ID!, $at: DateTime!) {
+    updateChezin(id: $id, data: { signupNudgeAt: $at }) { data { id } }
+  }`,
+
+  "chezinEmailHasAccount": `query ChezinEmailHasAccount($email: String!) {
+    usersPermissionsUsers(filters: { email: { eqi: $email } }, pagination: { limit: 1 }) {
+      data { id }
+    }
+  }`,
+
+  "chezinForContinue": `query ChezinForContinue($id: ID!) {
+    chezin(id: $id) { data { id attributes {
+      name email
+      countries { data { id } }
+      users_permissions_user { data { id } }
+    } } }
+  }`,
+
+  "chezinSetNoMail": `mutation ChezinSetNoMail($id: ID!) {
+    updateChezin(id: $id, data: { noMail: true }) { data { id } }
+  }`,
+
   "281createTikunolam": `mutation CreateTikunolam($amort: String, $amorts: String, $amortt: String, $amortf: String, $amorth: String, $more: String, $notes: String, $name: String, $email: String, $publishedAt: DateTime) {
     createTikunolam(data: { amort: $amort, amorts: $amorts, amortt: $amortt, amortf: $amortf, amorth: $amorth, more: $more, notes: $notes, name: $name, email: $email, publishedAt: $publishedAt }) {
       data {

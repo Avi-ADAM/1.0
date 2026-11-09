@@ -234,10 +234,14 @@ These are the main content types in the Strapi backend.
 | `localizations` | `Maybe<ChezinRelationResponseCollection>` |
 | `myQuotes` | `Maybe<Scalars['String']['output']>` |
 | `name` | `Scalars['String']['output']` |
+| `noMail` | `Maybe<Scalars['Boolean']['output']>` |
 | `noOpHours` | `Maybe<Scalars['Float']['output']>` |
 | `phoneNumber` | `Maybe<Scalars['String']['output']>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `shekelsPerHoure` | `Maybe<Scalars['Float']['output']>` |
+| `signupLang` | `Maybe<Scalars['String']['output']>` |
+| `signupNudgeAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `source` | `Maybe<Scalars['String']['output']>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `users_permissions_user` | `Maybe<UsersPermissionsUserEntityResponse>` |
 
@@ -5674,10 +5678,14 @@ Used for creating/updating content.
 | `fullAgreement` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `myQuotes` | `InputMaybe<Scalars['String']['input']>` |
 | `name` | `InputMaybe<Scalars['String']['input']>` |
+| `noMail` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `noOpHours` | `InputMaybe<Scalars['Float']['input']>` |
 | `phoneNumber` | `InputMaybe<Scalars['String']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `shekelsPerHoure` | `InputMaybe<Scalars['Float']['input']>` |
+| `signupLang` | `InputMaybe<Scalars['String']['input']>` |
+| `signupNudgeAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `source` | `InputMaybe<Scalars['String']['input']>` |
 | `users_permissions_user` | `InputMaybe<Scalars['ID']['input']>` |
 
 ### ClauseInput
@@ -8754,7 +8762,7 @@ Fields: `and`, `createdAt`, `furfiled`, `id`, `mashaabim`, `matanot`, `name`, `n
 Fields: `active`, `and`, `createdAt`, `description`, `id`, `locale`, `localizations`, `matanots`, `name`, `not`, `or`, `parent`, `position`, `project`, `publishedAt`, `ratsons`, `sheiruts`, `slug`, `updatedAt`
 
 #### ChezinFiltersInput
-Fields: `and`, `assistant_sessions`, `countries`, `createdAt`, `deffinitions`, `email`, `fullAgreement`, `id`, `locale`, `localizations`, `myQuotes`, `name`, `noOpHours`, `not`, `or`, `phoneNumber`, `publishedAt`, `shekelsPerHoure`, `updatedAt`, `users_permissions_user`
+Fields: `and`, `assistant_sessions`, `countries`, `createdAt`, `deffinitions`, `email`, `fullAgreement`, `id`, `locale`, `localizations`, `myQuotes`, `name`, `noMail`, `noOpHours`, `not`, `or`, `phoneNumber`, `publishedAt`, `shekelsPerHoure`, `signupLang`, `signupNudgeAt`, `source`, `updatedAt`, `users_permissions_user`
 
 #### ClauseFiltersInput
 Fields: `and`, `authorExternalId`, `authorType`, `body`, `confirmedByAuthor`, `createdAt`, `id`, `issue`, `negotiation`, `not`, `or`, `origin`, `position`, `publishedAt`, `stanceValue`, `updatedAt`
@@ -9868,7 +9876,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 25197 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 25209 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

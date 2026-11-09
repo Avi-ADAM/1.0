@@ -4,8 +4,33 @@ import { importInvitedMeeting } from '$lib/server/importInvitedMeeting.js';
 import { signupCookieOptions } from '$lib/server/signupCookies.js';
 import { EVENT_SIGNUP_COOKIE } from '$lib/server/events/signupCookie.js';
 
-export async function load({ cookies, url }) {
+export async function load({ cookies, url, fetch }) {
   const opts = signupCookieOptions(url);
+
+  // The signed link from the "continue your signup" mail. Seats everything,
+  // then moves on to the ordinary ?fp= address, so the token leaves the URL
+  // while a browser that dropped the cookies still has what it needs.
+  const continueToken = url.searchParams.get('c');
+  if (continueToken) {
+    const res = await fetch('/api/chezin/continue', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'open', t: continueToken })
+    }).catch(() => null);
+    const signature = res?.ok ? await res.json().catch(() => null) : null;
+
+    if (!signature?.ok) {
+      throw redirect(303, signature?.reason === 'registered' ? '/login' : '/hascama');
+    }
+    const countries = signature.countries.join(',');
+    cookies.set('fpval', signature.id, { ...opts, httpOnly: true });
+    cookies.set('un', signature.name, { ...opts, httpOnly: false });
+    cookies.set('email', signature.email, { ...opts, httpOnly: false });
+    cookies.set('country', countries, { ...opts, httpOnly: false });
+
+    const next = new URLSearchParams({ fp: signature.id, un: signature.name, con: countries });
+    throw redirect(303, `/signup?${next}`);
+  }
 
   // /hascama also passes the signatory id (and name/countries) in the URL,
   // because a cookie written by the browser does not always survive the hop —

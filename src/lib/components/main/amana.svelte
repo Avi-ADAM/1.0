@@ -101,7 +101,8 @@
     st: false,
     msg: '',
     msg2: '',
-    msg1: 'baruch@1lev1.com'
+    msg1: 'baruch@1lev1.com',
+    login: false
   });
   let selected = $state([]);
 
@@ -178,7 +179,7 @@
       window.location.origin + '/hascama?agreed=true'
     );
 
-    let agreementUrl = `https://agreement.1lev1.com/hascama?return=${returnUrl}&lang=${$locale}`;
+    let agreementUrl = `https://agreement.1lev1.com/hascama?return=${returnUrl}&lang=${$locale}&from=main`;
     if (formName) agreementUrl += `&name=${encodeURIComponent(formName)}`;
     if (formEmail) agreementUrl += `&email=${encodeURIComponent(formEmail)}`;
     if (selected.length > 0)
@@ -198,6 +199,20 @@
     ).toUTCString();
     const secure = location.protocol === 'https:' ? '; Secure' : '';
     document.cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax${secure}`;
+  }
+
+  /** @param {string} name */
+  function readSignupCookie(name) {
+    const hit = document.cookie
+      .split('; ')
+      .find((c) => c.startsWith(`${name}=`));
+    if (!hit) return '';
+    const value = hit.slice(name.length + 1);
+    try {
+      return decodeURIComponent(value);
+    } catch {
+      return value;
+    }
   }
 
   /**
@@ -223,7 +238,12 @@
     }
 
     const jjj = formName;
-    if (fpp.includes(jjj)) {
+    const mail = formEmail.toLowerCase().trim();
+    // The name on the list may be this browser's own earlier signature; the
+    // server decides whether that one can carry on.
+    const ownSignature =
+      readSignupCookie('un') === jjj && readSignupCookie('email') === mail;
+    if (fpp.includes(jjj) && !ownSignature) {
       nameuse = true;
       animateScroll.scrollToTop();
       return;
@@ -231,7 +251,7 @@
 
     g = true;
     erorim.st = false;
-    const mail = formEmail.toLowerCase().trim();
+    erorim.login = false;
 
     try {
       const response = await fetch('/api/chezin', {
@@ -243,11 +263,26 @@
           email: mail,
           countries: find_contry_id(selected),
           publishedAt: new Date().toISOString(),
-          fullAgreement: agreedToFullAgreement
+          fullAgreement: agreedToFullAgreement,
+          source: 'main',
+          lang: $locale
         })
       });
 
       const result = await response.json();
+
+      if (result.alreadySigned) {
+        g = false;
+        erorim.st = true;
+        erorim.login = true;
+        erorim.msg = $t('home.amana.errors.alreadySigned');
+        sendError(
+          'email already signed, no matching signature in this browser',
+          '/amana.svelte',
+          fetch
+        );
+        return;
+      }
 
       if (result.errors) {
         throw new Error(result.errors[0].message);
@@ -293,7 +328,12 @@
       erorim.st = true;
       if (!error.response) {
         erorim.msg = $t('home.amana.errors.serverSleep');
-        sendError(JSON.stringify(error) ?? null, '/amana.svelte', fetch);
+        // JSON.stringify(new Error('x')) is "{}": the message is not enumerable.
+        sendError(
+          error?.message || (JSON.stringify(error) ?? null),
+          '/amana.svelte',
+          fetch
+        );
       } else {
         erorim.msg = ` ${error.response.data.message}  ${error.response.data.statusCode} :טעות`;
         sendError(erorim.msg, '/amana.svelte', fetch);
@@ -620,6 +660,9 @@
           {#if erorim.st}
             <div class="error-box">
               <p>{erorim.msg}</p>
+              {#if erorim.login}
+                <a href="/login" class="error-login">{$t('home.amana.errors.loginLink')}</a>
+              {/if}
               <p class="error-contact">
                 {$t('home.amana.errors.contactSupport')}
                 {erorim.msg1}
@@ -1603,6 +1646,14 @@
     padding: 1rem 1.5rem;
     color: #ff6b6b;
     text-align: center;
+  }
+
+  .error-login {
+    display: inline-block;
+    margin-top: 0.5rem;
+    color: #ffd700;
+    font-weight: 700;
+    text-decoration: underline;
   }
 
   .error-contact {

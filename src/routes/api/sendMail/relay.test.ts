@@ -162,7 +162,10 @@ const REVIEWED_PUBLIC_MAILERS: Record<string, string> = {
     '($lib/server/reportConfirmation.ts, report/server.test.ts)',
   'src/routes/api/cron/events/+server.ts':
     'cron, fails closed on CRON_SECRET (checkCron required); fixed templates to registrants of rikma events, ' +
-    'each mail claimed on its row before sending ($lib/server/events/cron.ts, cron.test.ts)'
+    'each mail claimed on its row before sending ($lib/server/events/cron.ts, cron.test.ts)',
+  'src/routes/api/cron/signup-nudge/+server.ts':
+    'cron, fails closed on CRON_SECRET (checkCron required); one fixed template to agreement signatories, ' +
+    'off until SIGNUP_NUDGE_SEND=true, each mail claimed on its row before sending ($lib/server/signupNudge/cron.ts)'
 };
 
 const ROOT = join(__dirname, '../../../..');

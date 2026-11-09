@@ -369,6 +369,13 @@
       "emailLabel": "Mi correo electrónico",
       "submit": "Registrarse"
     },
+    "stopMail": {
+      "title": "Darse de baja",
+      "body": "Pulsa el botón y no enviaremos más correos a esta dirección. Tu firma del acuerdo sigue vigente.",
+      "button": "Darme de baja",
+      "done": "Te hemos quitado de la lista. No enviaremos más correos a esta dirección.",
+      "invalid": "Este enlace no es válido. Escribe a baruch@1lev1.com y te daremos de baja."
+    },
     "errors": {
       "nameRequired": "El nombre es obligatorio",
       "nameTaken": "El nombre elegido ya está en uso",
@@ -376,6 +383,8 @@
       "locationRequired": "Debe seleccionarse al menos una ubicación",
       "agreementRequired": "Debes aceptar los términos de uso",
       "serverSleep": "El servidor se durmió, lo despertamos, intentándolo de nuevo",
+      "alreadySigned": "Este correo ya firmó el acuerdo. Si ya te registraste, puedes iniciar sesión. Si no, escríbenos y lo completamos juntos.",
+      "loginLink": "Iniciar sesión",
       "contactSupport": "Si el problema persiste, puedes contactar con"
     },
     "agreement": {
