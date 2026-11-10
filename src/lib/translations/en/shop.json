@@ -761,7 +761,11 @@
     "saved": "Shipping settings saved",
     "error": "The shipping settings could not be saved",
     "methodRules": "Handled by: {{names}}",
-    "pointRules": "Prepares the pickups here: {{names}}"
+    "pointRules": "Prepares the pickups here: {{names}}",
+    "methodProduct": "Product to record the delivery fee",
+    "pickupProduct": "Product to record the pickup fee",
+    "noProduct": "No product — keep the fee separate",
+    "productLineHint": "For a positive fee, it is recorded as a sale of this product. The shipping calculation sets the price, not the catalog price. This product is not shown in your shop."
   },
   "retry": {
     "title": "This order's tasks did not open",

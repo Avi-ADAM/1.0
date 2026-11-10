@@ -2,7 +2,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { ActionError } from '../errors.js';
 import { readStockFlags, withFlag, type StockRowFlags } from '$lib/server/shop/stockFlags.js';
 import { recordOrderSales } from '$lib/server/shop/orderSales.js';
-import { shippingRecordOf } from '$lib/server/shop/orderShipping.js';
+import { shippingRecordOf, storedOrderShipping } from '$lib/server/shop/orderShipping.js';
 import { buyerFactsOf } from '$lib/shop/orderMail';
 import { formatMoney } from '$lib/money/format.js';
 import { rikmaCurrency } from '$lib/money/resolve.js';
@@ -83,20 +83,40 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
   }
   // An arranged order is whole once its lines are stored (it has no sales
   // yet); a paid one once every line has its sale.
+  // A fee recorded as a line is one more stored line than the storefront sent.
+  // Its own read: `rikmaApiOrderByRef` stays valid before `Order.shipping` deploys.
+  const storedShipping = existing ? await storedOrderShipping(run, projectId, String(existing.id)) : null;
+  const expectedStoredLines = payload.lines.length + (storedShipping?.asLine ? 1 : 0);
   const complete = existing
     ? arranged
-      ? storedLinesOf(existing).length >= payload.lines.length
-      : orderIsComplete(existing, payload.lines.length)
+      ? storedLinesOf(existing).length >= expectedStoredLines
+      : orderIsComplete(existing, expectedStoredLines)
     : false;
   if (existing && complete) {
-    if (!sameOrder(payload, { currency: storedCurrency, lines: storedLinesOf(existing) })) {
+    const comparable = storedLinesOf(existing).filter((line) =>
+      !(storedShipping?.asLine && Number(line.position) >= payload.lines.length)
+    );
+    if (!sameOrder(payload, { currency: storedCurrency, lines: comparable })) {
       throw conflict();
     }
     return { ...resultOf(toOrderView(existing)!, existing.id), duplicated: true };
   }
 
+  // How it travels, priced again from the rikma's shipping settings
+  // (PLAN_SHOP_SHIPPING §5) — a fee that moved is a note, never a refusal. A
+  // product linked there turns a positive fee into a normal order line. A resume
+  // keeps what the first attempt decided, whatever the settings say by now.
+  const shipping = existing
+    ? null
+    : await shippingRecordOf(run, projectId, payload.delivery, payload.lines, context.fetch);
+  const shippingLine = existing
+    ? storedShipping?.asLine && storedShipping.productId && storedShipping.fee != null
+      ? { productId: storedShipping.productId, unitPrice: storedShipping.fee, settled: true }
+      : null
+    : (shipping?.line ?? null);
+
   // 2. Read what the order names — from the server, fenced to this rikma.
-  const productIds = [...new Set(payload.lines.map((l) => l.productId))];
+  const productIds = [...new Set([...payload.lines.map((l) => l.productId), ...(shippingLine ? [shippingLine.productId] : [])])];
   const variantIds = [
     ...new Set(payload.lines.map((l) => l.variantId).filter((v): v is string => !!v))
   ];
@@ -119,7 +139,7 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
   );
 
   // 3. Decide everything before writing anything.
-  const plan = planOrder({ payload, products, variants });
+  const plan = planOrder({ payload, products, variants, shippingLine });
   if (plan.ok === false) {
     throw new ActionError(plan.code, plan.message, { line: plan.line, status: plan.status });
   }
@@ -136,7 +156,8 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
         total: storedTotal == null ? null : Number(storedTotal),
         lines: storedLinesOf(existing)
       },
-      plan.total
+      plan.total,
+      plan.lines
     );
     if (!resumable) throw conflict();
   }
@@ -155,7 +176,7 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
   //     the engine says. Never a refusal — a gap is a fact on the order.
   const promo = await pricePaidOrderFor(
     projectId,
-    plan.lines.map((l, i) => ({
+    plan.lines.filter((l) => !l.shippingProduct).map((l, i) => ({
       position: l.position,
       productId: l.productId,
       variantId: l.variantId,
@@ -180,9 +201,6 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
     oversold = existing.attributes?.oversold === true;
   } else {
     const delivery = payload.delivery;
-    // How it travels, priced again from the rikma's shipping settings
-    // (PLAN_SHOP_SHIPPING §5) — a fee that moved is a note, never a refusal.
-    const shipping = await shippingRecordOf(run, projectId, delivery, plan.lines, context.fetch);
     const created = await run('rikmaApiOrderCreate', {
       data: {
         ref,
@@ -214,9 +232,15 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
     orderId = String(id);
     if (shipping) {
       // Its own write, after the row: the order never fails for its shipping record.
-      await run('rikmaApiOrderSetShipping', { id: orderId, shipping: shipping.record }).catch((e: unknown) =>
-        console.warn(`[shipping] order ${orderId} shipping record not written:`, (e as Error)?.message ?? e)
-      );
+      await run('rikmaApiOrderSetShipping', {
+        id: orderId,
+        shipping: { ...shipping.record, asLine: plan.shippingAsLine }
+      }).catch((e: unknown) => {
+        console.warn(`[shipping] order ${orderId} shipping record not written:`, (e as Error)?.message ?? e);
+        // Without the record a retry could not tell the fee's line from an added
+        // one, so the fee stays in the total, as it does with no product linked.
+        plan.lines = plan.lines.filter((l) => !l.shippingProduct);
+      });
     }
   }
   // What people say out loud — the storefront's number, else ours. A resume
@@ -365,8 +389,9 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
       const amountEn = formatMoney(plan.total, currency, 'en');
       // Units when they are whole; a line sold by the kilo makes "3.5 items"
       // nonsense, so then the count is of lines.
-      const whole = plan.lines.every((l) => Number.isInteger(l.quantity));
-      const items = whole ? plan.lines.reduce((s, l) => s + l.quantity, 0) : plan.lines.length;
+      const orderedLines = plan.lines.filter((l) => !l.shippingProduct);
+      const whole = orderedLines.every((l) => Number.isInteger(l.quantity));
+      const items = whole ? orderedLines.reduce((s, l) => s + l.quantity, 0) : orderedLines.length;
       const short = plan.lines.reduce((s, l) => s + l.shortBy, 0);
       const itemsHe = items === 1 ? 'פריט אחד' : `${items} פריטים`;
       const itemsEn = items === 1 ? '1 item' : `${items} items`;

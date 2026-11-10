@@ -126,6 +126,12 @@ const node = (over: Record<string, any> = {}) => ({
 });
 
 describe('mailOrderFromNode', () => {
+  it('a fee that is already a line is not listed again', () => {
+    const shipping = { optionId: 'm:a:b', kind: 'delivery', fee: 30 };
+    expect(mailOrderFromNode(node(), shipping)!.input.delivery.fee).toBe(30);
+    expect(mailOrderFromNode(node(), { ...shipping, asLine: true, productId: '9' })!.input.delivery.fee).toBeNull();
+  });
+
   it('reads the buyer, the shop, the lines in order, and the holder as Reply-To', () => {
     const m = mailOrderFromNode(node(), null)!;
     expect(m.to).toBe('dana@example.com');

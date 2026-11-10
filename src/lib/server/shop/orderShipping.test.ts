@@ -21,6 +21,29 @@ describe('shippingRecordFrom', () => {
     expect(r.record).toMatchObject({ optionId: 'm:center:courier', zoneId: 'center', fee: 30, quotedFee: 30 });
   });
 
+  describe('a linked product', () => {
+    const linked = quoteShipping(
+      normalizeShippingConfig({
+        enabled: true,
+        zones: [{ id: 'center', name: 'מרכז', cities: ['רמת גן'], methods: [{ id: 'courier', name: 'שליח', fee: 30, productId: '9' }] }]
+      }),
+      [{ productId: '1', variantId: null, quantity: 1, unitPrice: 50, weightGrams: null, productKinds: [] }],
+      { city: 'רמת גן' }
+    );
+
+    it('turns the fee the buyer paid into a line', () => {
+      const r = shippingRecordFrom(linked, { preference: 'delivery', optionId: 'm:center:courier', fee: 25 });
+      expect(r.line).toEqual({ productId: '9', unitPrice: 25 });
+      expect(r.record).toMatchObject({ asLine: true, productId: '9' });
+    });
+
+    it('a free delivery has no line', () => {
+      const r = shippingRecordFrom(linked, { preference: 'delivery', optionId: 'm:center:courier', fee: 0 });
+      expect(r.line).toBeNull();
+      expect(r.record.asLine).toBe(false);
+    });
+  });
+
   it('a fee that moved is a note, not a refusal', () => {
     const r = shippingRecordFrom(quote, { preference: 'delivery', optionId: 'm:center:courier', fee: 20 });
     expect(r.note).toContain('(20)');

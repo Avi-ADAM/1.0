@@ -21,6 +21,10 @@ const promo = vi.hoisted(() => ({
 }));
 vi.mock('$lib/server/promotions/pricing', () => promo);
 
+// What the rikma's shipping settings answer — a seam; orderShipping.test.ts covers the record.
+const shippingQuote = vi.hoisted(() => ({ quoteForRikma: vi.fn(async (..._a: any[]): Promise<any> => ({ configured: false, quote: null })) }));
+vi.mock('$lib/server/shop/shipping', () => shippingQuote);
+
 import { createPaidOrderConfig } from './createPaidOrder.js';
 import { createSaleConfig } from './createSale.js';
 import { confirmOrderPaymentConfig } from './confirmOrderPayment.js';
@@ -32,6 +36,7 @@ import {
 } from './orderLifecycle.js';
 import { validateOrderPayload, type OrderPayload } from '$lib/server/ordersApi.js';
 import { resetStockFlagsVerdict } from '$lib/server/shop/stockFlags.js';
+import { resetShippingSchemaVerdict } from '$lib/server/shop/shippingConfig.js';
 import { readTracking } from '$lib/shop/tracking';
 
 type Row = Record<string, any>;
@@ -51,7 +56,9 @@ function makeDb() {
     calls: [] as string[],
     failOnce: new Set<string>(),
     /** Is the `unlimited` column deployed in this Strapi? (§2.5) */
-    flagsLive: false
+    flagsLive: false,
+    /** Are `Project.shipping` / `Order.shipping` deployed? */
+    shippingLive: false
   };
 }
 let db: ReturnType<typeof makeDb>;
@@ -108,6 +115,16 @@ const strapi = {
       case 'rikmaApiOrderByRef': {
         const o = db.orders.find((x) => x.data.ref === vars.ref);
         return { data: { orders: idsOf(o ? [orderNode(o)] : []) } };
+      }
+      case 'rikmaApiShippingSchema':
+        if (!db.shippingLive) throw new Error('GRAPHQL_VALIDATION_FAILED: Cannot query field "shipping"');
+        return { data: { projects: idsOf([]), orders: idsOf([]) } };
+      case 'rikmaApiOrderSetShipping':
+        db.orders.find((x) => x.id === String(vars.id))!.shipping = vars.shipping;
+        return { data: { updateOrder: { data: { id: vars.id } } } };
+      case 'orderShippingById': {
+        const o = db.orders.find((x) => x.id === String(vars.id));
+        return { data: { orders: idsOf(o ? [{ id: o.id, attributes: { shipping: o.shipping ?? null } }] : []) } };
       }
       case 'ordersApiProject':
         return { data: { project: { data: { id: '57', attributes: { projectName: 'האוהל', currencyCode: 'ILS' } } } } };
@@ -253,6 +270,8 @@ beforeEach(() => {
   db = makeDb();
   notices.length = 0;
   resetStockFlagsVerdict();
+  resetShippingSchemaVerdict();
+  shippingQuote.quoteForRikma.mockImplementation(async () => ({ configured: false, quote: null }));
   for (const fn of Object.values(promo)) fn.mockClear();
   promo.pricePaidOrderFor.mockImplementation(async () => null);
   promo.fetchOrderLinePromotions.mockImplementation(async () => new Map());
@@ -805,5 +824,101 @@ describe('tracking numbers', () => {
     await expect(act(setOrderTrackingConfig, { orderRef: '57:arr_3', number: '1' })).rejects.toMatchObject({ code: 'PAYMENT_PENDING' });
 
     await expect(act(setOrderTrackingConfig, { orderRef: '57:nope', number: '1' })).rejects.toMatchObject({ code: 'NOT_FOUND' });
+  });
+});
+
+describe('a delivery fee recorded as a product line', () => {
+  const FEE_PRODUCT = '900';
+  const deliveryOrder = (over: Record<string, any> = {}) =>
+    order({
+      buyer: { name: 'דנה', phone: '050-1234567' },
+      delivery: { preference: 'delivery', fee: 30, optionId: 'm:center:courier', address: { city: 'רמת גן', street: 'הרצל', houseNumber: '1' } },
+      lines: [{ productId: '1901', quantity: 1, unitPrice: 40 }],
+      ...over
+    });
+
+  beforeEach(() => {
+    db.shippingLive = true;
+    db.products.set(FEE_PRODUCT, { name: 'משלוח', price: 1, pricingMode: 'fixed', quant: null, kindOf: 'total', status_of_voting: 'active', hasVariants: false });
+    shippingQuote.quoteForRikma.mockImplementation(async () => ({
+      configured: true,
+      quote: { options: [{ id: 'm:center:courier', kind: 'delivery', productId: FEE_PRODUCT, name: 'שליח', fee: 30, free: false }] }
+    }));
+  });
+
+  it('sells the fee: a line and a sale for it, the same total', async () => {
+    const r = await run(deliveryOrder());
+    expect(r).toMatchObject({ duplicated: false, total: 70 });
+    expect(db.lines.map((l) => [l.matanot, l.lineTotal, l.position])).toEqual([['1901', 40, 0], [FEE_PRODUCT, 30, 1]]);
+    expect(db.sales.map((s) => [s.matanot, s.in])).toEqual([['1901', 40], [FEE_PRODUCT, 30]]);
+    expect(db.orders[0].shipping).toMatchObject({ asLine: true, productId: FEE_PRODUCT, fee: 30 });
+    expect(promo.pricePaidOrderFor.mock.calls[0][1].map((l: any) => l.productId)).toEqual(['1901']);
+  });
+
+  it('a retry of the finished order is a duplicate, not a conflict', async () => {
+    await run(deliveryOrder());
+    const again = await run(deliveryOrder());
+    expect(again.duplicated).toBe(true);
+    expect(again.lines).toHaveLength(2);
+    expect(db.sales).toHaveLength(2);
+  });
+
+  it('a retry finishes the fee line a dead write left out', async () => {
+    await run(deliveryOrder());
+    db.lines.pop();
+    db.sales.pop();
+    // The settings moved since: the first attempt's decision stands.
+    shippingQuote.quoteForRikma.mockImplementation(async () => ({ configured: false, quote: null }));
+    const again = await run(deliveryOrder());
+    expect(again.duplicated).toBe(false);
+    expect(db.lines.map((l) => l.matanot)).toEqual(['1901', FEE_PRODUCT]);
+    expect(db.sales.map((s) => s.in)).toEqual([40, 30]);
+  });
+
+  it.each([
+    ['archived', { archived: true, lifecycle: 'archived' }],
+    ['without a fixed price', { pricingMode: 'quote' }],
+    ['with variants', { hasVariants: true }]
+  ])('a linked product %s never refuses a paid order: the fee stays separate', async (_name, over) => {
+    Object.assign(db.products.get(FEE_PRODUCT)!, over);
+    const r = await run(deliveryOrder());
+    expect(r.total).toBe(70);
+    expect(db.lines.map((l) => l.matanot)).toEqual(['1901']);
+    expect(db.sales).toHaveLength(1);
+    expect(db.orders[0].shipping).toMatchObject({ asLine: false, fee: 30 });
+    expect(db.orders[0].data.note).toContain('#900');
+  });
+
+  it('the shipping product also in the cart is sold as an item, not refused', async () => {
+    const r = await run(deliveryOrder({ lines: [{ productId: FEE_PRODUCT, quantity: 1, unitPrice: 1 }] }));
+    expect(r.total).toBe(31);
+    expect(db.orders[0].shipping.asLine).toBe(false);
+  });
+
+  it('a shipping record that could not be written drops the line, and a retry still answers', async () => {
+    db.failOnce.add('rikmaApiOrderSetShipping');
+    const r = await run(deliveryOrder());
+    expect(r.total).toBe(70);
+    expect(db.lines.map((l) => l.matanot)).toEqual(['1901']);
+    expect((await run(deliveryOrder())).duplicated).toBe(true);
+  });
+
+  it('with no product linked the fee stays beside the lines', async () => {
+    shippingQuote.quoteForRikma.mockImplementation(async () => ({
+      configured: true,
+      quote: { options: [{ id: 'm:center:courier', kind: 'delivery', productId: null, name: 'שליח', fee: 30, free: false }] }
+    }));
+    expect((await run(deliveryOrder())).total).toBe(70);
+    expect(db.lines).toHaveLength(1);
+    expect(db.orders[0].shipping.asLine).toBe(false);
+  });
+
+  it('an arranged order sells the fee when its money arrives', async () => {
+    const o = deliveryOrder({ externalId: 'arr_f', payment: 'arranged' });
+    await run(o);
+    expect(db.sales).toHaveLength(0);
+    expect((await run(o)).duplicated).toBe(true);
+    await act(confirmOrderPaymentConfig, { orderRef: '57:arr_f', method: 'cash' });
+    expect(db.sales.map((s) => [s.matanot, s.in])).toEqual([['1901', 40], [FEE_PRODUCT, 30]]);
   });
 });

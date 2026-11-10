@@ -191,7 +191,8 @@ export function mailOrderFromNode(node: any, shippingRaw: unknown): MailOrder | 
         preference,
         addressLine: addressLine(addressOf(a.deliveryAddress)) || null,
         method: shipping?.kind === 'pickup' ? null : (shipping?.name ?? null),
-        fee: shipping?.fee ?? null,
+        // A fee recorded as a line is already in `lines`; twice reads as two charges.
+        fee: shipping?.asLine ? null : (shipping?.fee ?? null),
         pickupPointName: shipping?.pickupPointName ?? null,
         pickupAddress: shipping?.pickupAddress ?? null,
         etaMinDays: shipping?.etaMinDays ?? null,

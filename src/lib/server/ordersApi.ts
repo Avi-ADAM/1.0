@@ -477,7 +477,8 @@ export function canResume(
       position?: number | null;
     }>;
   },
-  plannedTotal: number
+  plannedTotal: number,
+  plannedLines: Array<Pick<PlannedLine, 'productId' | 'variantId' | 'quantity' | 'unitPrice'>> = payload.lines
 ): boolean {
   if (
     payload.currency &&
@@ -488,7 +489,7 @@ export function canResume(
   if (stored.total !== null && Number.isFinite(stored.total) && stored.total !== plannedTotal)
     return false;
   return stored.lines.every((s) => {
-    const line = payload.lines[Number(s.position ?? -1)];
+    const line = plannedLines[Number(s.position ?? -1)];
     return (
       !!line &&
       String(s.productId ?? '') === line.productId &&
@@ -517,6 +518,8 @@ export interface OrderRefusal {
 
 export interface PlannedLine {
   position: number;
+  /** Internal line created from the trusted shipping config, never sent by the storefront. */
+  shippingProduct?: boolean;
   productId: string;
   variantId: string | null;
   quantity: number;
@@ -545,6 +548,8 @@ export interface OrderPlan {
   oversold: boolean;
   /** Human-readable facts for the order's note — never reasons to refuse. */
   notes: string[];
+  /** The delivery fee went onto a line of its product, not beside the lines. */
+  shippingAsLine: boolean;
 }
 
 
@@ -571,8 +576,10 @@ export function planOrder(args: {
   payload: OrderPayload;
   products: Map<string, { id: string | number; attributes?: Record<string, any> | null }>;
   variants: Map<string, { id: string | number; attributes?: Record<string, any> | null }>;
+  /** Server-resolved from ShippingMethod/PickupPoint; never trusted from payload. */
+  shippingLine?: { productId: string; unitPrice: number; settled?: boolean } | null;
 }): OrderPlan | OrderRefusal {
-  const { payload, products, variants } = args;
+  const { payload, products, variants, shippingLine = null } = args;
   // The running count of each counted row; `null` = unlimited.
   const remaining = new Map<string, number | null>();
   const notes: string[] = [];
@@ -678,8 +685,43 @@ export function planOrder(args: {
     });
   }
 
+  // The delivery fee as a line of a product the rikma linked to the method. The
+  // buyer has paid, so a link that went stale is a note and a separate fee —
+  // never a refusal (`orderShipping.ts`).
+  let shippingAsLine = false;
+  if (shippingLine && shippingLine.unitPrice > 0) {
+    const id = String(shippingLine.productId);
+    const a = products.get(id)?.attributes;
+    if (shippingLine.settled || shippingProductSellable(a, id, payload)) {
+      const image = imageOf(a?.pic);
+      lines.push({
+        position: lines.length,
+        productId: id,
+        variantId: null,
+        quantity: 1,
+        unitPrice: round2(shippingLine.unitPrice),
+        lineTotal: round2(shippingLine.unitPrice),
+        kindOf: str(a?.kindOf) ?? 'total',
+        nameSnapshot: str(a?.name) ?? `#${id}`,
+        optionLabelSnapshot: null,
+        skuSnapshot: null,
+        imageUrlSnapshot: image?.url ?? null,
+        note: null,
+        oversold: false,
+        shortBy: 0,
+        shippingProduct: true
+      });
+      shippingAsLine = true;
+    } else {
+      notes.push(
+        `דמי המשלוח (${round2(shippingLine.unitPrice)}) נשארו בנפרד ולא נרשמו כמכירה: מוצר המשלוח #${id} לא זמין לכך (לא פורסם, בלי מחיר קבוע, עם וריאציות, או שהוזמן גם כמוצר).`
+      );
+    }
+  }
+
   const subtotal = round2(lines.reduce((s, l) => s + l.lineTotal, 0));
-  const computedTotal = round2(subtotal + (payload.delivery.fee ?? 0));
+  const separateFee = shippingAsLine ? 0 : (payload.delivery.fee ?? 0);
+  const computedTotal = round2(subtotal + separateFee);
   const total = payload.amount ?? computedTotal;
   if (payload.amount !== null && round2(payload.amount) !== computedTotal) {
     notes.push(
@@ -694,8 +736,21 @@ export function planOrder(args: {
     computedTotal,
     total,
     oversold: lines.some((l) => l.oversold),
-    notes
+    notes,
+    shippingAsLine
   };
+}
+
+/** Can this linked product carry the fee? The calculator sets the price, the product only has to be sellable. */
+function shippingProductSellable(
+  a: Record<string, any> | null | undefined,
+  id: string,
+  payload: OrderPayload
+): boolean {
+  if (!a || payload.lines.some((line) => line.productId === id)) return false;
+  if (productStatusOf(a) !== 'published' || a.hasVariants === true) return false;
+  const pricingMode = pricingModeOf(a);
+  return checkoutOf({ status: 'published', pricingMode, price: pricingMode === 'quote' ? null : num(a.price) });
 }
 
 function refuse(

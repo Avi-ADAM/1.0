@@ -31,6 +31,8 @@ import { apiRikmaPath } from './rikmaPath.js';
 import { optionAxesOf, optionValuesOf } from './shop.js';
 import { errorText, schemaProbe } from './schemaProbe.js';
 import { readStockFlags } from '$lib/server/shop/stockFlags.js';
+import { readShippingConfig } from '$lib/server/shop/shippingConfig.js';
+import { shippingProductIds } from '$lib/shop/shipping';
 
 export type ApiRun = (
   qid: string,
@@ -349,6 +351,27 @@ async function withStockFlags(
 }
 
 /**
+ * Keeps the products that only carry a delivery fee out of the shop's lists —
+ * `hideFromDiscovery` does not, the shop lists those (§4.3). A key that reads
+ * drafts is the rikma's own tooling and still sees them. Settings that cannot be
+ * read leave the list as it was.
+ */
+async function shippingProductFilters(
+  run: ApiRun,
+  projectId: string,
+  access: ApiAccess
+): Promise<Record<string, unknown>[]> {
+  if (access.level === 'draft') return [];
+  try {
+    const { config } = await readShippingConfig((qid, vars) => cachedRun(run, qid, vars ?? {}), projectId);
+    const ids = shippingProductIds(config);
+    return ids.length ? [{ id: { notIn: ids } }] : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
  * One page of the catalog. The filters carry the rikma and the visibility rule
  * (`buildCatalogFilters`); the JS pass below re-checks each row's derived
  * status, because a filter that is subtly wrong on a NULL column must not
@@ -371,7 +394,7 @@ export async function fetchProductPage(
   const filters = buildCatalogFilters(
     projectId,
     query.statuses,
-    query.callerFilters
+    [...query.callerFilters, ...(await shippingProductFilters(run, projectId, access))]
   );
   if (!filters) return { data: [], total: 0, pages: 0 };
 
@@ -497,7 +520,7 @@ export async function fetchCategories(
   const filters = buildCatalogFilters(
     args.projectId,
     defaultListStatuses(args.access),
-    args.callerFilters ?? []
+    [...(args.callerFilters ?? []), ...(await shippingProductFilters(run, args.projectId, args.access))]
   );
   if (!filters) return [];
 

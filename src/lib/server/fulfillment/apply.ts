@@ -129,24 +129,22 @@ export async function applyFulfillment(input: {
   if (!order) return EMPTY;
   const wasPending = node.attributes?.fulfillmentPending === true;
 
-  // Order.shipping — only when a rule narrows by zone / method / pickup point
-  // or batches in waves (the dispatch day). Read beside the order, so the
-  // order query stays valid before the field deploys.
+  // Order.shipping — read beside the order, so the order query stays valid
+  // before the field deploys. Rules narrow by its zone / method / pickup point
+  // or batch by its dispatch day, and it names the line that is only the fee.
   const order$ = steps.filter((s) => s.when.event === 'order.paid' && !s.archived);
-  const needsShipping = order$.some(
-    (s) => s.when.shippingZones?.length || s.when.shippingMethods?.length || s.when.pickupPoints?.length || s.batching === 'wave'
-  );
-  if (needsShipping) {
-    try {
-      const shipRes = await run('orderShippingById', { pid: projectId, id: orderId });
-      const ship = readOrderShipping(shipRes?.data?.orders?.data?.[0]?.attributes?.shipping);
-      order.shippingZoneId = ship?.zoneId ?? null;
-      order.shippingMethodId = ship?.optionId?.startsWith('m:') ? ship.optionId : null;
-      order.pickupPointId = ship?.pickupPointId ?? null;
-      order.dispatchOn = ship?.nextDispatch ?? null;
-    } catch {
-      order.shippingZoneId = null;
+  try {
+    const shipRes = await run('orderShippingById', { pid: projectId, id: orderId });
+    const ship = readOrderShipping(shipRes?.data?.orders?.data?.[0]?.attributes?.shipping);
+    order.shippingZoneId = ship?.zoneId ?? null;
+    order.shippingMethodId = ship?.optionId?.startsWith('m:') ? ship.optionId : null;
+    order.pickupPointId = ship?.pickupPointId ?? null;
+    order.dispatchOn = ship?.nextDispatch ?? null;
+    if (ship?.asLine && ship.productId) {
+      for (const line of order.lines) if (line.productId === ship.productId) line.shippingFee = true;
     }
+  } catch {
+    order.shippingZoneId = null;
   }
   // Product categories — only for a rule scoped to categories.
   if (order$.some((s) => s.scope === 'category' && s.when.categories?.length)) {

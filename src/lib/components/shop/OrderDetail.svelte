@@ -30,6 +30,7 @@
   // What the buyer paid beyond the lines. An order from before the shipping
   // record still carries the fee in its total, so the gap is the fallback.
   let shipFee = $derived.by(() => {
+    if (ship?.asLine) return 0;
     if (ship?.fee != null) return ship.fee;
     if (order.total == null || order.delivery.preference !== 'delivery') return 0;
     const gap = Math.round((order.total - order.lines.reduce((s, l) => s + (l.lineTotal ?? 0), 0)) * 100) / 100;

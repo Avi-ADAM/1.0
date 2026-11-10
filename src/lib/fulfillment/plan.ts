@@ -110,6 +110,8 @@ export interface OrderLineFacts {
   optionLabel: string | null;
   /** The product's categories — read only when a rule asks for them. */
   categoryIds?: string[];
+  /** The delivery fee's own line: money and stock, but nothing to make or pack. */
+  shippingFee?: boolean;
 }
 
 export interface OrderFacts {
@@ -255,7 +257,8 @@ export function stepMatches(step: FulfillmentStepRow, event: FulfillmentEvent, o
 }
 
 /** The lines of the order a step is about (its scope). */
-export function linesInScope(step: FulfillmentStepRow, lines: OrderLineFacts[]): OrderLineFacts[] {
+export function linesInScope(step: FulfillmentStepRow, allLines: OrderLineFacts[]): OrderLineFacts[] {
+  const lines = allLines.filter((l) => !l.shippingFee);
   if (step.scope === 'product' && step.productIds.length) {
     const ids = new Set(step.productIds);
     return lines.filter((l) => l.productId != null && ids.has(l.productId));

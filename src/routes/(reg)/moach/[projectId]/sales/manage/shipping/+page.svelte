@@ -77,6 +77,7 @@
     return {
       id: newId('m', taken),
       name: '',
+      productId: null,
       fee: 0,
       perItem: 0,
       perKg: 0,
@@ -180,6 +181,7 @@
       address: null,
       hours: null,
       note: null,
+      productId: null,
       fee: 0
     });
   }
@@ -393,7 +395,7 @@
                 <fieldset class="sh-field sp-fs">
                   <legend>{$t('shop.ship.methods')}</legend>
                   {#each zone.methods as m, mi (m.id)}
-                    <ShippingMethodEditor bind:method={zone.methods[mi]} onremove={() => (zone.methods = zone.methods.filter((x) => x.id !== m.id))} />
+                    <ShippingMethodEditor bind:method={zone.methods[mi]} products={setup.products} onremove={() => (zone.methods = zone.methods.filter((x) => x.id !== m.id))} />
                   {/each}
                   <button type="button" class="sh-btn sh-btn-outline sp-self" onclick={() => zone.methods.push(newMethod(zone.methods.map((x) => x.id)))}>{$t('shop.ship.addMethod')}</button>
                 </fieldset>
@@ -449,6 +451,16 @@
           <label class="sh-field">
             {$t('shop.ship.pickupFee')}
             <input class="sh-input sh-num" type="number" min="0" step="0.01" inputmode="decimal" bind:value={draft.pickupPoints[pi].fee} />
+          </label>
+          <label class="sh-field">
+            {$t('shop.ship.pickupProduct')}
+            <select class="sh-input" bind:value={draft.pickupPoints[pi].productId}>
+              <option value={null}>{$t('shop.ship.noProduct')}</option>
+              {#each setup.products as product (product.id)}
+                <option value={product.id}>{product.name || `#${product.id}`}</option>
+              {/each}
+            </select>
+            <span class="sp-muted">{$t('shop.ship.productLineHint')}</span>
           </label>
           <label class="sh-field">
             {$t('shop.ship.note')}

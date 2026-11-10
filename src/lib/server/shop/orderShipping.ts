@@ -1,6 +1,6 @@
 import type { ProbeRun } from '$lib/server/apiPublic/schemaProbe.js';
 import { shippingSchemaLive } from './shippingConfig.js';
-import { orderShippingOf, type OrderShipping, type ShippingQuote } from '$lib/shop/shipping';
+import { orderShippingOf, readOrderShipping, type OrderShipping, type ShippingQuote } from '$lib/shop/shipping';
 
 /**
  * How a reported order travels, priced again on our side
@@ -17,6 +17,8 @@ const round2 = (n: number) => Math.round(n * 100) / 100;
 
 export interface ShippingRecord {
   record: OrderShipping;
+  /** The synthetic product line to add to the order, when linked and charged. */
+  line: { productId: string; unitPrice: number; settled?: boolean } | null;
   /** A fact for the order's note, in the rikma's working language. */
   note: string | null;
 }
@@ -39,7 +41,25 @@ export function shippingRecordFrom(
   } else if (option && delivery.fee !== null && round2(delivery.fee) !== round2(option.fee)) {
     note = `דמי המשלוח שנגבו (${round2(delivery.fee)}) שונים מהמחיר בהגדרות הרקמה לשיטה "${option.name || option.kind}" (${round2(option.fee)}).`;
   }
-  return { record, note };
+  const line = record.asLine && record.productId && delivery.fee !== null && delivery.fee > 0
+    ? { productId: record.productId, unitPrice: round2(delivery.fee) }
+    : null;
+  return { record, line, note };
+}
+
+/**
+ * The shipping record an order already has. A failed read throws rather than
+ * answering null: null means "no fee line", and a retry that believed that
+ * would call an order it already finished a conflict.
+ */
+export async function storedOrderShipping(
+  run: ProbeRun,
+  projectId: string,
+  orderId: string
+): Promise<OrderShipping | null> {
+  if (!(await shippingSchemaLive(run))) return null;
+  const res = await run('orderShippingById', { pid: projectId, id: orderId });
+  return readOrderShipping(res?.data?.orders?.data?.[0]?.attributes?.shipping);
 }
 
 /**

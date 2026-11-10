@@ -40,6 +40,8 @@ export interface RateTier {
 export interface ShippingMethod {
   id: string;
   name: string;
+  /** Rikma product that receives the charged delivery fee as an order line. */
+  productId: string | null;
   fee: number;
   /** Added for every unit after the first. */
   perItem: number;
@@ -85,6 +87,8 @@ export interface PickupPoint {
   /** Free text — "א׳–ה׳ 10:00–18:00". */
   hours: string | null;
   note: string | null;
+  /** Rikma product that receives the charged pickup fee as an order line. */
+  productId: string | null;
   fee: number;
 }
 
@@ -111,6 +115,14 @@ export interface ShippingConfig {
   contactFallback: boolean;
   updatedAt: string | null;
   updatedBy: string | null;
+}
+
+/** The products that only carry a delivery fee — never offered as items in a shop. */
+export function shippingProductIds(config: ShippingConfig): string[] {
+  return [...new Set([
+    ...config.zones.flatMap((z) => z.methods.map((m) => m.productId)),
+    ...config.pickupPoints.map((p) => p.productId)
+  ].filter((id): id is string => !!id))];
 }
 
 // ─── reading a stored config (never trust its shape) ────────────────────────
@@ -179,6 +191,7 @@ function methodOf(raw: any, i: number): ShippingMethod {
   return {
     id: idOf(raw?.id, 'm', i),
     name: str(raw?.name, 80) ?? '',
+    productId: /^\d{1,12}$/.test(String(raw?.productId ?? '')) ? String(raw.productId) : null,
     fee: money(raw?.fee),
     perItem: money(raw?.perItem),
     perKg: money(raw?.perKg),
@@ -218,6 +231,7 @@ function pointOf(raw: any, i: number): PickupPoint {
     address: str(raw?.address, 160),
     hours: str(raw?.hours, 160),
     note: str(raw?.note, 200),
+    productId: /^\d{1,12}$/.test(String(raw?.productId ?? '')) ? String(raw.productId) : null,
     fee: money(raw?.fee)
   };
 }
@@ -385,6 +399,8 @@ export interface ShippingOption {
   /** `m:<zone>:<method>` · `p:<point>` · `digital` · `contact` — what the order reports back. */
   id: string;
   kind: OptionKind;
+  /** The method/point's linked rikma product, if any. */
+  productId: string | null;
   name: string;
   fee: number;
   /** The method's own fee was waived by its free-over threshold. */
@@ -536,6 +552,7 @@ export function quoteShipping(
           priced.push({
             id: `m:${zone.id}:${m.id}`,
             kind: 'delivery',
+            productId: m.productId,
             name: m.name,
             fee: r.fee,
             free: r.free,
@@ -557,6 +574,7 @@ export function quoteShipping(
         options.push({
           ...plain('pickup'),
           id: `p:${p.id}`,
+          productId: p.productId,
           name: p.name,
           fee: p.fee,
           note: p.note,
@@ -583,6 +601,7 @@ function plain(kind: OptionKind): ShippingOption {
   return {
     id: kind,
     kind,
+    productId: null,
     name: '',
     fee: 0,
     free: false,
@@ -608,6 +627,10 @@ export function lowestFreeOver(config: ShippingConfig): number | null {
 export interface OrderShipping {
   optionId: string;
   kind: OptionKind;
+  /** Linked rikma product, when this delivery option is an order line. */
+  productId: string | null;
+  /** True only when a positive fee was recorded as a product line. */
+  asLine: boolean;
   name: string | null;
   zoneId: string | null;
   zoneName: string | null;
@@ -627,6 +650,8 @@ export function orderShippingOf(option: ShippingOption | null, optionId: string,
   return {
     optionId,
     kind: option?.kind ?? 'contact',
+    productId: option?.productId ?? null,
+    asLine: !!option?.productId && fee !== null && fee > 0,
     name: option?.name || null,
     zoneId: option?.zone?.id ?? null,
     zoneName: option?.zone?.name ?? null,
@@ -653,6 +678,8 @@ export function readOrderShipping(raw: unknown): OrderShipping | null {
   return {
     optionId,
     kind,
+    productId: /^\d{1,12}$/.test(String(v.productId ?? '')) ? String(v.productId) : null,
+    asLine: v.asLine === true,
     name: str(v.name, 80),
     zoneId: str(v.zoneId, 40),
     zoneName: str(v.zoneName, 80),

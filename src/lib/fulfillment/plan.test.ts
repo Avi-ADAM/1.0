@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { linesInScope, type OrderLineFacts } from './plan';
 import {
   UNIT_CAP,
   chainProblem,
@@ -428,5 +429,17 @@ describe('planStockLow (A3)', () => {
 describe('order steps ignore stock rules', () => {
   it('a stock.low step never opens for an order', () => {
     expect(run([step({ when: { event: 'stock.low' } })]).acts).toEqual([]);
+  });
+});
+
+describe('the delivery fee line', () => {
+  const line = (id: string, over: Partial<OrderLineFacts> = {}): OrderLineFacts => ({
+    id, position: 0, productId: id, variantId: null, quantity: 1, name: id, optionLabel: null, ...over
+  });
+  const lines = [line('1'), line('9', { shippingFee: true })];
+
+  it('is nothing to make or pack, whatever the step is scoped to', () => {
+    expect(linesInScope({ scope: 'order', productIds: [], variantIds: [], when: {} } as any, lines).map((l) => l.id)).toEqual(['1']);
+    expect(linesInScope({ scope: 'product', productIds: ['9'], variantIds: [], when: {} } as any, lines)).toEqual([]);
   });
 });

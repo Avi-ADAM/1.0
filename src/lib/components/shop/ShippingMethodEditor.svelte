@@ -7,7 +7,11 @@
   import { t, locale } from '$lib/translations';
   import type { ShippingMethod, TierBasis } from '$lib/shop/shipping';
 
-  let { method = $bindable(), onremove }: { method: ShippingMethod; onremove: () => void } = $props();
+  let { method = $bindable(), products = [], onremove }: {
+    method: ShippingMethod;
+    products: Array<{ id: string; name: string }>;
+    onremove: () => void;
+  } = $props();
 
   const TIER_BASES: TierBasis[] = ['none', 'subtotal', 'weight'];
   // 2026-10-18 was a Sunday: weekday names in the reader's language, no keys.
@@ -37,6 +41,16 @@
     </label>
     <button type="button" class="sh-btn sh-btn-quiet me-x" onclick={onremove} aria-label={$t('shop.ship.removeMethod')}>✕</button>
   </div>
+  <label class="sh-field">
+    {$t('shop.ship.methodProduct')}
+    <select class="sh-input" bind:value={method.productId}>
+      <option value={null}>{$t('shop.ship.noProduct')}</option>
+      {#each products as product (product.id)}
+        <option value={product.id}>{product.name || `#${product.id}`}</option>
+      {/each}
+    </select>
+    <span class="me-hint">{$t('shop.ship.productLineHint')}</span>
+  </label>
   <div class="me-grid">
     <label class="sh-field">
       {$t('shop.ship.fee')}
