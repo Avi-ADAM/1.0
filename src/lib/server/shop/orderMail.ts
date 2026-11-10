@@ -31,7 +31,7 @@
 // and per rikma, like the report confirmation is.
 
 import { orderNumberOf } from '$lib/server/ordersApi.js';
-import { shippingSchemaLive } from '$lib/server/shop/shippingConfig.js';
+import { readShippingConfig, shippingSchemaLive } from '$lib/server/shop/shippingConfig.js';
 import { addressLine, addressOf, preferenceOf } from '$lib/shop/manage';
 import { buildOrderMail, type OrderMailInput, type OrderMailKind } from '$lib/shop/orderMail';
 import { readOrderShipping } from '$lib/shop/shipping';
@@ -263,7 +263,18 @@ export async function runOrderMail(
       return { sent: false, reason: 'throttled' };
     }
 
-    const built = buildOrderMail({ ...mail.input, kind });
+    // The shop's own setting; a failed read must not cost the buyer the mail.
+    let hideSentVia = false;
+    let buyerWhatsapp: string | null = null;
+    try {
+      const { config } = await readShippingConfig(run, projectId);
+      hideSentVia = config.hideSentVia;
+      buyerWhatsapp = config.buyerWhatsapp;
+    } catch {
+      /* the mail goes with the default signature and the rikma's own link */
+    }
+
+    const built = buildOrderMail({ ...mail.input, whatsapp: buyerWhatsapp ?? mail.input.whatsapp, kind, hideSentVia });
     const sent = await deps.send({
       to: mail.to,
       subject: built.subject,

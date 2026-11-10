@@ -72,6 +72,16 @@ describe('buildOrderMail', () => {
     expect(text).toContain('זמן אספקה משוער: 2–4 ימים');
   });
 
+  it('leaves out the platform line only when the shop asked', () => {
+    const shown = buildOrderMail(base);
+    expect(shown.text).toContain('חנות הספרים · נשלח באמצעות 1lev1');
+    expect(shown.html).toContain('נשלח באמצעות 1lev1');
+    const hidden = buildOrderMail({ ...base, hideSentVia: true });
+    expect(hidden.text).not.toContain('1lev1');
+    expect(hidden.html).not.toContain('1lev1');
+    expect(hidden.text.endsWith('\nחנות הספרים')).toBe(true);
+  });
+
   it('is right-to-left for Hebrew and Arabic only', () => {
     expect(buildOrderMail(base).html).toContain('dir="rtl"');
     expect(buildOrderMail({ ...base, locale: 'ar' }).html).toContain('dir="rtl"');
@@ -142,6 +152,40 @@ describe('buildOrderMail', () => {
     const delivery = { ...base.delivery, preference: 'pickup' as const, pickupPointName: 'הסניף' };
     expect(buildOrderMail({ ...base, delivery: { ...delivery, pickupByAppointment: true } }).text).toContain('בתיאום מראש');
     expect(buildOrderMail({ ...base, delivery }).text).not.toContain('בתיאום מראש');
+  });
+
+  describe('WhatsApp to arrange the handover', () => {
+    const appointment = { ...base.delivery, preference: 'pickup' as const, pickupPointName: 'הסניף', pickupByAppointment: true };
+
+    it('puts the number by the handover of an order that waits on a conversation', () => {
+      const m = buildOrderMail({ ...base, delivery: appointment });
+      expect(m.text).toContain('לתיאום בוואטסאפ: https://wa.me/972501234567');
+      expect(m.html).toContain('+972501234567');
+      expect(m.html).toContain(`https://wa.me/972501234567?text=${encodeURIComponent('שלום, לגבי הזמנה 1042')}`);
+      // Once, by the handover — not again among the contact links at the bottom.
+      expect(m.text.split('wa.me/972501234567')).toHaveLength(2);
+      expect(buildOrderMail({ ...base, delivery: { ...base.delivery, preference: 'contact' } }).text).toContain('לתיאום בוואטסאפ');
+    });
+
+    it('stays a plain contact line when nothing needs arranging', () => {
+      const pickup = buildOrderMail({ ...base, delivery: { ...appointment, pickupByAppointment: false } });
+      expect(pickup.text).not.toContain('לתיאום בוואטסאפ');
+      expect(pickup.text).toContain('וואטסאפ: https://wa.me/972501234567');
+      expect(buildOrderMail(base).text).not.toContain('לתיאום בוואטסאפ');
+    });
+
+    it('offers nothing to arrange on a closed order', () => {
+      expect(buildOrderMail({ ...base, kind: 'cancelled', delivery: appointment }).text).not.toContain('לתיאום בוואטסאפ');
+    });
+
+    it('leaves a group link as it is', () => {
+      const m = buildOrderMail({ ...base, whatsapp: 'https://chat.whatsapp.com/AbC', delivery: appointment });
+      expect(m.html).toContain('href="https://chat.whatsapp.com/AbC"');
+    });
+
+    it('is written in the buyer language', () => {
+      expect(buildOrderMail({ ...base, locale: 'en', delivery: appointment }).text).toContain('Arrange on WhatsApp');
+    });
   });
 
   it('writes free delivery and a single-day estimate', () => {
@@ -215,6 +259,7 @@ describe('links', () => {
   it('whatsappLink', () => {
     expect(whatsappLink('https://wa.me/972501234567')).toBe('https://wa.me/972501234567');
     expect(whatsappLink('+972 50-123 4567')).toBe('https://wa.me/972501234567');
+    expect(whatsappLink('050-123 4567')).toBe('https://wa.me/972501234567');
     expect(whatsappLink('12')).toBeNull();
     expect(whatsappLink('abc 12345678')).toBeNull();
   });

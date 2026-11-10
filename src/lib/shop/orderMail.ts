@@ -87,6 +87,8 @@ export interface OrderMailInput {
   whatsapp: string | null;
   /** A reply reaches a person (a Reply-To is set). */
   canReply: boolean;
+  /** The shop chose to leave out the "sent through 1lev1" line. */
+  hideSentVia?: boolean;
 }
 
 export interface BuiltOrderMail {
@@ -122,6 +124,9 @@ interface Copy {
   daysUnit: string;
   digital: string;
   arrange: string;
+  arrangeWhatsapp: string;
+  /** What the buyer's WhatsApp message opens with. */
+  arrangeWhatsappText: string;
   tracking: string;
   carrier: string;
   trackingNumber: string;
@@ -173,6 +178,8 @@ const COPY: Record<MailLocale, Copy> = {
     daysUnit: 'ימים',
     digital: 'מוצר דיגיטלי — אין משלוח.',
     arrange: 'נתאם איתך את המסירה.',
+    arrangeWhatsapp: 'לתיאום בוואטסאפ',
+    arrangeWhatsappText: 'שלום, לגבי הזמנה {number}',
     tracking: 'מעקב משלוח',
     carrier: 'חברת שילוח',
     trackingNumber: 'מספר מעקב',
@@ -222,6 +229,8 @@ const COPY: Record<MailLocale, Copy> = {
     daysUnit: 'days',
     digital: 'Digital product — nothing is shipped.',
     arrange: "We'll arrange the handover with you.",
+    arrangeWhatsapp: 'Arrange on WhatsApp',
+    arrangeWhatsappText: 'Hi, about order {number}',
     tracking: 'Shipment tracking',
     carrier: 'Carrier',
     trackingNumber: 'Tracking number',
@@ -271,6 +280,8 @@ const COPY: Record<MailLocale, Copy> = {
     daysUnit: 'أيام',
     digital: 'منتج رقمي — لا يوجد شحن.',
     arrange: 'سننسّق معك التسليم.',
+    arrangeWhatsapp: 'التنسيق عبر واتساب',
+    arrangeWhatsappText: 'مرحبًا، بخصوص الطلب {number}',
     tracking: 'تتبّع الشحنة',
     carrier: 'شركة الشحن',
     trackingNumber: 'رقم التتبّع',
@@ -320,6 +331,8 @@ const COPY: Record<MailLocale, Copy> = {
     daysUnit: 'дн.',
     digital: 'Цифровой товар — доставка не требуется.',
     arrange: 'Мы согласуем с вами передачу заказа.',
+    arrangeWhatsapp: 'Договориться в WhatsApp',
+    arrangeWhatsappText: 'Здравствуйте, по поводу заказа {number}',
     tracking: 'Отслеживание посылки',
     carrier: 'Служба доставки',
     trackingNumber: 'Трек-номер',
@@ -369,6 +382,8 @@ const COPY: Record<MailLocale, Copy> = {
     daysUnit: 'días',
     digital: 'Producto digital: no hay envío.',
     arrange: 'Acordaremos contigo la entrega.',
+    arrangeWhatsapp: 'Coordinar por WhatsApp',
+    arrangeWhatsappText: 'Hola, sobre el pedido {number}',
     tracking: 'Seguimiento del envío',
     carrier: 'Transportista',
     trackingNumber: 'Número de seguimiento',
@@ -423,13 +438,15 @@ export function websiteLink(raw: string | null | undefined): string | null {
   return safeUrl(v) ?? (/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(v) ? safeUrl(`https://${v}`) : null);
 }
 
-/** The shop's WhatsApp as a link — a `wa.me` link, or just the number. */
+/** The shop's WhatsApp as a link — a `wa.me` link, or just the number (`050…` is an Israeli one). */
 export function whatsappLink(raw: string | null | undefined): string | null {
   const v = (raw ?? '').trim();
   if (!v) return null;
   const link = safeUrl(v);
   if (link) return link;
-  const digits = v.replace(/\D/g, '');
+  const typed = v.replace(/\D/g, '');
+  // wa.me wants the country code; a local 050… there opens a dead chat.
+  const digits = /^0\d{8,9}$/.test(typed) ? `972${typed.slice(1)}` : typed;
   return digits.length >= 8 && digits.length <= 15 && /^[+\d][\d\s()-]*$/.test(v) ? `https://wa.me/${digits}` : null;
 }
 
@@ -503,7 +520,14 @@ export function buildOrderMail(input: OrderMailInput): BuiltOrderMail {
   const wa = whatsappLink(input.whatsapp);
   const contact: Row[] = [];
   if (site) contact.push({ label: c.website, value: site, href: site });
-  if (wa) contact.push({ label: c.whatsapp, value: wa, href: wa });
+  // Whatever waits on a conversation gets the way to start it, up where the
+  // handover is described. A closed order has nothing left to arrange.
+  const needsArranging = d.preference === 'contact' || (d.preference === 'pickup' && d.pickupByAppointment);
+  const arrange = wa && needsArranging && !CLOSING_KINDS.includes(input.kind) ? wa : null;
+  const arrangeChat = arrange?.match(/^https:\/\/wa\.me\/(\d+)$/)?.[1] ?? null;
+  const arrangeHref =
+    arrange && arrangeChat ? `${arrange}?text=${encodeURIComponent(fill(c.arrangeWhatsappText, { number }))}` : arrange;
+  if (wa && !arrange) contact.push({ label: c.whatsapp, value: wa, href: wa });
 
   const total = money(input.total);
   const showDelay = input.oversold === true && input.kind === 'paid';
@@ -518,6 +542,7 @@ export function buildOrderMail(input: OrderMailInput): BuiltOrderMail {
   if (delivery.length) {
     out.push('', `${c.delivery}:`);
     for (const r of delivery) out.push(`${r.label}: ${r.value}`);
+    if (arrange) out.push(`${c.arrangeWhatsapp}: ${arrange}`);
   }
   if (tracking.length) {
     out.push('', `${c.tracking}:`);
@@ -528,7 +553,8 @@ export function buildOrderMail(input: OrderMailInput): BuiltOrderMail {
     out.push(c.contact);
     for (const r of contact) out.push(`${r.label}: ${r.value}`);
   }
-  out.push(input.canReply ? c.canReply : c.automatic, `${shop} · ${c.sentVia}`);
+  const signature = input.hideSentVia ? [shop] : [shop, c.sentVia];
+  out.push(input.canReply ? c.canReply : c.automatic, signature.join(' · '));
   const text = out.join('\n');
 
   // ── HTML ──
@@ -564,10 +590,15 @@ export function buildOrderMail(input: OrderMailInput): BuiltOrderMail {
       : '',
     `</table>`,
     delivery.length ? h(c.delivery) + table(delivery) : '',
+    arrangeHref
+      ? `<p style="margin:14px 0 0"><a href="${e(arrangeHref)}" style="display:inline-block;padding:10px 18px;background:#25d366;color:#0b2e17;border-radius:8px;font-weight:700;text-decoration:none">${e(c.arrangeWhatsapp)}</a>` +
+        (arrangeChat ? ` <span dir="ltr" style="font-size:14px;color:#6b6b6b;white-space:nowrap">+${e(arrangeChat)}</span>` : '') +
+        `</p>`
+      : '',
     tracking.length ? h(c.tracking) + table(tracking) : '',
     `<hr style="border:0;border-top:1px solid #ececec;margin:22px 0 12px">`,
     contact.length ? `<p style="margin:0 0 6px;font-size:13px;color:#6b6b6b">${e(c.contact)}</p>${table(contact)}` : '',
-    `<p style="margin:10px 0 0;font-size:12px;color:#8a8a8a">${e(input.canReply ? c.canReply : c.automatic)} · ${e(shop)} · ${e(c.sentVia)}</p>`,
+    `<p style="margin:10px 0 0;font-size:12px;color:#8a8a8a">${[input.canReply ? c.canReply : c.automatic, ...signature].map(e).join(' · ')}</p>`,
     `</div></div></body></html>`
   ].join('');
 

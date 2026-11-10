@@ -273,6 +273,10 @@
   let summary = $derived(stageSummary(salee));
   let shares = $derived(stageShares(summary));
   let proposal = $derived(trili?.[0] ?? null);
+  // One member: everything sold is theirs, so the page has nothing to say about
+  // splitting. A proposal still open (left from when there were more members)
+  // keeps the split visible, or nobody could reach it to close it.
+  let soloRikma = $derived(projectUsers.length === 1 && !proposal);
   let proposalYes = $derived(
     (proposal?.attributes?.vots ?? []).filter((v) => v?.what === true).length
   );
@@ -348,7 +352,7 @@
   let saleFilter = $state('waiting');
   let showAll = $state(false);
   const FIRST = 6;
-  let filtered = $derived(newestFirst(filterByStage(salee, saleFilter)));
+  let filtered = $derived(newestFirst(filterByStage(salee, soloRikma ? 'all' : saleFilter)));
   let shownSales = $derived(showAll ? filtered : filtered.slice(0, FIRST));
   /** @type {Array<{ id: 'waiting' | 'voting' | 'split' | 'all', label: string, count: number }>} */
   let filters = $derived([
@@ -479,6 +483,7 @@
 
     {@render top?.()}
 
+    {#if !soloRikma}
     <section class="sp-kpis" aria-label={$t('shop.sp.kpiLabel')}>
       <div class="sh-card sp-kpi">
         <span class="sh-section-label">{$t('shop.sp.kpiTotal')}</span>
@@ -503,9 +508,24 @@
         <span class="sp-kpi-sub">{salesN(summary.split.count)}</span>
       </div>
     </section>
+    {/if}
 
     <div class="sp-row">
-      <section class="sh-card-2 sp-headline" aria-label={$t('project.hamatanot.awaitingEarnings')}>
+      <section class="sh-card-2 sp-headline" aria-label={soloRikma ? $t('shop.sp.kpiTotal') : $t('project.hamatanot.awaitingEarnings')}>
+        {#if soloRikma}
+          <h2 class="sh-section-label">{$t('shop.sp.kpiTotal')}</h2>
+          {#if summary.total.count > 0}
+            <div class="sp-big">
+              <span class="sp-big-value"><bdi>{fmtMoney(summary.total.amount)}</bdi></span>
+              <span class="sp-muted">{salesN(summary.total.count)}</span>
+            </div>
+          {:else}
+            <p>{$t('shop.sp.emptyBodySolo')}</p>
+            <div class="sp-actions">
+              <button type="button" class="sh-btn sh-btn-primary sh-btn-lg sp-grow" onclick={reportSale}>{$t('project.hamatanot.reportSale')}</button>
+            </div>
+          {/if}
+        {:else}
         <h2 class="sh-section-label">{$t('project.hamatanot.awaitingEarnings')}</h2>
         <div class="sp-big">
           <span class="sp-big-value"><bdi>{fmtMoney(summary.waiting.amount)}</bdi></span>
@@ -572,6 +592,7 @@
             <button type="button" class="sh-btn sh-btn-primary sh-btn-lg sp-grow" onclick={reportSale}>{$t('project.hamatanot.reportSale')}</button>
           </div>
         {/if}
+        {/if}
       </section>
 
       {#if summary.total.count > 0}
@@ -626,6 +647,7 @@
           <h2 class="sp-h2">{$t('shop.sp.salesTitle')}</h2>
           <a class="sp-link" href="/moach/{projectId}/sales/manage/sales">{$t('shop.sp.tableLink')}</a>
         </div>
+        {#if !soloRikma}
         <div class="sh-pills" role="group" aria-label={$t('shop.sp.filterLabel')}>
           {#each filters as f (f.id)}
             <button
@@ -641,6 +663,7 @@
             </button>
           {/each}
         </div>
+        {/if}
         {#if shownSales.length === 0}
           <p class="sp-none">{$t('shop.sp.noneInFilter')}</p>
         {:else}
@@ -664,7 +687,7 @@
                   </span>
                 </div>
                 <div class="sp-sale-chips">
-                  {#if st !== 'waiting'}
+                  {#if st !== 'waiting' && !soloRikma}
                     <span class="sh-chip {st === 'split' ? 'sh-chip-ok' : 'sh-chip-info'}">{$t(`project.hamatanot.${STAGE_KEY[st]}`)}</span>
                   {/if}
                   <span class="sh-chip {chip.cls}">{chip.text}</span>

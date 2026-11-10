@@ -16,6 +16,7 @@
   import { t, locale } from '$lib/translations';
   import { executeAction, actionErrorText } from '$lib/client/actionClient';
   import { shopShippingKey } from '$lib/shop/keys';
+  import { whatsappLink } from '$lib/shop/orderMail';
   import { formatWhen } from '$lib/time/formatWhen';
   import { clock } from '$lib/stores/clock.svelte';
   import ShopNotice from '$lib/components/shop/ShopNotice.svelte';
@@ -290,6 +291,24 @@
         <span>{$t('shop.ship.fallback')}</span>
       </label>
     </div>
+  </section>
+
+  <section class="sh-card sp-sec">
+    <label class="sp-switch">
+      <input type="checkbox" bind:checked={draft.hideSentVia} />
+      <span>
+        <strong>{$t('shop.ship.hideSentVia')}</strong>
+        <span class="sp-muted">{$t('shop.ship.hideSentViaHint')}</span>
+      </span>
+    </label>
+    <label class="sh-field">
+      {$t('shop.ship.buyerWhatsapp')}
+      <input class="sh-input" type="tel" dir="ltr" maxlength="200" placeholder="050-1234567" bind:value={draft.buyerWhatsapp} />
+      <span class="sp-muted">{$t('shop.ship.buyerWhatsappHint')}</span>
+      {#if draft.buyerWhatsapp?.trim() && !whatsappLink(draft.buyerWhatsapp)}
+        <span class="sp-warn" role="status">{$t('shop.ship.buyerWhatsappBad')}</span>
+      {/if}
+    </label>
   </section>
 
   <!-- zones -->
@@ -597,6 +616,14 @@
   }
   .sp-muted {
     color: var(--sh-muted);
+    font-size: 13px;
+  }
+  .sp-warn {
+    color: var(--sh-ink);
+    background: var(--sh-warn-tint);
+    border: 1px solid var(--sh-warn-line);
+    border-radius: 6px;
+    padding: 4px 8px;
     font-size: 13px;
   }
   .sp-sec {

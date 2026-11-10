@@ -29,6 +29,8 @@
   let { data } = $props();
   const fmtMoney = useFormatMoney();
   let base = $derived(`/moach/${page.params.projectId}/sales/manage`);
+  // One member: everything sold is theirs, so there is no split to report on.
+  let soloRikma = $derived(data.memberCount === 1);
 
   let sales = $state<ShopSaleRow[] | null>(null);
   let failed = $state(false);
@@ -93,7 +95,7 @@
       $t('shop.sales.col.units'),
       $t('shop.sales.col.holder'),
       $t('shop.sales.col.source'),
-      $t('shop.sales.col.split'),
+      ...(soloRikma ? [] : [$t('shop.sales.col.split')]),
       $t('shop.sales.col.order')
     ];
     const rows = list.map((s) => [
@@ -103,7 +105,7 @@
       s.units ?? '',
       s.holderName ?? '',
       $t(`shop.sales.source.${s.source}`),
-      $t(`shop.sales.split.${splitStateOf(s)}`),
+      ...(soloRikma ? [] : [$t(`shop.sales.split.${splitStateOf(s)}`)]),
       s.orderId ? (orderNumber.get(s.orderId) ?? s.orderId) : ''
     ]);
     const slug = (data.projectBase?.projectName ?? 'rikma').replace(/[^\p{L}\p{N}]+/gu, '-');
@@ -162,7 +164,7 @@
             <th scope="col">{$t('shop.sales.col.amount')}</th>
             <th scope="col" class="sa-wide">{$t('shop.sales.col.holder')}</th>
             <th scope="col" class="sa-wide">{$t('shop.sales.col.source')}</th>
-            <th scope="col">{$t('shop.sales.col.split')}</th>
+            {#if !soloRikma}<th scope="col">{$t('shop.sales.col.split')}</th>{/if}
           </tr>
         </thead>
         <tbody>
@@ -180,7 +182,7 @@
               <td class="sh-num sa-amount"><bdi>{fmtMoney(s.amount)}</bdi></td>
               <td class="sa-wide sa-muted">{s.holderName ?? ''}</td>
               <td class="sa-wide sa-muted">{$t(`shop.sales.source.${s.source}`)}</td>
-              <td><span class="sh-chip {SPLIT_CHIP[split]}">{$t(`shop.sales.split.${split}`)}</span></td>
+              {#if !soloRikma}<td><span class="sh-chip {SPLIT_CHIP[split]}">{$t(`shop.sales.split.${split}`)}</span></td>{/if}
             </tr>
           {/each}
         </tbody>

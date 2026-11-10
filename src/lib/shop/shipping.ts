@@ -115,6 +115,10 @@ export interface ShippingConfig {
   products: ProductShipping[];
   /** No zone covers the address ⇒ offer "we will be in touch" instead of nothing. */
   contactFallback: boolean;
+  /** Buyer mails leave out the "sent through 1lev1" line. Lives here because this is the rikma's one shop-wide record. */
+  hideSentVia: boolean;
+  /** Where a buyer writes to arrange a handover. Empty ⇒ the rikma's own WhatsApp link. */
+  buyerWhatsapp: string | null;
   updatedAt: string | null;
   updatedBy: string | null;
 }
@@ -272,6 +276,8 @@ export function emptyShippingConfig(): ShippingConfig {
     pickupPoints: [],
     products: [],
     contactFallback: true,
+    hideSentVia: false,
+    buyerWhatsapp: null,
     updatedAt: null,
     updatedBy: null
   };
@@ -301,6 +307,8 @@ export function normalizeShippingConfig(raw: unknown): ShippingConfig {
     pickupPoints: uniqueIds(arr(v.pickupPoints).slice(0, LIMITS.points).map(pointOf), 'p'),
     products: [...products.values()],
     contactFallback: v.contactFallback !== false,
+    hideSentVia: v.hideSentVia === true,
+    buyerWhatsapp: str(v.buyerWhatsapp, 200),
     updatedAt: str(v.updatedAt, 40),
     updatedBy: str(v.updatedBy, 20)
   };

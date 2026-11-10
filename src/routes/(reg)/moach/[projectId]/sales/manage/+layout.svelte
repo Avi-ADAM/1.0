@@ -131,11 +131,13 @@
       <span class="sh-kpi-value">{counts ? counts.attention : '—'}</span>
       <span class="sh-kpi-sub">{counts ? $t('shop.kpi.attentionSub', { count: counts.open }) : ''}</span>
     </a>
+    {#if data.memberCount !== 1}
     <div class="sh-kpi sh-card">
       <span class="sh-section-label">{$t('shop.kpi.awaitingSplit')}</span>
       <span class="sh-kpi-value sh-gold"><bdi>{summary ? fmtMoney(summary.awaiting) : '—'}</bdi></span>
       <a class="sh-kpi-sub" href="/moach/{projectId}/sales">{$t('shop.kpi.toSplit')}</a>
     </div>
+    {/if}
     <a class="sh-kpi sh-card sh-kpi-link" href="{base}/orders">
       <span class="sh-section-label">{$t('shop.kpi.waiting')}</span>
       <span class="sh-kpi-value">{waiting.length}</span>

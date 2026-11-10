@@ -7,6 +7,7 @@ import {
   runOrderMail,
   type MailDeps
 } from './orderMail';
+import { resetShippingSchemaVerdict } from './shippingConfig';
 import { trackingLine } from '$lib/shop/tracking';
 
 describe('orderMailKindFor', () => {
@@ -200,6 +201,32 @@ describe('runOrderMail', () => {
     expect(h.sent[0].subject).toBe('Book shop — payment received for order 1042');
     // Served by the service token, not a member's JWT.
     expect(h.execute.mock.calls[0]).toEqual(['orderMailByRef', { pid: '3', ref: '3:pi_1' }, undefined, globalThis.fetch]);
+  });
+
+  it('reads the shop\'s choice to hide the platform line', async () => {
+    resetShippingSchemaVerdict();
+    const h = harness();
+    const original = h.execute.getMockImplementation()!;
+    h.execute.mockImplementation(async (qid: string): Promise<any> => {
+      if (qid === 'rikmaApiShippingSchema') return { data: { projects: { data: [] }, orders: { data: [] } } };
+      if (qid === 'shippingConfigGet') return { data: { project: { data: { attributes: { shipping: { hideSentVia: true, buyerWhatsapp: '050-765 4321' } } } } } };
+      return original(qid);
+    });
+    await h.call('createPaidOrder', { orderRef: '3:pi_1', status: 'paid' });
+    expect(h.sent).toHaveLength(1);
+    expect(h.sent[0].text).not.toContain('1lev1');
+    // The number the shop set for buyers, in the form wa.me can open.
+    expect(h.sent[0].text).toContain('https://wa.me/972507654321');
+    resetShippingSchemaVerdict();
+  });
+
+  it('keeps the platform line when the setting cannot be read', async () => {
+    resetShippingSchemaVerdict();
+    const h = harness();
+    await h.call('createPaidOrder', { orderRef: '3:pi_1', status: 'paid' });
+    expect(h.sent).toHaveLength(1);
+    expect(h.sent[0].text).toContain('1lev1');
+    resetShippingSchemaVerdict();
   });
 
   it('does nothing for a retry, a repeated cancel, or when switched off', async () => {
