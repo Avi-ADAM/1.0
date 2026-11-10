@@ -16,6 +16,9 @@
 //   confirmOrderPayment   changed                 → paid
 //   markOrderShipped      changed                 → shipped
 //   setOrderTracking      changed, order has left → tracking
+//   cancelOrder           changed, never paid     → cancelledUnpaid
+//                         changed, after payment  → cancelled
+//   expireOrder           changed (the hourly cron) → expired
 //
 // A retry (`duplicated`, `changed: false`) never mails twice. Nothing here may
 // fail or slow the action that triggered it — the caller runs it after the
@@ -37,7 +40,14 @@ import { readTracking } from '$lib/shop/tracking';
 type Strapi = { execute: (qid: string, vars: any, jwt?: any, fetchFn?: any) => Promise<any> };
 
 /** The actions that can produce a buyer mail. */
-export const ORDER_MAIL_ACTIONS = new Set(['createPaidOrder', 'confirmOrderPayment', 'markOrderShipped', 'setOrderTracking']);
+export const ORDER_MAIL_ACTIONS = new Set([
+  'createPaidOrder',
+  'confirmOrderPayment',
+  'markOrderShipped',
+  'setOrderTracking',
+  'cancelOrder',
+  'expireOrder'
+]);
 
 /**
  * Which mail does this run call for? Pure — decided from the action's result
@@ -58,6 +68,12 @@ export function orderMailKindFor(actionKey: string, result: any): OrderMailKind 
       // Only a parcel that already left: before that, the number waits in the
       // order and rides in the "shipped" mail.
       return r.changed === true && r.tracking && (r.status === 'shipped' || r.status === 'fulfilled') ? 'tracking' : null;
+    case 'cancelOrder':
+      if (r.status !== 'cancelled' || r.alreadyCancelled === true) return null;
+      return r.beforePayment === true ? 'cancelledUnpaid' : 'cancelled';
+    case 'expireOrder':
+      // The cron lapses a waiting order: nothing was ever charged.
+      return r.changed === true ? 'expired' : null;
     default:
       return null;
   }

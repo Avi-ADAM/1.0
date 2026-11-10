@@ -36,8 +36,18 @@ describe('orderMailKindFor', () => {
     expect(orderMailKindFor('setOrderTracking', { changed: false, status: 'shipped', tracking: t })).toBeNull();
   });
 
+  it('a cancel — never-paid and paid orders read differently, a retry says nothing', () => {
+    expect(orderMailKindFor('cancelOrder', { status: 'cancelled', beforePayment: true })).toBe('cancelledUnpaid');
+    expect(orderMailKindFor('cancelOrder', { status: 'cancelled', alreadyCancelled: false })).toBe('cancelled');
+    expect(orderMailKindFor('cancelOrder', { status: 'cancelled', alreadyCancelled: true })).toBeNull();
+  });
+
+  it('a lapsed order', () => {
+    expect(orderMailKindFor('expireOrder', { changed: true, orderRef: 'ABC' })).toBe('expired');
+    expect(orderMailKindFor('expireOrder', { changed: false })).toBeNull();
+  });
+
   it('nothing for other actions', () => {
-    expect(orderMailKindFor('cancelOrder', { status: 'cancelled' })).toBeNull();
     expect(orderMailKindFor('createSale', {})).toBeNull();
   });
 });
@@ -186,10 +196,10 @@ describe('runOrderMail', () => {
     expect(h.execute.mock.calls[0]).toEqual(['orderMailByRef', { pid: '3', ref: '3:pi_1' }, undefined, globalThis.fetch]);
   });
 
-  it('does nothing for a retry, a cancel, or when switched off', async () => {
+  it('does nothing for a retry, a repeated cancel, or when switched off', async () => {
     const h = harness();
     expect(await h.call('createPaidOrder', { orderRef: 'r', status: 'paid', duplicated: true })).toMatchObject({ sent: false, reason: 'not-an-order-mail' });
-    expect(await h.call('cancelOrder', { orderRef: 'r', status: 'cancelled' })).toMatchObject({ sent: false });
+    expect(await h.call('cancelOrder', { orderRef: 'r', status: 'cancelled', alreadyCancelled: true })).toMatchObject({ sent: false });
     const off = harness({ enabled: () => false });
     expect(await off.call('createPaidOrder', { orderRef: 'r', status: 'paid' })).toEqual({ sent: false, reason: 'disabled' });
     expect(h.sent).toHaveLength(0);

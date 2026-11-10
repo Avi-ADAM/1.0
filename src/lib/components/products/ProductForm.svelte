@@ -373,7 +373,13 @@
     { label: $t('shopEditor.form.checkMore'), done: gallery.length > 0 || rows.length > 0, optional: true }
   ]);
   const note = $derived(
-    product ? '' : multiMember ? $t('shopEditor.form.noteVote') : $t('shopEditor.form.noteSolo')
+    product
+      ? ''
+      : multiMember
+        ? isCost
+          ? $t('shopEditor.form.noteVote')
+          : $t('shopEditor.form.noteLive')
+        : $t('shopEditor.form.noteSolo')
   );
 
   // ── what an edit changes ─────────────────────────────────────────────────
@@ -425,7 +431,7 @@
       ? proposing
         ? $t('shopEditor.saveAndPropose')
         : $t('shopEditor.save')
-      : multiMember
+      : multiMember && isCost
         ? $t('shopEditor.form.saveVote')
         : $t('shopEditor.form.save')
   );

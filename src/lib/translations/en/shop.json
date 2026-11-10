@@ -109,6 +109,8 @@
     "lines": {
       "title": "What was ordered",
       "sku": "SKU",
+      "shipping": "Delivery fee",
+      "shippingHint": "The delivery fee is set aside for the cost of delivery. It is not recorded as a sale and is not part of the split.",
       "total": "Total"
     },
     "buyer": {
@@ -417,7 +419,7 @@
     "toShip": "Everything's shipped",
     "toShipBody": "A new order will show up here, and you'll be notified.",
     "products": "No products in this rikma yet",
-    "productsBody": "A new product goes to the partners for approval before it reaches the shop.",
+    "productsBody": "A new product goes live as soon as it is saved; a product with a recipe goes to the partners for approval first.",
     "filtered": "Nothing matches this filter",
     "clearFilter": "Clear filter",
     "sales": "No sales in this range",

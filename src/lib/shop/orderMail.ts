@@ -25,7 +25,10 @@ import type { CurrencyCode } from '$lib/money/currencies.js';
 import { addressLine, addressOf } from './manage';
 import { safeUrl, type Tracking } from './tracking';
 
-export type OrderMailKind = 'received' | 'paid' | 'shipped' | 'tracking';
+export type OrderMailKind = 'received' | 'paid' | 'shipped' | 'tracking' | 'cancelled' | 'cancelledUnpaid' | 'expired';
+
+/** The mails that close an order: no delivery section, nothing left to arrange. */
+export const CLOSING_KINDS: readonly OrderMailKind[] = ['cancelled', 'cancelledUnpaid', 'expired'];
 
 export const MAIL_LOCALES = ['he', 'en', 'ar', 'ru', 'es'] as const;
 export type MailLocale = (typeof MAIL_LOCALES)[number];
@@ -136,13 +139,19 @@ const COPY: Record<MailLocale, Copy> = {
       received: '{shop} — קיבלנו את הזמנה {number}',
       paid: '{shop} — התשלום על הזמנה {number} התקבל',
       shipped: '{shop} — הזמנה {number} יצאה אליך',
-      tracking: '{shop} — מספר מעקב להזמנה {number}'
+      tracking: '{shop} — מספר מעקב להזמנה {number}',
+      cancelled: '{shop} — הזמנה {number} בוטלה',
+      cancelledUnpaid: '{shop} — הזמנה {number} בוטלה',
+      expired: '{shop} — הזמנה {number} פגה'
     },
     intro: {
       received: 'קיבלנו את ההזמנה שלך. התשלום עדיין לא נגבה — נחזור אליך בקרוב כדי לתאם אותו.',
       paid: 'תודה! התשלום התקבל וההזמנה שלך נכנסה לטיפול.',
       shipped: 'ההזמנה שלך נשלחה והיא בדרך אליך.',
-      tracking: 'הוספנו מספר מעקב למשלוח שלך.'
+      tracking: 'הוספנו מספר מעקב למשלוח שלך.',
+      cancelled: 'ההזמנה שלך בוטלה. אם כבר שילמת, נחזור אליך בנוגע להחזר.',
+      cancelledUnpaid: 'ההזמנה שלך בוטלה. לא נגבה ממך תשלום.',
+      expired: 'ההזמנה שלך פגה כי התשלום לא תואם בזמן. לא נגבה ממך תשלום, ואפשר להזמין שוב בכל עת.'
     },
     delay: 'חלק מהפריטים אינם במלאי כרגע. ניצור איתך קשר לגבי מועד האספקה.',
     orderNumber: 'מספר הזמנה',
@@ -177,13 +186,19 @@ const COPY: Record<MailLocale, Copy> = {
       received: '{shop} — we got your order {number}',
       paid: '{shop} — payment received for order {number}',
       shipped: '{shop} — your order {number} is on its way',
-      tracking: '{shop} — tracking number for order {number}'
+      tracking: '{shop} — tracking number for order {number}',
+      cancelled: '{shop} — order {number} was cancelled',
+      cancelledUnpaid: '{shop} — order {number} was cancelled',
+      expired: '{shop} — order {number} expired'
     },
     intro: {
       received: "We've received your order. You haven't been charged yet — we'll be in touch soon to arrange payment.",
       paid: 'Thank you! Your payment was received and your order is being handled.',
       shipped: 'Your order has shipped and is on its way to you.',
-      tracking: "We've added a tracking number to your shipment."
+      tracking: "We've added a tracking number to your shipment.",
+      cancelled: "Your order was cancelled. If you already paid, we'll get back to you about the refund.",
+      cancelledUnpaid: 'Your order was cancelled. You were not charged.',
+      expired: "Your order expired because payment wasn't arranged in time. You were not charged, and you're welcome to order again any time."
     },
     delay: "Some items are out of stock right now. We'll contact you about when they will arrive.",
     orderNumber: 'Order number',
@@ -218,13 +233,19 @@ const COPY: Record<MailLocale, Copy> = {
       received: '{shop} — استلمنا طلبك {number}',
       paid: '{shop} — تم استلام الدفع للطلب {number}',
       shipped: '{shop} — طلبك {number} في الطريق إليك',
-      tracking: '{shop} — رقم تتبّع الطلب {number}'
+      tracking: '{shop} — رقم تتبّع الطلب {number}',
+      cancelled: '{shop} — تم إلغاء الطلب {number}',
+      cancelledUnpaid: '{shop} — تم إلغاء الطلب {number}',
+      expired: '{shop} — انتهت صلاحية الطلب {number}'
     },
     intro: {
       received: 'استلمنا طلبك. لم يتم سحب أي مبلغ بعد — سنتواصل معك قريبًا لترتيب الدفع.',
       paid: 'شكرًا لك! تم استلام الدفع وطلبك قيد المعالجة.',
       shipped: 'تم شحن طلبك وهو في الطريق إليك.',
-      tracking: 'أضفنا رقم تتبّع لشحنتك.'
+      tracking: 'أضفنا رقم تتبّع لشحنتك.',
+      cancelled: 'تم إلغاء طلبك. إذا كنت قد دفعت بالفعل فسنتواصل معك بخصوص الاسترداد.',
+      cancelledUnpaid: 'تم إلغاء طلبك. لم يُخصم منك أي مبلغ.',
+      expired: 'انتهت صلاحية طلبك لأن الدفع لم يُرتَّب في الوقت المناسب. لم يُخصم منك أي مبلغ، ويمكنك الطلب مجددًا في أي وقت.'
     },
     delay: 'بعض المنتجات غير متوفرة في المخزون حاليًا. سنتواصل معك بشأن موعد التوريد.',
     orderNumber: 'رقم الطلب',
@@ -259,13 +280,19 @@ const COPY: Record<MailLocale, Copy> = {
       received: '{shop} — мы получили ваш заказ {number}',
       paid: '{shop} — оплата заказа {number} получена',
       shipped: '{shop} — заказ {number} отправлен',
-      tracking: '{shop} — трек-номер заказа {number}'
+      tracking: '{shop} — трек-номер заказа {number}',
+      cancelled: '{shop} — заказ {number} отменён',
+      cancelledUnpaid: '{shop} — заказ {number} отменён',
+      expired: '{shop} — срок заказа {number} истёк'
     },
     intro: {
       received: 'Мы получили ваш заказ. Оплата пока не списана — скоро свяжемся с вами, чтобы её согласовать.',
       paid: 'Спасибо! Оплата получена, заказ принят в работу.',
       shipped: 'Ваш заказ отправлен и уже в пути.',
-      tracking: 'Мы добавили трек-номер к вашей посылке.'
+      tracking: 'Мы добавили трек-номер к вашей посылке.',
+      cancelled: 'Ваш заказ отменён. Если вы уже заплатили, мы свяжемся с вами по поводу возврата.',
+      cancelledUnpaid: 'Ваш заказ отменён. Деньги с вас не списывались.',
+      expired: 'Срок вашего заказа истёк: оплату не согласовали вовремя. Деньги с вас не списывались, и вы можете оформить заказ снова в любое время.'
     },
     delay: 'Некоторых товаров сейчас нет в наличии. Мы свяжемся с вами по поводу сроков.',
     orderNumber: 'Номер заказа',
@@ -300,13 +327,19 @@ const COPY: Record<MailLocale, Copy> = {
       received: '{shop} — hemos recibido tu pedido {number}',
       paid: '{shop} — pago recibido del pedido {number}',
       shipped: '{shop} — tu pedido {number} va en camino',
-      tracking: '{shop} — número de seguimiento del pedido {number}'
+      tracking: '{shop} — número de seguimiento del pedido {number}',
+      cancelled: '{shop} — pedido {number} cancelado',
+      cancelledUnpaid: '{shop} — pedido {number} cancelado',
+      expired: '{shop} — el pedido {number} venció'
     },
     intro: {
       received: 'Hemos recibido tu pedido. Todavía no se ha cobrado nada: te contactaremos pronto para acordar el pago.',
       paid: '¡Gracias! Hemos recibido el pago y tu pedido ya está en preparación.',
       shipped: 'Tu pedido ha sido enviado y va de camino.',
-      tracking: 'Hemos añadido un número de seguimiento a tu envío.'
+      tracking: 'Hemos añadido un número de seguimiento a tu envío.',
+      cancelled: 'Tu pedido fue cancelado. Si ya pagaste, te contactaremos por el reembolso.',
+      cancelledUnpaid: 'Tu pedido fue cancelado. No se te cobró nada.',
+      expired: 'Tu pedido venció porque el pago no se coordinó a tiempo. No se te cobró nada y puedes volver a pedir cuando quieras.'
     },
     delay: 'Algunos artículos no están en stock ahora mismo. Te contactaremos para informarte de la fecha.',
     orderNumber: 'Número de pedido',
@@ -439,6 +472,8 @@ export function buildOrderMail(input: OrderMailInput): BuiltOrderMail {
   } else {
     delivery.push({ label: c.delivery, value: c.arrange });
   }
+  // A closed order has nothing left to deliver or arrange.
+  if (CLOSING_KINDS.includes(input.kind)) delivery.length = 0;
 
   // A parcel's tracking — only once it has left.
   const t = input.kind === 'shipped' || input.kind === 'tracking' ? input.tracking : null;
@@ -466,8 +501,10 @@ export function buildOrderMail(input: OrderMailInput): BuiltOrderMail {
   out.push('', `${c.orderNumber}: ${number}`, '', `${c.items}:`);
   for (const it of items) out.push(`- ${it.name} × ${it.qty}${it.sum ? ` — ${it.sum}` : ''}`);
   if (total) out.push(`${c.total}: ${total}`);
-  out.push('', `${c.delivery}:`);
-  for (const r of delivery) out.push(`${r.label}: ${r.value}`);
+  if (delivery.length) {
+    out.push('', `${c.delivery}:`);
+    for (const r of delivery) out.push(`${r.label}: ${r.value}`);
+  }
   if (tracking.length) {
     out.push('', `${c.tracking}:`);
     for (const r of tracking) out.push(`${r.label}: ${r.value}`);
@@ -512,8 +549,7 @@ export function buildOrderMail(input: OrderMailInput): BuiltOrderMail {
       ? `<tr><td style="padding:8px 0 0;font-weight:700">${e(c.total)}</td><td style="padding:8px 0 0;text-align:${c.rtl ? 'left' : 'right'};font-weight:700;white-space:nowrap">${e(total)}</td></tr>`
       : '',
     `</table>`,
-    h(c.delivery),
-    table(delivery),
+    delivery.length ? h(c.delivery) + table(delivery) : '',
     tracking.length ? h(c.tracking) + table(tracking) : '',
     `<hr style="border:0;border-top:1px solid #ececec;margin:22px 0 12px">`,
     contact.length ? `<p style="margin:0 0 6px;font-size:13px;color:#6b6b6b">${e(c.contact)}</p>${table(contact)}` : '',

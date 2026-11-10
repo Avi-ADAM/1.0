@@ -77,8 +77,18 @@ describe('buildOrderMail', () => {
     expect(buildOrderMail({ ...base, locale: 'en' }).html).toContain('dir="ltr"');
   });
 
+  it('a closing mail carries no delivery section', () => {
+    for (const kind of ['cancelled', 'cancelledUnpaid', 'expired'] as const) {
+      const m = buildOrderMail({ ...base, kind });
+      expect(m.text).not.toContain('משלוח:');
+      // Only "what was ordered" — no delivery heading.
+      expect(m.html.match(/<h2/g)).toHaveLength(1);
+    }
+    expect(buildOrderMail({ ...base, kind: 'paid' }).html.match(/<h2/g)).toHaveLength(2);
+  });
+
   it.each([...MAIL_LOCALES])('has every moment in %s, with no placeholder left over', (locale) => {
-    for (const kind of ['received', 'paid', 'shipped', 'tracking'] as const) {
+    for (const kind of ['received', 'paid', 'shipped', 'tracking', 'cancelled', 'cancelledUnpaid', 'expired'] as const) {
       const m = buildOrderMail({
         ...base,
         locale,

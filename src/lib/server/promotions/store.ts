@@ -89,7 +89,8 @@ export async function fetchShelf(exec: Exec, projectId: string): Promise<ShelfPr
         .map((v: any) => ({ id: String(v.id), price: num(v.attributes?.price) })),
       published: !['draft', 'voting', 'archived'].includes(a.status_of_voting) && !['archived', 'released'].includes(a.lifecycle),
       // ComposeProduct prices a BOM as cost × (1 + margin%); the floor is that cost.
-      cost: estimated != null && estimated > 0 ? Math.round((estimated / (1 + (num(a.marginPct) ?? 0) / 100)) * 100) / 100 : null
+      // A fixed/quote price is not a BOM: its estimatedPrice just echoes the list price, so it is no floor.
+      cost: a.pricingMode !== 'fixed' && a.pricingMode !== 'quote' && estimated != null && estimated > 0 ? Math.round((estimated / (1 + (num(a.marginPct) ?? 0) / 100)) * 100) / 100 : null
     } satisfies ShelfProduct;
   });
 }

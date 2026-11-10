@@ -231,6 +231,7 @@
     "openItems": "Open items in the rikma: {{count}}",
     "noteVote": "The product goes to the partners for approval, and silence until the rikma's response time ends is consent.",
     "noteSolo": "In a rikma of one, the product is saved at once.",
+    "noteLive": "The product goes live in the shop as soon as you save it. Partners can propose an edit or archive it.",
     "save": "Save product",
     "saveVote": "Send to the rikma",
     "nameMissing": "The product needs a name",

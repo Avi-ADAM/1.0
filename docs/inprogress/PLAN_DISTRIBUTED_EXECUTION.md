@@ -88,6 +88,7 @@
 | **C — עמידות קוונטית** | Node 24, KEM היברידי, `cosig` | KEM היברידי = תנאי לשער S3 (SPEC §13) |
 | **D — Tauri R1** | חתימה במפתח חומרה (כולל ML-DSA) | חסום על מסלול ה-SPA ב-PLAN_TAURI_MOBILE (שלבים 1–2) |
 | **E — R2 ליבת Rust** | crate אחד, WASM + נייטיב | **לא להתחיל.** תנאי כניסה ב-HANDOFF §8.3 |
+| **F — הדרך המהירה ל-S2** | רקמה על ה-Space והשרת כתומך: מה שחסר בין shadow לבין דפים שקוראים מה-projection | ממשיך את A. הכרטיסים ב-[PLAN_S2_SUPPORTED_SERVER](./PLAN_S2_SUPPORTED_SERVER.md) |
 
 ---
 
@@ -113,6 +114,11 @@
 | 13 | B5 | מזכר החלטה: חבילת bump v3 (O-3, O-5, O-6) | S | — | ✔ קריאה; פליטה ⬜ (אותו מתג כמו B4) |
 | 14 | A4 | פיילוט: רקמה אחת על ה-Space, 30 יום / 1,000 אירועים | — | A0b, A1, A3 | ⬜ 🧑 — runbook מוכן: [RUNBOOK_SPACE_PILOT](RUNBOOK_SPACE_PILOT.md) |
 | 15 | A5 | דף ראשון קורא מה-projection (עם fallback) | M | A4 | ⬜ |
+| 16 | F0 | אימות סביבה: vps2 מריץ את קוד 6.11, env, לוגים ל-Axiom | S | — | ⬜ 🧑 |
+| 17 | F1 | סנכרון ה-Space בכל דפי הרקמה (לא רק split) | M | — | ⬜ |
+| 18 | F2 | התמדת היומן הגלוי ב-relay (`spaceId` ב-`consent-event`) | M | — | ⬜ (🧑 deploy 1.0b) |
+| 19 | F3 | חתימה על מה שהשרת מבשיל לבד — באצוות | L | F1 | ⬜ |
+| 20 | F6 | היפוך הכתיבה + אכיפת חתימות | L+ | A5; תכנון מאושר | ⬜ 🧑 לא להתחיל |
 | — | D1 | Tauri R1 | L | PLAN_TAURI_MOBILE שלבים 1–2 | ⬜ חסום |
 | — | E1 | R2 ליבת Rust | L+ | שער S3 + HANDOFF §8.3 | ⬜ לא להתחיל |
 
@@ -785,3 +791,4 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 - 2026-11-06 · B5 · מזכר bump v3 בכרטיס: `v:2` לאירוע (O-6 לפי אירוע), dedupe JSON אחיד לכל הגרסאות (O-5), `STATE_ROOT_VERSION 3` בלי `eventId` (O-3), אותו מתג כמו פליטת `deviceId` · ממתין לאישור, בלי מימוש
 - 2026-11-06 · B5 מימוש (קריאה) · `v:2` (what boolean, roots ב-v3), state root v3 בלי `eventId` של הצבעות, dedupe עם escape (במקום JSON — המפתחות קפואים ב-`events.json`), מתג פליטה אחד כבוי ב-`emitFormat.ts` · `format-v2-mixed` + `shapeRejects`, תוספת בלבד · +12 ב-`formatV2.test.ts`, +4 ב-vectors; ‏636 בשכבה, check ‏1218, check:proxy ירוק · O-3/O-5/O-6 ✔ · הבא: להדליק את המתג אחרי deploy + חלון (B4+B5 יחד)
 - 2026-11-06 · C0 (חלק הסוכן) + A4 runbook · `pqCapabilities.ts` (ניסיון generateKey, memo) + טסט שמדלג ב-22; ה-`Dockerfile` נשאר על 22 בכוונה (deploy נפרד). `RUNBOOK_SPACE_PILOT.md`: env בשני המקומות (Vercel ל-load, VPS ל-`deviceCosign`), genesis, דוח, אי-התאמות צפויות, כיבוי · הבא: 🧑 Node 24 מקומית → C2/C1; 🧑 בחירת רקמה ל-A4
+- 2026-11-10 · F (תכנון) · נפתח מסלול F ב-[PLAN_S2_SUPPORTED_SERVER](./PLAN_S2_SUPPORTED_SERVER.md): F0–F6, הדרך המהירה ל-S2. F4 = A4 ו-F5 = A5 (אותן משימות, לא שורות חדשות). **ממצא**: ב-Axiom 10 דגימות `[space-shadow-telemetry]`, כולן מ-30.10 — ה-Space מסתנכרן רק בדף split ואיש לא נכנס, ולכן F1 קודם לפיילוט. **תיקון**: ה-`Dockerfile` כבר על `node:24-alpine` (כרטיס C0 מתאר 22); לא נבדק אם vps2 נבנה ממנו · מסמכים בלבד · לא בוצע commit · הבא: F1 (ו-F0 🧑)

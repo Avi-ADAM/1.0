@@ -16,6 +16,7 @@ import type { RequestHandler } from './$types';
 import { ordersSchemaLive, strapiRun } from '$lib/server/apiPublic/catalog.js';
 import { expireArrangedOrders } from '$lib/server/shop/arrangedExpiry.js';
 import { onOrderChanged } from '$lib/server/webhooks/orderEvents.js';
+import { onOrderMail } from '$lib/server/shop/orderMailHook.js';
 import { strapiClient } from '$lib/server/actions/index.js';
 
 export const GET: RequestHandler = async ({ url, fetch }) => {
@@ -30,15 +31,20 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
   try {
     const report = await expireArrangedOrders(run);
     await Promise.all(
-      report.lapsed.map((o) =>
-        onOrderChanged({
+      report.lapsed.map((o) => {
+        const event = {
           actionKey: 'expireOrder',
           params: { projectId: o.projectId },
           result: { changed: true, orderRef: o.ref },
           context: { userId: '', jwt: undefined, lang: 'he', fetch } as any,
           strapi: strapiClient as any
-        }).catch((e) => console.warn('[cron/orders] webhook failed', o.ref, e))
-      )
+        };
+        return Promise.all([
+          onOrderChanged(event).catch((e) => console.warn('[cron/orders] webhook failed', o.ref, e)),
+          // The buyer hears that the order lapsed (never throws; a failure is a log line).
+          onOrderMail(event).catch((e) => console.warn('[cron/orders] mail failed', o.ref, e))
+        ]);
+      })
     );
     console.log(`[cron/orders] lapsed ${report.lapsed.length}, skipped ${report.skipped}, errors ${report.errors.length}`);
     return json(report);

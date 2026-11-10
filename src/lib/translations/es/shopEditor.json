@@ -231,6 +231,7 @@
     "openItems": "Elementos abiertos en la rikma: {{count}}",
     "noteVote": "El producto va a las socias y socios para su aprobación, y el silencio hasta que termina el tiempo de respuesta de la rikma es consentimiento.",
     "noteSolo": "En una rikma de una sola persona, el producto se guarda al momento.",
+    "noteLive": "El producto sale a la tienda en cuanto lo guardas. Las socias y socios pueden proponer editarlo o archivarlo.",
     "save": "Guardar producto",
     "saveVote": "Enviar a la rikma",
     "nameMissing": "El producto necesita un nombre",

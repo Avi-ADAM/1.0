@@ -445,14 +445,15 @@ export class ActionService {
           });
       }
 
-      // Step 5c': the buyer's mail (received / paid / shipped / tracking) —
+      // Step 5c': the buyer's mail (received / paid / shipped / tracking / cancelled) —
       // $lib/server/shop/orderMail. Same fire-and-forget rule: a mail that does
       // not go out is a log line, never a failed order.
       if (
         actionKey === 'createPaidOrder' ||
         actionKey === 'confirmOrderPayment' ||
         actionKey === 'markOrderShipped' ||
-        actionKey === 'setOrderTracking'
+        actionKey === 'setOrderTracking' ||
+        actionKey === 'cancelOrder'
       ) {
         import('../shop/orderMailHook.js')
           .then(({ onOrderMail }) =>

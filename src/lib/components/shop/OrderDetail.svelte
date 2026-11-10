@@ -27,6 +27,14 @@
   let address = $derived(addressLine(order.delivery.address));
   let extras = $derived(addressExtras(order.delivery.address, (k, v) => $t(k, v)));
   let ship = $derived(order.shipping);
+  // What the buyer paid beyond the lines. An order from before the shipping
+  // record still carries the fee in its total, so the gap is the fallback.
+  let shipFee = $derived.by(() => {
+    if (ship?.fee != null) return ship.fee;
+    if (order.total == null || order.delivery.preference !== 'delivery') return 0;
+    const gap = Math.round((order.total - order.lines.reduce((s, l) => s + (l.lineTotal ?? 0), 0)) * 100) / 100;
+    return gap > 0 ? gap : 0;
+  });
   // The note without the tracking line — that has a place of its own, beside the address.
   let noteText = $derived(withTracking(order.note, null));
   let shipEta = $derived(
@@ -164,10 +172,19 @@
         </li>
       {/each}
     </ul>
+    {#if shipFee > 0}
+      <div class="od-fee">
+        <span>{$t('shop.order.lines.shipping')}</span>
+        <span class="sh-num"><bdi>{money(shipFee)}</bdi></span>
+      </div>
+    {/if}
     <div class="od-total">
       <span>{$t('shop.order.lines.total')}</span>
       <strong class="sh-num"><bdi>{money(order.total)}</bdi></strong>
     </div>
+    {#if shipFee > 0}
+      <p class="od-small">{$t('shop.order.lines.shippingHint')}</p>
+    {/if}
   </section>
 
   <div class="od-pair">
@@ -391,6 +408,12 @@
     gap: 2px;
     font-size: 15px;
     font-weight: 600;
+  }
+  .od-fee {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--sh-muted);
   }
   .od-total {
     display: flex;

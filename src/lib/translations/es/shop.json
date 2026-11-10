@@ -109,6 +109,8 @@
     "lines": {
       "title": "Qué se pidió",
       "sku": "SKU",
+      "shipping": "Gastos de envío",
+      "shippingHint": "Los gastos de envío se reservan para el coste del envío. No se registran como venta ni entran en el reparto.",
       "total": "Total"
     },
     "buyer": {
@@ -417,7 +419,7 @@
     "toShip": "Todo enviado",
     "toShipBody": "Un pedido nuevo aparecerá aquí y recibirás un aviso.",
     "products": "Aún no hay productos en la rikma",
-    "productsBody": "Un producto nuevo pasa por la aprobación de los socios antes de llegar a la tienda.",
+    "productsBody": "Un producto nuevo sale a la tienda al guardarlo; uno con receta pasa antes por la aprobación de los socios.",
     "filtered": "Nada coincide con este filtro",
     "clearFilter": "Quitar filtro",
     "sales": "No hay ventas en este rango",

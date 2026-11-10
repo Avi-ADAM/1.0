@@ -12,6 +12,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { actionService } from '$lib/server/actions/index.js';
 import { normalizeAdminToken } from '$lib/server/adminToken.js';
 import { checkTelegramWebhook } from '$lib/server/telegramWebhookAuth.js';
+import { trackTelegramCalls } from '$lib/server/telegramPendingCalls.js';
 // createServer is likely not needed when using SvelteKit endpoint for webhook
 // import { createServer } from 'https';
 
@@ -798,6 +799,16 @@ Your Answer (in ${lang}):
 }
 
 // --- Bot Middleware ---
+// Must stay first: the webhook may not answer before the replies have left.
+bot.use(async (ctx, next) => {
+    const settled = trackTelegramCalls(ctx.telegram);
+    try {
+        await next();
+    } finally {
+        await settled();
+    }
+});
+
 bot.use(async (ctx, next) => {
     const chatId = ctx.chat?.id || ctx.callbackQuery?.message?.chat?.id;
     if (chatId) {
@@ -2598,10 +2609,10 @@ export async function POST({ request, fetch: svelteFetch }) {
 }
 
 // --- Fallback Error Handler ---
-bot.catch((err, ctx) => {
+bot.catch(async (err, ctx) => {
     console.error(`Telegraf Error caught for update type ${ctx.updateType}:`, err);
     const lang = ctx?.state?.lang || 'he';
     if (ctx.updateType !== 'callback_query' || !ctx.answered) {
-        ctx.reply(getText('generalError', lang)).catch(e => console.error("Error sending error reply:", e));
+        await ctx.reply(getText('generalError', lang)).catch(e => console.error("Error sending error reply:", e));
     }
 });
