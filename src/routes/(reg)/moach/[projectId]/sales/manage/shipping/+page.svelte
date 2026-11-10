@@ -180,6 +180,7 @@
       city: null,
       address: null,
       hours: null,
+      byAppointment: false,
       note: null,
       productId: null,
       fee: 0
@@ -467,6 +468,13 @@
             <input class="sh-input" bind:value={draft.pickupPoints[pi].note} maxlength="200" />
           </label>
         </div>
+        <label class="sp-switch">
+          <input type="checkbox" bind:checked={draft.pickupPoints[pi].byAppointment} />
+          <span>
+            <strong>{$t('shop.ship.pickupByAppointment')}</strong>
+            <span class="sp-muted">{$t('shop.ship.pickupByAppointmentHint')}</span>
+          </span>
+        </label>
         {#if pr.length}<p class="sp-muted">{$t('shop.ship.pointRules', { names: ruleNames(pr) })}</p>{/if}
         <button type="button" class="sh-btn sh-btn-quiet sh-btn-warn sp-self" onclick={() => (draft.pickupPoints = draft.pickupPoints.filter((x) => x.id !== p.id))}>{$t('shop.ship.remove')}</button>
       </div>

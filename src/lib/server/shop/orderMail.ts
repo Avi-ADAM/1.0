@@ -195,6 +195,7 @@ export function mailOrderFromNode(node: any, shippingRaw: unknown): MailOrder | 
         fee: shipping?.asLine ? null : (shipping?.fee ?? null),
         pickupPointName: shipping?.pickupPointName ?? null,
         pickupAddress: shipping?.pickupAddress ?? null,
+        pickupByAppointment: shipping?.pickupByAppointment === true,
         etaMinDays: shipping?.etaMinDays ?? null,
         etaMaxDays: shipping?.etaMaxDays ?? null
       },

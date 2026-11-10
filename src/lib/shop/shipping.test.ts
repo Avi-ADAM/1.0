@@ -88,6 +88,18 @@ describe('normalizeShippingConfig', () => {
     expect(normalizeShippingConfig(JSON.stringify({ enabled: true })).enabled).toBe(true);
   });
 
+  it('carries a by-appointment pickup point through to the order', () => {
+    const c = normalizeShippingConfig({ pickupPoints: [{ id: 'a', name: 'א', byAppointment: true }, { id: 'b', name: 'ב', byAppointment: 'yes' }, { id: 'c', name: 'ג' }] });
+    expect(c.pickupPoints.map((p) => p.byAppointment)).toEqual([true, false, false]);
+
+    const options = quoteShipping({ ...c, enabled: true }, [], null).options;
+    const record = orderShippingOf(options.find((o) => o.id === 'p:a') ?? null, 'p:a', 0);
+    expect(record.pickupByAppointment).toBe(true);
+    expect(readOrderShipping(JSON.parse(JSON.stringify(record)))?.pickupByAppointment).toBe(true);
+    // An order written before the field existed.
+    expect(readOrderShipping({ optionId: 'p:a', kind: 'pickup' })?.pickupByAppointment).toBe(false);
+  });
+
   it('drops a product row that says nothing', () => {
     const c = normalizeShippingConfig({ products: [{ productId: '5' }, { productId: 'x', surcharge: 3 }] });
     expect(c.products).toEqual([]);

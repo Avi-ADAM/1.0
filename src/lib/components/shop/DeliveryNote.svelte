@@ -36,6 +36,7 @@
     {#if extras}<div>{extras}</div>{/if}
     {#if order.shipping?.kind === 'pickup' && order.shipping.pickupPointName}
       <div>{$t('shop.order.ship.pickupAt', { name: order.shipping.pickupPointName })}</div>
+      {#if order.shipping.pickupByAppointment}<div>{$t('shop.order.ship.byAppointment')}</div>{/if}
     {:else if order.shipping?.name}
       <div>{order.shipping.name}</div>
     {/if}

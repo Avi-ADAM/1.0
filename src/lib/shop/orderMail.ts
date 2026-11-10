@@ -62,6 +62,7 @@ export interface OrderMailDelivery {
   fee: number | null;
   pickupPointName: string | null;
   pickupAddress: string | null;
+  pickupByAppointment: boolean;
   etaMinDays: number | null;
   etaMaxDays: number | null;
 }
@@ -109,6 +110,8 @@ interface Copy {
   delivery: string;
   pickup: string;
   pickupAt: string;
+  pickupWhen: string;
+  byAppointment: string;
   shipTo: string;
   fee: string;
   free: string;
@@ -160,6 +163,8 @@ const COPY: Record<MailLocale, Copy> = {
     delivery: 'משלוח',
     pickup: 'איסוף עצמי',
     pickupAt: 'איסוף מ{name}',
+    pickupWhen: 'מועד האיסוף',
+    byAppointment: 'בתיאום מראש',
     shipTo: 'כתובת למשלוח',
     fee: 'דמי משלוח',
     free: 'ללא עלות',
@@ -207,6 +212,8 @@ const COPY: Record<MailLocale, Copy> = {
     delivery: 'Delivery',
     pickup: 'Pickup',
     pickupAt: 'Pick up at {name}',
+    pickupWhen: 'Pickup time',
+    byAppointment: 'By appointment',
     shipTo: 'Ship to',
     fee: 'Delivery fee',
     free: 'Free',
@@ -254,6 +261,8 @@ const COPY: Record<MailLocale, Copy> = {
     delivery: 'التوصيل',
     pickup: 'استلام شخصي',
     pickupAt: 'الاستلام من {name}',
+    pickupWhen: 'موعد الاستلام',
+    byAppointment: 'بتنسيق مسبق',
     shipTo: 'عنوان التوصيل',
     fee: 'رسوم التوصيل',
     free: 'مجانًا',
@@ -301,6 +310,8 @@ const COPY: Record<MailLocale, Copy> = {
     delivery: 'Доставка',
     pickup: 'Самовывоз',
     pickupAt: 'Самовывоз: {name}',
+    pickupWhen: 'Время самовывоза',
+    byAppointment: 'По предварительной договорённости',
     shipTo: 'Адрес доставки',
     fee: 'Стоимость доставки',
     free: 'Бесплатно',
@@ -348,6 +359,8 @@ const COPY: Record<MailLocale, Copy> = {
     delivery: 'Entrega',
     pickup: 'Recogida',
     pickupAt: 'Recogida en {name}',
+    pickupWhen: 'Horario de recogida',
+    byAppointment: 'Con cita previa',
     shipTo: 'Enviar a',
     fee: 'Gastos de envío',
     free: 'Gratis',
@@ -461,6 +474,7 @@ export function buildOrderMail(input: OrderMailInput): BuiltOrderMail {
       value: d.pickupPointName ? fill(c.pickupAt, { name: oneLine(d.pickupPointName) }) : c.pickup
     });
     if (d.pickupAddress) delivery.push({ label: c.shipTo, value: oneLine(d.pickupAddress) });
+    if (d.pickupByAppointment) delivery.push({ label: c.pickupWhen, value: c.byAppointment });
   } else if (d.preference === 'delivery') {
     if (d.addressLine) delivery.push({ label: c.shipTo, value: oneLine(d.addressLine) });
     if (d.method) delivery.push({ label: c.delivery, value: oneLine(d.method) });

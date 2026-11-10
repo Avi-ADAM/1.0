@@ -231,6 +231,7 @@
           {#if ship.kind === 'pickup' && ship.pickupPointName}
             <span>{$t('shop.order.ship.pickupAt', { name: ship.pickupPointName })}</span>
             {#if ship.pickupAddress}<span class="od-small">{ship.pickupAddress}</span>{/if}
+            {#if ship.pickupByAppointment}<span class="od-small">{$t('shop.order.ship.byAppointment')}</span>{/if}
           {:else if ship.name}
             <span><bdi>{ship.name}</bdi>{#if ship.zoneName} · <span class="od-small">{$t('shop.order.ship.zone', { name: ship.zoneName })}</span>{/if}</span>
           {/if}

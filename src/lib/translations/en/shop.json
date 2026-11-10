@@ -156,6 +156,7 @@
     "whatsapp": "WhatsApp",
     "whatsappText": "Hi, about order {{number}} you placed with us — we'd like to arrange the payment with you.",
     "ship": {
+      "byAppointment": "By appointment",
       "pickupAt": "Pickup at {{name}}",
       "zone": "Zone {{name}}",
       "fee": "Delivery {{amount}}",
@@ -763,6 +764,8 @@
     "methodRules": "Handled by: {{names}}",
     "pointRules": "Prepares the pickups here: {{names}}",
     "methodProduct": "Product to record the delivery fee",
+    "pickupByAppointment": "Pickup by appointment",
+    "pickupByAppointmentHint": "The buyer will see that a time has to be arranged first. You can leave the hours empty.",
     "pickupProduct": "Product to record the pickup fee",
     "noProduct": "No product — keep the fee separate",
     "productLineHint": "For a positive fee, it is recorded as a sale of this product. The shipping calculation sets the price, not the catalog price. This product is not shown in your shop."

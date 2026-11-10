@@ -86,6 +86,8 @@ export interface PickupPoint {
   address: string | null;
   /** Free text — "א׳–ה׳ 10:00–18:00". */
   hours: string | null;
+  /** The buyer has to arrange a time first; there are no open hours to just turn up in. */
+  byAppointment: boolean;
   note: string | null;
   /** Rikma product that receives the charged pickup fee as an order line. */
   productId: string | null;
@@ -230,6 +232,7 @@ function pointOf(raw: any, i: number): PickupPoint {
     city: str(raw?.city, 80),
     address: str(raw?.address, 160),
     hours: str(raw?.hours, 160),
+    byAppointment: raw?.byAppointment === true,
     note: str(raw?.note, 200),
     productId: /^\d{1,12}$/.test(String(raw?.productId ?? '')) ? String(raw.productId) : null,
     fee: money(raw?.fee)
@@ -637,6 +640,7 @@ export interface OrderShipping {
   pickupPointId: string | null;
   pickupPointName: string | null;
   pickupAddress: string | null;
+  pickupByAppointment: boolean;
   /** What the storefront charged for delivery. */
   fee: number | null;
   /** What 1lev1 prices the same option at now — differs ⇒ the order's note says so. */
@@ -660,6 +664,7 @@ export function orderShippingOf(option: ShippingOption | null, optionId: string,
     pickupAddress: option?.pickupPoint
       ? [option.pickupPoint.address, option.pickupPoint.city].filter(Boolean).join(', ') || null
       : null,
+    pickupByAppointment: option?.pickupPoint?.byAppointment === true,
     fee,
     quotedFee: option ? option.fee : null,
     etaMinDays: option?.etaMinDays ?? null,
@@ -686,6 +691,7 @@ export function readOrderShipping(raw: unknown): OrderShipping | null {
     pickupPointId: str(v.pickupPointId, 40),
     pickupPointName: str(v.pickupPointName, 80),
     pickupAddress: str(v.pickupAddress, 200),
+    pickupByAppointment: v.pickupByAppointment === true,
     fee: optMoney(v.fee),
     quotedFee: optMoney(v.quotedFee),
     etaMinDays: optInt(v.etaMinDays, 90),

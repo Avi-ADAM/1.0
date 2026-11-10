@@ -29,6 +29,7 @@ const base: OrderMailInput = {
     fee: 20,
     pickupPointName: null,
     pickupAddress: null,
+    pickupByAppointment: false,
     etaMinDays: 2,
     etaMaxDays: 4
   },
@@ -135,6 +136,12 @@ describe('buildOrderMail', () => {
     expect(pickup.text).not.toContain('דמי משלוח');
     expect(buildOrderMail({ ...base, delivery: { ...base.delivery, preference: 'digital' } }).text).toContain('אין משלוח');
     expect(buildOrderMail({ ...base, delivery: { ...base.delivery, preference: 'contact' } }).text).toContain('נתאם איתך את המסירה');
+  });
+
+  it('says a pickup point works by appointment, only when it does', () => {
+    const delivery = { ...base.delivery, preference: 'pickup' as const, pickupPointName: 'הסניף' };
+    expect(buildOrderMail({ ...base, delivery: { ...delivery, pickupByAppointment: true } }).text).toContain('בתיאום מראש');
+    expect(buildOrderMail({ ...base, delivery }).text).not.toContain('בתיאום מראש');
   });
 
   it('writes free delivery and a single-day estimate', () => {
