@@ -174,6 +174,20 @@ describe('NotificationOrchestrator — the actor is never notified outside the s
     expect(sent.push).toEqual([]);
   });
 
+  it('a key owner who did not place the order hears about it off the site', async () => {
+    const { orch, sent } = setup();
+    await orch.notify(
+      config({ recipients: { type: 'specificUsers', config: { userIdsParam: 'userIds', notifyActorOffSite: true } } }),
+      { userIds: ['1'] },
+      {},
+      context
+    );
+    expect(sent.socket).toEqual([['1']]);
+    expect(sent.email).toEqual([['1']]);
+    expect(sent.telegram).toEqual([['1']]);
+    expect(sent.push).toEqual([['1']]);
+  });
+
   it('an outcome reaches a member with no app and no bot by email', async () => {
     const { orch, sent } = setup();
     vi.spyOn(orch as any, 'getUserProfile').mockImplementation(async (id: any) =>

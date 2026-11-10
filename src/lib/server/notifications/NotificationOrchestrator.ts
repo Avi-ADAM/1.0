@@ -210,9 +210,10 @@ export class NotificationOrchestrator {
 
       // Nobody is pushed, telegrammed or emailed about what they did
       // themselves, whatever `excludeSender` says — that flag is about the
-      // socket (and also drops the sender's other devices there).
+      // socket (and also drops the sender's other devices there). A call made
+      // through someone's key for a stranger is not their act: `notifyActorOffSite`.
       const externalRecipients = filteredRecipients.filter(
-        u => String(u.id) !== String(context.userId)
+        u => config.recipients.config?.notifyActorOffSite || String(u.id) !== String(context.userId)
       );
       // Who hears it where off the site: email to everyone only when the
       // intent asks for it, otherwise to whoever push/telegram would miss;

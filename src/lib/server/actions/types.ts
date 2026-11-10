@@ -328,6 +328,14 @@ export interface RecipientRuleConfig {
   /** Whether to exclude the action initiator from notifications */
   excludeSender?: boolean;
 
+  /**
+   * The authenticated user did not do this: the call came through their key on
+   * behalf of a stranger (a storefront reporting a buyer's order). They are told
+   * off the site like any other recipient — the rule that nobody is pushed or
+   * emailed about their own act does not apply to something they did not do.
+   */
+  notifyActorOffSite?: boolean;
+
   /** Required skills for skill-based selection */
   skills?: string[];
 

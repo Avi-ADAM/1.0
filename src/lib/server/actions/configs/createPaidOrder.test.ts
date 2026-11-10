@@ -292,6 +292,8 @@ describe('createPaidOrder', () => {
     expect(db.sales[0].variant).toBe('77');
     expect(r.lines.map((l: any) => l.saleId)).toEqual(db.sales.map((s) => s.id));
     expect(notices).toHaveLength(1);
+    // A buyer placed it, so the key's owner is told like everyone else.
+    expect(notices[0].recipients.config.notifyActorOffSite).toBe(true);
   });
 
   it("moves the variant's own stock, and carries the product's from line to line", async () => {
@@ -587,6 +589,7 @@ describe('arranged orders', () => {
     expect(db.sales).toHaveLength(0);
     expect(db.variants.get('77')!.quant).toBe(3);
     expect(notices[0].metadata.type).toBe('arrangedOrder');
+    expect(notices[0].recipients.config.notifyActorOffSite).toBe(true);
   });
 
   it('a retry is the same order, and tells nobody again', async () => {

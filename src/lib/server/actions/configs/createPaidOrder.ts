@@ -53,6 +53,10 @@ import {
  * nothing charged yet: the row and its lines are written in `pendingPayment`
  * with an `expiresAt`, and no holder, no sale, no stock move and no value
  * follow until the member who gets the money runs `confirmOrderPayment`.
+ *
+ * The caller is the key's owner, but a buyer placed the order, so the owner is
+ * told like every other member (`notifyActorOffSite`) — in a rikma of one, they
+ * would otherwise be the only recipient and hear nothing outside the site.
  */
 const handler: ActionExecutionHandler = async (params, context, deps) => {
   const { strapi, notifier } = deps;
@@ -295,7 +299,7 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
       try {
         await notifier.notify(
           {
-            recipients: { type: 'projectMembers', config: { projectIdParam: 'projectId' } },
+            recipients: { type: 'projectMembers', config: { projectIdParam: 'projectId', notifyActorOffSite: true } },
             templates: {
               title: { he: '📞 הזמנה מהאתר — לתאם תשלום', en: '📞 Order from your site — arrange the payment' },
               body: {
@@ -406,7 +410,7 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
         : '';
       await notifier.notify(
         {
-          recipients: { type: 'projectMembers', config: { projectIdParam: 'projectId' } },
+          recipients: { type: 'projectMembers', config: { projectIdParam: 'projectId', notifyActorOffSite: true } },
           templates: {
             title: oversold
               ? { he: '🛒 הזמנה מהאתר — חסר במלאי', en: '🛒 Order from your site — short on stock' }
