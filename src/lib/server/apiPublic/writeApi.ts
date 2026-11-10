@@ -236,6 +236,16 @@ const actionContext = (
   fetch: fetchFn
 });
 
+/**
+ * An order or a refund the storefront's server reported: the key's owner is
+ * who it is recorded for, not who did it (`ActionContext.via`), so she is
+ * told about it like any other member.
+ */
+const shopKeyContext = (userId: string, fetchFn?: typeof fetch): ActionContext => ({
+  ...actionContext(userId, fetchFn),
+  via: 'apiKey'
+});
+
 /** `VALIDATION_FAILED`/`UNAUTHORIZED`/`NOT_FOUND` → the status the endpoints used. */
 function statusOfActionError(code: string | undefined): number {
   return code === 'VALIDATION_FAILED'
@@ -764,7 +774,7 @@ export async function handleOrderPost(args: WriteArgs): Promise<Response> {
   const result = await actionService.executeAction(
     'createPaidOrder',
     { projectId, order: payload },
-    actionContext(String(key.user.id), fetch)
+    shopKeyContext(String(key.user.id), fetch)
   );
   touchLastUsed(key.keyId, fetch);
 
@@ -904,7 +914,7 @@ export async function handleOrderCancel(args: {
   const result = await actionService.executeAction(
     'cancelOrder',
     params,
-    actionContext(String(key.user.id), fetch)
+    shopKeyContext(String(key.user.id), fetch)
   );
   touchLastUsed(key.keyId, fetch);
 

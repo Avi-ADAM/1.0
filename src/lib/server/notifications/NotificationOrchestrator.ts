@@ -211,9 +211,12 @@ export class NotificationOrchestrator {
       // Nobody is pushed, telegrammed or emailed about what they did
       // themselves, whatever `excludeSender` says — that flag is about the
       // socket (and also drops the sender's other devices there).
-      const externalRecipients = filteredRecipients.filter(
-        u => String(u.id) !== String(context.userId)
-      );
+      // A shop's server reporting with a key (`context.via === 'apiKey'`) is
+      // not its owner acting: a rikma of one must still hear about its orders.
+      const externalRecipients =
+        context.via === 'apiKey'
+          ? filteredRecipients
+          : filteredRecipients.filter(u => String(u.id) !== String(context.userId));
       // Who hears it where off the site: email to everyone only when the
       // intent asks for it, otherwise to whoever push/telegram would miss;
       // a `review` reaches each person on exactly one channel.

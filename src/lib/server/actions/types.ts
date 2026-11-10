@@ -454,6 +454,16 @@ export interface ActionContext {
    * no details (PLAN_OFFSITE_CLIENT) — it widens nothing but that one check.
    */
   intake?: 'publicProduct' | 'offsiteDeal';
+
+  /**
+   * Set only by the public write API for what a storefront's **server**
+   * reports with a key (an order it charged, a refund). `userId` is then the
+   * key's owner, but she did not do it — her shop did, while she may be
+   * asleep. So the notification rule "nobody is told off the site about what
+   * they did themselves" does not apply to her: a rikma of one still hears
+   * about its own shop's orders (NotificationOrchestrator).
+   */
+  via?: 'apiKey';
 }
 
 /**
