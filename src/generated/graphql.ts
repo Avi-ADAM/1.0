@@ -13286,6 +13286,7 @@ export type OpenMission = {
   archive_decisions?: Maybe<DecisionRelationResponseCollection>;
   archived: Scalars['Boolean']['output'];
   asks?: Maybe<AskRelationResponseCollection>;
+  backfill?: Maybe<Scalars['JSON']['output']>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   dates?: Maybe<Scalars['DateTime']['output']>;
   declined?: Maybe<UsersPermissionsUserEntityResponse>;
@@ -13507,6 +13508,7 @@ export type OpenMissionFiltersInput = {
   archive_decisions?: InputMaybe<DecisionFiltersInput>;
   archived?: InputMaybe<BooleanFilterInput>;
   asks?: InputMaybe<AskFiltersInput>;
+  backfill?: InputMaybe<JsonFilterInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
   dates?: InputMaybe<DateTimeFilterInput>;
   declined?: InputMaybe<UsersPermissionsUserFiltersInput>;
@@ -13573,6 +13575,7 @@ export type OpenMissionInput = {
   archive_decisions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   archived?: InputMaybe<Scalars['Boolean']['input']>;
   asks?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  backfill?: InputMaybe<Scalars['JSON']['input']>;
   dates?: InputMaybe<Scalars['DateTime']['input']>;
   declined?: InputMaybe<Scalars['ID']['input']>;
   descrip?: InputMaybe<Scalars['String']['input']>;

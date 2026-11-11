@@ -25,6 +25,12 @@
   import { quintOut } from 'svelte/easing';
   import { executeAction } from '$lib/client/actionClient';
   import Button from '$lib/celim/ui/button.svelte';
+  import { MAX_BACKFILL_CYCLES } from '$lib/recurring/backfill';
+  import {
+    MAX_HOURS_IN_MONTH,
+    missionBackfillBook,
+    missionPastMonths
+  } from '$lib/recurring/missionBackfill';
   // AI suggest / improve / translate
   let aiSuggesting = $state(false);
   let aiSuggestResult = $state(null); // { extraction, matchResults, similarMissions }
@@ -811,6 +817,9 @@
           : undefined,
         dateStart,
         dateEnd,
+        backfill: backfillOn
+          ? backfillRows.map((r) => ({ key: r.key, amount: Number(r.hours) || 0 }))
+          : undefined,
         isOnline: element.location?.location_mode === 'online',
         lat: normalizeLocationNumber(element.location?.lat),
         lng: normalizeLocationNumber(element.location?.lng),
@@ -833,6 +842,7 @@
       if (result.success) {
         // The mission stands even if its plan could not be saved — say so.
         if (result.data?.shiftPlanError) toast.warning($trans('shifts.form.planNotSaved'));
+        if (result.data?.backfillNotBooked) toast.warning($trans('mission.form2.backfill.notBooked'));
         handleSuccess(result.data);
       } else {
         loading = false;
@@ -1043,6 +1053,65 @@
   /** The rikma-only parts (headcount, stipend, equity, assignment, shifts). */
   const inProject = $derived(!!projectId && !specMode && !publishMode);
   const showHeadcount = $derived(inProject && miData[0].myM !== true);
+
+  // ── Past months of a recurring mission ($lib/recurring/missionBackfill) ─────
+  // Only here, at creation, and only for a mission with a named member: the
+  // creator, or another member who must agree explicitly. The rikma signs the
+  // table together with the mission, in one vote.
+  const pastMonths = $derived(
+    inProject && miData[0].iskvua && miData[0].date
+      ? missionPastMonths(moment(miData[0].date, 'HH:mm DD/MM/YYYY').toISOString())
+      : []
+  );
+  const backfillTooLong = $derived(pastMonths.length > MAX_BACKFILL_CYCLES);
+  const myId = $derived(String(page.data?.uid ?? ''));
+  const hasTaker = $derived(
+    miData[0].myM === true && (userslength > 1 ? Number(miData[0].rishon) > 0 : true)
+  );
+  const takerIsMe = $derived(userslength <= 1 || String(miData[0].rishon) === myId);
+  let wantBackfill = $state(false);
+  /** Hours the creator typed, by `YYYY-MM`; an untouched month reads the monthly plan. */
+  /** @type {Record<string, any>} */
+  let backfillHours = $state({});
+  const backfillOn = $derived(wantBackfill && hasTaker && pastMonths.length > 0 && !backfillTooLong);
+  const backfillRows = $derived(
+    pastMonths.slice(0, MAX_BACKFILL_CYCLES).map((w) => ({
+      key: w.key,
+      hours: backfillHours[w.key] ?? (Number(miData[0].nhours) || 0)
+    }))
+  );
+  const backfillBook = $derived(
+    missionBackfillBook(
+      backfillRows.map((r) => ({ amount: Number(r.hours) || 0 })),
+      miData[0].valph
+    )
+  );
+
+  /** The table needs someone it is about: with nobody chosen, that is the creator. */
+  function toggleBackfill() {
+    const next = !(wantBackfill && hasTaker);
+    wantBackfill = next;
+    if (!next || hasTaker) return;
+    if (userslength > 1) {
+      const me = pu.find((u) => String(u.id) === myId);
+      if (!me) {
+        wantBackfill = false;
+        return;
+      }
+      miData[0].rishoni = [me.attributes.username];
+      miData[0].rishon = me.id;
+    } else {
+      miData[0].rishon = 'self';
+    }
+    miData[0].myM = true;
+    inviteNew = false;
+  }
+
+  /** @param {string} key */
+  function backfillLabel(key) {
+    const [y, m] = key.split('-').map(Number);
+    return new Date(y, m - 1, 1).toLocaleDateString($lang || undefined, { month: 'long', year: 'numeric' });
+  }
   const totalValue = $derived(perPersonValue * seats);
   const formulaText = $derived(
     seats > 1
@@ -1690,6 +1759,68 @@
               />
             </div>
           </div>
+
+          <!-- Past months already worked (src/lib/recurring/missionBackfill.ts) -->
+          {#if pastMonths.length > 0}
+            <div class="flex flex-col gap-3 rounded-2xl border border-[#eee2a6] bg-[#fdf9ea] p-3 sm:p-4">
+              <label for="mission-backfill" class="flex min-h-11 cursor-pointer items-center gap-3">
+                <input
+                  id="mission-backfill"
+                  type="checkbox"
+                  checked={wantBackfill && hasTaker}
+                  onchange={toggleBackfill}
+                  class="h-5 w-5 flex-none accent-[#c8155f]"
+                />
+                <span>
+                  <span class="block font-semibold text-[#2a1420]">
+                    {$trans('mission.form2.backfill.toggle', { count: Math.min(pastMonths.length, MAX_BACKFILL_CYCLES) })}
+                  </span>
+                  <span class="block text-sm text-[#6b5560]">{$trans('mission.form2.backfill.hint')}</span>
+                </span>
+              </label>
+
+              {#if wantBackfill && hasTaker && backfillTooLong}
+                <p class="m-0 text-sm font-semibold text-[#a3124e]" role="alert">
+                  {$trans('mission.form2.backfill.tooLong', { count: MAX_BACKFILL_CYCLES })}
+                </p>
+              {:else if backfillOn}
+                <ul class="m-0 grid list-none gap-2 p-0 sm:grid-cols-2">
+                  {#each backfillRows as row (row.key)}
+                    <li class="flex items-center gap-2">
+                      <label for="bf-{row.key}" class="min-w-0 flex-1 text-[15px] text-[#2a1420]">
+                        {backfillLabel(row.key)}
+                      </label>
+                      <input
+                        id="bf-{row.key}"
+                        type="number"
+                        min="0"
+                        max={MAX_HOURS_IN_MONTH}
+                        step="any"
+                        inputmode="decimal"
+                        value={row.hours}
+                        oninput={(e) => (backfillHours[row.key] = e.currentTarget.value)}
+                        class="{inp} max-w-28 tabular-nums"
+                      />
+                    </li>
+                  {/each}
+                </ul>
+                <div class="flex flex-wrap items-center justify-between gap-2 border-t border-[#eee2a6] pt-2">
+                  <span class="text-[15px] text-[#5a4a2a]" dir="auto">
+                    {$trans('mission.form2.backfill.total', { hours: backfillBook.hours })}
+                  </span>
+                  <strong class="text-xl font-extrabold text-[#2a1420]" dir="auto">{moneyText(backfillBook.value)}</strong>
+                </div>
+                <p class="m-0 text-[13px] text-[#6b5560]">
+                  {#if !takerIsMe}
+                    {$trans('mission.form2.backfill.noteMember', { name: miData[0].rishoni?.[0] ?? '' })}
+                  {:else}
+                    {$trans(userslength > 1 ? 'mission.form2.backfill.noteVote' : 'mission.form2.backfill.noteSolo')}
+                  {/if}
+                </p>
+              {/if}
+            </div>
+          {/if}
+
           <div>
             <span class={lbl}>{$trans('mission.form2.location')}</span>
             {#if locationE}

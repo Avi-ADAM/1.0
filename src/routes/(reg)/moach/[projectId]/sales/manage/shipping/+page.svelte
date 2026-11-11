@@ -10,7 +10,7 @@
    * out is a fulfilment rule — linked, not repeated here.
    */
   import { page } from '$app/state';
-  import { untrack } from 'svelte';
+  import { tick, untrack } from 'svelte';
   import { invalidate } from '$app/navigation';
   import { toast } from 'svelte-sonner';
   import { t, locale } from '$lib/translations';
@@ -52,6 +52,14 @@
   let busy = $state(false);
   let openZone = $state<string | null>(null);
   let shownProblems = $state<ConfigProblem[]>([]);
+  let problemsEl = $state<HTMLElement | null>(null);
+
+  // What buyers get right now is the saved switch; the checkbox is only the draft.
+  let live = $derived(setup.config.enabled);
+  const offersSomething = (c: ShippingConfig) => c.zones.some((z) => z.methods.length > 0) || c.pickupPoints.length > 0;
+  let hasOffers = $derived(offersSomething(draft));
+  // Everything is set up and nobody can see it: the one state this page must not stay quiet about.
+  let offWarning = $derived(!live && !draft.enabled && hasOffers);
 
   // The rikma's own currency, never converted: these are the prices being set.
   let moneyFmt = $derived.by(() => {
@@ -238,19 +246,26 @@
     if (problems.length) {
       const first = problems.find((p) => 'zoneId' in p) as { zoneId: string } | undefined;
       if (first) openZone = first.zoneId;
+      await tick();
+      problemsEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
     busy = true;
     try {
       const res = await executeAction('saveShippingConfig', { projectId, config });
       if (res?.success === false) throw new Error(actionErrorText(res, $t('shop.ship.error')));
-      toast.success($t('shop.ship.saved'));
+      if (!config.enabled && offersSomething(config)) toast.warning($t('shop.ship.savedButOff'));
+      else toast.success($t('shop.ship.saved'));
       await invalidate(shopShippingKey(projectId));
     } catch (e) {
       toast.error(e instanceof Error && e.message ? e.message : $t('shop.ship.error'));
     } finally {
       busy = false;
     }
+  }
+  function activate() {
+    draft.enabled = true;
+    void save();
   }
   function discard() {
     draft = JSON.parse(saved);
@@ -272,7 +287,12 @@
     {/if}
   </section>
 
-  <section class="sh-card sp-sec">
+  <!-- is any of this reaching buyers? -->
+  <section class="sh-card sp-sec sp-status" class:sp-status-off={offWarning}>
+    <div class="sp-status-head">
+      <h2 class="sh-section-label">{$t('shop.ship.statusTitle')}</h2>
+      <span class="sh-chip {live ? 'sh-chip-ok' : 'sh-chip-muted'}">{live ? $t('shop.ship.statusOn') : $t('shop.ship.statusOff')}</span>
+    </div>
     <label class="sp-switch">
       <input type="checkbox" bind:checked={draft.enabled} />
       <span>
@@ -280,35 +300,16 @@
         <span class="sp-muted">{draft.enabled ? $t('shop.ship.enabledOn') : $t('shop.ship.enabledOff')}</span>
       </span>
     </label>
-    <div class="sp-grid2">
-      <label class="sh-field">
-        {$t('shop.ship.handling')}
-        <input class="sh-input sh-num" type="number" min="0" max="60" step="1" inputmode="numeric" bind:value={draft.handlingDays} />
-        <span class="sp-muted">{$t('shop.ship.handlingHint')}</span>
-      </label>
-      <label class="sp-switch">
-        <input type="checkbox" bind:checked={draft.contactFallback} />
-        <span>{$t('shop.ship.fallback')}</span>
-      </label>
-    </div>
-  </section>
-
-  <section class="sh-card sp-sec">
-    <label class="sp-switch">
-      <input type="checkbox" bind:checked={draft.hideSentVia} />
-      <span>
-        <strong>{$t('shop.ship.hideSentVia')}</strong>
-        <span class="sp-muted">{$t('shop.ship.hideSentViaHint')}</span>
-      </span>
-    </label>
-    <label class="sh-field">
-      {$t('shop.ship.buyerWhatsapp')}
-      <input class="sh-input" type="tel" dir="ltr" maxlength="200" placeholder="050-1234567" bind:value={draft.buyerWhatsapp} />
-      <span class="sp-muted">{$t('shop.ship.buyerWhatsappHint')}</span>
-      {#if draft.buyerWhatsapp?.trim() && !whatsappLink(draft.buyerWhatsapp)}
-        <span class="sp-warn" role="status">{$t('shop.ship.buyerWhatsappBad')}</span>
-      {/if}
-    </label>
+    {#if draft.enabled !== live}
+      <p class="sp-muted sp-pending" role="status">{$t('shop.ship.statusPending')}</p>
+    {/if}
+    {#if offWarning}
+      <div class="sp-offwarn" role="status">
+        <strong>{$t('shop.ship.offWarnTitle')}</strong>
+        <span>{$t('shop.ship.offWarnBody')}</span>
+        <button type="button" class="sh-btn sh-btn-primary sp-self" disabled={busy} onclick={activate}>{$t('shop.ship.offWarnAction')}</button>
+      </div>
+    {/if}
   </section>
 
   <!-- zones -->
@@ -540,6 +541,44 @@
     {/if}
   </section>
 
+  <!-- dispatch -->
+  <section class="sp-sec">
+    <h2 class="sh-section-label">{$t('shop.ship.secDispatch')}</h2>
+    <div class="sh-card sp-card sp-grid2">
+      <label class="sh-field">
+        {$t('shop.ship.handling')}
+        <input class="sh-input sh-num" type="number" min="0" max="60" step="1" inputmode="numeric" bind:value={draft.handlingDays} />
+        <span class="sp-muted">{$t('shop.ship.handlingHint')}</span>
+      </label>
+      <label class="sp-switch">
+        <input type="checkbox" bind:checked={draft.contactFallback} />
+        <span>{$t('shop.ship.fallback')}</span>
+      </label>
+    </div>
+  </section>
+
+  <!-- what buyers hear from us -->
+  <section class="sp-sec">
+    <h2 class="sh-section-label">{$t('shop.ship.secBuyers')}</h2>
+    <div class="sh-card sp-card">
+      <label class="sp-switch">
+        <input type="checkbox" bind:checked={draft.hideSentVia} />
+        <span>
+          <strong>{$t('shop.ship.hideSentVia')}</strong>
+          <span class="sp-muted">{$t('shop.ship.hideSentViaHint')}</span>
+        </span>
+      </label>
+      <label class="sh-field">
+        {$t('shop.ship.buyerWhatsapp')}
+        <input class="sh-input" type="tel" dir="ltr" maxlength="200" placeholder="+972501234567" bind:value={draft.buyerWhatsapp} />
+        <span class="sp-muted">{$t('shop.ship.buyerWhatsappHint')}</span>
+        {#if draft.buyerWhatsapp?.trim() && !whatsappLink(draft.buyerWhatsapp)}
+          <span class="sp-warn" role="status">{$t('shop.ship.buyerWhatsappBad')}</span>
+        {/if}
+      </label>
+    </div>
+  </section>
+
   <!-- preview -->
   <section class="sh-card sp-sec sp-preview">
     <h2 class="sh-section-label">{$t('shop.ship.preview')}</h2>
@@ -587,7 +626,7 @@
   </section>
 
   {#if shownProblems.length}
-    <section class="sh-card sp-problems" role="alert">
+    <section class="sh-card sp-problems" role="alert" bind:this={problemsEl}>
       <strong>{$t('shop.ship.problems')}</strong>
       <ul>
         {#each shownProblems as p, i (i)}<li>{problemText(p)}</li>{/each}
@@ -596,7 +635,10 @@
   {/if}
 
   <div class="sp-bar" class:sp-bar-dirty={dirty}>
-    <span class="sp-muted">{dirty ? $t('shop.ship.dirty') : $t('shop.ship.clean')}</span>
+    <div class="sp-row sp-bar-state">
+      <span class="sp-muted">{dirty ? $t('shop.ship.dirty') : $t('shop.ship.clean')}</span>
+      {#if !draft.enabled && hasOffers}<span class="sh-chip sh-chip-warn-soft">{$t('shop.ship.barOff')}</span>{/if}
+    </div>
     <div class="sp-row">
       {#if dirty}<button type="button" class="sh-btn sh-btn-quiet" disabled={busy} onclick={discard}>{$t('shop.ship.discard')}</button>{/if}
       <button type="button" class="sh-btn sh-btn-primary" disabled={busy || !dirty} onclick={save}>{$t('shop.ship.save')}</button>
@@ -635,6 +677,43 @@
   }
   .sh-card.sp-sec {
     padding: 14px 16px;
+  }
+  .sp-card {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .sp-card.sp-grid2 {
+    display: grid;
+  }
+  .sp-status-off {
+    border-color: var(--sh-warn-line);
+  }
+  .sp-status-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .sp-pending {
+    margin: 0;
+  }
+  .sp-offwarn {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 12px;
+    border: 1px solid var(--sh-warn-line);
+    border-radius: var(--sh-radius-sm);
+    background: var(--sh-warn-tint);
+    font-size: 14px;
+  }
+  .sp-offwarn button {
+    margin-top: 4px;
+  }
+  .sp-bar-state {
+    align-items: center;
   }
   .sp-head {
     display: flex;

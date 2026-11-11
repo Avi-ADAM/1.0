@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-11-09
+> Last updated: 2026-11-11
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -1960,6 +1960,7 @@ These are the main content types in the Strapi backend.
 | `archive_decisions` | `Maybe<DecisionRelationResponseCollection>` |
 | `archived` | `Scalars['Boolean']['output']` |
 | `asks` | `Maybe<AskRelationResponseCollection>` |
+| `backfill` | `Maybe<Scalars['JSON']['output']>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `dates` | `Maybe<Scalars['DateTime']['output']>` |
 | `declined` | `Maybe<UsersPermissionsUserEntityResponse>` |
@@ -7016,6 +7017,7 @@ Used for creating/updating content.
 | `archive_decisions` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `archived` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `asks` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `backfill` | `InputMaybe<Scalars['JSON']['input']>` |
 | `dates` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `declined` | `InputMaybe<Scalars['ID']['input']>` |
 | `descrip` | `InputMaybe<Scalars['String']['input']>` |
@@ -8921,7 +8923,7 @@ Fields: `and`, `createdAt`, `id`, `lastSeenAt`, `milon`, `mutedProjects`, `not`,
 Fields: `and`, `archiveEffectiveFrom`, `archive_decisions`, `archived`, `askms`, `backfill`, `createdAt`, `cycleSize`, `declinedsps`, `descrip`, `dormancyDays`, `easy`, `entryCurrency`, `entryRate`, `extractedKey`, `haamadapruvs`, `haamadas`, `hm`, `howMeny`, `id`, `isMust`, `isYesod`, `kindOf`, `lifecycle`, `linkto`, `locale`, `localizations`, `location`, `maagad`, `maap`, `mashaabim`, `match_suggestions`, `name`, `nego_mashes`, `not`, `or`, `partofs`, `pmash`, `price`, `project`, `publishedAt`, `ratson`, `ratson_proposal`, `recurring`, `rikmashes`, `source`, `splited`, `spnot`, `sps`, `sqadualed`, `sqadualedf`, `stipend_program`, `timegrama`, `updatedAt`, `users`
 
 #### OpenMissionFiltersInput
-Fields: `acts`, `and`, `archiveEffectiveFrom`, `archive_decisions`, `archived`, `asks`, `createdAt`, `dates`, `declined`, `descrip`, `dormancyDays`, `entryCurrency`, `entryRate`, `extractedKey`, `hatzaas`, `hearotMeyuchadot`, `howMeny`, `id`, `isMust`, `isRishon`, `isYesod`, `isglobal`, `iskvua`, `isshift`, `lifecycle`, `locale`, `localizations`, `location`, `maagad`, `match_suggestions`, `mesimabetahaliches`, `mission`, `name`, `negopendmissions`, `noofhours`, `not`, `or`, `partofs`, `pendm`, `perhour`, `pledges`, `privatlinks`, `project`, `publicklinks`, `publishedAt`, `ratson`, `ratson_proposals`, `rishon`, `rishonves`, `skills`, `source`, `sqadualed`, `stipendCostShare`, `stipendFunder`, `stipendMode`, `stipendRate`, `stipend_pledges`, `tafkidims`, `timegrama`, `updatedAt`, `users`, `usersNotRelevant`, `vallues`, `work_ways`
+Fields: `acts`, `and`, `archiveEffectiveFrom`, `archive_decisions`, `archived`, `asks`, `backfill`, `createdAt`, `dates`, `declined`, `descrip`, `dormancyDays`, `entryCurrency`, `entryRate`, `extractedKey`, `hatzaas`, `hearotMeyuchadot`, `howMeny`, `id`, `isMust`, `isRishon`, `isYesod`, `isglobal`, `iskvua`, `isshift`, `lifecycle`, `locale`, `localizations`, `location`, `maagad`, `match_suggestions`, `mesimabetahaliches`, `mission`, `name`, `negopendmissions`, `noofhours`, `not`, `or`, `partofs`, `pendm`, `perhour`, `pledges`, `privatlinks`, `project`, `publicklinks`, `publishedAt`, `ratson`, `ratson_proposals`, `rishon`, `rishonves`, `skills`, `source`, `sqadualed`, `stipendCostShare`, `stipendFunder`, `stipendMode`, `stipendRate`, `stipend_pledges`, `tafkidims`, `timegrama`, `updatedAt`, `users`, `usersNotRelevant`, `vallues`, `work_ways`
 
 #### OrderFiltersInput
 Fields: `acts`, `and`, `archived`, `buyerEmail`, `buyerName`, `buyerPhone`, `buyer_user`, `createdAt`, `currencyCode`, `deliveryAddress`, `deliveryPreference`, `displayNumber`, `expiresAt`, `externalId`, `fulfilledAt`, `fulfillmentPending`, `holder`, `id`, `leads`, `lines`, `locale`, `not`, `note`, `or`, `oversold`, `paidAt`, `paymentMethod`, `paymentRef`, `project`, `publicTokenHash`, `ref`, `requestedDate`, `sales`, `sheirutpends`, `shippedAt`, `shipping`, `source`, `status`, `stockMoves`, `total`, `updatedAt`
@@ -9876,7 +9878,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 25209 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 25212 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

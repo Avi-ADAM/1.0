@@ -682,6 +682,7 @@
   </div>
 </DialogOverlay>
 <Card
+  {openMid}
   onAgree={() => agree()}
   onNego={toggleNegotiationMode}
   onHover={hoverc}

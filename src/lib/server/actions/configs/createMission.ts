@@ -50,6 +50,13 @@ import { asUser as asShiftUser } from '$lib/server/shifts/exec.js';
 import { createPlan } from '$lib/server/shifts/store.js';
 import { findOrCreateMissionTemplate } from '$lib/server/missions/missionTemplate.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
+import { backfillPayload, readBackfillEntries } from '$lib/recurring/backfill';
+import {
+  missionBackfillBook,
+  missionBackfillCycles,
+  missionBackfillProblem
+} from '$lib/recurring/missionBackfill';
+import { settleMissionBackfill } from '$lib/server/missions/settleMissionBackfill';
 
 interface ChecklistItem {
   shem: string;
@@ -157,6 +164,23 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   if (wantsInvite && userCount > 1 && !inviteEmail) {
     throw new Error('An invite in a rikma that votes needs an email — it is sent when the vote matures');
   }
+
+  // Past months of a recurring mission ($lib/recurring/missionBackfill) — only at
+  // creation, and only for a named member: the creator, or another member who
+  // must then agree explicitly. Checked before anything is written. In a rikma
+  // of one the form sends `'self'` as the assignee.
+  const assignedToMember =
+    userCount > 1 ? members.some((m) => String(m.id) === String(assignedUserId ?? '')) : Boolean(assignedUserId);
+  const backfillProblem = missionBackfillProblem(params.backfill, {
+    iskvua: iskvua === true,
+    isAssigned: assignedToMember,
+    anchor: dateStart
+  });
+  if (backfillProblem) throw new Error(backfillProblem);
+  const backfillCycles =
+    readBackfillEntries(params.backfill).length > 0
+      ? missionBackfillCycles(params.backfill, { anchor: dateStart })
+      : [];
 
   // Context for the case-specific notifications sent at the end of the handler.
   const projectName: string = projAttrs.projectName ?? '';
@@ -288,6 +312,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   let notificationKind: string | null = null;
   let createdAskId: string | null = null;
   let inviteOutcome: MissionInviteOutcome | null = null;
+  let backfillNotBooked = false;
 
   // ── BRANCH 1: Multi-user, open vote → Pendm ──────────────────────────────
   if (userCount > 1 && !assignedUserId) {
@@ -335,6 +360,18 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     createdEntityId = openRes?.data?.createOpenMission?.data?.id;
     if (!createdEntityId) throw new Error('Failed to create OpenMission (branch 2)');
     createdEntityType = 'openMission';
+
+    // The past months go on the request itself, so the rikma signs them together
+    // with the mission, in one vote, and acceptance reads them from there. Before
+    // the Ask: a table that was not saved must not reach a vote without it.
+    if (backfillCycles.length > 0) {
+      await strapi.execute(
+        'setOpenMissionBackfill',
+        { id: createdEntityId, backfill: backfillPayload(backfillCycles) },
+        context.jwt,
+        context.fetch,
+      );
+    }
 
     // Create Ask for the assigned person
     const askRes = await strapi.execute(
@@ -430,6 +467,29 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     createdEntityId = mbRes?.data?.createMesimabetahalich?.data?.id;
     if (!createdEntityId) throw new Error('Failed to create Mesimabetahalich');
     createdEntityType = 'mesimabetahalich';
+
+    // A solo creator is the whole quorum, so the months are booked now. The
+    // mission stands either way; report it instead of inviting a second one.
+    if (backfillCycles.length > 0) {
+      try {
+        await settleMissionBackfill(
+          (qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch),
+          {
+            missionId: String(createdEntityId),
+            projectId: String(projectId),
+            templateId: String(missionId),
+            name: missionName,
+            userId: String(userId),
+            rate: valph,
+            plannedHours: nhours,
+            cycles: backfillCycles,
+          },
+        );
+      } catch (e) {
+        backfillNotBooked = true;
+        console.error('[createMission] past months not booked:', e);
+      }
+    }
   }
 
   // 3. Attach to process (if processId provided)
@@ -566,6 +626,12 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
       const url = voteUrl(projectId, 'ask', createdAskId);
       const assigneeName = memberName(assignedUserId);
       const selfAssigned = String(assignedUserId) === String(userId);
+      // Everyone is told before they vote: approving the mission books these hours.
+      const pastHours = missionBackfillBook(backfillCycles, valph).hours;
+      const pastNote = {
+        he: backfillCycles.length ? ` ההצעה כוללת גם ${backfillCycles.length} חודשים קודמים, ${pastHours} שעות, שיירשמו עם אישור המשימה.` : '',
+        en: backfillCycles.length ? ` The proposal also includes ${backfillCycles.length} past months, ${pastHours} hours, booked when the mission is approved.` : '',
+      };
 
       // 5a. Personal invitation to the assigned member — recruiter style.
       //     Skipped when the creator took the mission themselves (self-proposal):
@@ -580,8 +646,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
                 en: `✨ ${creatorName} thinks you're the one for "${missionName}"`,
               },
               body: {
-                he: `ברקמה "${projectName}" נולדה משימה חדשה - "${missionName}" - ו${creatorName} בחר/ה דווקא בך. שום דבר לא קורה בלי ההסכמה שלך: המשימה תירשם על שמך רק אם תאשר/י אותה. יש לך ${restimeHe} לאשר, לדייק את התנאים בהצעה נגדית או לפתוח שיחה; אם לא תגיב/י עד אז, ההצעה תיפתח לכל החברים והרקמה תחפש מישהו אחר. לחצו כדי לצפות בכל הפרטים ולהצביע.`,
-                en: `A new mission was born in "${projectName}" - "${missionName}" - and ${creatorName} picked you for it. Nothing happens without your consent: the mission is registered under your name only once you approve. You have ${restimeEn} to approve, refine the terms with a counter-offer or open a discussion; if you don't respond in time the offer opens up to everyone and the rikma looks for someone else. Tap to see the full details and vote.`,
+                he: `ברקמה "${projectName}" נולדה משימה חדשה - "${missionName}" - ו${creatorName} בחר/ה דווקא בך.${pastNote.he} שום דבר לא קורה בלי ההסכמה שלך: המשימה תירשם על שמך רק אם תאשר/י אותה. יש לך ${restimeHe} לאשר, לדייק את התנאים בהצעה נגדית או לפתוח שיחה; אם לא תגיב/י עד אז, ההצעה תיפתח לכל החברים והרקמה תחפש מישהו אחר. לחצו כדי לצפות בכל הפרטים ולהצביע.`,
+                en: `A new mission was born in "${projectName}" - "${missionName}" - and ${creatorName} picked you for it.${pastNote.en} Nothing happens without your consent: the mission is registered under your name only once you approve. You have ${restimeEn} to approve, refine the terms with a counter-offer or open a discussion; if you don't respond in time the offer opens up to everyone and the rikma looks for someone else. Tap to see the full details and vote.`,
               },
             },
             intent: 'consent',
@@ -620,8 +686,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
                 en: `${creatorName} offers to take on "${missionName}"`,
               },
               body: {
-                he: `${creatorName} הציע/ה ברקמה "${projectName}" את המשימה "${missionName}" ומציע/ה לבצע אותה בעצמו/ה. במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לדייק את התנאים או לפתוח שיחה - ההצעה האחרונה שעל השולחן מאושרת אוטומטית בתום הזמן. לחצו להצבעה.`,
-                en: `${creatorName} proposed the mission "${missionName}" in "${projectName}" and offers to carry it out themselves. During the ${restimeEn} response window you can approve, refine the terms or open a discussion - the last version on the table is auto-approved when time runs out. Tap to vote.`,
+                he: `${creatorName} הציע/ה ברקמה "${projectName}" את המשימה "${missionName}" ומציע/ה לבצע אותה בעצמו/ה.${pastNote.he} במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לדייק את התנאים או לפתוח שיחה - ההצעה האחרונה שעל השולחן מאושרת אוטומטית בתום הזמן. לחצו להצבעה.`,
+                en: `${creatorName} proposed the mission "${missionName}" in "${projectName}" and offers to carry it out themselves.${pastNote.en} During the ${restimeEn} response window you can approve, refine the terms or open a discussion - the last version on the table is auto-approved when time runs out. Tap to vote.`,
               },
             }
           : {
@@ -630,8 +696,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
                 en: `New mission on its way to ${assigneeName}: "${missionName}"`,
               },
               body: {
-                he: `${creatorName} הציע/ה ברקמה "${projectName}" את המשימה "${missionName}" והועיד/ה אותה ל${assigneeName}. ההצעה ממתינה להסכמתו/ה, וגם אתם מוזמנים להביע עמדה, לדייק או לפתוח שיחה במהלך ${restimeHe} של זמן התגובה. לחצו להצבעה.`,
-                en: `${creatorName} proposed the mission "${missionName}" in "${projectName}" and offered it to ${assigneeName}. It now awaits their consent - and you too can weigh in, refine or open a discussion during the ${restimeEn} response window. Tap to vote.`,
+                he: `${creatorName} הציע/ה ברקמה "${projectName}" את המשימה "${missionName}" והועיד/ה אותה ל${assigneeName}.${pastNote.he} ההצעה ממתינה להסכמתו/ה, וגם אתם מוזמנים להביע עמדה, לדייק או לפתוח שיחה במהלך ${restimeHe} של זמן התגובה. לחצו להצבעה.`,
+                en: `${creatorName} proposed the mission "${missionName}" in "${projectName}" and offered it to ${assigneeName}.${pastNote.en} It now awaits their consent - and you too can weigh in, refine or open a discussion during the ${restimeEn} response window. Tap to vote.`,
               },
             };
         notifier
@@ -673,6 +739,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
       shiftPlanId,
       shiftPlanError,
       invite: inviteOutcome,
+      backfillNotBooked,
     },
     updateStrategy: { type: 'none' },
   };
@@ -726,6 +793,7 @@ export const createMissionConfig: ActionConfig = {
     valph:              { type: 'number',  required: false, description: 'Value per hour' },
     entryCurrency:      ENTRY_CURRENCY_PARAM,
     iskvua:             { type: 'boolean', required: false, description: 'Is recurring mission' },
+    backfill:           { type: 'array',   required: false, description: 'Recurring mission only, at creation only, assigned to a member only (the creator, or another member who must agree explicitly): the hours of each past month, [{ key: "YYYY-MM", amount }]. Signed with the mission and booked on activation — src/lib/recurring/missionBackfill.ts' },
     howMeny:            { type: 'number',  required: false, description: 'How many people the mission needs (default 1). The OpenMission stays open, and other candidacies stay valid, until that many have joined — docs/inprogress/PLAN_SHIFTS.md §2' },
     shiftPlan:          { type: 'object',  required: false, description: 'Staffing plan { pattern, name?, timezone?, cycleDays?, closeOffsetHours?, draftWindowHours?, minRestHours? } — created with the mission; waits for the vote on a proposal. Ignored while SHIFTS=off — docs/inprogress/PLAN_SHIFTS.md §13.6' },
     dateStart:          { type: 'string',  required: false, description: 'Start date ISO string' },

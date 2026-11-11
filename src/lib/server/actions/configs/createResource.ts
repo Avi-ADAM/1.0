@@ -218,16 +218,17 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
   const userId = context.userId as string;
 
   // Past cycles of a recurring expense (src/lib/recurring/backfill.ts) — only at
-  // creation, and only for the creator's own payments.
+  // creation, and only for a named member: the creator, or another member who
+  // must then agree explicitly.
   const rawBackfill = readBackfillEntries(params.backfill);
   if (rawBackfill.length > 0) {
     if (!(recurring && (kindOf === 'monthly' || kindOf === 'yearly'))) {
       throw new Error('Past cycles can only be entered for a recurring monthly or yearly resource');
     }
-    // The table says what *you* paid — a resource someone else will provide
-    // has nobody to have paid it.
-    if (!isAssigned) {
-      throw new Error('Past cycles can only be entered when you provide the resource yourself');
+    // The table says what one named member paid — an open resource that anybody
+    // may yet provide has nobody to have paid it.
+    if (!isAssigned && !assignsOther) {
+      throw new Error('Past cycles can only be entered for a resource assigned to a member of this rikma');
     }
     if (rawBackfill.some((e) => e.amount < 0)) {
       throw new Error('A past cycle cannot have a negative amount');
@@ -363,7 +364,9 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
   const backfillCycles = isRecurring
     ? normalizeBackfill(convertedBackfill, { unit: cycleUnit, anchor: startDate, size: cycleEvery })
     : [];
-  if (backfillCycles.length > 0) resourceData.backfill = backfillPayload(backfillCycles);
+  if (backfillCycles.length > 0) {
+    resourceData.backfill = backfillPayload(backfillCycles, assignsOther ? assigneeId : null);
+  }
 
   const locationInput = buildLocationInput(isOnline, lat, lng, radius, location_hint);
   if (locationInput) resourceData.location = locationInput;
@@ -438,6 +441,11 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
       const restimeHe = restimeLabel(effectiveRestime, 'he');
       const restimeEn = restimeLabel(effectiveRestime, 'en');
       const url = voteUrl(String(projectId), 'askm', String(askmId));
+      // Everyone is told before they vote: approving the resource books these.
+      const pastNote = {
+        he: backfillCycles.length ? ` ההצעה כוללת גם ${backfillCycles.length} מחזורים קודמים ששולמו, שיירשמו עם האישור.` : '',
+        en: backfillCycles.length ? ` The proposal also includes ${backfillCycles.length} past cycles already paid, booked on approval.` : '',
+      };
 
       notifier
         .notify(
@@ -449,8 +457,8 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
                 en: `${creatorName} suggests you bring the resource "${name}"`,
               },
               body: {
-                he: `ברקמה "${projectName}" ${creatorName} הציע/ה את המשאב "${name}" ובחר/ה בך לספק אותו. שום דבר לא נרשם על שמך בלי הסכמתך: בכרטיס בלב בוחרים אחד מהמשאבים שלך או יוצרים חדש, ואז מאשרים - או מדייקים את התנאים בהצעה נגדית או פותחים שיחה. לחצו כדי לצפות בפרטים.`,
-                en: `In "${projectName}", ${creatorName} proposed the resource "${name}" and picked you to provide it. Nothing is registered under your name without your consent: on the card in your heart page you choose one of your resources or create a new one, then approve - or refine the terms with a counter-offer or open a discussion. Tap to see the details.`,
+                he: `ברקמה "${projectName}" ${creatorName} הציע/ה את המשאב "${name}" ובחר/ה בך לספק אותו.${pastNote.he} שום דבר לא נרשם על שמך בלי הסכמתך: בכרטיס בלב בוחרים אחד מהמשאבים שלך או יוצרים חדש, ואז מאשרים - או מדייקים את התנאים בהצעה נגדית או פותחים שיחה. לחצו כדי לצפות בפרטים.`,
+                en: `In "${projectName}", ${creatorName} proposed the resource "${name}" and picked you to provide it.${pastNote.en} Nothing is registered under your name without your consent: on the card in your heart page you choose one of your resources or create a new one, then approve - or refine the terms with a counter-offer or open a discussion. Tap to see the details.`,
               },
             },
             intent: 'consent',
@@ -477,8 +485,8 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
                   en: `New resource on its way to ${assigneeName}: "${name}"`,
                 },
                 body: {
-                  he: `${creatorName} הציע/ה ברקמה "${projectName}" את המשאב "${name}" והועיד/ה אותו ל${assigneeName}. ההצבעה כפולה - גם על המשאב וגם על מי שמביא אותו - והיא ממתינה להסכמה המפורשת של ${assigneeName}. במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לדייק את התנאים או לפתוח שיחה. לחצו להצבעה.`,
-                  en: `${creatorName} proposed the resource "${name}" in "${projectName}" and offered it to ${assigneeName}. The vote is double - on the resource and on who brings it - and it awaits ${assigneeName}'s explicit consent. During the ${restimeEn} response window you can approve, refine the terms or open a discussion. Tap to vote.`,
+                  he: `${creatorName} הציע/ה ברקמה "${projectName}" את המשאב "${name}" והועיד/ה אותו ל${assigneeName}.${pastNote.he} ההצבעה כפולה - גם על המשאב וגם על מי שמביא אותו - והיא ממתינה להסכמה המפורשת של ${assigneeName}. במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לדייק את התנאים או לפתוח שיחה. לחצו להצבעה.`,
+                  en: `${creatorName} proposed the resource "${name}" in "${projectName}" and offered it to ${assigneeName}.${pastNote.en} The vote is double - on the resource and on who brings it - and it awaits ${assigneeName}'s explicit consent. During the ${restimeEn} response window you can approve, refine the terms or open a discussion. Tap to vote.`,
                 },
               },
               intent: 'consent',

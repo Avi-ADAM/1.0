@@ -317,6 +317,16 @@
     "notStored": "The proposal was created, but we couldn't save the invite. You can invite again once the rikma approves."
   },
   "form2": {
+    "backfill": {
+      "toggle": "The work already started - enter {{count}} past months",
+      "hint": "Only now, while creating the mission. Each month is booked at the hours you enter, at the mission's hourly value. If nobody was chosen to do it, it is registered to you, and you can choose another member of the rikma instead.",
+      "tooLong": "You can enter up to {{count}} months. Choose a later start date.",
+      "total": "Total {{hours}} hours",
+      "noteSolo": "The months are booked right away as approved hours.",
+      "noteVote": "The rikma approves the months together with the mission, in one vote.",
+      "notBooked": "The mission was created, but its past months were not booked. Do not create it again - contact us and we will complete them.",
+      "noteMember": "The hours are credited to {{name}} only after their explicit approval, and silence is not consent. The rest of the rikma approves them in the same vote."
+    },
     "title": "New mission",
     "intro": "Four short steps. Anything marked “optional” can stay empty and be filled in later.",
     "rikmaChip": "Rikma: {{name}}",

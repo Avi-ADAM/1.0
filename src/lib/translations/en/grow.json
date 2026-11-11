@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "1💗1 · Grow Together - a living from the land, without going it alone",
-    "description": "An ecological livelihood that starts from the community and reduces risk. Land, seedlings, hands and time - each person contributes their unique part, and together they create a harmonious, circular livelihood based on real demand."
+    "description": "Already growing? Sell your produce directly to customers through the concierge, demand pools and a shop of your own. Not yet? Land, seedlings, hands and time - everyone brings their part, and together you build a living from the land on real demand. And customers get a fresh food box straight from the people who grew it."
   },
   "hero": {
     "eyebrow": "◈ Ecological doing · Connection to the land · Creative community ◈",
@@ -10,17 +10,48 @@
     "h3": "Everyone brings what they have and love - together a livelihood grows",
     "h4": "From the eater back to the soil - one whole, harmonious circle",
     "h5": "Start from the customers. The business is built around the need",
-    "sub": "No initial capital, land purchase or going it alone is required. Everyone brings their share - land, seedlings, working hands, time or a desire to consume - and 1💗1's cooperative model coordinates everything transparently and shares the fruits fairly.",
+    "sub": "Have a farm and produce? Meet customers directly, with no chain of middlemen. Not yet? No starting capital, no buying land, no doing it alone: everyone brings their part - land, seedlings, working hands, time or the wish to buy - and 1💗1's cooperative model coordinates it all transparently and shares the fruits fairly.",
     "ctaPrimary": "Let's grow together",
-    "ctaSecondary": "I want to order a local veggie box"
+    "ctaSecondary": "I want a fresh food box",
+    "h6": "Already growing? Sell directly to the people who eat it",
+    "ctaDirect": "I already have produce - how do I sell directly?"
   },
   "nav": {
+    "direct": "Direct sales",
     "barriers": "The barriers",
     "weave": "The rikma: a living partnership",
     "demand": "Start from the customer",
+    "tools": "Shop & sales",
     "how": "How to start",
     "who": "Who it's for",
     "join": "Join the circle"
+  },
+  "direct": {
+    "eyebrow": "◈ Already growing · Looking for good food ◈",
+    "title": "From the field straight to the home - without building anything from scratch",
+    "p1": "Not every farming story starts with an empty plot and a group still taking shape. Many farmers already grow good produce and sell it through a chain where much of the price stays with people who neither grew it nor picked it. Meanwhile, not far from the field, families looking for truly fresh vegetables and fruit buy whatever is left on the shelf after days of transport and cold storage, with no idea who grew it.",
+    "p2": "1💗1 connects the two sides directly. You do not need to open a rikma, give up your farm's independence or change what you grow: list your produce, mark how far you reach and set your own price. The concierge brings you to people who write that they are looking for exactly this, and a demand pool gathers neighbours from one area for you, so instead of chasing single orders you get one delivery round that is worth picking and driving for.",
+    "p3": "The risk shrinks here too: an offer on a pool only goes ahead if the number of signers you set is reached by the date you set. You know how much to pick before you pick it, and customers know exactly who grew what reaches them.",
+    "farmer_t": "Farmers with produce: three ways to sell directly",
+    "f1_t": "Appear in the concierge",
+    "f1_d": "Add your produce as a fixed-price product with your location and delivery radius. People looking for a box or produce in your area see you and order, and you get notified and arrange it with them directly.",
+    "f2_t": "Make an offer on a demand pool",
+    "f2_d": "The demand map shows how many households in your area are looking for produce. Make a threshold offer: what is in the box, the price, minimum signers, capacity, and a weekly, biweekly or monthly schedule.",
+    "f3_t": "Send a personal offer by link",
+    "f3_d": "For a regular customer, a neighbourhood restaurant or a kindergarten that came to you: write an offer and send a link. Nothing closes until both sides sign the same version.",
+    "farmerMap": "See who is looking in my area",
+    "farmerShop": "Set up a shop for my produce",
+    "customer_t": "Customers: a fresh, high-quality food box, straight from the grower",
+    "c1_t": "Write what you want",
+    "c1_d": "A weekly veggie box for the family, seasonal fruit, vegetables for a kindergarten or a community kitchen. The concierge looks for who in your area can supply it and brings you offers.",
+    "c2_t": "Join your neighbours",
+    "c2_d": "Joining a demand pool is soft and reversible, and only signing an offer commits you. The more households in your area join, the more worthwhile it is for a farmer to come regularly.",
+    "c3_t": "Know who you are buying from",
+    "c3_d": "Talk directly with the grower: what goes in the box, when it was picked, how it reaches you and for how much. No shelf in the middle and no guessing.",
+    "customerWish": "I want a fresh food box",
+    "customerMap": "What is already offered near me",
+    "wishPrefill": "A fresh food box straight from a farmer in my area",
+    "note": "No farmer reaching your area yet? Your demand is what invites one: once enough households gather, the pool becomes visible to suppliers."
   },
   "problem": {
     "title": "The difficulty of founding an agricultural venture alone",
@@ -63,6 +94,25 @@
     "economy_d": "Building a comprehensive subscription system around the community's needs: weekly boxes, complementary products and broad community integration.",
     "note": "You can start simply with basic sales, and expand to a full local economy at the pace that's right for you."
   },
+  "tools": {
+    "eyebrow": "◈ Shop · Sales · API ◈",
+    "title": "Everything you need to sell is already built",
+    "sub": "Whether you are a single farmer or a rikma of partners, you can run a full shop and sales system without building a server or adding a separate admin panel.",
+    "t1_t": "An online shop of your own",
+    "t1_d": "A ready-made template that goes live in one click: catalogue, box sizes as variants, cart and an order tracking page. Buyers do not need to register.",
+    "t2_t": "Payment without a card processor",
+    "t2_d": "Stripe, PayPal, or arranged payment by phone, WhatsApp, Bit or bank transfer. The money goes straight to you and never passes through 1💗1.",
+    "t3_t": "Delivery and pickup",
+    "t3_d": "Delivery zones and rates, pickup points including pickup by appointment, and email updates to the buyer along the way.",
+    "t4_t": "Stock, orders and inquiries",
+    "t4_d": "One screen for stock, orders and customer inquiries, with call and WhatsApp buttons and one-click \"shipped\".",
+    "t5_t": "Coordinated picking, packing and delivery",
+    "t5_d": "Each order can open tasks for whoever agreed to receive them and update your stock of crates and jars. With partners, every sale counts automatically toward the split.",
+    "t6_t": "A friendly API and AI agents",
+    "t6_d": "REST API and signed webhooks to connect an existing site, and MCP tools to manage products, stock and orders in a conversation with Claude or any AI agent.",
+    "link": "Everything about the shop and sales system",
+    "linkHint": "The shop template, payments, automations and API"
+  },
   "how": {
     "title": "Four simple steps to get started",
     "s1_t": "Join and present your resources",
@@ -86,7 +136,9 @@
     "w4_t": "Settlements and local communities",
     "w4_d": "Who aspire to strengthen their economic and social resilience through cooperative, connecting local agriculture.",
     "w5_t": "Conscious consumers",
-    "w5_d": "People who want fresh, local vegetables directly from the field, and to get to know the partners who grew them."
+    "w5_d": "People who want fresh, local vegetables directly from the field, and to get to know the partners who grew them.",
+    "w6_t": "Farmers with existing produce",
+    "w6_d": "Farms already growing that want to sell directly to customers through the concierge, demand pools or their own shop, and keep a larger part of the price."
   },
   "values": {
     "title": "The values that drive us",
@@ -99,9 +151,9 @@
   },
   "cta": {
     "title": "The land is ready, the community is waiting",
-    "sub": "Whether you have land to offer, working hands, professional knowledge - or simply a desire to eat healthy local food - there's a place for you in our circle.",
+    "sub": "Whether you have produce to sell, land to offer, working hands, know-how or simply the wish to eat healthy local food - there is a place for you in our circle.",
     "register": "Let's grow together",
-    "wish": "I want a local box",
+    "wish": "I want a fresh box",
     "login": "Login to existing account"
   }
 }

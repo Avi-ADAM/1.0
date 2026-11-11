@@ -438,16 +438,18 @@ export function websiteLink(raw: string | null | undefined): string | null {
   return safeUrl(v) ?? (/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(v) ? safeUrl(`https://${v}`) : null);
 }
 
-/** The shop's WhatsApp as a link — a `wa.me` link, or just the number (`050…` is an Israeli one). */
+/** The shop's WhatsApp as a link — a `wa.me` link, or the number with its country code (`05X…` alone is an Israeli mobile). */
 export function whatsappLink(raw: string | null | undefined): string | null {
   const v = (raw ?? '').trim();
   if (!v) return null;
   const link = safeUrl(v);
   if (link) return link;
-  const typed = v.replace(/\D/g, '');
-  // wa.me wants the country code; a local 050… there opens a dead chat.
-  const digits = /^0\d{8,9}$/.test(typed) ? `972${typed.slice(1)}` : typed;
-  return digits.length >= 8 && digits.length <= 15 && /^[+\d][\d\s()-]*$/.test(v) ? `https://wa.me/${digits}` : null;
+  const typed = v.replace(/\D/g, '').replace(/^00/, '');
+  // wa.me wants the country code. Only an Israeli mobile can be completed: any
+  // other leading 0 could be another country's (06… is French), and guessing
+  // would send the customer to a stranger, so it gets no link at all.
+  const digits = /^05\d{8}$/.test(typed) ? `972${typed.slice(1)}` : typed;
+  return /^[1-9]\d{7,14}$/.test(digits) && /^[+\d][\d\s()-]*$/.test(v) ? `https://wa.me/${digits}` : null;
 }
 
 function etaText(c: Copy, min: number | null, max: number | null): string | null {

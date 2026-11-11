@@ -263,4 +263,15 @@ describe('links', () => {
     expect(whatsappLink('12')).toBeNull();
     expect(whatsappLink('abc 12345678')).toBeNull();
   });
+  it('whatsappLink keeps any country code', () => {
+    expect(whatsappLink('+972587494431')).toBe('https://wa.me/972587494431');
+    expect(whatsappLink('+1 (415) 555-2671')).toBe('https://wa.me/14155552671');
+    expect(whatsappLink('+44 7911 123456')).toBe('https://wa.me/447911123456');
+    expect(whatsappLink('00972587494431')).toBe('https://wa.me/972587494431');
+  });
+  it('whatsappLink never guesses a country for a local number that is not an Israeli mobile', () => {
+    expect(whatsappLink('06 12 34 56 78')).toBeNull();
+    expect(whatsappLink('07911123456')).toBeNull();
+    expect(whatsappLink('02-1234567')).toBeNull();
+  });
 });

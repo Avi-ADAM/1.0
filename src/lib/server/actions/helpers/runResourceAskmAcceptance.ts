@@ -4,7 +4,7 @@
  */
 
 import { cycleWindowIso, normalizeCycleSize } from '$lib/recurring/recurringPlan.js';
-import { normalizeBackfill } from '$lib/recurring/backfill';
+import { backfillOwner, normalizeBackfill } from '$lib/recurring/backfill';
 import { settleBackfill, votsFromRequest } from '$lib/server/recurring/settleBackfill';
 import { bestEffort } from '$lib/server/resources/bookingStore.js';
 import { openGrantBooking } from '$lib/server/resources/grantBooking.js';
@@ -173,11 +173,12 @@ export async function activateRecurringEngine(
   // (src/lib/recurring/backfill.ts). The rikma signed them with the request, so
   // they settle now with the request's own signatures. Read against the agreed
   // start — a counter that moved it later drops the months before it. They are
-  // a claim about what the proposer paid, so they count only when the proposer
-  // is the one taking the resource on.
-  const proposerId = pm.selfProposalUser?.data?.id;
+  // a claim about what one named member paid, so they count only when that
+  // member is the one taking the resource on: the proposer of a self-proposal,
+  // or the member an OpenMashaabim was offered to.
+  const claimedFor = termsFromPmash ? pm.selfProposalUser?.data?.id : backfillOwner(pm.backfill);
   const pastCycles =
-    termsFromPmash && proposerId && String(proposerId) === String(acceptedUserId)
+    claimedFor && String(claimedFor) === String(acceptedUserId)
       ? normalizeBackfill(pm.backfill, { unit, anchor: pm.sqadualed, size: cycleSize, now })
       : [];
   let settledPast = 0;

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
+  addressExtras,
   addressLine,
   addressOf,
   bannerOf,
@@ -186,6 +187,32 @@ describe('address', () => {
     expect(addressLine(a)).toBe('הרצל 1, נתניה 42500');
     expect(addressOf({})).toBeNull();
     expect(addressOf('x')).toBeNull();
+  });
+});
+
+describe('an address that came through PayPal', () => {
+  const tr = (key: string, vars: Record<string, string>) => `${key.split('.').pop()}=${vars.value}`;
+  const base = { city: 'נתניה', street: 'הרצל 1' };
+
+  it('reads the English second line back into its fields', () => {
+    const a = addressOf({ ...base, notes: 'apt 4, floor 2, entrance 1' });
+    expect(a).toMatchObject({ apartment: '4', floor: '2', entrance: '1', notes: null });
+    expect(addressExtras(a, tr)).toBe('apartment=4 · floor=2 · entrance=1');
+  });
+
+  it('reads a line with only some of the parts', () => {
+    expect(addressOf({ ...base, notes: 'floor 2' })).toMatchObject({ apartment: null, floor: '2', entrance: null, notes: null });
+    expect(addressOf({ ...base, notes: 'apt 4, entrance ב' })).toMatchObject({ apartment: '4', floor: null, entrance: 'ב', notes: null });
+  });
+
+  it('leaves what the buyer wrote alone', () => {
+    for (const notes of ['להשאיר ליד הדלת', 'apt', 'call before the floor 2 delivery']) {
+      expect(addressOf({ ...base, notes })).toMatchObject({ apartment: null, floor: null, entrance: null, notes });
+    }
+  });
+
+  it('keeps real fields over the note', () => {
+    expect(addressOf({ ...base, apartment: '9', notes: 'apt 4' })).toMatchObject({ apartment: '9', notes: 'apt 4' });
   });
 });
 

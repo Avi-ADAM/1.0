@@ -491,7 +491,7 @@
       return;
     }
 
-    if (wantBackfill && isSelfAssigned && backfillTooLong) {
+    if (wantBackfill && hasProvider && backfillTooLong) {
       toast.warning(rc('backfill.tooLong', { count: MAX_BACKFILL_CYCLES }));
       return;
     }
@@ -599,9 +599,9 @@
   let detailsOpen = $state(false);
 
   // ── Past cycles of a recurring expense (src/lib/recurring/backfill.ts) ──────
-  // Only here, at creation, and only for a recurring resource the creator pays
-  // for themselves: the table is a claim about what *they* already paid. The
-  // rikma signs it together with the resource, in one vote.
+  // Only here, at creation, and only for a recurring resource with a named
+  // provider: the creator, or another member who must agree explicitly. The
+  // rikma signs the table together with the resource, in one vote.
   // Self-assigning was solo-only. In a rikma that votes the server has always
   // taken it as a self-proposal: one double vote, on the resource and on the
   // proposer bringing it (pmash + askm), like a self-assigned mission. So it is
@@ -609,6 +609,8 @@
   const canAssignSelf = $derived(!specMode && !publishMode);
   /** Offer it to another member — a rikma with someone else in it. */
   const canAssignMember = $derived(inProject && !isSingleUser && otherMembers.length > 0);
+  const offeredToMember = $derived(canAssignMember && !isSelfAssigned && !!assignMemberId);
+  const hasProvider = $derived(isSelfAssigned || offeredToMember);
   const pastWindows = $derived(
     inProject && isRecurring && startDate
       ? pastCycleWindows(kindOf === 'yearly' ? 'year' : 'month', startDate, cycleSize)
@@ -620,7 +622,7 @@
   /** @type {Record<string, any>} */
   let backfillAmounts = $state({});
   const backfillOn = $derived(
-    wantBackfill && isSelfAssigned && pastWindows.length > 0 && !backfillTooLong
+    wantBackfill && hasProvider && pastWindows.length > 0 && !backfillTooLong
   );
   const backfillRows = $derived(
     pastWindows.slice(0, MAX_BACKFILL_CYCLES).map((w) => ({
@@ -631,9 +633,10 @@
   const backfillSum = $derived(backfillTotal(backfillRows.map((r) => ({ amount: Number(r.amount) || 0 }))));
 
   function toggleBackfill() {
-    const next = !(wantBackfill && isSelfAssigned);
+    const next = !(wantBackfill && hasProvider);
     wantBackfill = next;
-    if (next && !isSelfAssigned) toggleSelfAssign();
+    // The table needs someone it is about: with nobody chosen, that is the creator.
+    if (next && !hasProvider) toggleSelfAssign();
   }
 
   /** @param {string} key */
@@ -1081,7 +1084,7 @@
                 <input
                   id="resource-backfill"
                   type="checkbox"
-                  checked={wantBackfill && isSelfAssigned}
+                  checked={wantBackfill && hasProvider}
                   onchange={toggleBackfill}
                   class="h-5 w-5 flex-none accent-[#c8155f]"
                 />
@@ -1095,7 +1098,7 @@
                 </span>
               </label>
 
-              {#if wantBackfill && isSelfAssigned && backfillTooLong}
+              {#if wantBackfill && hasProvider && backfillTooLong}
                 <p class="m-0 text-sm font-semibold text-[#a3124e]" role="alert">
                   {rc('backfill.tooLong', { count: MAX_BACKFILL_CYCLES })}
                 </p>
@@ -1124,7 +1127,11 @@
                   <strong class="text-xl font-extrabold text-[#2a1420]" dir="auto">{moneyText(backfillSum)}</strong>
                 </div>
                 <p class="m-0 text-[13px] text-[#6b5560]">
-                  {isSingleUser ? rc('backfill.noteSolo') : rc('backfill.noteVote')}
+                  {#if offeredToMember}
+                    {rc('backfill.noteMember', { name: assignMemberName[0] ?? '' })}
+                  {:else}
+                    {isSingleUser ? rc('backfill.noteSolo') : rc('backfill.noteVote')}
+                  {/if}
                 </p>
               {/if}
             </div>

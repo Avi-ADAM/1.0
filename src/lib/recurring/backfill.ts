@@ -15,8 +15,10 @@
  * `backfill: { cycles: [{ key, amount }] }`, where `key` is the cycle's start as
  * `YYYY-MM`.
  *
- * Only the creator's own payments can be backfilled — the past months are a
- * claim about what *they* paid, so the request must be self-assigned.
+ * The past months are a claim about what one named member paid, so the request
+ * must name them: the creator (self-assigned), or another member it is offered
+ * to. For another member the table also records `forUser`, and it counts only
+ * for them, after their explicit yes (silence is never their consent there).
  */
 
 import { cycleWindow, normalizeCycleSize } from './recurringPlan.js';
@@ -127,7 +129,19 @@ export function backfillTotal(cycles: Array<{ amount: number }>): number {
   return +cycles.reduce((s, c) => s + (Number(c.amount) || 0), 0).toFixed(2);
 }
 
-/** What is stored on the request. */
-export function backfillPayload(cycles: Array<{ key: string; amount: number }>): { cycles: BackfillEntry[] } {
-  return { cycles: cycles.map((c) => ({ key: c.key, amount: c.amount })) };
+/** What is stored on the request; `forUser` names the member it is offered to. */
+export function backfillPayload(
+  cycles: Array<{ key: string; amount: number }>,
+  forUser?: string | null
+): { cycles: BackfillEntry[]; forUser?: string } {
+  return {
+    cycles: cycles.map((c) => ({ key: c.key, amount: c.amount })),
+    ...(forUser ? { forUser: String(forUser) } : {})
+  };
+}
+
+/** Who a stored table is about, when the request was offered to another member. */
+export function backfillOwner(raw: unknown): string | null {
+  const id = raw && typeof raw === 'object' ? (raw as any).forUser : null;
+  return id == null || id === '' ? null : String(id);
 }

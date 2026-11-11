@@ -509,13 +509,14 @@
       "assignMember": "Propuesto a {{name}}, a la espera de su aprobación"
     },
     "backfill": {
-      "toggle": "Ya pagué los {{count}} meses anteriores — ingresarlos",
-      "toggleYears": "Ya pagué los {{count}} años anteriores — ingresarlos",
-      "hint": "Solo ahora, al crear el recurso: cada mes empieza con el precio mensual y puedes corregirlo a lo que realmente se pagó. Un mes en 0 no se registra. Esto también te marca como quien aporta el recurso.",
+      "toggle": "Los pagos ya comenzaron - ingresar {{count}} meses pasados",
+      "toggleYears": "Los pagos ya comenzaron - ingresar {{count}} años pasados",
+      "hint": "Solo ahora, al crear el recurso: cada mes comienza con el precio mensual y puedes corregirlo a lo realmente pagado. Un mes en 0 no se registra. Si aún no se eligió quién aporta el recurso, se registrará a tu nombre, y puedes elegir en su lugar a otro miembro de la rikma.",
       "total": "Total pagado hasta hoy",
       "noteVote": "Estos meses son parte de la propuesta: la rikma los aprueba junto con el recurso, en una sola votación. Una vez aprobados, cada mes se registra como tu parte en la rikma, y el mes actual se abre como siempre.",
       "noteSolo": "Cada mes se registra de inmediato como tu parte en la rikma, y el mes actual se abre como siempre.",
-      "tooLong": "Se pueden ingresar hasta {{count}} ciclos anteriores — elige una fecha de inicio posterior."
+      "tooLong": "Se pueden ingresar hasta {{count}} ciclos anteriores — elige una fecha de inicio posterior.",
+      "noteMember": "Los montos se acreditan a {{name}} solo tras su aprobación explícita, y el silencio no es consentimiento. El resto de la rikma los aprueba en la misma votación."
     },
     "selfAssignVoteHint": "Yo aporto este recurso. La votación es doble: la rikma aprueba el recurso y que yo lo aporte",
     "assignMember": "O proponerlo a otro miembro de la rikma",

@@ -7,6 +7,7 @@
   import { onMount } from 'svelte';
   import { lang, langUs, doesLang } from '$lib/stores/lang';
   import { youtubeEmbedSrc, noCaptions } from '$lib/youtube.js';
+  import { WISH_PREFILL_KEY } from '$lib/concierge/wishDraft.js';
 
   const regPath = $derived(
     $locale === 'he'
@@ -19,7 +20,15 @@
   function gotoRegister() {
     goto(regPath);
   }
+  /* Every wish button on this page asks for the same thing, so the composer
+     opens with the basket already written (same hand-over as the homepage's
+     wish field: sessionStorage, read once, never over a draft). */
   function gotoWish() {
+    try {
+      sessionStorage.setItem(WISH_PREFILL_KEY, $t('grow.direct.wishPrefill'));
+    } catch {
+      // storage blocked - the wish page simply opens empty
+    }
     goto('/wish/new');
   }
   function gotoLogin() {
@@ -37,8 +46,30 @@
     $t('grow.hero.h2'),
     $t('grow.hero.h3'),
     $t('grow.hero.h4'),
-    $t('grow.hero.h5')
+    $t('grow.hero.h5'),
+    $t('grow.hero.h6')
   ]);
+
+  /* Below xl the header has room for the sections a visitor comes for; the
+     two that explain the background join it on wide screens. */
+  const NAV = [
+    { id: 'direct', key: 'direct' },
+    { id: 'barriers', key: 'barriers', wide: true },
+    { id: 'weave', key: 'weave', wide: true },
+    { id: 'demand', key: 'demand' },
+    { id: 'tools', key: 'tools' },
+    { id: 'how', key: 'how' },
+    { id: 'who', key: 'who' }
+  ];
+
+  const TOOLS = [
+    { key: 't1', svg: 'M3 9l1-5h16l1 5M3 9a3 3 0 006 0 3 3 0 006 0 3 3 0 006 0M5 12v8h14v-8' },
+    { key: 't2', svg: 'M3 8h18a1 1 0 011 1v9a1 1 0 01-1 1H3a1 1 0 01-1-1V9a1 1 0 011-1zm-1 4h20M6 16h3' },
+    { key: 't3', svg: 'M1 6h13v11H1zM14 10h4l4 4v3h-8zM6 20a2 2 0 100-4 2 2 0 000 4zm12 0a2 2 0 100-4 2 2 0 000 4z' },
+    { key: 't4', svg: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4' },
+    { key: 't5', svg: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
+    { key: 't6', svg: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4' }
+  ];
   let current = $state(0);
   let dir = $derived($locale === 'he' || $locale === 'ar' ? 1 : -1);
   $effect(() => {
@@ -186,33 +217,15 @@
       <span class="font-bold text-emerald-800 text-xl tracking-tight select-none">1💗1</span>
     </a>
     <nav
-      class="hidden md:flex flex-1 items-center justify-center gap-6 text-emerald-800 font-semibold text-sm lg:text-base"
+      class="hidden md:flex flex-1 items-center justify-center gap-4 xl:gap-6 text-emerald-800 font-semibold text-sm lg:text-base"
     >
-      <button
-        type="button"
-        class="hover:text-amber-600 transition-colors relative after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-amber-500 hover:after:w-full after:transition-all"
-        onclick={() => scrollToId('barriers')}>{$t('grow.nav.barriers')}</button
-      >
-      <button
-        type="button"
-        class="hover:text-amber-600 transition-colors relative after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-amber-500 hover:after:w-full after:transition-all"
-        onclick={() => scrollToId('weave')}>{$t('grow.nav.weave')}</button
-      >
-      <button
-        type="button"
-        class="hover:text-amber-600 transition-colors relative after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-amber-500 hover:after:w-full after:transition-all"
-        onclick={() => scrollToId('demand')}>{$t('grow.nav.demand')}</button
-      >
-      <button
-        type="button"
-        class="hover:text-amber-600 transition-colors relative after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-amber-500 hover:after:w-full after:transition-all"
-        onclick={() => scrollToId('how')}>{$t('grow.nav.how')}</button
-      >
-      <button
-        type="button"
-        class="hover:text-amber-600 transition-colors relative after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-amber-500 hover:after:w-full after:transition-all"
-        onclick={() => scrollToId('who')}>{$t('grow.nav.who')}</button
-      >
+      {#each NAV as item (item.id)}
+        <button
+          type="button"
+          class="{item.wide ? 'hidden xl:block' : ''} whitespace-nowrap hover:text-amber-600 transition-colors relative after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-amber-500 hover:after:w-full after:transition-all"
+          onclick={() => scrollToId(item.id)}>{$t(`grow.nav.${item.key}`)}</button
+        >
+      {/each}
     </nav>
     <div class="flex-1 md:flex-none"></div>
     <!-- Desktop lang selector -->
@@ -289,12 +302,127 @@
           {$t('grow.hero.ctaSecondary')}
         </button>
       </div>
+
+      <button
+        type="button"
+        class="mt-6 text-emerald-800 font-semibold text-base sm:text-lg underline decoration-amber-500 decoration-2 underline-offset-4 hover:text-amber-700 transition-colors"
+        onclick={() => scrollToId('direct')}
+      >
+        {$t('grow.hero.ctaDirect')}
+      </button>
     </div>
   </section>
 
   <div
     class="max-w-6xl mx-auto px-4 sm:px-8 flex flex-col gap-24 sm:gap-32 pb-32"
   >
+    <!-- ===== Direct from the farm (מכירה ישירה) =====
+         For the reader who does not need a rikma built around them: a farmer
+         who already has produce, and a household that wants it. -->
+    <section id="direct" class="scroll-mt-24">
+      <div class="text-center mb-10">
+        <div
+          class="inline-block px-4 py-1.5 rounded-full bg-amber-100/70 border border-amber-200/70 text-amber-900 font-medium text-xs sm:text-sm mb-5"
+        >
+          {$t('grow.direct.eyebrow')}
+        </div>
+        <h2 class="text-emerald-900 font-extrabold text-3xl sm:text-4xl">
+          {$t('grow.direct.title')}
+        </h2>
+      </div>
+
+      <div
+        class="max-w-3xl mx-auto flex flex-col gap-5 text-emerald-950/85 text-lg leading-relaxed text-start mb-12"
+      >
+        <p>{$t('grow.direct.p1')}</p>
+        <p>{$t('grow.direct.p2')}</p>
+        <p class="font-semibold text-emerald-900">{$t('grow.direct.p3')}</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {#snippet directRows(keys)}
+          <ol class="flex flex-col gap-5 mb-8">
+            {#each keys as k, i (k)}
+              <li class="flex items-start gap-4">
+                <span
+                  class="shrink-0 w-9 h-9 rounded-xl bg-emerald-700 text-amber-50 font-bold flex items-center justify-center shadow"
+                >
+                  {i + 1}
+                </span>
+                <div class="min-w-0 text-start">
+                  <h4 class="font-bold text-lg text-emerald-900 mb-1">
+                    {$t(`grow.direct.${k}_t`)}
+                  </h4>
+                  <p class="text-emerald-950/80 text-base leading-relaxed">
+                    {$t(`grow.direct.${k}_d`)}
+                  </p>
+                </div>
+              </li>
+            {/each}
+          </ol>
+        {/snippet}
+
+        <!-- Farmers -->
+        <div
+          class="bg-white/85 backdrop-blur-sm border border-emerald-200 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col justify-between"
+        >
+          <div>
+            <h3 class="font-extrabold text-2xl text-emerald-900 mb-6 text-start">
+              {$t('grow.direct.farmer_t')}
+            </h3>
+            {@render directRows(['f1', 'f2', 'f3'])}
+          </div>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <a
+              href="/demand"
+              class="flex-1 text-center bg-emerald-700 text-amber-50 hover:bg-emerald-800 font-bold px-5 py-3.5 rounded-2xl shadow-md transition-colors"
+            >
+              {$t('grow.direct.farmerMap')}
+            </a>
+            <a
+              href="/shop"
+              class="flex-1 text-center bg-white text-emerald-900 border-2 border-emerald-700/25 hover:bg-amber-50 font-bold px-5 py-3.5 rounded-2xl transition-colors"
+            >
+              {$t('grow.direct.farmerShop')}
+            </a>
+          </div>
+        </div>
+
+        <!-- Customers -->
+        <div
+          class="bg-gradient-to-br from-amber-100 to-amber-50 border border-amber-300/60 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col justify-between"
+        >
+          <div>
+            <h3 class="font-extrabold text-2xl text-emerald-900 mb-6 text-start">
+              {$t('grow.direct.customer_t')}
+            </h3>
+            {@render directRows(['c1', 'c2', 'c3'])}
+          </div>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <button
+              type="button"
+              class="flex-1 text-center bg-emerald-700 text-amber-50 hover:bg-emerald-800 font-bold px-5 py-3.5 rounded-2xl shadow-md transition-colors"
+              onclick={gotoWish}
+            >
+              {$t('grow.direct.customerWish')}
+            </button>
+            <a
+              href="/demand"
+              class="flex-1 text-center bg-white text-emerald-900 border-2 border-emerald-700/25 hover:bg-amber-50 font-bold px-5 py-3.5 rounded-2xl transition-colors"
+            >
+              {$t('grow.direct.customerMap')}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <p
+        class="mt-8 max-w-3xl mx-auto text-center text-emerald-800 font-medium text-base sm:text-lg"
+      >
+        {$t('grow.direct.note')}
+      </p>
+    </section>
+
     <!-- ===== Barriers (האתגרים) ===== -->
     <section id="barriers" class="scroll-mt-24">
       <div class="text-center mb-12">
@@ -681,6 +809,69 @@
       </p>
     </section>
 
+    <!-- ===== Shop & sales (חנות ומערכת מכירות) ===== -->
+    <section id="tools" class="scroll-mt-24">
+      <div class="text-center mb-12">
+        <div
+          class="inline-block px-4 py-1.5 rounded-full bg-emerald-100/60 border border-emerald-200/50 text-emerald-800 font-medium text-xs sm:text-sm mb-5"
+        >
+          {$t('grow.tools.eyebrow')}
+        </div>
+        <h2 class="text-emerald-900 font-extrabold text-3xl sm:text-4xl mb-4">
+          {$t('grow.tools.title')}
+        </h2>
+        <p class="text-emerald-900/70 text-lg max-w-3xl mx-auto leading-relaxed">
+          {$t('grow.tools.sub')}
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {#each TOOLS as tool (tool.key)}
+          <div
+            class="bg-white/80 backdrop-blur-sm border border-emerald-100 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300 text-start"
+          >
+            <div
+              class="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center mb-4 text-emerald-700"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d={tool.svg}
+                />
+              </svg>
+            </div>
+            <h3 class="bg-transparent font-bold text-lg text-emerald-900 mb-2">
+              {$t(`grow.tools.${tool.key}_t`)}
+            </h3>
+            <p class="text-emerald-950/80 text-base leading-relaxed">
+              {$t(`grow.tools.${tool.key}_d`)}
+            </p>
+          </div>
+        {/each}
+      </div>
+
+      <div class="mt-10 text-center">
+        <a
+          href="/shop"
+          class="inline-block bg-emerald-700 text-amber-50 hover:bg-emerald-800 font-bold text-lg px-8 py-4 rounded-2xl shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+        >
+          {$t('grow.tools.link')}
+          <span aria-hidden="true">{$isRtl ? '←' : '→'}</span>
+        </a>
+        <p class="mt-3 text-emerald-900/70 text-sm sm:text-base">
+          {$t('grow.tools.linkHint')}
+        </p>
+      </div>
+    </section>
+
     <!-- ===== How it works (איך מתחילים) ===== -->
     <section id="how" class="scroll-mt-24">
       <h2
@@ -700,7 +891,7 @@
             >
               {i + 1}
             </div>
-            <h3 class="font-bold text-lg text-emerald-900 mb-2 mt-1">
+            <h3 class="bg-transparent font-bold text-lg text-emerald-900 mb-2 mt-1">
               {$t(`grow.how.${s}_t`)}
             </h3>
             <p class="text-emerald-950/80 text-base leading-relaxed">
@@ -753,7 +944,7 @@
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {#each [{ key: 'w1', color: 'bg-emerald-50 text-emerald-700', svg: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' }, { key: 'w2', color: 'bg-amber-50 text-amber-800', svg: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' }, { key: 'w3', color: 'bg-emerald-50 text-emerald-700', svg: 'M12 19l9 2-9-18-9 18 9-2zm0 0v-8' }, { key: 'w4', color: 'bg-amber-50 text-amber-800', svg: 'M17 20h5-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' }, { key: 'w5', color: 'bg-emerald-50 text-emerald-700', svg: 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z' }] as w}
+        {#each [{ key: 'w1', color: 'bg-emerald-50 text-emerald-700', svg: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' }, { key: 'w2', color: 'bg-amber-50 text-amber-800', svg: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' }, { key: 'w3', color: 'bg-emerald-50 text-emerald-700', svg: 'M12 19l9 2-9-18-9 18 9-2zm0 0v-8' }, { key: 'w4', color: 'bg-amber-50 text-amber-800', svg: 'M17 20h5-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' }, { key: 'w5', color: 'bg-emerald-50 text-emerald-700', svg: 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z' }, { key: 'w6', color: 'bg-amber-50 text-amber-800', svg: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' }] as w}
           <div
             class="bg-white/80 backdrop-blur-sm border border-emerald-100 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300 flex flex-col items-center text-center"
           >
@@ -775,7 +966,7 @@
                 />
               </svg>
             </div>
-            <h3 class="font-bold text-lg text-emerald-900 mb-2">
+            <h3 class="bg-transparent font-bold text-lg text-emerald-900 mb-2">
               {$t(`grow.who.${w.key}_t`)}
             </h3>
             <p class="text-emerald-950/80 text-base leading-relaxed">

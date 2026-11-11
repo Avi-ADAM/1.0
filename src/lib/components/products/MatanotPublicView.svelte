@@ -255,23 +255,25 @@
     display: inline-block;
     margin-inline-start: 6px;
     padding: 0 6px;
-    border: 1px solid var(--border, #3b3540);
+    border: 1px solid var(--surface-line);
     border-radius: 99px;
     font-size: 0.7rem;
-    color: var(--gold-l, #f1c47a);
+    color: var(--surface-muted);
     white-space: nowrap;
   }
+  /* Opaque on purpose: this view sits on a white card on /gift and in the lev
+     card, and on a near-black var(--s1) on /deals/request, in the same theme.
+     Taking the ink from the page (--text) read 1.25:1 on the white ones in
+     personal light, so it paints the surface its own ink is guaranteed on. */
   .matanot-view {
-    --gold: var(--gold, #d8a64b);
-    --gold-l: var(--gold-l, #f1c47a);
-    --border: var(--border, #3b3540);
-    --tm: var(--tm, #b6acb1);
-    --bg-2: var(--bg-2, #251f2c);
-
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    color: var(--text, #f4ecd6);
+    padding: 0.75rem;
+    border: 1px solid var(--surface-line);
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--surface-ink);
   }
   .cover {
     width: 100%;
@@ -287,7 +289,7 @@
     flex-wrap: wrap;
   }
   .title {
-    color: var(--gold);
+    color: var(--surface-accent);
     font-size: 1.4rem;
     font-weight: 700;
     margin: 0;
@@ -297,18 +299,19 @@
     font-weight: 700;
     padding: 2px 10px;
     border-radius: 99px;
-    border: 1px solid var(--border);
-    background: var(--bg-2);
-    color: var(--gold-l);
+    border: 1px solid var(--surface-line);
+    background: var(--surface-2);
+    color: var(--surface-accent);
   }
-  .status-active { color: #6fcf97; border-color: #6fcf97; }
-  .status-voting { color: var(--gold-l); border-color: var(--gold); }
-  .status-archived { color: var(--tm); }
+  .status-active { color: #15803d; border-color: #15803d; }
+  :global(html.dark) .status-active { color: #6fcf97; border-color: #6fcf97; }
+  .status-voting { border-color: var(--surface-accent); }
+  .status-archived { color: var(--surface-muted); }
   .desc :global(p) { margin: 0; }
 
   .bom {
-    background: var(--bg-2);
-    border: 1px solid var(--border);
+    background: var(--surface-2);
+    border: 1px solid var(--surface-line);
     border-radius: 12px;
     padding: 0.75rem;
     display: flex;
@@ -317,13 +320,13 @@
   }
   .bom h2 {
     margin: 0;
-    color: var(--gold);
+    color: var(--surface-accent);
     font-size: 1.05rem;
   }
   .bom-group h3 {
     margin: 0 0 4px 0;
     font-size: 0.9rem;
-    color: var(--gold-l);
+    color: var(--surface-ink);
   }
   .bom-group table {
     width: 100%;
@@ -332,18 +335,18 @@
   }
   .bom-group th,
   .bom-group td {
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--surface-line);
     padding: 4px 6px;
     text-align: start;
   }
-  .bom-group th { color: var(--tm); font-weight: 600; }
-  .empty { color: var(--tm); font-size: 0.8rem; }
+  .bom-group th { color: var(--surface-muted); font-weight: 600; }
+  .empty { color: var(--surface-muted); font-size: 0.8rem; }
 
   .summary {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    border-top: 1px dashed var(--gold);
+    border-top: 1px dashed var(--surface-line);
     padding-top: 6px;
   }
   .summary .row {
@@ -352,6 +355,6 @@
   }
   .summary .total {
     font-size: 1.05rem;
-    color: var(--gold);
+    color: var(--surface-accent);
   }
 </style>

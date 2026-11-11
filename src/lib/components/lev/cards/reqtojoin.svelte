@@ -11,6 +11,7 @@
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
   import ComparisonDisplay from '../../ui/ComparisonDisplay.svelte';
   import NegotiationHistory from '../../ui/NegotiationHistory.svelte';
+  import MissionBackfillSummary from '../../mission/MissionBackfillSummary.svelte';
   /**
    * @typedef {Object} Props
    * @property {boolean} [low]
@@ -55,6 +56,7 @@
    * @property {number} [activeOrder]
    * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
    * @property {(() => void) | null} [onDismiss] - fully dismiss a self-nominated proposal
+   * @property {any} [openMid] - the offer this vote is about
    */
 
   /** @type {Props} */
@@ -101,7 +103,9 @@
     // Self-nomination (PLAN_SELF_NOMINATION §4.2): candidate-authored proposal —
     // members get a full-dismiss option alongside approve/nego/chat.
     selfNomination = false,
-    onDismiss = null
+    onDismiss = null,
+    // The offer this vote is about — its past months are read from there.
+    openMid = null
   } = $props();
   let user_1s = $derived.by(() => {
     return getProjectData(projectId, 'us') || [];
@@ -344,6 +348,14 @@
         </div>
       </div>
     </div>
+
+    {#if isRishon && iskvua && openMid}
+      <MissionBackfillSummary
+        openMissionId={openMid}
+        perhour={negopendmissions[0]?.attributes?.perhour ?? perhour}
+        {projectId}
+      />
+    {/if}
 
     <!-- Dates -->
     {#if sqedualed || dates}

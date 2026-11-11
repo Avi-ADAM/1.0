@@ -115,24 +115,32 @@ export function preferenceOf(value: unknown): DeliveryPreference {
   return PREFERENCES.includes(value as DeliveryPreference) ? (value as DeliveryPreference) : 'contact';
 }
 
+/**
+ * PayPal has no field for these, so a storefront folds them into the second
+ * address line, in English ("apt 4, floor 2, entrance 1"), and that line comes
+ * back as `notes`. Reading it back is what lets the screen say them in its language.
+ */
+const FOLDED_ADDRESS_LINE = /^(?:apt (?<apartment>.+?))?(?:(?:^|, )floor (?<floor>.+?))?(?:(?:^|, )entrance (?<entrance>.+?))?$/;
+
 /** A delivery address as the API stored it (`{city, street, house, apartment, floor, entrance, zip, country, notes}`), or null. */
 export function addressOf(value: unknown): ShopAddress | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const v = value as Record<string, unknown>;
   const s = (k: string) => (typeof v[k] === 'string' && (v[k] as string).trim() ? (v[k] as string).trim() : null);
   const country = s('country')?.toUpperCase() ?? null;
+  const folded = s('apartment') || s('floor') || s('entrance') ? null : (s('notes')?.match(FOLDED_ADDRESS_LINE)?.groups ?? null);
   const a: ShopAddress = {
     city: s('city'),
     street: s('street'),
     zip: s('zip'),
-    notes: s('notes'),
+    notes: folded ? null : s('notes'),
     house: s('house'),
-    apartment: s('apartment'),
-    floor: s('floor'),
-    entrance: s('entrance'),
+    apartment: s('apartment') ?? folded?.apartment ?? null,
+    floor: s('floor') ?? folded?.floor ?? null,
+    entrance: s('entrance') ?? folded?.entrance ?? null,
     country: country && country !== 'IL' ? country : null
   };
-  return a.city || a.street || a.zip || a.notes ? a : null;
+  return a.city || a.street || a.zip || a.notes || folded ? a : null;
 }
 
 /** One line for copying or printing: "הרצל 1, נתניה 4250000". Apartment/floor/entrance are the screen's, in its language. */

@@ -11,6 +11,7 @@
   import { loadCandidacyDeal, fillOfferIntoDeal } from '$lib/server/deal/offerDeal';
   import { tellMatured } from '$lib/server/notifications/matured';
   import { askAccepted, askOfferLapsed } from '$lib/server/notifications/maturedNotices';
+  import { settleOpenMissionBackfill } from '$lib/server/missions/settleMissionBackfill';
 
   /** Admin qid runner for the deal of a candidacy (QA C-19). */
   const runAdmin = (qid, vars) => strapiClient.execute(qid, vars);
@@ -265,6 +266,19 @@ updateOpenMission(
             ){data{id}}
             }`;
         await SendToAdmin(monti, env.ADMINMONTHER).catch((e) => console.error(e));
+
+        // The past months the rikma approved, by silence, with the mission.
+        await settleOpenMissionBackfill(runAdmin, {
+          openMissionId: String(omId),
+          missionId: String(chiluzh),
+          projectId: String(projectId),
+          templateId: om.mission?.data?.id ? String(om.mission.data.id) : null,
+          name: String(fName ?? ''),
+          userId: String(takerUser.id),
+          rate: fPer,
+          plannedHours: fHours,
+          start: fStart,
+        });
       }
 
       // Onboarding email to a freshly-joined (non-member) candidate.

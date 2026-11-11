@@ -5525,6 +5525,7 @@ ${PROMO_DECISION_FIELDS}
                           easy
                           recurring
                           cycleSize
+                          backfill
                           mashaabim { data { id } }
                         }
                       }
@@ -10137,6 +10138,27 @@ export const moachQids = {
       } }
     }
   }`,
+  // Past months of a recurring mission ($lib/recurring/missionBackfill). Kept out
+  // of 164createOpenMission and getAskNegoRounds on purpose: until the backend
+  // has `backfill`, only a mission that actually carries a table can fail.
+  'setOpenMissionBackfill': `mutation SetOpenMissionBackfill($id: ID!, $backfill: JSON) {
+    updateOpenMission(id: $id, data: { backfill: $backfill }) { data { id } }
+  }`,
+  'getOpenMissionBackfill': `query GetOpenMissionBackfill($id: ID!) {
+    openMission(id: $id) { data { id attributes {
+      backfill iskvua isRishon sqadualed
+      rishon { data { id } }
+    } } }
+  }`,
+  'settleMissionBackfill': `mutation SettleMissionBackfill(
+    $id: ID!,
+    $monter: [ComponentNewMonterInput],
+    $totalHoursSaved: Float,
+    $data: FinnishedMissionInput!
+  ) {
+    updateMesimabetahalich(id: $id, data: { monter: $monter, totalHoursSaved: $totalHoursSaved }) { data { id } }
+    createFinnishedMission(data: $data) { data { id } }
+  }`,
   'mrCreateCycleMaap': `mutation MrCreateCycleMaap($data: MaapInput!) {
     createMaap(data: $data) { data { id attributes { cycleIndex } } }
   }`,
@@ -10187,7 +10209,7 @@ export const moachQids = {
   'mrGetOpenMashaabimRecurringTerms': `query MrGetOpenMashaabimRecurringTerms($id: ID!) {
     openMashaabim(id: $id) {
       data { id attributes {
-        recurring cycleSize easy price kindOf sqadualed sqadualedf
+        recurring cycleSize easy price kindOf sqadualed sqadualedf backfill
         mashaabim { data { id } }
       } }
     }
@@ -11040,7 +11062,7 @@ export const moachQids = {
           createdAt
           chat { why ide what zman id users_permissions_user { data { id } } }
           users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
-          open_mashaabim { data { id attributes { price descrip spnot kindOf sqadualedf sqadualed linkto createdAt hm name easy recurring cycleSize mashaabim { data { id } } } } }
+          open_mashaabim { data { id attributes { price descrip spnot kindOf sqadualedf sqadualed linkto createdAt hm name easy recurring cycleSize backfill mashaabim { data { id } } } } }
           pmash { data { id attributes { name descrip spnot price easy hm kindOf sqadualed sqadualedf recurring cycleSize backfill } } }
           sp { data { id attributes { name descrip price myp spnot users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } } } } }
         }
@@ -13468,6 +13490,7 @@ ${PROMO_DECISION_FIELDS}
                           easy
                           recurring
                           cycleSize
+                          backfill
                           mashaabim { data { id } }
                         }
                       }

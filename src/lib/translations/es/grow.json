@@ -2,7 +2,7 @@
   "_review": true,
   "meta": {
     "title": "1💗1 · Crecer juntos - un sustento de la tierra, sin ir en solitario",
-    "description": "Un sustento ecológico que parte de la comunidad y reduce el riesgo. Tierra, plantones, manos y tiempo: cada persona aporta su parte única y, juntos, crean un sustento armónico y circular basado en la demanda real."
+    "description": "¿Ya cultivas? Vende tu producción directamente a los clientes mediante el concierge, los grupos de demanda y tu propia tienda. ¿Aún no? Tierra, plántulas, manos y tiempo: cada cual aporta su parte y juntos construyen un sustento de la tierra sobre demanda real. Y los clientes reciben una caja de alimentos frescos directamente de quien los cultivó."
   },
   "hero": {
     "eyebrow": "◈ Hacer ecológico · Conexión con la tierra · Comunidad creativa ◈",
@@ -11,17 +11,48 @@
     "h3": "Cada uno aporta lo que tiene y ama: juntos crece un sustento",
     "h4": "Del comensal de vuelta a la tierra: un círculo entero y armónico",
     "h5": "Empieza por los clientes. El negocio se construye en torno a la necesidad",
-    "sub": "No hace falta capital inicial, comprar tierra ni ir en solitario. Cada uno aporta su parte -tierra, plantones, manos que trabajan, tiempo o ganas de consumir- y el modelo cooperativo de 1💗1 lo coordina todo con transparencia y reparte los frutos de forma justa.",
+    "sub": "¿Tienes finca y producción? Encuéntrate con los clientes directamente, sin cadena de intermediarios. ¿Aún no? No hace falta capital inicial, comprar tierra ni hacerlo en solitario: cada cual aporta su parte - terreno, plántulas, manos, tiempo o ganas de consumir - y el modelo cooperativo de 1💗1 lo coordina todo con transparencia y reparte los frutos de forma justa.",
     "ctaPrimary": "Crezcamos juntos",
-    "ctaSecondary": "Quiero pedir una caja de verduras local"
+    "ctaSecondary": "Quiero una caja de alimentos frescos",
+    "h6": "¿Ya cultivas? Vende directamente a quien se lo come",
+    "ctaDirect": "Ya tengo producción: ¿cómo vendo directamente?"
   },
   "nav": {
+    "direct": "Venta directa",
     "barriers": "Las barreras",
     "weave": "La rikma: una asociación viva",
     "demand": "Empieza por el cliente",
+    "tools": "Tienda y ventas",
     "how": "Cómo empezar",
     "who": "Para quién es",
     "join": "Únete al círculo"
+  },
+  "direct": {
+    "eyebrow": "◈ Ya cultivas · Buscas buena comida ◈",
+    "title": "Del campo directamente a casa, sin construir nada desde cero",
+    "p1": "No toda historia agrícola empieza con un terreno vacío y un grupo que aún se está formando. Muchos agricultores ya cultivan buena producción y la venden a través de una cadena en la que buena parte del precio se queda con quien no la cultivó ni la cosechó. Mientras tanto, no lejos del campo, hay familias que buscan verduras y frutas realmente frescas y compran lo que queda en el estante tras días de transporte y frío, sin saber quién las cultivó.",
+    "p2": "1💗1 conecta directamente a las dos partes. No hace falta abrir una rikma, renunciar a la independencia de tu finca ni cambiar lo que cultivas: muestras tu producción, marcas hasta dónde llegas y fijas tú el precio. El concierge te lleva a quien escribe que busca exactamente eso, y un grupo de demanda te reúne a vecinos de una misma zona, de modo que en lugar de perseguir pedidos sueltos tienes una ronda de reparto que compensa cosechar y transportar.",
+    "p3": "El riesgo también se reduce aquí: una oferta sobre un grupo solo sale adelante si se alcanza el número de firmantes que fijaste en la fecha que fijaste. Sabes cuánto cosechar antes de cosechar, y los clientes saben exactamente quién cultivó lo que les llega.",
+    "farmer_t": "Agricultores con producción: tres formas de vender directamente",
+    "f1_t": "Aparecer en el concierge",
+    "f1_d": "Añade tu producción como producto de precio fijo, con tu ubicación y radio de entrega. Quien busque una caja o producción en tu zona te verá y pedirá, y tú recibes el aviso y lo coordinas directamente.",
+    "f2_t": "Hacer una oferta a un grupo de demanda",
+    "f2_d": "El mapa de demanda muestra cuántos hogares de tu zona buscan producción. Haz una oferta por umbral: qué lleva la caja, precio, mínimo de firmantes, capacidad y frecuencia semanal, quincenal o mensual.",
+    "f3_t": "Enviar una oferta personal por enlace",
+    "f3_d": "Para un cliente habitual, un restaurante del barrio o una guardería que te contactó: escribe una oferta y envía un enlace. Nada se cierra hasta que ambas partes firmen la misma versión.",
+    "farmerMap": "Ver quién busca en mi zona",
+    "farmerShop": "Montar una tienda para mi producción",
+    "customer_t": "Clientes: una caja de alimentos frescos y de calidad, directa de quien cultiva",
+    "c1_t": "Escribe lo que quieres",
+    "c1_d": "Una caja semanal de verduras para la familia, fruta de temporada, verduras para una guardería o una cocina comunitaria. El concierge busca quién puede suministrarlo en tu zona y te trae ofertas.",
+    "c2_t": "Únete a tus vecinos",
+    "c2_d": "Unirse a un grupo de demanda es flexible y reversible, y solo firmar una oferta te compromete. Cuantos más hogares de tu zona se unan, más le compensa a un agricultor llegar de forma regular.",
+    "c3_t": "Sabe a quién le compras",
+    "c3_d": "Habla directamente con quien cultiva: qué lleva la caja, cuándo se cosechó, cómo te llega y a qué precio. Sin estante de por medio y sin suposiciones.",
+    "customerWish": "Quiero una caja de alimentos frescos",
+    "customerMap": "Qué se ofrece ya cerca de mí",
+    "wishPrefill": "Una caja de alimentos frescos directa de un agricultor de mi zona",
+    "note": "¿Aún no llega ningún agricultor a tu zona? Tu demanda es lo que lo invita: cuando se reúnen suficientes hogares, el grupo se hace visible para los proveedores."
   },
   "problem": {
     "title": "La dificultad de fundar un proyecto agrícola en solitario",
@@ -64,6 +95,25 @@
     "economy_d": "Construir un sistema de suscripción integral en torno a las necesidades de la comunidad: cajas semanales, productos complementarios y una amplia integración comunitaria.",
     "note": "Puedes empezar de forma sencilla con ventas básicas y ampliar hacia una economía local completa al ritmo que mejor te convenga."
   },
+  "tools": {
+    "eyebrow": "◈ Tienda · Ventas · API ◈",
+    "title": "Todo lo que necesitas para vender ya está construido",
+    "sub": "Tanto si eres un agricultor solo como una rikma de socios, puedes poner en marcha una tienda y un sistema de ventas completos sin construir un servidor ni un panel de administración aparte.",
+    "t1_t": "Tu propia tienda en línea",
+    "t1_d": "Una plantilla lista que se publica con un clic: catálogo, tamaños de caja como variantes, carrito y página de seguimiento del pedido. Quien compra no necesita registrarse.",
+    "t2_t": "Cobrar sin pasarela de pago",
+    "t2_d": "Stripe, PayPal o pago coordinado por teléfono, WhatsApp o transferencia. El dinero te llega directamente y nunca pasa por 1💗1.",
+    "t3_t": "Envío y recogida",
+    "t3_d": "Zonas y tarifas de envío, puntos de recogida, incluida la recogida con cita previa, y avisos por correo al comprador durante el proceso.",
+    "t4_t": "Stock, pedidos y consultas",
+    "t4_d": "Una sola pantalla para stock, pedidos y consultas de clientes, con botones de llamada y WhatsApp y «enviado» con un clic.",
+    "t5_t": "Cosecha, empaque y entrega coordinados",
+    "t5_d": "Cada pedido puede abrir tareas para quien aceptó recibirlas y actualizar tu stock de cajas y frascos. Y si hay socios, cada venta cuenta automáticamente en el reparto.",
+    "t6_t": "Una API cómoda y agentes de IA",
+    "t6_d": "REST API y webhooks firmados para conectar un sitio existente, y herramientas MCP para gestionar productos, stock y pedidos conversando con Claude o cualquier agente de IA.",
+    "link": "Todos los detalles de la tienda y el sistema de ventas",
+    "linkHint": "La plantilla, los pagos, las automatizaciones y la API"
+  },
   "how": {
     "title": "Cuatro pasos sencillos para empezar",
     "s1_t": "Únete y presenta tus recursos",
@@ -87,7 +137,9 @@
     "w4_t": "Localidades y comunidades locales",
     "w4_d": "Que aspiran a fortalecer su resiliencia económica y social mediante una agricultura local cooperativa y conectada.",
     "w5_t": "Consumidores conscientes",
-    "w5_d": "Personas que quieren verduras frescas y locales directamente del campo, y conocer a los socios que las cultivaron."
+    "w5_d": "Personas que quieren verduras frescas y locales directamente del campo, y conocer a los socios que las cultivaron.",
+    "w6_t": "Agricultores con producción existente",
+    "w6_d": "Fincas que ya cultivan y quieren vender directamente a los clientes mediante el concierge, los grupos de demanda o su propia tienda, y quedarse con una parte mayor del precio."
   },
   "values": {
     "title": "Los valores que nos impulsan",
@@ -100,9 +152,9 @@
   },
   "cta": {
     "title": "La tierra está lista, la comunidad espera",
-    "sub": "Ya sea que tengas tierra que ofrecer, manos que trabajan, conocimiento profesional, o simplemente ganas de comer alimentos locales y sanos, hay un lugar para ti en nuestro círculo.",
+    "sub": "Tanto si tienes producción que vender, tierra que ofrecer, manos, conocimientos o simplemente ganas de comer sano y local, hay un lugar para ti en nuestro círculo.",
     "register": "Crezcamos juntos",
-    "wish": "Quiero una caja local",
+    "wish": "Quiero una caja fresca",
     "login": "Iniciar sesión en una cuenta existente"
   }
 }

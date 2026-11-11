@@ -15,6 +15,7 @@ import { asUser as asShiftUser } from '$lib/server/shifts/exec.js';
 import { commitmentForAsk, setMissionCommitment } from '$lib/server/shifts/store.js';
 import { gqlString } from './actionUtils.js';
 import { loadCandidacyDeal, fillOfferIntoDeal } from '$lib/server/deal/offerDeal.js';
+import { settleOpenMissionBackfill } from '$lib/server/missions/settleMissionBackfill';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 /** A wish need may carry no mission template; never write the string "undefined" as a relation. */
@@ -331,6 +332,21 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
             }) { data { id } }
           }`,
         }),
+      });
+    }
+
+    // The past months the rikma just signed together with the mission.
+    if (iskvua && chiluzh) {
+      await settleOpenMissionBackfill(run, {
+        openMissionId: String(openMid),
+        missionId: String(chiluzh),
+        projectId: String(projectId),
+        templateId: hasMissionTemplate(missId) ? String(missId) : null,
+        name: String(finalName ?? ''),
+        userId: String(acceptedUserId),
+        rate: finalValph,
+        plannedHours: finalNhours,
+        start: finalSqedualed,
       });
     }
 

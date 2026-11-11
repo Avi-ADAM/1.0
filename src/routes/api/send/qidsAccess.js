@@ -480,6 +480,11 @@ export const qidsAccess = {
   'mrUpdateMashabetahalich': { allow: ['user', 'serviceAdmin'] },
   'mrGetMashabetahalich': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   'mrGetRecurringForMonthi': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  // Past months of a recurring mission: the writes book equity, so only the
+  // actions reach them (StrapiClient.execute does not pass through /api/send).
+  'setOpenMissionBackfill': { allow: ['serviceAdmin'] },
+  'settleMissionBackfill': { allow: ['serviceAdmin'] },
+  'getOpenMissionBackfill': { allow: ['user', 'serviceAdmin'] }, // the vote card shows the table to the rikma
   'mrCreateCycleMaap': { allow: ['user', 'serviceAdmin'] }, // past cycles of a recurring resource (settleBackfill), run under the approver's or creator's session
   'mrGetRikmashForDelivery': { allow: ['user', 'serviceAdmin'] },
   'mrCreateRikmash': { allow: ['user', 'serviceAdmin'] },

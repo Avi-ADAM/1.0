@@ -318,6 +318,16 @@
     "notStored": "La propuesta se creó, pero no pudimos guardar la invitación. Puedes invitar de nuevo cuando la rikma la apruebe."
   },
   "form2": {
+    "backfill": {
+      "toggle": "El trabajo ya comenzó - ingresar {{count}} meses anteriores",
+      "hint": "Solo ahora, al crear la misión. Cada mes se registra con las horas que ingreses, al valor por hora de la misión. Si aún no se eligió quién la realiza, se registrará a tu nombre, y puedes elegir en su lugar a otro miembro de la rikma.",
+      "tooLong": "Puedes ingresar hasta {{count}} meses. Elige una fecha de inicio posterior.",
+      "total": "Total {{hours}} horas",
+      "noteSolo": "Los meses se registran de inmediato como horas aprobadas.",
+      "noteVote": "La rikma aprueba los meses junto con la misión, en una sola votación.",
+      "notBooked": "La misión se creó, pero sus meses anteriores no se registraron. No la crees de nuevo: escríbenos y completaremos el registro.",
+      "noteMember": "Las horas se acreditan a {{name}} solo tras su aprobación explícita, y el silencio no es consentimiento. El resto de la rikma las aprueba en la misma votación."
+    },
     "title": "Nueva misión",
     "intro": "Cuatro pasos cortos. Lo marcado como «opcional» puede quedar vacío y completarse después.",
     "rikmaChip": "Rikma: {{name}}",

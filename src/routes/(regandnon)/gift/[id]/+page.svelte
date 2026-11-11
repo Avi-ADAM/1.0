@@ -226,7 +226,7 @@
     </div>
     <!-- Main Card -->
     <div
-      class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700"
+      class="bg-white dark:bg-gray-800 text-surfaceInk rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700"
     >
       <!-- Header Gradient -->
       <div

@@ -1885,8 +1885,9 @@ export function extractAskedResources(userData: any): AskedResourceData[] {
         recurring: omData.recurring === true,
         cycleSize: omData.cycleSize ?? 1,
         // Past cycles the proposer paid, signed with this request
-        // ($lib/recurring/backfill). Only a self-proposal can carry them.
-        backfill: pmashAttrs.backfill ?? null,
+        // ($lib/recurring/backfill): on the pmash of a self-proposal, on the
+        // open resource when it was offered to another member.
+        backfill: pmashAttrs.backfill ?? askAttributes.open_mashaabim?.data?.attributes?.backfill ?? null,
         openName: omData.name,
         omid: askAttributes.open_mashaabim?.data?.id,
         pmashId: askAttributes.pmash?.data?.id,
