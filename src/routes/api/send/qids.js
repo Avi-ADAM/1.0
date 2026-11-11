@@ -10870,7 +10870,9 @@ export const moachQids = {
           finiapruvals(filters: { archived: { eq: false } }) {
             data { id attributes { missname noofhours isTimerSave iskvua month timer { data { id } } vots { what order users_permissions_user { data { id } } } users_permissions_user { data { id attributes { username } } } } }
           }
-          open_missions(filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }) {
+          # A mission offered to one named member (isRishon) is created archived so
+          # nobody else can take it — but its ask is still a vote of the rikma.
+          open_missions(filters: { and: [ { or: [ { archived: { eq: false } }, { isRishon: { eq: true } } ] }, ${NOT_ARCHIVED} ] }) {
             data {
               id
               attributes {
@@ -10910,7 +10912,7 @@ export const moachQids = {
           decisions(filters: { archived: { eq: false } }) { data { id } }
           askms(filters: { archived: { eq: false } }) { data { id } }
           finiapruvals(filters: { archived: { eq: false } }) { data { id } }
-          open_missions(filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }) {
+          open_missions(filters: { and: [ { or: [ { archived: { eq: false } }, { isRishon: { eq: true } } ] }, ${NOT_ARCHIVED} ] }) {
             data { id attributes { asks(filters: { archived: { eq: false } }) { data { id } } } }
           }
         }
