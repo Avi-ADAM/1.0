@@ -26,6 +26,7 @@
   import ThreadHeart from '$lib/components/main/ThreadHeart.svelte';
   import ProductPeek from '$lib/components/main/ProductPeek.svelte';
   import SplitCalculator from '$lib/components/main/SplitCalculator.svelte';
+  import FormulaStory from '$lib/components/main/FormulaStory.svelte';
   import VideoModal from '$lib/components/main/VideoModal.svelte';
   import { VIDEO_HOW_IT_WORKS, VIDEO_CONCIERGE, VIDEO_SHOP_BUILD, VIDEO_IDEA_TO_RIKMA, videoFor } from '$lib/videos.js';
   import DemoRequest from '$lib/components/main/DemoRequest.svelte';
@@ -443,6 +444,15 @@
       {/each}
       <span class="hm-stage-result">{$t('home.hero.stageResult')}</span>
     </div>
+  </section>
+
+  <!-- ============ FORMULA ============
+       Straight after the hero on purpose: "so who pays me?" is the question a
+       lifelong employee arrives with, and nothing below makes sense until it
+       is answered. The calculator in #split is the same thing with your own
+       numbers, and this ends by pointing there. -->
+  <section id="formula" class="hm-section">
+    <FormulaStory />
   </section>
 
   <!-- ============ DOORS ============ -->

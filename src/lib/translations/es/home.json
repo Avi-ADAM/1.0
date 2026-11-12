@@ -782,5 +782,32 @@
     "invite": "Lo que sí hacemos es invitarte a dar lo que sientas que puedes y que nos merecemos. Y si ahora mismo no puedes, también está perfectamente bien.",
     "rikma": "Conoce la rikma de 1💗1",
     "give": "Da lo que puedas"
+  },
+  "formula": {
+    "eyebrow": "◈ Cómo funciona, en menos de un minuto ◈",
+    "title": "No es un sueldo. Es una parte.",
+    "sub": "Todo lo que se aporta a una rikma se cuenta igual: una cantidad por un valor que acordamos.",
+    "s0": "En un trabajo normal das horas y recibes un sueldo. El negocio sigue siendo de otra persona.",
+    "s1": "En la rikma cuenta todo lo que aportas: equipo, alquiler, facturas y horas de trabajo. Todo en la misma moneda.",
+    "s2": "Ningún número lo fija una sola persona. Propones, la otra parte responde con una oferta más precisa, hasta que todos firman la misma versión.",
+    "s3": "Todo lo aportado, junto, es el valor de la rikma. Tu parte de ese total es tu parte de la rikma.",
+    "s4": "La clienta también acuerda el precio. Y cada ingreso se reparte según las partes.",
+    "kindOnce": "Aportado una vez: el valor que acordamos",
+    "kindMonthly": "Cada mes de nuevo: meses × coste por mes",
+    "kindHours": "Trabajo: horas × valor acordado por hora",
+    "pure": "cantidad × valor acordado + otra cantidad × valor acordado + … = el valor de la rikma",
+    "exLabel": "Ejemplo",
+    "ex": {
+      "bakery": "Panadería",
+      "studio": "Estudio de software",
+      "clinic": "Clínica",
+      "formula": "Solo la fórmula"
+    },
+    "play": "Reproducir",
+    "pause": "Pausa",
+    "replay": "Desde el inicio",
+    "step": "Paso {{step}} de {{total}}",
+    "cta": "Pruébalo con tus números",
+    "alt": "Animación: tres socios aportan equipo, alquiler, facturas y horas de trabajo. Cada aporte se convierte en cubos en una sola pila, la pila es el valor de la rikma, y cada venta se reparte según la parte de cada socio."
   }
 }

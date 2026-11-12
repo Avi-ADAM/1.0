@@ -781,5 +781,32 @@
     "invite": "What we do: invite you to give whatever you feel you can and feel we deserve. And if right now you can't - that's completely fine too.",
     "rikma": "Meet the 1💗1 rikma",
     "give": "Give what you can"
+  },
+  "formula": {
+    "eyebrow": "◈ How it works, in under a minute ◈",
+    "title": "Not a salary. A share.",
+    "sub": "Everything brought into a rikma is counted the same way: a quantity times a value we agreed on.",
+    "s0": "In a regular job you give hours and get a salary. The business stays someone else's.",
+    "s1": "In a rikma everything you bring counts: equipment, rent, bills and hours of work. All in the same currency.",
+    "s2": "No number is set by one person. You propose, the other side returns a more precise offer, until everyone signs the same version.",
+    "s3": "Everything that went in, together, is the rikma's value. Your part of it is your share of the rikma.",
+    "s4": "The customer agrees to the price too. And every sale is split by the shares.",
+    "kindOnce": "Brought once: the value we agreed on",
+    "kindMonthly": "Every month again: months × cost per month",
+    "kindHours": "Work: hours × agreed hourly value",
+    "pure": "quantity × agreed value + another quantity × agreed value + … = the rikma's value",
+    "exLabel": "Example",
+    "ex": {
+      "bakery": "Bakery",
+      "studio": "Software studio",
+      "clinic": "Clinic",
+      "formula": "Just the formula"
+    },
+    "play": "Play",
+    "pause": "Pause",
+    "replay": "From the start",
+    "step": "Step {{step}} of {{total}}",
+    "cta": "Try it with your own numbers",
+    "alt": "Animation: three partners bring equipment, rent, bills and hours of work. Each contribution turns into cubes in one pile, the pile is the rikma's value, and every sale is split by each partner's share."
   }
 }
