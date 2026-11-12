@@ -67,7 +67,7 @@
 
   function reuseAxis(e: Event) {
     const select = e.currentTarget as HTMLSelectElement;
-    const found = rikmaAxes.find((a) => a.key === select.value);
+    const found = select.value === '' ? undefined : unusedRikmaAxes[Number(select.value)];
     select.value = '';
     if (!found || axes.length >= MAX_AXES || axes.some((a) => slugOf(a.key || a.name) === found.key)) return;
     axes.push(copy(found));
@@ -127,7 +127,7 @@
           <input class="sh-input" bind:value={axis.name} placeholder={$t('shopEditor.options.namePlaceholder')} />
         </label>
         <div class="vf-values">
-          {#each axis.values as v, j (v.value)}
+          {#each axis.values as v, j (j)}
             <span class="vf-value">
               {v.label}
               <button type="button" class="vf-value-x" onclick={() => axis.values.splice(j, 1)} aria-label={$t('shopEditor.options.removeValue', { value: v.label })}>
@@ -160,7 +160,7 @@
             <span>{$t('shopEditor.options.reuse')}</span>
             <select class="sh-input" onchange={reuseAxis}>
               <option value="">{$t('shopEditor.options.reusePick')}</option>
-              {#each unusedRikmaAxes as a (a.key)}<option value={a.key}>{a.name}</option>{/each}
+              {#each unusedRikmaAxes as a, i (i)}<option value={i}>{a.name}</option>{/each}
             </select>
           </label>
         {/if}
@@ -213,7 +213,7 @@
             </tr>
           </thead>
           <tbody>
-            {#each rows as r, i (r.axisKey || r.id || i)}
+            {#each rows as r, i (i)}
               {@const err = issueOf.get(i)}
               {@const waitingPrice = r.id ? waiting?.prices.get(r.id) : undefined}
               <tr class:vf-off={!r.active}>
@@ -279,7 +279,7 @@
                 </td>
               </tr>
             {/each}
-            {#each waiting?.creates ?? [] as c (c.axisKey)}
+            {#each waiting?.creates ?? [] as c, i (i)}
               <tr class="vf-waiting-row">
                 <td class="vf-combo">{c.name}<span class="vf-note vf-note-gold">{$t('shopEditor.variants.newPending')}</span></td>
                 <td class="sh-num"><bdi>{money(c.price ?? productPrice)}</bdi></td>
