@@ -276,7 +276,8 @@
         "phone": "By phone",
         "whatsapp": "On WhatsApp"
       }
-    }
+    },
+    "promoUntilStock": "sale price until stock runs out"
   },
   "editBasic": {
     "head": "Edit Profile",

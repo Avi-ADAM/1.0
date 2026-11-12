@@ -897,9 +897,10 @@
       "bxgy": "How many to buy, how many they get, and a percentage from 1 to 100",
       "minSubtotal": "The amount the discount starts at is missing",
       "noProducts": "Pick at least one product",
-      "noEnd": "A promotion needs an end date",
+      "noEnd": "A promotion needs an end date — or a unit cap that ends it",
       "endPassed": "The end date has already passed",
-      "endBeforeStart": "The end must come after the start"
+      "endBeforeStart": "The end must come after the start",
+      "noCap": "Ending on a cap needs a whole number of units, above zero"
     },
     "back": "Back",
     "next": "Next",
@@ -926,7 +927,14 @@
       "voteNote": "The envelope itself goes to a vote of the whole rikma. Silence until the response time is consent.",
       "send": "Send to a vote"
     },
-    "onSale": "On sale"
+    "onSale": "On sale",
+    "endsOnHint": "Empty = no end date. Leave it empty only when the promotion is limited by units.",
+    "endsOnCap": "No end date — until the units run out",
+    "endsOnCapHint": "The promotion closes by itself when the units are gone, with no end date.",
+    "endsOnCapFieldHint": "Not used — the promotion ends when the units are sold.",
+    "endsOnCapNeedsCap": "To end on a cap, fill in the unit cap above.",
+    "untilStock": "until stock runs out",
+    "untilStockLeft": "until stock runs out — {{left}} of {{cap}} units left"
   },
   "leads": {
     "taken": "It's yours now",

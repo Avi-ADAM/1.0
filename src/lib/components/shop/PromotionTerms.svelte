@@ -13,13 +13,16 @@
     scope,
     startsAt = null,
     endsAt = null,
+    capUnits = null,
     name = null
   }: {
     kind: PromotionKind;
     rule: Record<string, number | boolean>;
     scope: PromotionScope;
     startsAt?: string | null;
+    /** null = it does not end on a date — it ends when `capUnits` runs out. */
     endsAt?: string | null;
+    capUnits?: number | null;
     name?: string | null;
   } = $props();
 
@@ -61,7 +64,14 @@
 
 <span class="pt">
   {#if name}<strong class="pt-name"><bdi>{name}</bdi></strong>{/if}
-  <span><bdi>{what}</bdi> · {scopeText} · {$t('lev.promo.dates', { from: fmtDate(startsAt), to: fmtDate(endsAt) })}</span>
+  <span>
+    <bdi>{what}</bdi> · {scopeText} ·
+    {#if endsAt}
+      {$t('lev.promo.dates', { from: fmtDate(startsAt), to: fmtDate(endsAt) })}
+    {:else}
+      {$t('lev.promo.datesUntilStock', { from: fmtDate(startsAt), count: capUnits })}
+    {/if}
+  </span>
 </span>
 
 <style>

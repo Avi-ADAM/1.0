@@ -1211,14 +1211,17 @@
       "maxPct": "Up to what %",
       "maxDays": "Up to how many days",
       "why": "Why this version?",
-      "zeroHint": "0 = no promotion. It is a counter-proposal, not a veto."
+      "zeroHint": "0 = no promotion. It is a counter-proposal, not a veto.",
+      "endsOnCap": "No end date — until the units run out",
+      "capUnits": "Unit cap"
     },
     "toast": {
       "signed": "You signed the version on the table",
       "applied": "Everyone signed — it is approved",
       "countered": "Your version is on the table and the clock restarted",
       "error": "Something went wrong — try again"
-    }
+    },
+    "datesUntilStock": "{{from}} until stock runs out"
   },
   "provideAssigned": {
     "title": "Which resource will you bring to \"{{name}}\"?",
