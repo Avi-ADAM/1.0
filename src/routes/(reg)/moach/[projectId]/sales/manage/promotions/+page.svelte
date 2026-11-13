@@ -90,6 +90,17 @@
   let draft = $state<PromoDraft>(emptyDraft());
   let tried = $state<Record<WizardStep, boolean>>({ what: false, scope: false, when: false });
   let now = $derived(new Date());
+  /**
+   * "עד גמר המלאי" — a promotion limited to a number of units that ends when
+   * they are sold, rather than on a date. On, the end date is cleared and the
+   * unit cap becomes what ends it (the server refuses a promotion with neither).
+   */
+  let endsOnCap = $state(false);
+  function toggleEndsOnCap() {
+    endsOnCap = !endsOnCap;
+    if (endsOnCap) draft.endsOn = '';
+    else if (!draft.endsOn) draft.capUnits = null;
+  }
   let problems = $derived(draftProblems(draft, now));
   let preview = $derived(
     previewDraft($state.snapshot(draft) as PromoDraft, {
@@ -104,12 +115,20 @@
 
   function openWizard() {
     draft = emptyDraft();
+    endsOnCap = false;
     step = 'what';
     tried = { what: false, scope: false, when: false };
     wizardOpen = true;
   }
   function setKind(kind: PromotionKind) {
-    const keep = { name: draft.name, products: draft.products, startsOn: draft.startsOn, endsOn: draft.endsOn, capUnits: draft.capUnits, why: draft.why };
+    const keep = {
+      name: draft.name,
+      products: draft.products,
+      startsOn: draft.startsOn,
+      endsOn: endsOnCap ? '' : draft.endsOn,
+      capUnits: draft.capUnits,
+      why: draft.why
+    };
     draft = { ...emptyDraft(kind), ...keep, all: kindIsStoreWide(kind) || (draft.all && kind !== 'item') };
   }
   function next() {
@@ -202,7 +221,7 @@
           <span class="pm-muted">{$t(`shop.promo.endedReason.${p.endedReason}`)}</span>
         {/if}
       </div>
-      <PromotionTerms kind={p.kind} rule={p.rule} scope={p.scope} startsAt={p.startsAt} endsAt={p.endsAt} name={p.name} />
+      <PromotionTerms kind={p.kind} rule={p.rule} scope={p.scope} startsAt={p.startsAt} endsAt={p.endsAt} capUnits={p.capUnits} name={p.name} />
       {#if p.usedUnits || p.capUnits}
         <span class="pm-muted">
           {p.capUnits ? $t('shop.promo.usedOfCap', { used: p.usedUnits ?? 0, cap: p.capUnits }) : $t('shop.promo.used', { count: p.usedUnits ?? 0 })}
@@ -252,7 +271,16 @@
       <span class="sh-section-label">{$t('shop.promo.activeNow')}</span>
       <ul>
         {#each active as p (p.id)}
-          <li><bdi>{p.name || kindLabel(p.kind)}</bdi> · {$t('shop.promo.until', { date: fmtDate(p.endsAt) })}</li>
+          <li>
+            <bdi>{p.name || kindLabel(p.kind)}</bdi> ·
+            {#if p.endsAt}
+              {$t('shop.promo.until', { date: fmtDate(p.endsAt) })}
+            {:else if p.capUnits}
+              {$t('shop.promo.untilStockLeft', { left: Math.max(0, p.capUnits - (p.usedUnits ?? 0)), cap: p.capUnits })}
+            {:else}
+              {$t('shop.promo.untilStock')}
+            {/if}
+          </li>
         {/each}
       </ul>
     </section>
@@ -360,7 +388,8 @@
           </label>
           <label class="sh-field">
             {$t('shop.promo.endsOn')}
-            <input class="sh-input" type="date" bind:value={draft.endsOn} required />
+            <input class="sh-input" type="date" bind:value={draft.endsOn} disabled={endsOnCap} />
+            <span class="pm-muted">{endsOnCap ? $t('shop.promo.endsOnCapFieldHint') : $t('shop.promo.endsOnHint')}</span>
           </label>
         </div>
         <label class="sh-field">
@@ -368,6 +397,17 @@
           <input class="sh-input sh-num" type="number" min="1" step="1" inputmode="numeric" bind:value={draft.capUnits} />
           <span class="pm-muted">{$t('shop.promo.capHint')}</span>
         </label>
+        <!-- A promotion limited to a number of units may end when they are gone, instead of on a date. -->
+        <label class="pm-check">
+          <input type="checkbox" checked={endsOnCap} onchange={toggleEndsOnCap} />
+          <span>
+            <bdi>{$t('shop.promo.endsOnCap')}</bdi>
+            <span class="pm-muted">{$t('shop.promo.endsOnCapHint')}</span>
+          </span>
+        </label>
+        {#if endsOnCap && !(draft.capUnits > 0)}
+          <span class="pm-muted">{$t('shop.promo.endsOnCapNeedsCap')}</span>
+        {/if}
         <label class="sh-field">
           {$t('shop.promo.why')}
           <textarea class="sh-input pm-why" rows="2" maxlength="500" bind:value={draft.why}></textarea>
@@ -376,7 +416,15 @@
         {#if preview.terms}
           <div class="pm-preview" class:pm-preview-vote={preview.needsVote}>
             <strong>{preview.needsVote ? $t('shop.promo.preview.vote') : $t('shop.promo.preview.now')}</strong>
-            <PromotionTerms kind={preview.terms.kind} rule={preview.terms.rule} scope={preview.terms.scope} startsAt={preview.terms.startsAt} endsAt={preview.terms.endsAt} name={preview.terms.name} />
+            <PromotionTerms
+              kind={preview.terms.kind}
+              rule={preview.terms.rule}
+              scope={preview.terms.scope}
+              startsAt={preview.terms.startsAt}
+              endsAt={preview.terms.endsAt}
+              capUnits={preview.terms.capUnits}
+              name={preview.terms.name}
+            />
             <span>{$t('shop.promo.preview.reaches', { count: preview.reaches.length })}</span>
             {#if preview.blocked.length}
               <span class="pm-muted">{$t('shop.promo.preview.blocked', { names: preview.blocked.map((p) => p.name).join(', ') })}</span>

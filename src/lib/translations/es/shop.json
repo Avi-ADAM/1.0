@@ -897,9 +897,10 @@
       "bxgy": "Cuántas comprar, cuántas llevar y un porcentaje de 1 a 100",
       "minSubtotal": "Falta el monto desde el que aplica",
       "noProducts": "Elige al menos un producto",
-      "noEnd": "Una promoción necesita fecha de fin",
+      "noEnd": "Una promoción necesita fecha de fin — o un tope de unidades que la termine",
       "endPassed": "La fecha de fin ya pasó",
-      "endBeforeStart": "El fin debe ser después del inicio"
+      "endBeforeStart": "El fin debe ser después del inicio",
+      "noCap": "Terminar por tope necesita un número entero de unidades mayor que cero"
     },
     "back": "Atrás",
     "next": "Siguiente",
@@ -926,7 +927,14 @@
       "voteNote": "El marco mismo va a votación de toda la rikma. El silencio hasta el plazo de respuesta es consentimiento.",
       "send": "Enviar a votación"
     },
-    "onSale": "En promoción"
+    "onSale": "En promoción",
+    "endsOnHint": "Vacío = sin fecha de fin. Déjalo vacío solo si la promoción está limitada por unidades.",
+    "endsOnCap": "Sin fecha de fin — hasta que se agoten las unidades",
+    "endsOnCapHint": "La promoción se cierra sola cuando se acaban las unidades, sin fecha de fin.",
+    "endsOnCapFieldHint": "No se usa — la promoción termina cuando se venden las unidades.",
+    "endsOnCapNeedsCap": "Para terminar por tope, completa el tope de unidades arriba.",
+    "untilStock": "hasta agotar existencias",
+    "untilStockLeft": "hasta agotar existencias — quedan {{left}} de {{cap}} unidades"
   },
   "leads": {
     "taken": "Ahora es tuya",

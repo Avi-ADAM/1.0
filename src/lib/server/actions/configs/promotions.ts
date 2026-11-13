@@ -109,7 +109,13 @@ function termsLine(t: PromoTerms, lang: Lang): string {
                   ? lang === 'he' ? `${r.pct}% מעל ${r.minSubtotal}` : `${r.pct}% over ${r.minSubtotal}`
                   : lang === 'he' ? `${r.off} הנחה מעל ${r.minSubtotal}` : `${r.off} off over ${r.minSubtotal}`;
   const name = t.name ? `"${t.name}" · ` : '';
-  return `${name}${KIND_TEXT[t.kind][lang]}: ${what} · ${fmtDate(t.startsAt, lang)}–${fmtDate(t.endsAt, lang)}`;
+  // "עד גמר המלאי" — a promotion that ends on its cap has no end date to print.
+  const until = t.endsAt
+    ? `${fmtDate(t.startsAt, lang)}–${fmtDate(t.endsAt, lang)}`
+    : lang === 'he'
+      ? `מ-${fmtDate(t.startsAt, lang)} ועד גמר המלאי${t.capUnits ? ` (${t.capUnits} יח׳)` : ''}`
+      : `from ${fmtDate(t.startsAt, lang)} until stock runs out${t.capUnits ? ` (${t.capUnits} units)` : ''}`;
+  return `${name}${KIND_TEXT[t.kind][lang]}: ${what} · ${until}`;
 }
 
 /** What goes beyond the envelope, in words — the card and the notice say it before anyone signs. */
@@ -549,14 +555,18 @@ const memberOf = (what: string) => [
 ];
 
 const TERMS_PARAMS = {
-  terms: { type: 'object' as const, required: false, description: '{ kind, name, scope, rule, startsAt, endsAt, capUnits, capOrders, perOrderMax } — or the same keys at the top level' },
+  terms: { type: 'object' as const, required: false, description: '{ kind, name, scope, rule, startsAt, endsAt, capUnits, capOrders, perOrderMax } — or the same keys at the top level. endsAt may be null when capUnits is set: it ends on its cap instead of a date' },
   kind: { type: 'string' as const, required: false, description: 'item | bundle | bxgy | store | threshold' },
   name: { type: 'string' as const, required: false },
   scope: { type: 'object' as const, required: false, description: '{ products, variants, categories, all, exclude }' },
   rule: { type: 'object' as const, required: false, description: 'item {pct|price|off} · bundle {qty, price, repeat} · bxgy {buy, get, getPct} · store {pct} · threshold {minSubtotal, off|pct}' },
   startsAt: { type: 'string' as const, required: false, description: 'ISO date; absent = as soon as approved' },
-  endsAt: { type: 'string' as const, required: false, description: 'ISO date — required on a new promotion' },
-  capUnits: { type: 'number' as const, required: false },
+  endsAt: {
+    type: 'string' as const,
+    required: false,
+    description: 'ISO date. Required on a new promotion unless capUnits is given — then null = it runs until the cap is used up'
+  },
+  capUnits: { type: 'number' as const, required: false, description: 'Units on promotion; the promotion ends when they are used up' },
   capOrders: { type: 'number' as const, required: false },
   perOrderMax: { type: 'number' as const, required: false },
   why: { type: 'string' as const, required: false }

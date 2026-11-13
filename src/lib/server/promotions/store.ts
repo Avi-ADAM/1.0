@@ -208,7 +208,8 @@ export function termsFields(t: Partial<PromoTerms>): Array<string | null> {
     jsonField('scope', t.scope),
     jsonField('rule', t.rule),
     'startsAt' in t ? (t.startsAt ? dateField('startsAt', t.startsAt) : 'startsAt: null') : null,
-    dateField('endsAt', t.endsAt),
+    // null endsAt = it ends on its cap ("עד גמר המלאי") — written as null, never skipped.
+    'endsAt' in t ? (t.endsAt ? dateField('endsAt', t.endsAt) : 'endsAt: null') : null,
     'capUnits' in t ? (numField('capUnits', t.capUnits) ?? 'capUnits: null') : null,
     'capOrders' in t ? (numField('capOrders', t.capOrders) ?? 'capOrders: null') : null,
     'perOrderMax' in t ? (numField('perOrderMax', t.perOrderMax) ?? 'perOrderMax: null') : null

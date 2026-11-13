@@ -276,7 +276,8 @@
         "phone": "По телефону",
         "whatsapp": "В WhatsApp"
       }
-    }
+    },
+    "promoUntilStock": "цена по акции до конца запаса"
   },
   "editBasic": {
     "head": "Редактировать профиль",

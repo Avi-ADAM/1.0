@@ -277,7 +277,8 @@
         "phone": "Por teléfono",
         "whatsapp": "Por WhatsApp"
       }
-    }
+    },
+    "promoUntilStock": "precio de oferta hasta agotar existencias"
   },
   "editBasic": {
     "head": "Editar perfil",
