@@ -104,5 +104,19 @@
     "q5_q": "¿No es otra plataforma más que se quedará con mis clientes?",
     "q5_a": "No hay exclusividad, y tus clientes no se van a ninguna parte. Lo que llega a través de la rikma pertenece a la rikma, es decir, también a ti, y no a la plataforma."
   },
+  "art": {
+    "alt": "A la izquierda: una figura corre en círculo detrás de una moneda que se le escapa, y las barras de los meses suben y vuelven a cero. A la derecha: tres figuras tejen juntas un hilo rosa, y debajo crecen pilas de monedas año tras año.",
+    "alone": "Solo: cada mes empieza de cero",
+    "together": "En una rikma: cada hora se queda y se acumula"
+  },
+  "reading": {
+    "title": "Seguir leyendo",
+    "noboss_t": "Ni jefe ni negocio en solitario",
+    "noboss_d": "La tercera vía: unirte a un proyecto con socios y recibir una parte según lo que aportaste de verdad.",
+    "shop_t": "Tu propia tienda, en propiedad compartida",
+    "shop_d": "Cómo una rikma abre una tienda, gestiona productos y pedidos y reparte cada venta por consenso.",
+    "broken_t": "El trato que se rompió",
+    "broken_d": "Por qué el mercado laboral nos agota a todos, de asalariados a freelancers, y cómo sería un nuevo contrato social."
+  },
   "back": "Volver a la página de inicio"
 }

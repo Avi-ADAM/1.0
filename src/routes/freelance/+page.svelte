@@ -39,6 +39,10 @@
      reason as /flexible-work: being found out later costs more than saying
      it first.
 
+  5. MIDDLE AND END. <FreelanceArt> draws the turn (treadmill vs woven
+     thread), <ThirdWayTable> is the homepage's employee/solo/rikma table
+     (shared with /no-boss), and the page closes on three further reads.
+
   Shape (conditional listings, both doors in the hero, <details> for depth)
   follows /flexible-work.
 -->
@@ -49,6 +53,8 @@
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import DemoRequest from '$lib/components/main/DemoRequest.svelte';
   import IncomeCurves from '$lib/components/main/IncomeCurves.svelte';
+  import ThirdWayTable from '$lib/components/main/ThirdWayTable.svelte';
+  import FreelanceArt from '$lib/components/main/FreelanceArt.svelte';
 
   let { data } = $props();
 
@@ -74,6 +80,16 @@
     ['community', 'coop'],
     ['equity', 'equity'],
     ['moach', 'agency']
+  ];
+
+  /* Further reading, closing the page: the neighbouring argument (/no-boss),
+     the tool a rikma sells through (/shop) and the long-form why
+     (/broken-deal). */
+  /** @type {[import('$lib/celim/icons/entityIcons').EntityIconKind, string, string][]} */
+  const READING = [
+    ['rikma', 'noboss', '/no-boss'],
+    ['store', 'shop', '/shop'],
+    ['document', 'broken', '/broken-deal']
   ];
 
   /** @type {{ icon: import('$lib/celim/icons/entityIcons').EntityIconKind, count: number, key: string, href: string }[]} */
@@ -157,6 +173,24 @@
     <p class="mt-4 text-center text-rose-700 dark:text-gold font-semibold text-lg sm:text-base">
       {$t('freelance.know.turn')}
     </p>
+  </section>
+
+  <!-- The turn, drawn: the treadmill and the coin on a stick against a
+       woven thread and stacks that only grow. -->
+  <section class="w-full max-w-xl mt-12">
+    <FreelanceArt />
+  </section>
+
+  <!-- The homepage's employee / solo / rikma table - the same three paths
+       the curves below then draw over ten years. -->
+  <section class="w-full max-w-xl mt-12">
+    <h2 class="text-rose-700 dark:text-gold font-bold text-2xl sm:text-xl mb-1 text-center">
+      {$t('home.sections.oldWayTitle')}
+    </h2>
+    <p class="text-center text-slate-700 dark:text-surfaceMuted text-base sm:text-sm mb-5">
+      {$t('home.sections.oldWaySub')}
+    </p>
+    <ThirdWayTable />
   </section>
 
   <!-- The whole argument in one picture: slower start, then it stacks - and
@@ -358,7 +392,30 @@
     </div>
   </section>
 
-  <section class="w-full max-w-xl mt-12 text-center">
+  <section class="w-full max-w-xl mt-12">
+    <h2 class="text-rose-700 dark:text-gold font-bold text-2xl sm:text-xl mb-4 text-center">
+      {$t('freelance.reading.title')}
+    </h2>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      {#each READING as [icon, key, href] (key)}
+        <a
+          {href}
+          data-sveltekit-prefetch
+          class="group flex flex-col bg-cyan-50/70 dark:bg-surface2 hover:bg-gold/20 border-2 border-gold/70 rounded-xl p-4 shadow-sm transition-colors text-start"
+        >
+          <span class="self-start"><EntityIcon kind={icon} size={24} tone="brand" /></span>
+          <span class="mt-1 text-rose-700 dark:text-gold font-bold text-lg sm:text-base group-hover:underline">
+            {$t(`freelance.reading.${key}_t`)}
+          </span>
+          <span class="mt-1 text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed">
+            {$t(`freelance.reading.${key}_d`)}
+          </span>
+        </a>
+      {/each}
+    </div>
+  </section>
+
+  <section class="w-full max-w-xl mt-10 text-center">
     <p>
       <a
         href="/"

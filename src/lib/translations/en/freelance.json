@@ -104,5 +104,19 @@
     "q5_q": "Isn't this just another platform that will take my clients?",
     "q5_a": "There is no exclusivity, and your clients don't move anywhere. What comes through the rikma belongs to the rikma, which means to you too, and not to the platform."
   },
+  "art": {
+    "alt": "On the left: one figure runs in a loop after a coin that keeps escaping, and the monthly bars rise and fall back to zero. On the right: three figures weave a pink thread together, and below it stacks of coins grow year after year.",
+    "alone": "Alone: every month starts from zero",
+    "together": "In a rikma: every hour stays and adds up"
+  },
+  "reading": {
+    "title": "Keep reading",
+    "noboss_t": "Neither a boss nor a business alone",
+    "noboss_d": "The third way: join a venture with partners and receive a share by what you actually gave.",
+    "shop_t": "Your own shop, jointly owned",
+    "shop_d": "How a rikma opens a shop, manages products and orders, and splits every sale by consent.",
+    "broken_t": "The deal that broke",
+    "broken_d": "Why the job market wears all of us out, from employees to freelancers, and what a new social contract looks like."
+  },
   "back": "Back to the homepage"
 }
