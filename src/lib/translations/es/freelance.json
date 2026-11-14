@@ -22,6 +22,14 @@
   "curve": {
     "lead": "Los ingresos de una sociedad no llegan a fin de mes como el pago de un cliente. Empiezan más despacio, y se acumulan. Mueve en el gráfico el año en que dejas de trabajar y mira qué queda en cada camino."
   },
+  "voice": {
+    "title": "Y no solo dinero: decidir juntos, no ser una marioneta movida por hilos",
+    "p1": "Como freelance, el cliente decide qué se construye, cómo será y cuándo termina. Ejecutas la visión de otra persona, y a veces tu mejor trabajo se archiva por un cambio de rumbo en el que no participaste. En una rikma te sientas en la sala donde se toman las decisiones: cada decisión que afecta a la rikma se toma por consenso, y cada socio tiene voz.",
+    "p2": "No solo es más justo, también se siente distinto. Una amplia investigación sobre la motivación (la teoría de la autodeterminación de Deci y Ryan) concluye que la autonomía, la sensación de competencia y la conexión con los demás son necesidades básicas, y que cuando se cubren las personas viven su trabajo con más satisfacción y alegría. Cuando compartes el objetivo, la planificación y el resultado, el trabajo deja de ser solo algo que haces por dinero.",
+    "b1": "Proponer, no solo ejecutar: cualquier socio puede plantear una idea o abrir una misión con sus propias palabras.",
+    "b2": "Sin «no» absoluto: a una propuesta que no encaja se responde con una contrapropuesta, hasta que todos firman la misma versión.",
+    "b3": "Ver el cuadro completo: desde la idea, pasando por el producto, hasta la clienta que lo recibió, y formas parte de cada paso."
+  },
   "tools": {
     "title": "Lo que el sistema hace por ti, en lugar de perseguir",
     "lead": "Un freelance se promociona solo. En una rikma, el trabajo y los clientes también llegan a ti, por canales que ya funcionan.",

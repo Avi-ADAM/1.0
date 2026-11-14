@@ -82,6 +82,13 @@
     ['moach', 'agency']
   ];
 
+  /** @type {[import('$lib/celim/icons/entityIcons').EntityIconKind, string][]} */
+  const VOICE = [
+    ['idea', 'b1'],
+    ['agreement', 'b2'],
+    ['lev', 'b3']
+  ];
+
   /* Further reading, closing the page: the neighbouring argument (/no-boss),
      the tool a rikma sells through (/shop) and the long-form why
      (/broken-deal). */
@@ -201,6 +208,37 @@
       {$t('freelance.curve.lead')}
     </p>
     <IncomeCurves />
+  </section>
+
+  <!-- Beyond money: a voice in the decisions. A client decides for a
+       freelancer; in a rikma every decision passes by consent. The research
+       line names self-determination theory (autonomy, competence,
+       relatedness -> satisfaction) and claims nothing more than that. -->
+  <section class="w-full max-w-xl mt-12">
+    <div
+      class="rounded-2xl border-2 border-gold bg-cyan-50/70 dark:bg-surface2 backdrop-blur-sm px-5 py-6 shadow"
+    >
+      <div class="flex justify-center mb-2"><EntityIcon kind="votes" size={28} tone="brand" /></div>
+      <h2 class="text-rose-700 dark:text-gold font-bold text-2xl sm:text-xl mb-3 text-center">
+        {$t('freelance.voice.title')}
+      </h2>
+      <p class="text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed text-start mb-3">
+        {$t('freelance.voice.p1')}
+      </p>
+      <p class="text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed text-start mb-4">
+        {$t('freelance.voice.p2')}
+      </p>
+      <ul class="flex flex-col gap-2.5">
+        {#each VOICE as [icon, key] (key)}
+          <li
+            class="flex items-start gap-3 bg-white/60 dark:bg-surface border border-gold/60 rounded-xl px-3 py-2.5 text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed text-start"
+          >
+            <span class="shrink-0 mt-0.5"><EntityIcon kind={icon} size={20} tone="brand" /></span>
+            <span>{$t(`freelance.voice.${key}`)}</span>
+          </li>
+        {/each}
+      </ul>
+    </div>
   </section>
 
   <!-- What replaces the chasing - each card a mechanism that runs today. -->
