@@ -1,0 +1,130 @@
+{
+  "meta": {
+    "title": "Freelance sin perseguir al próximo cliente: ingresos que crecen con socios | 1lev1",
+    "description": "Como freelance, cada mes empieza de cero: otro cliente, otro presupuesto, otro cobro. En una rikma, cada hora que aportas queda registrada como una parte de los beneficios de un proyecto, los clientes también llegan a ti y las partes se acumulan. Puedes empezar junto a tus clientes actuales."
+  },
+  "hero": {
+    "eyebrow": "◈ Para freelancers y autónomos ◈",
+    "h1": "¿Cansado de correr detrás del próximo euro del próximo cliente?",
+    "sub": "Como freelance, los ingresos del mes que viene dependen de un cliente que todavía no has encontrado. En una rikma eres socio: tu tiempo y tus habilidades quedan registrados como una parte de los beneficios de un proyecto, sus clientes son de todos y cada rikma a la que te unes añade otra capa de ingresos.",
+    "reassure": "No tienes que renunciar a tus clientes. Empiezas con unas horas a la semana, junto al trabajo que ya tienes.",
+    "ctaStart": "Empezar ahora",
+    "cta": "Cuéntanos en qué eres bueno"
+  },
+  "know": {
+    "title": "Si esto se parece a tu mes",
+    "k1": "La mitad del tiempo se va en encontrar el trabajo: presupuestos, llamadas de presentación, publicaciones y seguimiento de contactos que nunca responden.",
+    "k2": "Un proyecto termina, y el dinero termina con él. Lo que construiste se queda con el cliente, y vuelves al punto de partida.",
+    "k3": "El precio se fija compitiendo con quien lo haga por menos, y a veces la plataforma que trajo al cliente se lleva además entre una décima y una quinta parte del importe.",
+    "k4": "Unas vacaciones, una enfermedad o un mes flojo, y los ingresos se detienen ese mismo día.",
+    "turn": "El problema no es tu talento. Es que vendes horas y no tienes ninguna parte de lo que esas horas construyen."
+  },
+  "curve": {
+    "lead": "Los ingresos de una sociedad no llegan a fin de mes como el pago de un cliente. Empiezan más despacio, y se acumulan. Mueve en el gráfico el año en que dejas de trabajar y mira qué queda en cada camino."
+  },
+  "voice": {
+    "title": "Y no solo dinero: decidir juntos, no ser una marioneta movida por hilos",
+    "p1": "Como freelance, el cliente decide qué se construye, cómo será y cuándo termina. Ejecutas la visión de otra persona, y a veces tu mejor trabajo se archiva por un cambio de rumbo en el que no participaste. En una rikma te sientas en la sala donde se toman las decisiones: cada decisión que afecta a la rikma se toma por consenso, y cada socio tiene voz.",
+    "p2": "No solo es más justo, también se siente distinto. Una amplia investigación sobre la motivación (la teoría de la autodeterminación de Deci y Ryan) concluye que la autonomía, la sensación de competencia y la conexión con los demás son necesidades básicas, y que cuando se cubren las personas viven su trabajo con más satisfacción y alegría. Cuando compartes el objetivo, la planificación y el resultado, el trabajo deja de ser solo algo que haces por dinero.",
+    "b1": "Proponer, no solo ejecutar: cualquier socio puede plantear una idea o abrir una misión con sus propias palabras.",
+    "b2": "Sin «no» absoluto: a una propuesta que no encaja se responde con una contrapropuesta, hasta que todos firman la misma versión.",
+    "b3": "Ver el cuadro completo: desde la idea, pasando por el producto, hasta la clienta que lo recibió, y formas parte de cada paso."
+  },
+  "tools": {
+    "title": "Lo que el sistema hace por ti, en lugar de perseguir",
+    "lead": "Un freelance se promociona solo. En una rikma, el trabajo y los clientes también llegan a ti, por canales que ya funcionan.",
+    "concierge_t": "Los clientes del concierge llegan a la rikma",
+    "concierge_d": "Una clienta describe con sus palabras lo que necesita, y el sistema divide la petición en misiones y recursos y busca quién puede aportar cada parte. Cuando tu rikma encaja, la petición te llega directamente, con aviso por correo y Telegram, y tú decides si haces una oferta.",
+    "mail_t": "Un correo cuando se abre una sociedad que te encaja",
+    "mail_d": "¿Una rikma abrió una misión que busca tus habilidades, o pide un recurso que ofreces? Recibes un correo de «tienes una nueva sugerencia». Una habilidad que tienes siempre basta para que te enteres. Y sin saturarte: como mucho tres correos al día, y solo durante el día.",
+    "leads_t": "Una tabla de contactos que ven todos los socios",
+    "leads_d": "Cada consulta que llega a la rikma, desde la web, la tienda o el concierge, entra en una tabla compartida, con una tarea y quién la tomó. Un contacto nunca se rechaza: pasa a «ahora no» con una fecha para retomarlo. Nadie tiene que guardar contactos solo en su WhatsApp.",
+    "demand_t": "El mapa de la demanda",
+    "demand_d": "Mira lo que busca la gente a tu alrededor y únete a una demanda en grupo u ofrece un servicio que empieza cuando se ha sumado suficiente gente. Trabajo cuya demanda ya existe, antes de haber promocionado nada.",
+    "hours_t": "Cada hora queda registrada como una parte",
+    "hours_d": "Pones un temporizador en la misión, los socios aprueban las horas y tu parte de los beneficios se actualiza. Sin discutir el cincuenta-cincuenta: hay una fórmula y cifras que todos pueden ver.",
+    "stipend_t": "Gastos de vida mientras la sociedad crece",
+    "stipend_d": "Un socio que puede financiar parte de tus gastos de vida te paga ahora una cantidad inferior al precio de mercado del trabajo, y por la diferencia recibes una parte de la sociedad. Así no tienes que elegir entre el alquiler y la sociedad.",
+    "many_t": "Varias rikmas a la vez",
+    "many_d": "Puedes ser socio de varias rikmas al mismo tiempo. Cada una añade otra fuente de ingresos, y lo que ya aportaste se queda en el contador aunque pases al siguiente proyecto.",
+    "shop_t": "La tienda y las ventas de la rikma",
+    "shop_d": "Una rikma puede tener productos y servicios, una tienda, pedidos y existencias. Cada venta se registra y se reparte según las partes, así que la próxima venta no depende solo de ti."
+  },
+  "compare": {
+    "title": "¿Y las otras soluciones?",
+    "lead": "Hay varios caminos conocidos para los freelancers, y cada uno resuelve una parte del problema. Así se ven uno al lado del otro:",
+    "good": "Lo que te da",
+    "same": "Lo que sigue igual",
+    "here": "En una rikma",
+    "gig_n": "Plataformas de freelance y de encargos",
+    "gig_good": "Clientes sin tener que promocionarte.",
+    "gig_same": "Se compite en precio, la comisión suele ser entre una décima y una quinta parte de cada encargo, y tu perfil y tus valoraciones pertenecen a la plataforma. Cuando termina el proyecto, terminan los ingresos.",
+    "gig_here": "La petición llega por habilidad, no por subasta de precios. El cliente es de toda la rikma, y lo que construiste sigue generando ingresos.",
+    "coop_n": "Cooperativas y gremios de freelancers",
+    "coop_good": "Respaldo administrativo: facturación, seguros y, a veces, cobro garantizado.",
+    "coop_same": "Cada uno sigue vendiendo sus propias horas a sus propios clientes. Alguien gestiona el dinero contigo, pero no construye contigo un activo común.",
+    "coop_here": "Los socios construyen juntos un producto o servicio, y su beneficio se reparte según lo que cada uno aportó de verdad.",
+    "equity_n": "Trabajar a cambio de participaciones en una startup",
+    "equity_good": "Una parte de la propiedad en lugar de la tarifa completa.",
+    "equity_same": "El porcentaje se fija de antemano, en una sola negociación, y no se mueve aunque hayas hecho el triple. Y si la empresa nunca se vende, el porcentaje no vale nada.",
+    "equity_here": "Tu parte se actualiza con cada hora aprobada y se cobra de cada venta, no solo el día en que se vende la empresa.",
+    "agency_n": "Montar un estudio o una agencia",
+    "agency_good": "Control total, y puedes aceptar proyectos grandes.",
+    "agency_same": "Todo el riesgo es tuyo: cobros, marketing y sueldos del equipo antes de que el cliente haya pagado.",
+    "agency_here": "El riesgo y el trabajo se reparten entre socios, y nadie paga sueldos antes de que entre dinero."
+  },
+  "how": {
+    "title": "Cómo empezar",
+    "s1": "Regístrate y añade tus habilidades a tu perfil. Eso es lo que te trae peticiones y sugerencias.",
+    "s2": "Ofrécete para una misión abierta en una rikma existente, o abre una rikma con personas con las que ya trabajas.",
+    "s3": "Registra tus horas, y los socios las aprueban. Tu parte empieza a acumularse desde la primera hora.",
+    "s4": "Cuando entra una venta, se reparte según las partes. Mientras tanto, tus clientes siguen como siempre."
+  },
+  "honest": {
+    "title": "Lo que conviene saber antes de empezar",
+    "lead": "Mejor que lo oigas de nosotros ahora que descubrirlo después.",
+    "h1": "No es dinero rápido. Una primera rikma casi nunca genera ingresos el primer mes, así que conviene mantener tus clientes actuales junto a la sociedad.",
+    "h2": "Una parte en una rikma es una parte de los beneficios, no un sueldo. Si la rikma no vende, no hay nada que repartir.",
+    "h3": "Los socios deciden sobre tu candidatura. Puede que digan «ahora no» a una misión concreta, y entonces buscas la siguiente.",
+    "h4": "Los ingresos de un reparto de beneficios son ingresos como cualquier otro. Consulta con un asesor fiscal cómo declararlos en tu actividad."
+  },
+  "open": {
+    "title": "Abierto ahora",
+    "missions": "misiones abiertas que buscan socios",
+    "projects": "rikmas activas",
+    "view": "Ver"
+  },
+  "match": {
+    "title": "¿Quieres que busquemos contigo?",
+    "sub": "Cuéntanos en qué eres bueno y cuánto tiempo tienes a la semana. Te ayudamos a encontrar una rikma que te encaje, o a abrir una con personas con las que ya trabajas.",
+    "cta": "Reservar una llamada corta"
+  },
+  "doubts": {
+    "title": "Lo que preguntan los freelancers",
+    "q1_q": "¿Y de qué vivo hasta que dé ingresos?",
+    "q1_a": "De lo que vives hoy: de tus clientes. Empiezas con unas horas a la semana y no dejas nada. Y si en la rikma hay un socio que puede financiar parte de tus gastos de vida, existe un camino ordenado para eso, y la diferencia con el precio de mercado se queda contigo como parte de la sociedad.",
+    "q2_q": "¿Y si trabajo más que los demás?",
+    "q2_a": "Entonces tu parte es mayor. El reparto se mueve con las horas y los recursos aprobados, y no se queda atascado en lo que se acordó el primer día.",
+    "q3_q": "¿Puedo traer a la rikma a un cliente mío?",
+    "q3_a": "Sí. Entra en la tabla de contactos de la rikma, y los ingresos del trabajo para él se reparten según las partes. Si quieres que también cuente haber traído al cliente, lo propones como una aportación, y los socios lo aprueban o proponen otro valor. Los clientes que atiendes por tu cuenta siguen siendo tuyos: solo se reparte lo que se hace dentro de la rikma.",
+    "q4_q": "¿Cuánto cuesta?",
+    "q4_a": "Ahora mismo no hay obligación de pagar. 1lev1 invita a cada uno a dar lo que pueda, y cuando la plataforma recibe una parte de una operación, lo hace como socia que prestó un servicio, por decisión de cada miembro sobre su propia parte. No es una comisión que se descuenta de antemano.",
+    "q5_q": "¿No es otra plataforma más que se quedará con mis clientes?",
+    "q5_a": "No hay exclusividad, y tus clientes no se van a ninguna parte. Lo que llega a través de la rikma pertenece a la rikma, es decir, también a ti, y no a la plataforma."
+  },
+  "art": {
+    "alt": "A la izquierda: una figura corre en círculo detrás de una moneda que se le escapa, y las barras de los meses suben y vuelven a cero. A la derecha: tres figuras tejen juntas un hilo rosa, y debajo crecen pilas de monedas año tras año.",
+    "alone": "Solo: cada mes empieza de cero",
+    "together": "En una rikma: cada hora se queda y se acumula"
+  },
+  "reading": {
+    "title": "Seguir leyendo",
+    "noboss_t": "Ni jefe ni negocio en solitario",
+    "noboss_d": "La tercera vía: unirte a un proyecto con socios y recibir una parte según lo que aportaste de verdad.",
+    "shop_t": "Tu propia tienda, en propiedad compartida",
+    "shop_d": "Cómo una rikma abre una tienda, gestiona productos y pedidos y reparte cada venta por consenso.",
+    "broken_t": "El trato que se rompió",
+    "broken_d": "Por qué el mercado laboral nos agota a todos, de asalariados a freelancers, y cómo sería un nuevo contrato social."
+  },
+  "back": "Volver a la página de inicio"
+}

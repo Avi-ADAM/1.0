@@ -1,0 +1,130 @@
+{
+  "meta": {
+    "title": "Freelancing without chasing the next client: income that grows with partners | 1lev1",
+    "description": "As a freelancer every month starts from zero: another client, another quote, another invoice to chase. In a rikma, every hour you give is recorded as a share in a venture's profits, customers come to you too, and the shares add up. You can start alongside your existing clients."
+  },
+  "hero": {
+    "eyebrow": "◈ For freelancers and the self-employed ◈",
+    "h1": "Tired of chasing the next dollar from the next client?",
+    "sub": "As a freelancer, next month's income depends on a client you haven't found yet. In a rikma you are a partner: your time and skills are recorded as a share in a venture's profits, its customers belong to all of you, and every rikma you join adds another layer of income.",
+    "reassure": "You don't have to give up your clients. Start with a few hours a week, alongside the work you already have.",
+    "ctaStart": "Start now",
+    "cta": "Tell us what you're good at"
+  },
+  "know": {
+    "title": "If this sounds like your month",
+    "k1": "Half your time goes into finding the work: quotes, intro calls, posts, and following up on leads that never reply.",
+    "k2": "A project ends, and the money ends with it. What you built stays with the client, and you are back at the start.",
+    "k3": "The price is set by competing with whoever will do it for less, and sometimes the platform that brought the client takes another tenth to a fifth of the amount.",
+    "k4": "A holiday, an illness or a slow month, and the income stops that same day.",
+    "turn": "The problem isn't your talent. It's that you sell hours and own no part of what those hours build."
+  },
+  "curve": {
+    "lead": "Income from a partnership doesn't arrive at the end of the month like a client's payment. It starts slower, and it accumulates. Move the year you stop working on the graph and see what's left on each path."
+  },
+  "voice": {
+    "title": "And not just money: deciding together, not a puppet on strings",
+    "p1": "As a freelancer, the client decides what gets built, what it looks like and when it ends. You carry out someone else's vision, and sometimes your best work is shelved because of a change of direction you had no part in. In a rikma you sit in the room where decisions are made: every decision that touches the rikma passes by consent, and every partner has a voice.",
+    "p2": "It isn't only fairer, it also feels different. A large body of research on motivation (Deci and Ryan's self-determination theory) finds that autonomy, a sense of competence and connection to others are basic needs, and when they are met people experience more satisfaction and joy in their work. When you share the goal, the planning and the outcome, work stops being only something you do for the money.",
+    "b1": "Propose, don't just execute: any partner can raise an idea or open a mission in their own words.",
+    "b2": "No absolute \"no\": a proposal that doesn't fit gets a counter-proposal, until everyone signs the same version.",
+    "b3": "See the whole picture: from the idea, through the product, to the customer who received it, and you are part of every step."
+  },
+  "tools": {
+    "title": "What the system does for you, instead of chasing",
+    "lead": "A freelancer markets themselves alone. In a rikma, work and customers come to you too, through channels that already run.",
+    "concierge_t": "Customers from the concierge reach the rikma",
+    "concierge_d": "A customer describes in her own words what she needs, and the system breaks the request into missions and resources and looks for who can supply each part. When your rikma fits, the request comes straight to you, with an email and Telegram alert, and you decide whether to make an offer.",
+    "mail_t": "An email when a partnership that fits you opens",
+    "mail_d": "A rikma opened a mission looking for your skills, or is asking for a resource you offer? You get a \"you have a new suggestion\" email. A skill you hold is always enough for you to hear about it. And no flooding: at most three emails a day, and only during the day.",
+    "leads_t": "A leads table every partner can see",
+    "leads_d": "Every enquiry that reaches the rikma, from the website, the shop or the concierge, goes into a shared table, with a task and whoever took it. A lead is never rejected: it moves to \"not now\" with a date to come back to it. Nobody has to keep leads alone in their own WhatsApp.",
+    "demand_t": "The demand map",
+    "demand_d": "See what people around you are looking for, and join a group demand or offer a service that starts once enough people have joined. Work whose demand already exists, before you have marketed anything.",
+    "hours_t": "Every hour is recorded as a share",
+    "hours_d": "Start a timer on the mission, the partners approve the hours, and your share of the profits updates. No arguing over fifty-fifty: there is a formula and numbers everyone can see.",
+    "stipend_t": "Living costs while the partnership grows",
+    "stipend_d": "A partner who can fund part of your living costs pays you now an amount below the market rate for the work, and for the gap you receive a share in the partnership. So you don't have to choose between the rent and the partnership.",
+    "many_t": "Several rikmas at once",
+    "many_d": "You can be a partner in several rikmas at the same time. Each one adds another source of income, and what you have already given stays on the counter even when you move on to the next project.",
+    "shop_t": "The rikma's shop and sales",
+    "shop_d": "A rikma can have products and services, a shop, orders and stock. Every sale is recorded and split by the shares, so the next sale doesn't depend on you alone."
+  },
+  "compare": {
+    "title": "And what about the other options?",
+    "lead": "There are a few familiar paths for freelancers, and each one solves part of the problem. Here they are side by side:",
+    "good": "What it gives you",
+    "same": "What stays the same",
+    "here": "In a rikma",
+    "gig_n": "Freelance and gig platforms",
+    "gig_good": "Clients without marketing yourself.",
+    "gig_same": "Competition is on price, the fee is usually a tenth to a fifth of every deal, and your profile and ratings belong to the platform. When the project ends, the income ends.",
+    "gig_here": "The request arrives by skill, not by a price auction. The customer belongs to the whole rikma, and what you built keeps earning.",
+    "coop_n": "Freelancer co-ops and guilds",
+    "coop_good": "Admin backing: invoicing, insurance, sometimes guaranteed payment.",
+    "coop_same": "Everyone still sells their own hours to their own clients. Someone handles the money with you, but doesn't build a shared asset with you.",
+    "coop_here": "Partners build a product or service together, and its profit is split by what each one actually gave.",
+    "equity_n": "Working for equity in a startup",
+    "equity_good": "A stake in ownership instead of a full fee.",
+    "equity_same": "The percentage is fixed up front, in one negotiation, and doesn't move even if you did three times as much. And if the company is never sold, the percentage is worth nothing.",
+    "equity_here": "Your share updates with every approved hour and is paid out of every sale, not only on the day the company is sold.",
+    "agency_n": "Starting a studio or an agency",
+    "agency_good": "Full control, and you can take on large projects.",
+    "agency_same": "All the risk is yours: collections, marketing, and salaries for staff before the client has paid.",
+    "agency_here": "Risk and work are shared between partners, and nobody pays salaries before money comes in."
+  },
+  "how": {
+    "title": "How to start",
+    "s1": "Sign up and add your skills to your profile. That is what brings requests and suggestions to you.",
+    "s2": "Offer yourself for an open mission in an existing rikma, or open a rikma with people you already work with.",
+    "s3": "Log your hours, and the partners approve them. Your share starts accruing from the first hour.",
+    "s4": "When a sale comes in, it is split by the shares. Meanwhile, your clients carry on as usual."
+  },
+  "honest": {
+    "title": "What to know before you start",
+    "lead": "Better that you hear it from us now than find out later.",
+    "h1": "This isn't quick money. A first rikma almost never earns in its first month, so keep your existing clients alongside the partnership.",
+    "h2": "A share in a rikma is a share of profits, not a salary. If the rikma doesn't sell, there is nothing to split.",
+    "h3": "The partners decide on your candidacy. They may say \"not now\" to a particular mission, and then you look for the next one.",
+    "h4": "Income from a profit split is income like any other. Check with an accountant how to report it in your business."
+  },
+  "open": {
+    "title": "Open right now",
+    "missions": "open missions looking for partners",
+    "projects": "active rikmas",
+    "view": "View"
+  },
+  "match": {
+    "title": "Want us to look with you?",
+    "sub": "Tell us what you're good at and how much time you have each week. We'll help you find a rikma that fits, or open one with people you already work with.",
+    "cta": "Book a short call"
+  },
+  "doubts": {
+    "title": "What freelancers ask",
+    "q1_q": "And what do I live on until it pays?",
+    "q1_a": "What you live on today: your clients. You start with a few hours a week and leave nothing behind. And if the rikma has a partner who can fund part of your living costs, there is a proper path for that, and the gap from the market rate stays with you as a share in the partnership.",
+    "q2_q": "What if I work more than the others?",
+    "q2_a": "Then your share is bigger. The split moves with the approved hours and resources, and doesn't stay stuck on what was agreed on day one.",
+    "q3_q": "Can I bring a client of mine into the rikma?",
+    "q3_a": "Yes. They go into the rikma's leads table, and the income from the work for them is split by the shares. If you want bringing the client to count as well, you propose it as a contribution, and the partners approve it or propose a different value. Clients you serve on your own stay yours: only what is done inside the rikma is split.",
+    "q4_q": "How much does it cost?",
+    "q4_a": "There is no obligation to pay right now. 1lev1 invites everyone to give what they can, and when the platform receives part of a deal, it does so as a partner that provided a service, by each member's own decision about their share. It is not a fee deducted up front.",
+    "q5_q": "Isn't this just another platform that will take my clients?",
+    "q5_a": "There is no exclusivity, and your clients don't move anywhere. What comes through the rikma belongs to the rikma, which means to you too, and not to the platform."
+  },
+  "art": {
+    "alt": "On the left: one figure runs in a loop after a coin that keeps escaping, and the monthly bars rise and fall back to zero. On the right: three figures weave a pink thread together, and below it stacks of coins grow year after year.",
+    "alone": "Alone: every month starts from zero",
+    "together": "In a rikma: every hour stays and adds up"
+  },
+  "reading": {
+    "title": "Keep reading",
+    "noboss_t": "Neither a boss nor a business alone",
+    "noboss_d": "The third way: join a venture with partners and receive a share by what you actually gave.",
+    "shop_t": "Your own shop, jointly owned",
+    "shop_d": "How a rikma opens a shop, manages products and orders, and splits every sale by consent.",
+    "broken_t": "The deal that broke",
+    "broken_d": "Why the job market wears all of us out, from employees to freelancers, and what a new social contract looks like."
+  },
+  "back": "Back to the homepage"
+}

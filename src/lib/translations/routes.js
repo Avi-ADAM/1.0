@@ -80,6 +80,10 @@ export const ROUTED = {
     // homepage door and banner keep their copy in `home`, which loads
     // everywhere; only the page's own copy is gated.
     flexible: at('/flexible-work'),
+    // The freelancer track: from chasing the next client to income that
+    // accumulates across partnerships. Its homepage door keeps its copy in
+    // `home`; the curves graph it embeds reads `home.curves`, also global.
+    freelance: at('/freelance'),
     // The page behind the product - why consent is re-checked at every step.
     // One route, one namespace; the homepage teaser for it lives in `home`.
     why: at('/why'),
