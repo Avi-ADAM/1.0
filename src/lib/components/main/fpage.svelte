@@ -164,6 +164,9 @@
     ['a8', 'd6', '/vision', 'growth'],
     ['a2', 'd2', '/join', 'search'],
     ['a5', 'd3', '/no-boss', 'rikma'],
+    // The freelancer on the treadmill of the next client - not "alone vs a
+    // boss" (/no-boss) but "one-off fees vs income that accumulates".
+    ['a9', 'd7', '/freelance', 'growth'],
     // The reader the other doors quietly assume away: someone whose constraint
     // is not "which of these am I" but "will any of this take me".
     ['a7', 'd5', '/flexible-work', 'timer'],

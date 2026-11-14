@@ -90,7 +90,9 @@
     "doorsTitle": "Where are you today?",
     "doorsSub": "Each one leads to a page of its own. Pick whichever is closest to you.",
     "a7": "A standard job does not fit me",
-    "d5": "Age, a career break or a pace of your own — and on your terms"
+    "d5": "Age, a career break or a pace of your own — and on your terms",
+    "a9": "I'm a freelancer chasing the next client",
+    "d7": "Instead of chasing the next dollar: income that accumulates with partners"
   },
   "sections": {
     "problemTitle": "Know that feeling?",
