@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { deriveProductFields, type DeriveVariant } from './derived';
+import { deriveProductFields, soldByVariant, type DeriveVariant } from './derived';
 
 const variants: DeriveVariant[] = [
   { price: 480, quant: 4, active: true, position: 0, optionValues: [{ key: 'height', value: '65', label: '65' }, { key: 'finish', value: 'nat', label: 'טבעי' }] },
@@ -26,7 +26,8 @@ const cases: Array<[string, Parameters<typeof deriveProductFields>]> = [
   ['a plain product flagged unlimited', [{ price: 120, quant: 3, unlimited: true }, [], null]],
   ['a counted plain product without a number', [{ price: 120, quant: null, unlimited: false }, [], null]],
   ['a variant oversold by one', [{ price: 500 }, [{ price: 10, quant: -1, unlimited: false, active: true }, { price: 10, quant: 0, unlimited: false, active: true }], null]],
-  ['a variant flagged unlimited', [{ price: 500 }, [{ price: 10, quant: 4, unlimited: true, active: true }, { price: 10, quant: 2, active: true }], null]]
+  ['a variant flagged unlimited', [{ price: 500 }, [{ price: 10, quant: 4, unlimited: true, active: true }, { price: 10, quant: 2, active: true }], null]],
+  ['every variant off and no axis left', [{ price: 88, quant: 12 }, [{ ...variants[2] }, { ...variants[2], position: 3 }], []]]
 ];
 
 describe('deriveProductFields', () => {
@@ -69,6 +70,21 @@ describe('deriveProductFields', () => {
 
   it('a product whose variants are all off stays sold by variant, with nothing to sell', () => {
     expect(deriveProductFields(...cases[5][1])).toMatchObject({ hasVariants: true, stockTotal: 0, stockUnlimited: false, priceMin: null });
+  });
+
+  it('every variant off and no axis left: a plain product again, with its own stock', () => {
+    expect(deriveProductFields(...cases[11][1])).toEqual({
+      hasVariants: false,
+      priceMin: 88,
+      priceMax: 88,
+      stockTotal: 12,
+      stockUnlimited: false,
+      variantAxes: null
+    });
+    expect(soldByVariant([{ active: false }], [])).toBe(false);
+    expect(soldByVariant([{ active: false }], [{ key: 'size' }])).toBe(true);
+    expect(soldByVariant([{ active: true }], [])).toBe(true);
+    expect(soldByVariant([], [{ key: 'size' }])).toBe(false);
   });
 
   // The Strapi lifecycle carries the same function in plain JS. When the

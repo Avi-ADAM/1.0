@@ -70,6 +70,23 @@ function unlimitedOf(row: { quant?: unknown; unlimited?: unknown } | null | unde
   return q === UNLIMITED || (nullIsUnlimited && q === null);
 }
 
+/**
+ * Is this product sold by variant? Yes while a variant is on sale — and also
+ * while every one is switched off but the product still declares its axes
+ * (the seller hid the sizes for now: the product's own stock must not become
+ * sellable under them). Every variant off **and** no axis left is the seller
+ * taking the options away: the rows stay for the orders that point at them,
+ * and the product is a plain one again, with its own stock.
+ */
+export function soldByVariant(
+  variants: Array<{ active?: unknown } | null | undefined> | null | undefined,
+  options: ArrayLike<unknown> | null | undefined
+): boolean {
+  const rows = Array.isArray(variants) ? variants : [];
+  if (rows.some((v) => v && v.active !== false)) return true;
+  return rows.length > 0 && (options?.length ?? 0) > 0;
+}
+
 export function deriveProductFields(
   product: { price?: unknown; quant?: unknown; unlimited?: unknown },
   variants: DeriveVariant[] | null | undefined,
@@ -78,7 +95,7 @@ export function deriveProductFields(
   const rows = Array.isArray(variants) ? variants : [];
   const basePrice = num(product?.price);
 
-  if (!rows.length) {
+  if (!soldByVariant(rows, options)) {
     const unlimited = unlimitedOf(product, true);
     return {
       hasVariants: false,
@@ -90,8 +107,8 @@ export function deriveProductFields(
     };
   }
 
-  // Variant rows ⇒ sold by variant, even with every one switched off: the
-  // product's own stock must never become sellable again under them.
+  // Sold by variant, even with every one switched off while the axes stay:
+  // the product's own stock must never become sellable again under them.
   const active = rows.filter((v) => v && v.active !== false);
   const prices = active
     .map((v) => num(v.price) ?? basePrice)

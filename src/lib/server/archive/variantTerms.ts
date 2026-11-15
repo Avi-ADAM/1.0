@@ -202,7 +202,7 @@ export async function applyVariantTerms(
  * deployment without the lifecycle still knows the product is sold by
  * variant — `createSale` refuses a sale without one only when `hasVariants`.
  */
-export async function refreshDerived(exec: Exec, productId: string): Promise<void> {
+export async function refreshDerived(exec: Exec, productId: string): Promise<{ hasVariants: boolean } | null> {
   const data = await run(
     exec,
     `{ matanot(id: ${gqlStr(productId)}) { data { id attributes {
@@ -213,7 +213,7 @@ export async function refreshDerived(exec: Exec, productId: string): Promise<voi
     'derived:read'
   );
   const a = data?.matanot?.data?.attributes;
-  if (!a) return;
+  if (!a) return null;
   const rows: any[] = a.variants?.data ?? [];
 
   // The `unlimited` flag beside each count once it is deployed — otherwise a
@@ -244,4 +244,5 @@ export async function refreshDerived(exec: Exec, productId: string): Promise<voi
     )} }) { data { id } } }`,
     'derived:write'
   );
+  return { hasVariants: d.hasVariants };
 }

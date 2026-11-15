@@ -60,6 +60,7 @@
     validateVariants,
     type EditorAxis
   } from '$lib/shop/variantEditor';
+  import { soldByVariant } from '$lib/shop/derived';
   import {
     detailChanges,
     isCostPriced,
@@ -191,8 +192,11 @@
   let rows = $state<EditorRow[]>([]);
   const kindChoices = $derived<Kind[]>(product?.kindOf === 'daily' ? [...KINDS, 'daily'] : KINDS);
   // With variants the count lives on each of them.
-  const showQuant = $derived(kindOf !== 'unlimited' && !unlimitedM && !rows.length);
-  const showUnlimitedM = $derived(periodic || (!!product?.unlimited && !rows.length));
+  // Rows all switched off with no axis left are a plain product again ($lib/shop/derived.ts).
+  // `clean` is declared below; the closure reads it lazily.
+  const byVariant = $derived.by(() => soldByVariant(rows, clean.axes));
+  const showQuant = $derived(kindOf !== 'unlimited' && !unlimitedM && !byVariant);
+  const showUnlimitedM = $derived(periodic || (!!product?.unlimited && !byVariant));
 
   // ── more options ─────────────────────────────────────────────────────────
   let locationOpen = $state(false);
@@ -395,7 +399,7 @@
   const waiting = $derived(product?.pending ? pendingByVariant(product.pending.terms) : null);
   const stockMoves = $derived(
     !!product &&
-      !rows.length &&
+      !byVariant &&
       kindOf !== 'unlimited' &&
       (unlimitedM !== product.unlimited || (!unlimitedM && Number(quant) !== (product.quant ?? 0)))
   );
@@ -1056,7 +1060,7 @@
               <label for="pf-quant" class={lbl}>{$t('offerings.compose.quant')}</label>
               <input id="pf-quant" class={inp} type="number" min="0" step="1" bind:value={quant} />
             </div>
-          {:else if rows.length && kindOf !== 'unlimited'}
+          {:else if byVariant && kindOf !== 'unlimited'}
             <p class="m-0 text-sm text-[#6b5560]">{$t('shopEditor.form.stockInVariants')}</p>
           {/if}
           {#if periodic}
@@ -1188,7 +1192,7 @@
             <OptionRow
               icon={Boxes}
               title={$t('shopEditor.form.stock')}
-              status={rows.length
+              status={byVariant
                 ? $t('shopEditor.form.stockInVariantsShort')
                 : kindOf === 'unlimited' || unlimitedM
                   ? $t('shopEditor.variants.unlimited')

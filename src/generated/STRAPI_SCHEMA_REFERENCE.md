@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-11-11
+> Last updated: 2026-11-15
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -5556,6 +5556,7 @@ Used for creating/updating content.
 | `archived` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `chat` | `InputMaybe<Array<InputMaybe<ComponentProjectsVotsInput>>>` |
 | `forums` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `lapsedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `negopendmissions` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `open_mission` | `InputMaybe<Scalars['ID']['input']>` |
 | `partofs` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -8747,7 +8748,7 @@ Fields: `allowed_origins`, `and`, `callback_url`, `createdAt`, `env`, `expiresAt
 Fields: `and`, `arguments`, `authorEmail`, `authorExternalId`, `authorName`, `authorType`, `body`, `createdAt`, `id`, `negotiation`, `not`, `or`, `parent`, `position`, `publishedAt`, `stance`, `updatedAt`, `voters`, `votes`
 
 #### AskFiltersInput
-Fields: `and`, `archived`, `chat`, `createdAt`, `forums`, `id`, `negopendmissions`, `not`, `open_mission`, `or`, `partofs`, `project`, `publishedAt`, `shiftsMax`, `shiftsMin`, `timegrama`, `updatedAt`, `users_permissions_user`, `vots`
+Fields: `and`, `archived`, `chat`, `createdAt`, `forums`, `id`, `lapsedAt`, `negopendmissions`, `not`, `open_mission`, `or`, `partofs`, `project`, `publishedAt`, `shiftsMax`, `shiftsMin`, `timegrama`, `updatedAt`, `users_permissions_user`, `vots`
 
 #### AskmFiltersInput
 Fields: `and`, `archived`, `chat`, `createdAt`, `forum`, `id`, `isSelfProposal`, `nego_mashes`, `not`, `open_mashaabim`, `or`, `partofs`, `pendingMainVote`, `pmash`, `project`, `publishedAt`, `sp`, `timegrama`, `updatedAt`, `users_permissions_user`, `vots`
@@ -9879,7 +9880,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 25212 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 25215 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

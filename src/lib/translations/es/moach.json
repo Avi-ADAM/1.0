@@ -18,7 +18,7 @@
     "noTasks": "Esta misión todavía no tiene tareas.",
     "startTimer": "Iniciar temporizador",
     "stopTimer": "Detener temporizador",
-    "saveTimer": "Guardar el tiempo",
+    "saveTimer": "Guardar / editar temporizador",
     "updateStatus": "Actualizar el progreso",
     "timerUnavailable": "El temporizador se está cargando…",
     "stopTimerFirst": "Detén el temporizador antes de enviar la misión.",

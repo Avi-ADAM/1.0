@@ -5,6 +5,7 @@ import { execFromContext } from '$lib/server/archive/exec.js';
 import { refreshDerived, variantTermsLive } from '$lib/server/archive/variantTerms.js';
 import { detailChanges, isCostPriced, isRecipeDeal, isRecipeLocked, locationOf, recipeOfNode, toEditorProduct, type EditorProduct } from '$lib/shop/productEditor.js';
 import { bomAssignees, planBomChanges, type BomTerm } from '$lib/shop/bomEditor.js';
+import { soldByVariant } from '$lib/shop/derived.js';
 import { applyBomTerms, bomLinksBelong, bomTermsLive, withAssignees, withResourcePicks } from '$lib/server/archive/bomTerms.js';
 import { readStockFlags, withFlag, writeStock } from '$lib/server/shop/stockFlags.js';
 import {
@@ -327,10 +328,11 @@ const saveVariantsHandler: ActionExecutionHandler = async (params, context, { st
     }
   }
 
-  // A count on the product itself only means something while it has no variants
-  // (with variants it is derived from theirs). Checked before anything is written.
+  // A count on the product itself only means something while it is not sold by
+  // variant (then it is derived from theirs) — rows all switched off with no
+  // axis left are a plain product again. Checked before anything is written.
   let productStock: { quant: number; unlimited: boolean } | null = null;
-  if (params.stock != null && !desired.length) {
+  if (params.stock != null && !soldByVariant(desired, axes)) {
     const raw = params.stock as { quant?: unknown; unlimited?: unknown };
     const unlimited = raw.unlimited === true;
     const quant = unlimited ? -1 : num(raw.quant);

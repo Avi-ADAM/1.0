@@ -275,6 +275,18 @@
   let pinTop = false;
   // Did the deck have a card the last time the slide set changed? See `reanchor`.
   let hadCards = false;
+  // The filter (project chip + card-kind gate) the last re-anchor saw. A
+  // change here is the reader asking for a different list, so the old scroll
+  // offset — measured against the unfiltered deck — means nothing: kept, it
+  // lands past the shorter list's end and the browser snaps to end-of-line.
+  let lastFilterSig = null;
+  const filterSigNow = () =>
+    (currentProjectIdFilter ?? 'all') +
+    '|' +
+    Object.keys(milon)
+      .filter((k) => milon[k])
+      .sort()
+      .join(',');
 
   function touch() {
     touched = true;
@@ -345,12 +357,19 @@
     // the one time the "parked on end-of-line" rule below must not apply.
     const firstFill = !hadCards && count > 0;
     hadCards = count > 0;
+    const fsig = filterSigNow();
+    const filterChanged = lastFilterSig !== null && fsig !== lastFilterSig;
+    lastFilterSig = fsig;
 
     const wanted = deckPosition.id;
     const indexOfWanted = () =>
       wanted ? visibleArr.findIndex((b) => String(b.coinlapach) === wanted) : -1;
     let idx;
-    if (firstFill) {
+    if (filterChanged) {
+      // A new filter opens on the first card of its results (or end-of-line
+      // when nothing matches), never on the old list's offset.
+      idx = 0;
+    } else if (firstFill) {
       // Resume on the card the reader was on in this tab, else the top of the
       // feed — and hold the top until they move, because the feed is still
       // streaming in and more urgent cards can land in front of the first one.
@@ -388,6 +407,9 @@
   $effect(() => {
     const el = deckEl;
     idsSig;
+    // A filter that doesn't change the slide set must still be recorded now,
+    // or a later feed re-emit would read it as fresh and jump to card 0.
+    filterSigNow();
     // Rotating the device swaps the scroll axis, so the offset the browser kept
     // means nothing any more — re-anchor on that too.
     narrow;

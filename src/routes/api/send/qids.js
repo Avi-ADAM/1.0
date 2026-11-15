@@ -20,6 +20,18 @@ import { eventsQids } from './qidsEvents.js';
 const NOT_ARCHIVED = `{ or: [{ lifecycle: { null: true } }, { lifecycle: { ne: "archived" } }] }`;
 
 /**
+ * A product the rikma still sells — the same three flags `productStatusOf`
+ * (apiPublic/dto.ts) reads as "archived", so the sale form offers exactly the
+ * products the manage table lists. Each branch keeps its NULL arm for the
+ * same reason as above.
+ */
+const PRODUCT_LIVE = `{ and: [
+  { or: [{ archived: { null: true } }, { archived: { eq: false } }] },
+  { or: [{ lifecycle: { null: true } }, { lifecycle: { notIn: ["archived", "released"] } }] },
+  { or: [{ status_of_voting: { null: true } }, { status_of_voting: { ne: "archived" } }] }
+] }`;
+
+/**
  * What the public read API reads from a product row (PLAN_HEADLESS_PRODUCTS_API).
  *
  * The list, the single-product and the categories queries all interpolate this
@@ -10765,7 +10777,7 @@ export const moachQids = {
               }
             }
           }
-          matanotofs {
+          matanotofs(filters: ${PRODUCT_LIVE}, pagination: { limit: -1 }) {
             data {
               id
               attributes {

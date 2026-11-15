@@ -35,7 +35,7 @@ vi.mock('../LevViewSwitch.svelte', async () => ({
   default: (await import('../../prPr/open/__mocks__/Empty.svelte')).default
 }));
 vi.mock('./filter.svelte', async () => ({
-  default: (await import('../../prPr/open/__mocks__/Empty.svelte')).default
+  default: (await import('./__mocks__/CaptureFilter.svelte')).default
 }));
 vi.mock('$lib/celim/icons/filterIcon.svelte', async () => ({
   default: (await import('../../prPr/open/__mocks__/Empty.svelte')).default
@@ -183,5 +183,38 @@ describe('heart deck — where it opens', () => {
     await tick();
 
     expect(scrolled).toEqual([]);
+  });
+
+  it('a filter opens on the first card of its results, not the old offset', async () => {
+    const p = (id: string, projectId: number) => ({
+      coinlapach: id,
+      ani: 'pends',
+      projectId,
+      projectName: 'r' + projectId
+    });
+    const { container } = mount([
+      p('a', 1),
+      p('b', 1),
+      p('c', 1),
+      p('d', 1),
+      p('x', 2)
+    ]);
+    await tick();
+    // The reader paged deep into the full feed.
+    await fireEvent.pointerDown(deckOf(container));
+    parked = deckOf(container).children[3];
+
+    // Open the project filter and pick rikma 2 — one card, so the old offset
+    // (card 4) is past the filtered deck's end.
+    // Desktop chrome (matchMedia is false): the project chip sits top-right.
+    await fireEvent.click(container.querySelector('.right-4 > button')!);
+    await tick();
+    (globalThis as any).__levFilterProps.onShowonly({ kind: 'projects', id: 2 });
+    await tick();
+    await tick();
+
+    const deck = deckOf(container);
+    expect(deck.children.length).toBe(2);
+    expect((scrolled.at(-1) as HTMLElement).dataset.id).toBe('x');
   });
 });

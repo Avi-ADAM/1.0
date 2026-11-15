@@ -18,7 +18,7 @@
     "noTasks": "لا توجد مهام فرعية لهذه المهمة بعد.",
     "startTimer": "تشغيل المؤقت",
     "stopTimer": "إيقاف المؤقت",
-    "saveTimer": "حفظ الوقت",
+    "saveTimer": "حفظ/تعديل المؤقت",
     "updateStatus": "تحديث التقدم",
     "timerUnavailable": "يتم تحميل المؤقت…",
     "stopTimerFirst": "أوقف المؤقت قبل تقديم المهمة.",

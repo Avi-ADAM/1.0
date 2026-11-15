@@ -3,7 +3,11 @@
  * S5): fenced to the rikma, `set` and `add` read on the server, a variant
  * product stocked only per variant, and no write when nothing changes.
  */
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+// The stored hasVariants is re-derived before a refusal; what it finds is the test's call.
+const derived = vi.hoisted(() => ({ next: null as { hasVariants: boolean } | null }));
+vi.mock('$lib/server/archive/variantTerms.js', () => ({ refreshDerived: async () => derived.next }));
 import { setShopStockConfig } from './shopStock.js';
 import { resetStockFlagsVerdict } from '$lib/server/shop/stockFlags.js';
 
@@ -80,6 +84,7 @@ beforeEach(() => {
   ]);
   writes = [];
   flagsLive = false;
+  derived.next = { hasVariants: true };
   resetStockFlagsVerdict();
 });
 
@@ -134,6 +139,13 @@ describe('setShopStock', () => {
   it('a product sold by variant is never stocked on the product', async () => {
     await expect(run({ productId: '11', mode: 'set', value: 3 })).rejects.toMatchObject({ code: 'VARIANT_REQUIRED' });
     expect(writes).toEqual([]);
+  });
+
+  it('every variant off and no axis left: the stale flag is re-derived and the product stocked', async () => {
+    derived.next = { hasVariants: false };
+    const r = await run({ productId: '11', mode: 'set', value: 3 });
+    expect(r).toMatchObject({ quant: 3, changed: true, stockChanges: [{ productId: '11', variantId: null, quant: 3 }] });
+    expect(writes).toEqual(['p:11=3']);
   });
 
   it("another rikma's product or variant is not found, never written", async () => {

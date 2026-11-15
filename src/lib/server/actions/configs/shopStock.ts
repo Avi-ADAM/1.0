@@ -1,4 +1,6 @@
-import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import type { ActionConfig, ActionContext, ActionExecutionHandler } from '../types.js';
+import { execFromContext } from '$lib/server/archive/exec.js';
+import { refreshDerived } from '$lib/server/archive/variantTerms.js';
 import { ActionError } from '../errors.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
 import { nextStock, stockWouldChange, type StockMode } from '$lib/shop/manage.js';
@@ -66,7 +68,13 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   } else {
     // A product sold by variant counts its stock on the variants — writing
     // `Matanot.quant` under them would make two stocks disagree (§2.3).
-    if (hasVariants) throw new ActionError('VARIANT_REQUIRED', 'This product is stocked per variant');
+    // The stored flag can predate the seller taking every option away (all
+    // variants off, no axis left — a plain product again, $lib/shop/derived.ts):
+    // derive it once more before refusing.
+    if (hasVariants) {
+      const fresh = await refreshDerived(execFromContext(context as ActionContext), productId).catch(() => null);
+      if (!fresh || fresh.hasVariants) throw new ActionError('VARIANT_REQUIRED', 'This product is stocked per variant');
+    }
     // A legacy product with no number reads as unlimited, as it always did.
     const unlimitedFlag = flags.products.get(productId)?.unlimited ?? null;
     const q = product.attributes?.quant ?? (unlimitedFlag === false ? 0 : LEGACY_UNLIMITED);

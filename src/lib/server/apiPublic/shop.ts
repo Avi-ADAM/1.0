@@ -27,6 +27,7 @@
 
 import { mediaUrl } from '$lib/utils/processLifecycle.js';
 import { countOf, isUnlimited } from '$lib/shop/stock.js';
+import { soldByVariant } from '$lib/shop/derived.js';
 
 // ─── primitives ─────────────────────────────────────────────────────────────
 //
@@ -691,16 +692,22 @@ export function toApiShop(
     maxOrder: pick(base, extra, 'maxOrder'),
     leadTimeHours: pick(base, extra, 'leadTimeHours')
   });
-  const hasVariants =
-    loaded && variants.length
-      ? true
-      : pick(base, extra, 'hasVariants') === true;
+  const options = optionsOf(pick(base, extra, 'options'));
+  // Every variant off and no axis left is a plain product again ($lib/shop/derived.ts).
+  const rowsLoaded = loaded && variants.length > 0;
+  // Only when the options were read: "no axis" must be a fact, never a missing query.
+  const optionsRead = pick(base, extra, 'options') != null;
+  const byVariant = rowsLoaded && (optionsRead ? soldByVariant(variants, options) : true);
+  const hasVariants = rowsLoaded ? byVariant : pick(base, extra, 'hasVariants') === true;
 
   // Availability, in the documented order (§2.5): the variants themselves when
   // they were loaded, then the denormalized total, then the product's `quant`.
-  const availability =
-    loaded && variants.length
-      ? variantsAvailabilityOf(variants)
+  // Rows that no longer sell it (all off, no axis) leave the product's own
+  // stock — not a total the lifecycle may not have rewritten yet.
+  const availability = byVariant
+    ? variantsAvailabilityOf(variants)
+    : rowsLoaded
+      ? availabilityOf(base)
       : (stockTotalOf({
           stockTotal: pick(base, extra, 'stockTotal'),
           stockUnlimited: pick(base, extra, 'stockUnlimited')
@@ -719,7 +726,7 @@ export function toApiShop(
       priceMin: num(pick(base, extra, 'priceMin')),
       priceMax: num(pick(base, extra, 'priceMax'))
     }),
-    options: optionsOf(pick(base, extra, 'options')),
+    options,
     variants,
     availability,
     ...buying,

@@ -476,6 +476,22 @@ describe('toApiShop — the whole block', () => {
     expect(shop.availability).toEqual({ unlimited: false, quantity: 2 });
     expect(shop.priceRange).toEqual({ min: 260, max: 300, currency: CURRENCY });
   });
+
+  it('every variant off and no axis left: a plain product with its own stock, whatever the stale total says', () => {
+    const off = [variant('1', { quant: 0, active: false }), variant('2', { quant: 0, active: false })];
+    const plain = toApiShop(base, { price: PRODUCT_PRICE, currency: CURRENCY, variants: off, extra: { hasVariants: true, stockTotal: 0, options: { data: [] } } });
+    expect(plain.hasVariants).toBe(false);
+    expect(plain.availability).toEqual(availabilityOf(base));
+    // The sizes only hidden for now: the axis is still there, nothing to sell.
+    const hidden = toApiShop(base, {
+      price: PRODUCT_PRICE,
+      currency: CURRENCY,
+      variants: off,
+      extra: { options: { data: [{ id: '5', attributes: { key: 'size', name: 'מידה', values: [{ value: 'm', label: 'M' }] } }] } }
+    });
+    expect(hidden.hasVariants).toBe(true);
+    expect(hidden.availability).toEqual({ unlimited: false, quantity: 0 });
+  });
 });
 
 describe('optionAxesOf — the filter bar of GET /options', () => {
