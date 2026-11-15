@@ -260,6 +260,17 @@ describe('saveProductVariants', () => {
     await expect(run({ axes: sizeAxis, variants: [rowM({ optionValues: [{ key: 'size', value: 'xl' }] })] })).rejects.toMatchObject({ code: 'INVALID_OPTIONS' });
   });
 
+  it('a stored row switched off keeps a value taken off the axis', async () => {
+    // "generate" after removing M: the M row stays, inactive, still M.
+    const onlyL = [{ key: 'size', name: 'מידה', values: [{ value: 'l', label: 'L' }] }];
+    await expect(run({ axes: onlyL, variants: [rowM({ active: false })] })).resolves.toBeTruthy();
+  });
+
+  it('a row still on sale with a removed value is refused', async () => {
+    const onlyL = [{ key: 'size', name: 'מידה', values: [{ value: 'l', label: 'L' }] }];
+    await expect(run({ axes: onlyL, variants: [rowM()] })).rejects.toMatchObject({ code: 'INVALID_OPTIONS' });
+  });
+
   it("a product of another rikma is not found, never written", async () => {
     await expect(run({ productId: '30', axes: sizeAxis, variants: [] })).rejects.toMatchObject({ code: 'PRODUCT_NOT_FOUND' });
     expect(writes).toEqual([]);

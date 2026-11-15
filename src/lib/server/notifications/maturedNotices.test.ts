@@ -8,6 +8,13 @@ const ALL: Array<[string, MaturedNotice[]]> = [
   ['pmashOpened', [N.pmashOpened({ projectId: 7, name: 'R' })]],
   ['askAccepted', N.askAccepted({ projectId: 7, name: 'M', takerId: 4, takerName: 'dana' })],
   ['askOfferLapsed', N.askOfferLapsed({ projectId: 7, name: 'M', takerId: 4 })],
+  [
+    'askOfferRestored',
+    [
+      ...N.askOfferRestored({ projectId: 7, name: 'M', takerId: 4, takerName: 'dana', reviverId: 4, byTaker: true }),
+      ...N.askOfferRestored({ projectId: 7, name: 'M', takerId: 4, takerName: 'dana', reviverId: 2, byTaker: false })
+    ]
+  ],
   ['askmAccepted', N.askmAccepted({ projectId: 7, name: 'R', takerId: 4 })],
   ['finiapprovalMatured', [N.finiapprovalMatured({ projectId: 7, name: 'M', hours: 3, isHours: true })]],
   ['objectChangeApplied', N.objectChangeApplied({ projectId: 7, decisionId: 9, decisionName: 'D', endedMemberId: 4 })],

@@ -102,6 +102,7 @@
     "priceInvalid": "El precio es 0 o más",
     "stockInvalid": "El stock es 0 o más",
     "tooManyVariants": "Hasta 100 variantes",
+    "optionGone": "Este valor se quitó de las opciones: vuelve a generar la tabla o desactiva la fila",
     "fix": "Hay campos que corregir antes de guardar",
     "openProposal": "Un cambio de este producto ya espera la aprobación de la rikma. Respóndelo primero.",
     "notReady": "Todavía no se pueden proponer precios de variantes. Todo lo demás se guardó.",

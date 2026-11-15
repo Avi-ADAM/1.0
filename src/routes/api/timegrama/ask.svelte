@@ -100,6 +100,12 @@
             ){data{id}}
           }`;
           await SendToAdmin(reopen, env.ADMINMONTHER).catch((e) => console.error(e));
+          // Stamp the lapse on its own so the offer can be restored later
+          // (reviveLapsedAsk). Separate and best-effort: a Strapi without
+          // Ask.lapsedAt must not stop the reopen above.
+          await runAdmin('markAskLapsed', { id: String(id), at: new Date().toISOString() }).catch((e) =>
+            console.error('ask finalizer: lapse not stamped', id, e)
+          );
           // Their silence was not a yes — tell them so, and the rikma that it is free again (N5).
           await tellMatured(
             askOfferLapsed({

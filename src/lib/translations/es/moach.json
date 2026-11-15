@@ -392,7 +392,15 @@
     "staffingNeed": "se necesitan {{need}} personas",
     "seatsLeft": "quedan {{count}} plazas",
     "seatsLeftOne": "queda una plaza",
-    "overfilled": "se unieron {{filled}} — más de las {{need}} previstas"
+    "overfilled": "se unieron {{filled}} — más de las {{need}} previstas",
+    "lapsedHeading": "Ofertas que volvieron a la rikma",
+    "lapsedNote": "Misiones ofrecidas a un miembro que no respondió dentro del tiempo de respuesta. Mientras nadie más se haya postulado, la oferta puede volver a la mesa: la rikma vuelve a tener un tiempo de respuesta completo, y los meses anteriores registrados se conservan.",
+    "lapsedMine": "Te la ofrecieron y no alcanzaste a responder",
+    "lapsedFor": "Ofrecida a {{name}}",
+    "lapsedRestoreMine": "Todavía quiero esta misión",
+    "lapsedRestoreFor": "Ofrecerla otra vez a {{name}}",
+    "lapsedDone": "La oferta volvió a la mesa",
+    "lapsedFailed": "No se pudo restaurar la oferta"
   },
   "presence": {
     "region": "Quién está ahora en la rikma",

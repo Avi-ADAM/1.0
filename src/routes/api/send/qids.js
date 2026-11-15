@@ -10085,6 +10085,41 @@ ${PROMO_DECISION_FIELDS}
       data { id }
     }
   }`,
+  // A lapsed assigned offer (the invited member did not answer in time). The
+  // ask clock stamps it, the revival reads it back (reviveLapsedAsk).
+  'markAskLapsed': `mutation MarkAskLapsed($id: ID!, $at: DateTime) {
+    updateAsk(id: $id, data: { lapsedAt: $at }) { data { id } }
+  }`,
+  'lapsedAskForRevival': `query LapsedAskForRevival($id: ID!) {
+    ask(id: $id) { data { id attributes {
+      archived lapsedAt
+      users_permissions_user { data { id attributes { username } } }
+      project { data { id attributes { restime projectName user_1s { data { id } } } } }
+      open_mission { data { id attributes {
+        name archived isRishon
+        asks(filters: { or: [{ archived: { null: true } }, { archived: { eq: false } }] }) { data { id } }
+      } } }
+      vots { what order zman ide users_permissions_user { data { id } } }
+      negopendmissions(sort: "ordern:desc", pagination: { limit: 1 }) { data { attributes { ordern } } }
+    } } }
+  }`,
+  'reviveLapsedAsk': `mutation ReviveLapsedAsk($askId: ID!, $vots: [ComponentProjectsVotsInput]) {
+    updateAsk(id: $askId, data: { archived: false, lapsedAt: null, vots: $vots }) { data { id } }
+  }`,
+  'projectLapsedAsks': `query ProjectLapsedAsks($pid: ID!) {
+    asks(
+      filters: { project: { id: { eq: $pid } }, archived: { eq: true }, lapsedAt: { notNull: true }, open_mission: { archived: { eq: false } } }
+      sort: "lapsedAt:desc"
+      pagination: { limit: 20 }
+    ) { data { id attributes {
+      lapsedAt
+      users_permissions_user { data { id attributes { username } } }
+      open_mission { data { id attributes {
+        name isRishon
+        asks(filters: { or: [{ archived: { null: true } }, { archived: { eq: false } }] }) { data { id } }
+      } } }
+    } } }
+  }`,
   'getActiveTimegramaForAskm': `query GetActiveTimegramaForAskm($id: ID!) {
     timegramas(filters: { askm: { id: { eq: $id } }, done: { ne: true } }, sort: "id:desc", pagination: { limit: 1 }) {
       data { id }

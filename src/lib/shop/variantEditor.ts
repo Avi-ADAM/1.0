@@ -239,7 +239,9 @@ export type VariantError =
   | 'variantDuplicate'
   | 'priceInvalid'
   | 'stockInvalid'
-  | 'tooManyVariants';
+  | 'tooManyVariants'
+  /** A row on sale names a value (or a whole option) no longer on the axes. */
+  | 'optionGone';
 
 export interface VariantIssue {
   index: number;
@@ -263,7 +265,9 @@ export function validateVariants(
   rows: EditorVariant[],
   takenSkus: Iterable<string> = [],
   /** The stored count of each existing row — a queue below zero may stay as it is. */
-  storedCounts: Map<string, number> = new Map()
+  storedCounts: Map<string, number> = new Map(),
+  /** The axes the save sends; given, a row on sale must be one of their combinations. */
+  axes?: EditorAxis[]
 ): VariantIssue[] {
   const issues: VariantIssue[] = [];
   const taken = new Set([...takenSkus].map((s) => s.trim().toLowerCase()));
@@ -283,6 +287,13 @@ export function validateVariants(
     if (!validPrice(v.price) || !validPrice(v.compareAtPrice)) issues.push({ index, code: 'priceInvalid' });
     const kept = v.id != null && storedCounts.get(v.id) === v.quant;
     if (!v.unlimited && !kept && !validStock(v.quant)) issues.push({ index, code: 'stockInvalid' });
+    if (
+      axes &&
+      v.active &&
+      v.optionValues.some((p) => !axes.some((a) => a.key === p.key && a.values.some((x) => x.value === p.value)))
+    ) {
+      issues.push({ index, code: 'optionGone' });
+    }
   });
   return issues;
 }

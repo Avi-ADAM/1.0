@@ -102,6 +102,7 @@
     "priceInvalid": "A price is 0 or more",
     "stockInvalid": "Stock is 0 or more",
     "tooManyVariants": "Up to 100 variants",
+    "optionGone": "This value was removed from the options — regenerate the table or switch the row off",
     "fix": "Some fields need fixing before saving",
     "openProposal": "A change to this product is already waiting for the rikma. Answer it first.",
     "notReady": "Proposing variant prices isn't available yet. Everything else was saved.",

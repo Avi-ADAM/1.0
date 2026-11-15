@@ -122,6 +122,7 @@ These are the main content types in the Strapi backend.
 | `chat` | `Maybe<Array<Maybe<ComponentProjectsVots>>>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `forums` | `Maybe<ForumRelationResponseCollection>` |
+| `lapsedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `negopendmissions` | `Maybe<NegopendmissionRelationResponseCollection>` |
 | `open_mission` | `Maybe<OpenMissionEntityResponse>` |
 | `partofs` | `Maybe<PartofRelationResponseCollection>` |

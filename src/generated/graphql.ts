@@ -454,6 +454,7 @@ export type Ask = {
   chat?: Maybe<Array<Maybe<ComponentProjectsVots>>>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   forums?: Maybe<ForumRelationResponseCollection>;
+  lapsedAt?: Maybe<Scalars['DateTime']['output']>;
   negopendmissions?: Maybe<NegopendmissionRelationResponseCollection>;
   open_mission?: Maybe<OpenMissionEntityResponse>;
   partofs?: Maybe<PartofRelationResponseCollection>;
@@ -528,6 +529,7 @@ export type AskFiltersInput = {
   createdAt?: InputMaybe<DateTimeFilterInput>;
   forums?: InputMaybe<ForumFiltersInput>;
   id?: InputMaybe<IdFilterInput>;
+  lapsedAt?: InputMaybe<DateTimeFilterInput>;
   negopendmissions?: InputMaybe<NegopendmissionFiltersInput>;
   not?: InputMaybe<AskFiltersInput>;
   open_mission?: InputMaybe<OpenMissionFiltersInput>;
@@ -547,6 +549,7 @@ export type AskInput = {
   archived?: InputMaybe<Scalars['Boolean']['input']>;
   chat?: InputMaybe<Array<InputMaybe<ComponentProjectsVotsInput>>>;
   forums?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  lapsedAt?: InputMaybe<Scalars['DateTime']['input']>;
   negopendmissions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   open_mission?: InputMaybe<Scalars['ID']['input']>;
   partofs?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;

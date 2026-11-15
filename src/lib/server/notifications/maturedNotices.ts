@@ -126,9 +126,9 @@ export function askOfferLapsed(p: { projectId: Id; name: string; takerId: Id }):
       to: { projectId: p.projectId, except: [p.takerId] },
       title: L(`המשימה "${p.name}" פתוחה שוב`, `The mission "${p.name}" is open again`, `المهمة «${p.name}» مفتوحة من جديد`),
       body: L(
-        'מי שהמשימה הוצעה לו לא ענה בזמן התגובה, ולכן היא חזרה לרקמה ואפשר לחפש לה מישהו אחר.',
-        'The person it was offered to did not answer within the response time, so it went back to the rikma and can be offered to someone else.',
-        'لم يردّ من عُرضت عليه المهمة خلال وقت الاستجابة، لذلك عادت إلى الريكما ويمكن البحث عن شخص آخر.'
+        'מי שהמשימה הוצעה לו לא ענה בזמן התגובה, ולכן היא חזרה לרקמה ואפשר לחפש לה מישהו אחר, או להציע לו אותה שוב מהלוח "פתוח לשותפים".',
+        'The person it was offered to did not answer within the response time, so it went back to the rikma and can be offered to someone else, or offered to them again from the "Open for partners" board.',
+        'لم يردّ من عُرضت عليه المهمة خلال وقت الاستجابة، لذلك عادت إلى الريكما ويمكن البحث عن شخص آخر، أو عرضها عليه من جديد من لوحة «مفتوح للشركاء».'
       ),
       url: moach(p.projectId, 'open')
     },
@@ -138,11 +138,73 @@ export function askOfferLapsed(p: { projectId: Id; name: string; takerId: Id }):
       to: { userIds: [p.takerId] },
       title: L(`ההצעה למשימה "${p.name}" חזרה לרקמה`, `The offer of "${p.name}" went back to the rikma`, `عاد عرض المهمة «${p.name}» إلى الريكما`),
       body: L(
-        'לא התקבלה ממך תשובה בזמן התגובה, ולכן המשימה לא נרשמה על שמך. אם היא עדיין מתאימה לך, אפשר להגיש עליה מועמדות.',
-        'No answer came from you within the response time, so the mission was not registered in your name. If it still suits you, you can apply for it.',
-        'لم يصل ردّك خلال وقت الاستجابة، لذلك لم تُسجَّل المهمة باسمك. إن كانت لا تزال تناسبك يمكنك الترشّح لها.'
+        'לא התקבלה ממך תשובה בזמן התגובה, ולכן המשימה לא נרשמה על שמך. אם היא עדיין מתאימה לך, אפשר להחזיר את ההצעה בלחיצה מהלוח "פתוח לשותפים" של הרקמה, כל עוד אף אחד אחר לא לקח אותה. החודשים הקודמים שהוזנו בה נשמרים.',
+        `No answer came from you within the response time, so the mission was not registered in your name. If it still suits you, you can restore the offer with one tap on the rikma's "Open for partners" board, as long as nobody else has taken it. The past months entered on it are kept.`,
+        'لم يصل ردّك خلال وقت الاستجابة، لذلك لم تُسجَّل المهمة باسمك. إن كانت لا تزال تناسبك يمكنك استعادة العرض بنقرة من لوحة «مفتوح للشركاء» في الريكما، ما دام لم يأخذها أحد آخر. الأشهر السابقة المسجَّلة فيها محفوظة.'
       ),
       url: moach(p.projectId, 'open')
+    }
+  ];
+}
+
+/**
+ * A lapsed assigned offer was put back on the table (reviveLapsedAsk). Either
+ * the member it was offered to said they still want it, or a member of the
+ * rikma offered it to them again. The rikma has a full new restime either way.
+ */
+export function askOfferRestored(p: {
+  projectId: Id;
+  name: string;
+  takerId: Id;
+  takerName: string;
+  reviverId: Id;
+  byTaker: boolean;
+}): MaturedNotice[] {
+  const title = L(
+    `ההצעה למשימה "${p.name}" חזרה לשולחן`,
+    `The offer of "${p.name}" is back on the table`,
+    `عاد عرض المهمة «${p.name}» إلى الطاولة`
+  );
+  if (p.byTaker) {
+    return [
+      {
+        kind: 'ask',
+        intent: 'consent',
+        to: { projectId: p.projectId, except: [p.takerId] },
+        title,
+        body: L(
+          `${p.takerName} עדיין רוצה את המשימה ואישר/ה את ההצעה. לרקמה יש שוב זמן תגובה מלא: אפשר לאשר, לפתוח שיחה או להציע גרסה אחרת. בשתיקה המשימה תירשם על שם ${p.takerName}, עם החודשים הקודמים שהוזנו בה.`,
+          `${p.takerName} still wants the mission and said yes to the offer. The rikma has a full response time again: approve, open a discussion or counter. If nobody objects, the mission is registered to ${p.takerName}, with the past months entered on it.`,
+          `${p.takerName} لا يزال يريد المهمة ووافق على العرض. لدى الريكما وقت استجابة كامل من جديد: الموافقة أو فتح نقاش أو اقتراح نسخة أخرى. إن لم يعترض أحد تُسجَّل المهمة باسم ${p.takerName} مع الأشهر السابقة المسجَّلة فيها.`
+        ),
+        url: moach(p.projectId, 'votes')
+      }
+    ];
+  }
+  return [
+    {
+      kind: 'ask',
+      intent: 'consent',
+      to: { userIds: [p.takerId] },
+      title,
+      body: L(
+        'ההצעה שחזרה לרקמה הוצעה לך שוב. כדי שהמשימה תירשם על שמך צריך אישור ממך בתוך זמן התגובה של הרקמה. החודשים הקודמים שהוזנו בה נשמרים.',
+        `The offer that went back to the rikma was offered to you again. For the mission to be registered to you, your yes is needed within the rikma's response time. The past months entered on it are kept.`,
+        'عُرض عليك من جديد العرض الذي عاد إلى الريكما. لكي تُسجَّل المهمة باسمك يلزم موافقتك خلال وقت الاستجابة في الريكما. الأشهر السابقة المسجَّلة فيها محفوظة.'
+      ),
+      url: '/lev'
+    },
+    {
+      kind: 'ask',
+      intent: 'outcome',
+      to: { projectId: p.projectId, except: [p.takerId, p.reviverId] },
+      title,
+      body: L(
+        `המשימה הוצעה שוב ל${p.takerName}. לרקמה יש שוב זמן תגובה מלא לאשר, לפתוח שיחה או להציע גרסה אחרת.`,
+        `The mission was offered to ${p.takerName} again. The rikma has a full response time again to approve, discuss or counter.`,
+        `عُرضت المهمة من جديد على ${p.takerName}. لدى الريكما وقت استجابة كامل من جديد للموافقة أو النقاش أو اقتراح نسخة أخرى.`
+      ),
+      url: moach(p.projectId, 'votes')
     }
   ];
 }

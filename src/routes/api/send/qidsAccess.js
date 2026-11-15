@@ -473,6 +473,10 @@ export const qidsAccess = {
   'getAskmForFinalize': { allow: ['user', 'serviceAdmin'] },
   'archiveAskmSimple': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   'getActiveTimegramaForAsk': { allow: ['user', 'serviceAdmin'] },
+  'markAskLapsed': { allow: ['serviceAdmin'] },
+  'lapsedAskForRevival': { allow: ['user', 'serviceAdmin'] },
+  'reviveLapsedAsk': { allow: ['user', 'serviceAdmin'] },
+  'projectLapsedAsks': { allow: ['user', 'serviceAdmin'] },
   'getActiveTimegramaForAskm': { allow: ['user', 'serviceAdmin'] },
   'getAskProjectRestime': { allow: ['user', 'serviceAdmin'] },
   'getAskmProjectRestime': { allow: ['user', 'serviceAdmin'] },

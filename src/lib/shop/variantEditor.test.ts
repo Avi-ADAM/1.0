@@ -134,6 +134,16 @@ describe('validateVariants', () => {
     expect(validateVariants([variant({ sku: 'other-1' })], ['OTHER-1'])).toContainEqual({ index: 0, code: 'skuTaken' });
   });
 
+  it('flags a row on sale whose value left the axes, never a row switched off', () => {
+    const axes = [
+      { optionId: null, key: 'height', name: 'גובה', values: [{ value: '65', label: '65', hex: null }] },
+      { optionId: null, key: 'finish', name: 'גימור', values: [{ value: 'שחור', label: 'שחור', hex: null }] }
+    ];
+    expect(validateVariants([variant()], [], new Map(), axes)).toContainEqual({ index: 0, code: 'optionGone' });
+    expect(validateVariants([variant({ active: false })], [], new Map(), axes)).toEqual([]);
+    expect(validateVariants([variant()])).toEqual([]);
+  });
+
   it('allows unlimited stock, refuses a negative count or price', () => {
     expect(validateVariants([variant({ unlimited: true, quant: -1 })])).toEqual([]);
     expect(validateVariants([variant({ quant: -1 })])).toContainEqual({ index: 0, code: 'stockInvalid' });

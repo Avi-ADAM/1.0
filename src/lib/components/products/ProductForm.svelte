@@ -245,7 +245,7 @@
   const storedCounts = $derived(
     new Map((product?.variants ?? []).filter((v) => v.id && !v.unlimited).map((v) => [v.id as string, v.quant]))
   );
-  const issues = $derived(validateVariants(rows, takenSkus, storedCounts));
+  const issues = $derived(validateVariants(rows, takenSkus, storedCounts, clean.axes));
   const stagedTouched = $derived(
     gallery.length > 0 || axes.length > 0 || rows.length > 0 || lowAt.trim() !== ''
   );

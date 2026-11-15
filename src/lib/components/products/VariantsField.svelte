@@ -111,7 +111,8 @@
     variantDuplicate: 'shopEditor.err.variantDuplicate',
     priceInvalid: 'shopEditor.err.priceInvalid',
     stockInvalid: 'shopEditor.err.stockInvalid',
-    tooManyVariants: 'shopEditor.err.tooManyVariants'
+    tooManyVariants: 'shopEditor.err.tooManyVariants',
+    optionGone: 'shopEditor.err.optionGone'
   };
 </script>
 

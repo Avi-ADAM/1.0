@@ -403,6 +403,7 @@ export type ActionKey =
   | 'counterOnAsk'
   | 'acceptCounterOnAskm'
   | 'acceptCounterOnAsk'
+  | 'reviveLapsedAsk'
   | 'candidateCounterOnAskm'
   | 'candidateCounterOnAsk'
   | 'customizeOpenMashaabim'

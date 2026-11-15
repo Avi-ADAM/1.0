@@ -4,6 +4,7 @@
   import { t } from '$lib/translations';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import OpenBoard from '$lib/components/prPr/open/OpenBoard.svelte';
+  import LapsedOffers from '$lib/components/prPr/open/LapsedOffers.svelte';
 
   let { data } = $props();
   const moachStore = getMoachStore();
@@ -40,6 +41,8 @@
     >{projectName ? `${projectName} · ` : ''}{$t('moach.open.title')} · 1lev1</title
   >
 </svelte:head>
+
+<LapsedOffers {projectId} uid={data.uid} offers={data.lapsedOffers ?? []} />
 
 <OpenBoard
   {projectId}

@@ -184,16 +184,30 @@ function variantFrom(raw: any, axes: EditorAxis[], product: EditorProduct): Edit
   if (id && !product.variants.some((v) => v.id === id)) {
     throw new ActionError('VARIANT_NOT_FOUND', 'No such variant of this product');
   }
+  // A stored row the seller switched off may keep a value they have since taken
+  // off the axis — that is what "generate" does to a combination that is gone.
+  // It keeps the pair it was sold under; only a row still on sale must be
+  // one of today's combinations.
+  const stored = id ? product.variants.find((v) => v.id === id) : undefined;
+  const retired = !!stored && raw?.active === false;
   const pairs: OptionPair[] = (Array.isArray(raw?.optionValues) ? raw.optionValues : []).map((p: any) => {
     const key = slugOf(p?.key);
     const value = slugOf(p?.value);
     const axis = axes.find((a) => a.key === key);
     const known = axis?.values.find((v) => v.value === value);
-    if (!axis || !known) throw new ActionError('INVALID_OPTIONS', `"${key}:${value}" is not one of this product's options`);
-    return { key, value, label: known.label };
+    if (axis && known) return { key, value, label: known.label };
+    if (retired) {
+      const had = stored!.optionValues.find((x) => x.key === key && x.value === value);
+      return { key, value, label: had?.label ?? value };
+    }
+    throw new ActionError('INVALID_OPTIONS', `"${key}:${value}" is not one of this product's options`);
   });
+  const axisIndex = (k: string) => {
+    const i = axes.findIndex((x) => x.key === k);
+    return i < 0 ? axes.length : i;
+  };
   // In the axes' order, so "M / אדום" always reads size first.
-  pairs.sort((a, b) => axes.findIndex((x) => x.key === a.key) - axes.findIndex((x) => x.key === b.key));
+  pairs.sort((a, b) => axisIndex(a.key) - axisIndex(b.key));
   const quant = num(raw?.quant);
   const unlimited = raw?.unlimited === true;
   return {
