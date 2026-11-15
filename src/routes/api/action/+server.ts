@@ -27,6 +27,7 @@ import { isInternalRequest } from '$lib/server/internalSecret.js';
 import { resolvePrincipal } from '$lib/server/authz/principal.js';
 import { applyAuthz } from '$lib/server/authz/authorize.js';
 import { getAction } from '$lib/server/actions/registry.js';
+import { statusForActionError } from '$lib/server/actions/httpStatus';
 import { normalizeVia } from '$lib/consent/cosign';
 import { requestDeviceCosign } from '$lib/server/consent/deviceCosign';
 
@@ -166,7 +167,7 @@ export const POST: RequestHandler = async ({ request, cookies, fetch, locals }) 
       });
     } else {
       // Map error codes to HTTP status codes
-      const statusCode = getStatusCodeForError(result.error?.code);
+      const statusCode = statusForActionError(result.error?.code);
 
       return json(
         {
@@ -197,22 +198,3 @@ export const POST: RequestHandler = async ({ request, cookies, fetch, locals }) 
     throw error(500, e instanceof Error ? e.message : 'An internal server error occurred.');
   }
 };
-
-/**
- * Map error codes to HTTP status codes
- */
-function getStatusCodeForError(errorCode?: string): number {
-  switch (errorCode) {
-    case 'VALIDATION_FAILED':
-      return 400;
-    case 'UNAUTHORIZED':
-      return 403;
-    case 'UNKNOWN_ACTION':
-    case 'NOT_FOUND':
-      return 404;
-    case 'STRAPI_ERROR':
-    case 'INTERNAL_ERROR':
-    default:
-      return 500;
-  }
-}

@@ -119,31 +119,73 @@ self.addEventListener('sync', (ev) => {
   if (ev.tag === 'consent-sync') ev.waitUntil(flushPending());
 });
 
+// What a navigation gets when the network failed and nothing was cached. It is
+// the worker's own page, so it cannot use $t(); two lines cover the default
+// locale and everyone else.
+function offlinePage() {
+  const html =
+    '<!doctype html><html><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>1lev1</title></head>' +
+    '<body style="font-family:system-ui,sans-serif;text-align:center;padding:3rem 1rem">' +
+    '<p dir="rtl">אין חיבור לרשת כרגע.</p>' +
+    '<p dir="ltr">You seem to be offline.</p>' +
+    '<p><button onclick="location.reload()">↻</button></p>' +
+    '</body></html>';
+  return new Response(html, {
+    status: 503,
+    headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }
+  });
+}
+
 self.addEventListener('fetch', (event) => {
+  const request = event.request;
   // ignore POST requests etc
-  if (event.request.method !== 'GET') return;
+  if (request.method !== 'GET') return;
+
+  const url = new URL(request.url);
+  // Another origin (Strapi, Cloudinary, the socket server…) or a non-http
+  // scheme (chrome-extension:) is the browser's to fetch: Cache.put rejects a
+  // non-http request, and we have nothing to fall back to for it anyway.
+  if (url.origin !== self.location.origin) return;
+
+  // `respondWith` must always get a Response. `cache.match` resolves to
+  // `undefined` on a miss, and handing that over is "Failed to convert value to
+  // 'Response'" plus a network error for the whole navigation — so every path
+  // below ends in the network, the cache, or an explicit fallback.
+  async function fromNetwork(cache) {
+    const response = await fetch(request);
+    if (response.status === 200 && cache) {
+      // Fire-and-forget, but never an unhandled rejection (quota, a body
+      // already used, a response the cache will not store).
+      cache.put(request, response.clone()).catch(() => {});
+    }
+    return response;
+  }
 
   async function respond() {
-    const url = new URL(event.request.url);
-    const cache = await caches.open(CACHE);
+    let cache = null;
+    try {
+      cache = await caches.open(CACHE);
+    } catch {
+      // No cache storage (private mode, eviction): plain network.
+    }
 
     // `build`/`files` can always be served from the cache
-    if (ASSETS.includes(url.pathname)) {
-      return cache.match(url.pathname);
+    if (cache && ASSETS.includes(url.pathname)) {
+      const hit = await cache.match(url.pathname).catch(() => undefined);
+      if (hit) return hit;
     }
 
     // for everything else, try the network first, but
     // fall back to the cache if we're offline
     try {
-      const response = await fetch(event.request);
-
-      if (response.status === 200) {
-        cache.put(event.request, response.clone());
-      }
-
-      return response;
+      return await fromNetwork(cache);
     } catch {
-      return cache.match(event.request);
+      const hit = cache ? await cache.match(request).catch(() => undefined) : undefined;
+      if (hit) return hit;
+      if (request.mode === 'navigate') return offlinePage();
+      return Response.error();
     }
   }
 
