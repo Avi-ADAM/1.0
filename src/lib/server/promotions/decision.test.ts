@@ -186,4 +186,25 @@ describe('runPromotionClock', () => {
       ['3', 'active', null]
     ]);
   });
+
+  it('a promotion with no end date is not moved by the clock — only its cap ends it', async () => {
+    const fake = fakeExec({
+      promotions: {
+        promotions: {
+          data: [
+            // Runs until its cap: no end date, units still left.
+            row('1', { status: 'active', startsAt: day(-30), endsAt: null, capUnits: 20, usedUnits: 5 }),
+            // The last unit went: the cap ends it.
+            row('2', { status: 'active', startsAt: day(-30), endsAt: null, capUnits: 20, usedUnits: 20 }),
+            // Scheduled, and stays scheduled until its start.
+            row('3', { status: 'scheduled', startsAt: day(2), endsAt: null, capUnits: 5 })
+          ]
+        }
+      }
+    });
+    const out = await runPromotionClock(fake.exec, NOW);
+    expect(out.moved.map((m) => [m.promotionId, m.to])).toEqual([['2', { status: 'ended', endedReason: 'cap' }]]);
+    // The moment it sold out is written down — the payment grace is measured from it.
+    expect(fake.writes.find((w) => w.includes('updatePromotion(id: \"2\"'))).toContain(`endsAt: \"${NOW.toISOString()}\"`);
+  });
 });

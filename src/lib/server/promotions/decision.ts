@@ -152,7 +152,8 @@ export async function fetchPromoDecision(exec: Exec, decisionId: string): Promis
       scope: r.scope ?? {},
       rule: r.rule ?? {},
       startsAt: r.startsAt ?? null,
-      endsAt: r.endsAt ?? '',
+      // null = it ends on its cap, not on a date (PLAN_SHOP_PROMOTIONS §4.1).
+      endsAt: r.endsAt ?? null,
       capUnits: num(r.capUnits),
       capOrders: num(r.capOrders),
       perOrderMax: num(r.perOrderMax)

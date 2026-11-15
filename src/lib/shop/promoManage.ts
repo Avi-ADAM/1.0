@@ -52,6 +52,7 @@ export interface PromoDraft {
   products: string[];
   /** `YYYY-MM-DD`, local. An empty start = as soon as it is approved. */
   startsOn: string;
+  /** `YYYY-MM-DD`, local. Empty = no end date: the promotion ends when `capUnits` runs out. */
   endsOn: string;
   capUnits: number | null;
   why: string;
@@ -89,7 +90,10 @@ export type DraftProblem =
   | 'bxgy'
   | 'minSubtotal'
   | 'noProducts'
+  /** No end date and no unit cap — a promotion that never ends is a price change. */
   | 'noEnd'
+  /** No end date, and the cap is not a whole number above zero. */
+  | 'noCap'
   | 'endPassed'
   | 'endBeforeStart';
 
@@ -152,9 +156,15 @@ export function draftProblems(d: PromoDraft, now: Date): Record<WizardStep, Draf
 
   const when: DraftProblem[] = [];
   const start = d.startsOn ? dayToIso(d.startsOn, 'start') : null;
-  const end = dayToIso(d.endsOn, 'end');
-  if (!end) when.push('noEnd');
-  else if (Date.parse(end) <= now.getTime()) when.push('endPassed');
+  const end = d.endsOn ? dayToIso(d.endsOn, 'end') : null;
+  // A date is one way to end; a unit cap is the other ("עד גמר המלאי").
+  if (!end) {
+    // No date: the cap is what ends it — and it has to be a real number of units.
+    const cap = d.capUnits;
+    const blank = cap == null || String(cap).trim() === '';
+    if (blank) when.push('noEnd');
+    else if (!whole(cap)) when.push('noCap');
+  } else if (Date.parse(end) <= now.getTime()) when.push('endPassed');
   else if (start && Date.parse(end) <= Date.parse(start)) when.push('endBeforeStart');
 
   return { what, scope, when };
@@ -170,7 +180,7 @@ export function draftToTerms(d: PromoDraft): Record<string, unknown> {
     scope: scopeOf(d),
     rule: ruleOf(d),
     startsAt: d.startsOn ? dayToIso(d.startsOn, 'start') : null,
-    endsAt: dayToIso(d.endsOn, 'end'),
+    endsAt: d.endsOn ? dayToIso(d.endsOn, 'end') : null,
     capUnits: whole(d.capUnits) ? d.capUnits : null,
     capOrders: null,
     perOrderMax: null
@@ -225,7 +235,9 @@ export interface ListedPromotion {
 /** The tab's sections, in the order a member reads them. */
 export function groupPromotions<T extends ListedPromotion>(rows: readonly T[]) {
   const by = (s: PromotionStatus[]) => rows.filter((r) => s.includes(r.status));
-  const ending = (a: T, b: T) => Date.parse(a.endsAt ?? '') - Date.parse(b.endsAt ?? '');
+  // Soonest end first; a promotion that ends on its cap has no date and sorts last.
+  const endMs = (r: T) => (r.endsAt ? Date.parse(r.endsAt) : Number.POSITIVE_INFINITY);
+  const ending = (a: T, b: T) => endMs(a) - endMs(b);
   return {
     live: by(['active', 'paused']).sort(ending),
     upcoming: by(['scheduled']).sort(ending),

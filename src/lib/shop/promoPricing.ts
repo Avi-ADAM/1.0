@@ -399,6 +399,17 @@ export function pricePaidOrder(args: {
   };
 }
 
+/**
+ * What is left of a row's cap, as one string — for a cache key or an ETag. A
+ * promotion that ends on its cap (no end date) changes every price it touches
+ * when its last unit is sold, so a key that only holds the dates would keep
+ * serving the sale price after it sold out.
+ */
+export function remainingKey(row: Pick<PricingPromotionRow, 'capUnits' | 'capOrders' | 'usedUnits' | 'usedOrders'>): string {
+  const left = (cap: number | null, used: number | null) => (cap == null ? '' : String(Math.max(0, cap - (used ?? 0))));
+  return `${left(row.capUnits, row.usedUnits)}/${left(row.capOrders, row.usedOrders)}`;
+}
+
 /** The counters after an order, and whether that order closed the promotion (§5.3: the order keeps its price). */
 export function usageAfter(
   row: Pick<PricingPromotionRow, 'capUnits' | 'capOrders' | 'usedUnits' | 'usedOrders'>,

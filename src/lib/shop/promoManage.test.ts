@@ -46,6 +46,17 @@ describe('promotion wizard draft', () => {
     expect(draftReady(draft(), now)).toBe(true);
   });
 
+  it('a promotion limited to units may end on its cap instead of a date', () => {
+    const onCap = draft({ endsOn: '', capUnits: 40 });
+    expect(draftProblems(onCap, now).when).toEqual([]);
+    expect(draftReady(onCap, now)).toBe(true);
+    expect(draftToTerms(onCap)).toMatchObject({ endsAt: null, capUnits: 40 });
+    // Neither a date nor a cap: still a price change, still refused.
+    expect(draftProblems(draft({ endsOn: '', capUnits: null }), now).when).toEqual(['noEnd']);
+    expect(draftProblems(draft({ endsOn: '', capUnits: 0 }), now).when).toEqual(['noCap']);
+    expect(draftProblems(draft({ endsOn: '', capUnits: 2.5 }), now).when).toEqual(['noCap']);
+  });
+
   it('a store-wide sale needs no products picked', () => {
     const d = { ...emptyDraft('store'), value: 10, endsOn: '2026-11-01' };
     expect(draftProblems(d, now).scope).toEqual([]);
@@ -65,6 +76,15 @@ describe('promotion preview — what the server will decide', () => {
     expect(p.needsVote).toBe(false);
     expect(p.breaches).toEqual([]);
     expect(p.reaches.map((x) => x.id)).toEqual(['1']);
+  });
+
+  it('a promotion that ends on its cap still sounds out the rikma', () => {
+    // Nobody else's income here, so no vote — but if it reached a partner it would,
+    // and the cap (not a date) is what ends it.
+    const p = previewDraft(draft({ endsOn: '', capUnits: 25 }), ctx);
+    expect(p.terms?.endsAt ?? null).toBeNull();
+    expect(p.terms?.capUnits).toBe(25);
+    expect(p.needsVote).toBe(false);
   });
 
   it('beyond it is a vote, and says what is beyond and when it can start', () => {

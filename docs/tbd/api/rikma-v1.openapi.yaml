@@ -1403,10 +1403,13 @@ components:
             לפי `kind`: item `{pct}`|`{price}`|`{off}` · bundle `{qty, price, repeat}` ·
             bxgy `{buy, get, getPct, cheapestFree}` · store `{pct}` · threshold `{minSubtotal, off}`|`{minSubtotal, pct}`
         startsAt: { type: [string, 'null'], format: date-time }
-        endsAt: { type: [string, 'null'], format: date-time }
+        endsAt:
+          type: [string, 'null']
+          format: date-time
+          description: ריק = למבצע אין תאריך סיום, והוא נגמר כשהתקרה (remaining) מוצתה (עד גמר המלאי)
         remaining:
           type: object
-          description: מה שנשאר מהתקרה; null = בלי תקרה. "עד גמר המלאי" הוא המלאי, לא זה
+          description: מה שנשאר מהתקרה; null = בלי תקרה. מבצע עם endsAt ריק נגמר כשהיחידות נגמרות
           properties:
             units: { type: [number, 'null'] }
             orders: { type: [integer, 'null'] }

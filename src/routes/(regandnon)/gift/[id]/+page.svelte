@@ -33,6 +33,7 @@
   const byQuote = data.alld?.pricingMode === 'quote';
   // A running promotion (PLAN_SHOP_PROMOTIONS P5) is the price a request starts from.
   let price = $state(byQuote ? null : (data.promo?.price ?? data.alld?.price) || 0);
+  // A promotion that ends on its cap has no end date — "until stock runs out".
   let promoUntil = $derived(data.promo?.endsAt
     ? new Intl.DateTimeFormat($locale || 'he', { day: 'numeric', month: 'numeric', timeZone: 'Asia/Jerusalem' }).format(new Date(data.promo.endsAt))
     : '');
@@ -346,7 +347,11 @@
 
             {#if data.promo}
               <p class="mb-1 text-sm font-semibold text-barbi">
-                {data.promo.name ? `${data.promo.name} · ` : ''}{promoUntil ? $t('pages.gift.promoUntil', { date: promoUntil }) : $t('pages.gift.onSale')}
+                {data.promo.name ? `${data.promo.name} · ` : ''}{promoUntil
+                  ? $t('pages.gift.promoUntil', { date: promoUntil })
+                  : data.promo.endsAt
+                    ? $t('pages.gift.onSale')
+                    : $t('pages.gift.promoUntilStock')}
               </p>
             {/if}
             <!-- Price Tag -->

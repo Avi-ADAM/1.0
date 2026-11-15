@@ -39,9 +39,18 @@ describe('normalizePromoTerms', () => {
     expect(t.scope).toEqual({ products: ['5'] });
   });
 
-  it('refuses a promotion without an end — that is a price change', () => {
+  it('refuses a promotion with neither an end nor a cap — that is a price change', () => {
     const r = normalizePromoTerms({ kind: 'item', scope: { products: ['5'] }, rule: { pct: 10 } }, NOW);
     expect(r.ok).toBe(false);
+  });
+
+  it('keeps a promotion that is limited to units and ends when they run out', () => {
+    const r = normalizePromoTerms({ kind: 'item', scope: { products: ['5'] }, rule: { pct: 10 }, capUnits: 40 }, NOW);
+    expect(r.ok && r.terms.endsAt).toBeNull();
+    expect(r.ok && r.terms.capUnits).toBe(40);
+    // An explicit null end is the same thing — the cap is what ends it.
+    const explicit = normalizePromoTerms({ kind: 'store', rule: { pct: 10 }, endsAt: null, capUnits: '12' }, NOW);
+    expect(explicit.ok && explicit.terms.endsAt).toBeNull();
   });
 
   it('refuses an end in the past and an end before the start', () => {
@@ -165,6 +174,19 @@ describe('effectiveWindow (D2)', () => {
     expect(promoDays(terms(), NOW)).toBe(7);
     expect(promoDays(terms({ startsAt: null }), NOW)).toBe(8);
   });
+
+  it('a promotion with no end date is not measured in days — its cap ends it', () => {
+    expect(promoDays(terms({ endsAt: null, capUnits: 20 }), NOW)).toBeNull();
+    // …and an envelope's maxDays does not call it too long.
+    const policy = normalizePromoPolicy({ maxPct: 20, maxDays: 3, kinds: ['item'] })!;
+    expect(envelopeBreaches(terms({ endsAt: null, capUnits: 20 }), policy, { now: NOW })).toEqual([]);
+  });
+
+  it('a dateless promotion approved after its start just starts', () => {
+    const w = effectiveWindow(terms({ endsAt: null, capUnits: 20 }), new Date(day(9)));
+    expect(w.expired).toBe(false);
+    expect(w.endsAt).toBeNull();
+  });
 });
 
 describe('shelf', () => {
@@ -230,6 +252,15 @@ describe('nextPromoStatus', () => {
       status: 'ended',
       endedReason: 'cap'
     });
+  });
+
+  it('a promotion with no end date never ends by time — only its cap ends it', () => {
+    const dateless = { ...row, status: 'active', startsAt: day(-1), endsAt: null, capUnits: 10 };
+    expect(nextPromoStatus(dateless, new Date(day(365)))).toBeNull();
+    expect(nextPromoStatus({ ...dateless, usedUnits: 10 }, new Date(day(3)))).toEqual({ status: 'ended', endedReason: 'cap' });
+    // Scheduled: it starts at its start and stays — no end of its own.
+    expect(nextPromoStatus({ ...dateless, status: 'scheduled' }, new Date(day(1)))).toEqual({ status: 'active' });
+    expect(nextPromoStatus({ ...dateless, status: 'scheduled' }, new Date(day(9)))).toEqual({ status: 'active' });
   });
 
   it('the emergency pause holds 24 hours, then the promotion runs again (D3)', () => {

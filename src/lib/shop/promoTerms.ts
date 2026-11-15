@@ -37,8 +37,12 @@ export interface PromoTerms {
   rule: Record<string, number | boolean>;
   /** null = as soon as it is approved. */
   startsAt: string | null;
-  /** Always set — a promotion with no end is a price change, and belongs to `editObject`. */
-  endsAt: string;
+  /**
+   * The last moment it runs. null = it has no date of its own and ends only
+   * when its unit cap is used up ("עד גמר המלאי") — which is why a null end is
+   * allowed only together with `capUnits`.
+   */
+  endsAt: string | null;
   capUnits: number | null;
   capOrders: number | null;
   perOrderMax: number | null;
@@ -144,9 +148,7 @@ export function normalizePromoTerms(raw: unknown, now: Date): PromoTermsResult {
   const startsAt = iso(t.startsAt);
   const endsAt = iso(t.endsAt);
   if (startsAt === undefined) return refuse('startsAt is not a date');
-  if (!endsAt) return refuse('endsAt is required — a promotion without an end is a price change');
-  if (Date.parse(endsAt) <= now.getTime()) return refuse('endsAt has already passed');
-  if (startsAt && Date.parse(endsAt) <= Date.parse(startsAt)) return refuse('endsAt must be after startsAt');
+  if (endsAt === undefined) return refuse('endsAt is not a date');
 
   const capUnits = posInt(t.capUnits);
   const capOrders = posInt(t.capOrders);
@@ -154,6 +156,13 @@ export function normalizePromoTerms(raw: unknown, now: Date): PromoTermsResult {
   if ([capUnits, capOrders, perOrderMax].some((n) => Number.isNaN(n))) {
     return refuse('caps are whole numbers above zero');
   }
+
+  // A promotion ends by its date or by its cap — it needs one of them, never neither.
+  if (!endsAt && capUnits == null) {
+    return refuse('a promotion needs an end date — or a unit cap to end on (a promotion with neither is a price change)');
+  }
+  if (endsAt && Date.parse(endsAt) <= now.getTime()) return refuse('endsAt has already passed');
+  if (endsAt && startsAt && Date.parse(endsAt) <= Date.parse(startsAt)) return refuse('endsAt must be after startsAt');
 
   return { ok: true, error: null, terms: { kind, name, scope, rule, startsAt, endsAt, capUnits, capOrders, perOrderMax } };
 }
@@ -240,8 +249,13 @@ export function maxEffectivePct(terms: Pick<PromoTerms, 'kind' | 'rule'>, listPr
   }
 }
 
-/** Whole days a version runs, from when it would start. */
-export function promoDays(terms: Pick<PromoTerms, 'startsAt' | 'endsAt'>, from: Date): number {
+/**
+ * Whole days a version runs, from when it would start. A version with no end
+ * date runs until its cap — it is measured by `maxDaysPerHalfYear` only (see
+ * `envelopeBreaches`), so this answers null for it.
+ */
+export function promoDays(terms: Pick<PromoTerms, 'startsAt' | 'endsAt'>, from: Date): number | null {
+  if (!terms.endsAt) return null;
   const start = Math.max(from.getTime(), terms.startsAt ? Date.parse(terms.startsAt) : from.getTime());
   return Math.max(1, Math.ceil((Date.parse(terms.endsAt) - start) / DAY_MS));
 }
@@ -268,8 +282,9 @@ export function envelopeBreaches(
   if (!policy.kinds.includes(terms.kind)) out.push({ field: 'kind', value: terms.kind });
   const pct = maxEffectivePct(terms, ctx.listPrices);
   if (pct == null || pct > policy.maxPct) out.push({ field: 'pct', limit: policy.maxPct, value: pct });
+  // A version with no end date is not "too long": it lasts as long as its cap does.
   const days = promoDays(terms, ctx.now);
-  if (days > policy.maxDays) out.push({ field: 'days', limit: policy.maxDays, value: days });
+  if (days != null && days > policy.maxDays) out.push({ field: 'days', limit: policy.maxDays, value: days });
   if ('roles' in policy.who) {
     const mine = new Set(ctx.actorRoleIds ?? []);
     if (!policy.who.roles.some((r) => mine.has(r))) out.push({ field: 'who' });
@@ -280,15 +295,16 @@ export function envelopeBreaches(
 /**
  * When a version actually runs once it is approved at `approvedAt` (D2): never
  * before the approval, and its end stays where the rikma agreed to put it — a
- * slow vote does not stretch a holiday sale past the holiday.
+ * slow vote does not stretch a holiday sale past the holiday. A version that
+ * ends on its cap instead has no end date to move: it ends when it sells out.
  */
 export function effectiveWindow(
   terms: Pick<PromoTerms, 'startsAt' | 'endsAt'>,
   approvedAt: Date
-): { startsAt: string; endsAt: string; expired: boolean } {
+): { startsAt: string; endsAt: string | null; expired: boolean } {
   const start = Math.max(approvedAt.getTime(), terms.startsAt ? Date.parse(terms.startsAt) : 0);
-  const end = Date.parse(terms.endsAt);
-  return { startsAt: new Date(start).toISOString(), endsAt: terms.endsAt, expired: end <= start };
+  const end = terms.endsAt ? Date.parse(terms.endsAt) : null;
+  return { startsAt: new Date(start).toISOString(), endsAt: terms.endsAt, expired: end != null && end <= start };
 }
 
 /** The status an approved version starts in. */
@@ -390,7 +406,11 @@ export interface PromoClockRow {
 
 export type PromoTransition = { status: 'active' } | { status: 'ended'; endedReason: 'time' | 'cap' };
 
-/** What the clock moves a promotion to now, or null when nothing changes. */
+/**
+ * What the clock moves a promotion to now, or null when nothing changes.
+ * A promotion with no end date (`endsAt` null) runs until its cap is reached
+ * or a member ends it — the time never ends it.
+ */
 export function nextPromoStatus(row: PromoClockRow, now: Date): PromoTransition | null {
   const t = now.getTime();
   const ended = row.endsAt != null && Date.parse(row.endsAt) <= t;

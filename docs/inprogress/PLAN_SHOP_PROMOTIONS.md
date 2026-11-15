@@ -195,8 +195,8 @@
 | `status` | enum `proposed · scheduled · active · paused · ended` | `ended` עם `endedReason: time · cap · early · superseded` |
 | `scope` | json | `{ products:[id], variants:[id], categories:[id], all:bool, exclude:[id] }` |
 | `rule` | json | לפי `kind`, §4.2 |
-| `startsAt` / `endsAt` | datetime | **`endsAt` חובה** בכל מבצע שאינו `item` עם `priceFloor` — מבצע בלי סוף הוא שינוי מחיר, ושייך ל-`editObject` |
-| `capUnits` / `capOrders` | integer | null = בלי תקרה ("עד גמר המלאי" הוא המלאי, לא התקרה) |
+| `startsAt` / `endsAt` | datetime | **לכל מבצע יש סוף: תאריך או תקרת יחידות.** `endsAt: null` מותר רק כש-`capUnits` מלא — "מוגבל לכמות, נגמר כשהכמות נגמרת" (‏"עד גמר המלאי"). מבצע בלי תאריך ובלי תקרה הוא שינוי מחיר, ושייך ל-`editObject` |
+| `capUnits` / `capOrders` | integer | null = בלי תקרה ("עד גמר המלאי" הוא המלאי, לא התקרה). מבצע עם `endsAt: null` נסגר כשהיחידות נגמרות — השעון (`/api/cron/promotions`) רושם אז `endsAt` = רגע הסגירה, וכך חלון החסד לתשלום (§5.3) נמדד ממנו |
 | `usedUnits` / `usedOrders` | integer | נכתבים ב-`createPaidOrder`/`confirmOrderPayment` |
 | `perOrderMax` | integer | "עד 2 ללקוח" — ברמת ההזמנה (אין לנו זהות קונה, ראו §8) |
 | `code` | string, private | שלב P6; null = אוטומטי |

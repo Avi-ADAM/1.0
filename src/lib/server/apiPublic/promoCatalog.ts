@@ -11,7 +11,7 @@
  */
 import type { ApiProduct } from './dto.js';
 import { cachedPromoPricing } from '$lib/server/promotions/pricing';
-import { decorateProduct, floorOfShelf, pricingPromotions } from '$lib/shop/promoPricing';
+import { decorateProduct, floorOfShelf, pricingPromotions, remainingKey } from '$lib/shop/promoPricing';
 
 export async function withPromotions<T extends ApiProduct>(
   projectId: string,
@@ -25,7 +25,12 @@ export async function withPromotions<T extends ApiProduct>(
   const floorOf = floorOfShelf(pricing.shelf, pricing.policy);
   return {
     data: products.map((p) => decorateProduct(p, promos, now, floorOf) as T),
-    // A promotion that starts or ends changes prices without changing a row.
-    etagPart: promos.map((p) => `${p.id}:${p.endsAt ?? ''}`).join(',')
+    // A promotion that starts or ends changes prices without changing a row —
+    // and one that ends on its cap (no end date) changes them when its last
+    // unit is sold, so what is left of each running cap is part of the tag too.
+    etagPart: pricing.rows
+      .filter((r) => r.status === 'active')
+      .map((r) => `${r.id}:${r.endsAt ?? ''}:${remainingKey(r)}`)
+      .join(',')
   };
 }

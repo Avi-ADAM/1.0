@@ -1212,14 +1212,17 @@
       "maxPct": "Hasta qué %",
       "maxDays": "Hasta cuántos días",
       "why": "¿Por qué esta versión?",
-      "zeroHint": "0 = sin promoción. Es una contrapropuesta, no un veto."
+      "zeroHint": "0 = sin promoción. Es una contrapropuesta, no un veto.",
+      "endsOnCap": "Sin fecha de fin — hasta que se agoten las unidades",
+      "capUnits": "Tope de unidades"
     },
     "toast": {
       "signed": "Firmaste la versión sobre la mesa",
       "applied": "Todos firmaron — está aprobado",
       "countered": "Tu versión está sobre la mesa y el reloj se reinició",
       "error": "Algo salió mal — inténtalo de nuevo"
-    }
+    },
+    "datesUntilStock": "{{from}} hasta agotar existencias"
   },
   "provideAssigned": {
     "title": "¿Qué recurso aportarás a \"{{name}}\"?",

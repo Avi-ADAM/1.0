@@ -173,6 +173,8 @@
   let cValue = $state('');
   let cStart = $state('');
   let cEnd = $state('');
+  let cCap = $state('');
+  let cEndsOnCap = $state(false);
   let cMaxPct = $state('');
   let cMaxDays = $state('');
   let cWhy = $state('');
@@ -187,6 +189,9 @@
       cValue = valueKey ? String(rule[valueKey] ?? '') : '';
       cStart = dateInput(standing?.startsAt);
       cEnd = dateInput(standing?.endsAt);
+      cCap = standing?.capUnits != null ? String(standing.capUnits) : '';
+      // A version with no end date ends on its cap — the counter starts there.
+      cEndsOnCap = !standing?.endsAt;
     }
     cWhy = '';
     counterOpen = true;
@@ -209,7 +214,9 @@
         params.rule = valueKey ? { ...rule, [valueKey]: Number(cValue) } : rule;
         // An end date means its whole last day.
         if (cStart) params.startsAt = new Date(`${cStart}T00:00:00`).toISOString();
-        if (cEnd) params.endsAt = new Date(`${cEnd}T23:59:00`).toISOString();
+        // "עד גמר המלאי": no end date, and the cap is what ends it.
+        params.endsAt = !cEndsOnCap && cEnd ? new Date(`${cEnd}T23:59:00`).toISOString() : null;
+        if (cCap) params.capUnits = Number(cCap);
       }
       const res = await executeAction('counterPromotion', params);
       if (res?.success === false) throw new Error(actionErrorText(res, $t('lev.promo.toast.error')));
@@ -266,7 +273,11 @@
         <p class="text-xs text-gray-600 dark:text-gray-300">{$t(`lev.promo.kind.${standing.kind}`)} · {scopeText}</p>
         <p class="text-xl font-bold text-gray-900 dark:text-white">{what}</p>
         <p class="text-sm text-gray-800 dark:text-gray-100">
-          {$t('lev.promo.dates', { from: fmtDate(standing.startsAt), to: fmtDate(standing.endsAt) })}
+          {#if standing.endsAt}
+            {$t('lev.promo.dates', { from: fmtDate(standing.startsAt), to: fmtDate(standing.endsAt) })}
+          {:else}
+            {$t('lev.promo.datesUntilStock', { from: fmtDate(standing.startsAt), count: standing.capUnits })}
+          {/if}
         </p>
         {#if standing.capUnits}
           <p class="text-xs text-gray-600 dark:text-gray-300">{$t('lev.promo.capUnits', { count: standing.capUnits })}</p>
@@ -338,9 +349,22 @@
             </label>
             <label class="block flex-1">
               <span class="text-xs text-gray-600 dark:text-gray-300">{$t('lev.promo.counter.endsAt')}</span>
-              <input type="date" bind:value={cEnd} class="w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900 p-2" />
+              <input
+                type="date"
+                bind:value={cEnd}
+                disabled={cEndsOnCap}
+                class="w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900 p-2 disabled:opacity-60"
+              />
             </label>
           </div>
+          <label class="block">
+            <span class="text-xs text-gray-600 dark:text-gray-300">{$t('lev.promo.counter.capUnits')}</span>
+            <input type="number" min="1" step="1" bind:value={cCap} class="w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900 p-2" />
+          </label>
+          <label class="flex items-start gap-2">
+            <input type="checkbox" bind:checked={cEndsOnCap} class="mt-1" />
+            <span class="text-xs text-gray-600 dark:text-gray-300">{$t('lev.promo.counter.endsOnCap')}</span>
+          </label>
         {/if}
         <label class="block">
           <span class="text-xs text-gray-600 dark:text-gray-300">{$t('lev.promo.counter.why')}</span>

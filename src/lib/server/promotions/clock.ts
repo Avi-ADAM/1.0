@@ -27,6 +27,9 @@ export async function runPromotionClock(exec: Exec, now = new Date()): Promise<C
       await updatePromotion(exec, row.id, {
         status: next.status,
         ...(next.status === 'ended' ? { endedReason: next.endedReason } : {}),
+        // A promotion that ended on its cap and had no end date gets the moment it
+        // ended written down: the payment grace of §5.3 is measured from it.
+        ...(next.status === 'ended' && row.endsAt == null ? { endsAt: now.toISOString() } : {}),
         ...(row.status === 'paused' ? { pausedAt: null, pausedById: null } : {})
       });
       report.moved.push({ promotionId: row.id, projectId: row.projectId, from: row.status, to: next });
