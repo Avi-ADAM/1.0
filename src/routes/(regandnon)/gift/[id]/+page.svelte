@@ -215,6 +215,10 @@
 </script>
 
 <Head {title} {description} {image} {url} />
+<!-- Hidden from the directory: open by link, not indexed (PLAN_RIKMA_VISIBILITY S2). -->
+<svelte:head>
+  {#if data.hiddenFromDiscovery}<meta name="robots" content="noindex, follow" />{/if}
+</svelte:head>
 
 {#if data.alld}
   <div

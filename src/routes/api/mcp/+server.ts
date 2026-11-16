@@ -32,6 +32,7 @@ import { mcpInstructions } from '$lib/server/mcp/instructions';
 import { getPlatformInfoTool, noAccountTools, noAccountToolNames } from '$lib/server/mcp/publicTools';
 import { assistantMcpEnabled } from '../../../mastra/tools/assistantTools';
 import { normalizeApiKeyScopes } from '$lib/server/apiKeys';
+import { fetchUserLang, resolveMcpLang } from '$lib/server/mcp/lang';
 
 // --- Public Tools for Unauthenticated Users ---
 
@@ -194,6 +195,7 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
     let apiKey = null;
     let verdict: KeyVerdict = 'absent';
     let keyId: string | undefined;
+    let keyName: string | null | undefined;
 
     if (authHeader) {
         apiKey = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
@@ -201,7 +203,7 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
         // distinction: "you sent a dead key" and "you sent no key" need different
         // answers, and conflating them is what made a revoked key look like an
         // unregistered user for three restarts running.
-        ({ user, verdict, keyId } = await checkApiKey(apiKey));
+        ({ user, verdict, keyId, keyName } = await checkApiKey(apiKey));
         console.log(
             `[MCP] Request from ${user ? 'authenticated user: ' + user.id : `client with a ${verdict} key`}` +
             ` at ${url.pathname} (${request.method})`
@@ -236,7 +238,14 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
             userId: user.id.toString(),
             fetchInstance: svelteFetch,
             keyProjects: normalizeApiKeyScopes(user.scopes)?.projects,
-            keyId
+            keyId,
+            // Every tool and action message reads ctx.lang; without it they all
+            // answered in Hebrew (PLAN_MCP_PARTNER_INTEGRATION P0.4).
+            lang: resolveMcpLang({
+                storedLang: await fetchUserLang(user.id.toString()),
+                acceptLanguage: request.headers.get('accept-language'),
+                keyName
+            })
         });
 
         // Agents and workflows are deliberately NOT exposed. MCPServer turns

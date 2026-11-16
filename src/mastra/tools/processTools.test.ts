@@ -76,6 +76,13 @@ describe('startProcess', () => {
     expect(res).toMatchObject({ success: true, processId: '7', forumId: '12' });
   });
 
+  it("hands the request's language to the action (P0.4)", async () => {
+    executeAction.mockResolvedValue({ success: true, data: { processId: '7' } });
+    getMcpContext.mockReturnValue({ userId: '42', fetchInstance: vi.fn(), lang: 'en' });
+    await run(startProcessTool, { projectId: '89', name: 'Approach', description: 'they might fund it' });
+    expect(executeAction.mock.calls[0][2]).toMatchObject({ userId: '42', lang: 'en' });
+  });
+
   it('refuses without echoing the action error', async () => {
     executeAction.mockResolvedValue({ success: false, error: { message: 'User is not a member of project 89' } });
     const res: any = await run(startProcessTool, { projectId: '89', name: 'x y' });

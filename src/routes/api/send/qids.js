@@ -11464,6 +11464,18 @@ export const moachQids = {
       data { id attributes { kind newSlug createdAt } }
     }
   }`,
+  // PLAN_RIKMA_VISIBILITY S2: the rikma's products its sellers hid from the
+  // directory. The public rikma page drops these for anyone but a member, so a
+  // hidden product is reachable only by its own link. Ids only — the names
+  // never leave the server for a non-member.
+  'rikmaHiddenProductIds': `query RikmaHiddenProductIds($pid: ID!) {
+    matanots(
+      filters: { projectcreates: { id: { eq: $pid } }, hideFromDiscovery: { eq: true } }
+      pagination: { limit: 200 }
+    ) {
+      data { id }
+    }
+  }`,
   'rikmaIdentityDecision': `query RikmaIdentityDecision($id: ID!) {
     decision(id: $id) {
       data { id attributes { kind archived newSlug newLook projects { data { id } } } }
@@ -15149,8 +15161,9 @@ ${PROMO_DECISION_FIELDS}
   // hideFromDiscovery is the seller's own opt-out of this directory (a rikma
   // that sells only to its members, a product not ready for the public). Same
   // NULL guard as `archived` — rows created before the field exists read NULL,
-  // which means "not hidden". Hidden products stay reachable everywhere else:
-  // /gift/[id], the project page and the sales flows.
+  // which means "not hidden". Hidden products stay reachable by link (/gift/[id],
+  // noindex) and in the sales flows; the rikma's public page shows them to its
+  // members only (rikmaHiddenProductIds, PLAN_RIKMA_VISIBILITY S2).
   '282discoverProducts': `query DiscoverProducts {
     matanots(
       # Same NULL guard as 281 - never-archived products often have NULL here.
@@ -18654,6 +18667,112 @@ ${PROMO_DECISION_FIELDS}
     }
   }`,
 
+  // An outside agent's "where do my offers stand" (PLAN_MCP_PARTNER_INTEGRATION
+  // P1.3): the key owner's open candidacies — Ask (mission) and Askm (resource) —
+  // with the rounds on the table and the clock. `$uid`, not `$idL`: an MCP call
+  // has no session. serviceAdmin only; the tool passes the verified key owner.
+  'mcpMyApplications': `query McpMyApplications($uid: ID!) {
+    asks(
+      filters: { users_permissions_user: { id: { eq: $uid } }, or: [{ archived: { null: true } }, { archived: { eq: false } }] }
+      sort: "createdAt:desc"
+      pagination: { limit: 50 }
+    ) {
+      data { id attributes {
+        createdAt
+        vots { what order zman users_permissions_user { data { id } } }
+        timegrama { data { attributes { date done } } }
+        open_mission { data { id attributes { name noofhours perhour } } }
+        project { data { id attributes { projectName user_1s { data { id attributes { username } } } } } }
+        negopendmissions(sort: "ordern:asc", pagination: { limit: 50 }) { data { id attributes { ordern noofhours perhour proposedBy status } } }
+      } }
+    }
+    askms(
+      filters: { users_permissions_user: { id: { eq: $uid } }, archived: { eq: false } }
+      sort: "createdAt:desc"
+      pagination: { limit: 50 }
+    ) {
+      data { id attributes {
+        createdAt
+        vots { what order zman users_permissions_user { data { id } } }
+        timegrama { data { attributes { date done } } }
+        open_mashaabim { data { id attributes { name hm price } } }
+        project { data { id attributes { projectName user_1s { data { id attributes { username } } } } } }
+        nego_mashes(sort: "ordern:asc", pagination: { limit: 50 }) { data { id attributes { ordern hm price proposedBy status } } }
+      } }
+    }
+  }`,
+
+  // Being findable by other people's agents (PLAN_MCP_PARTNER_INTEGRATION P1.5)
+  // is opt-in: `findableByAgents` defaults to false. Separate reads on purpose —
+  // until the field is deployed they fail alone, and the caller reads that as
+  // "not findable" (the default) instead of breaking the profile query with it.
+  'findableByAgentsFor': `query FindableByAgentsFor($uid: ID!) {
+    usersPermissionsUser(id: $uid) { data { id attributes { findableByAgents } } }
+  }`,
+  // People by skill or role (PLAN_MCP_PARTNER_INTEGRATION P1.5). Two answers:
+  // `named` — only those who opted in (findableByAgents), with username, skills,
+  // roles and ways of working; `all` — how many match at all, as a number only.
+  // Someone who filled in skills already gets mission suggestions in the heart, so
+  // the agent may learn they exist; their name leaves only with their own switch.
+  // Never email, phone or location. The caller is never counted.
+  'mcpFindPartners': `query McpFindPartners($q: String, $uid: ID!, $limit: Int = 10) {
+    named: usersPermissionsUsers(
+      filters: {
+        findableByAgents: { eq: true }
+        id: { ne: $uid }
+        blocked: { ne: true }
+        or: [
+          { skills: { skillName: { containsi: $q } } }
+          { skills: { localizations: { skillName: { containsi: $q } } } }
+          { tafkidims: { roleDescription: { containsi: $q } } }
+          { tafkidims: { localizations: { roleDescription: { containsi: $q } } } }
+        ]
+      }
+      pagination: { limit: $limit }
+    ) {
+      meta { pagination { total } }
+      data {
+        id
+        attributes {
+          username
+          findableByAgents
+          skills { data { attributes { skillName } } }
+          tafkidims { data { attributes { roleDescription } } }
+          work_ways { data { attributes { workWayName } } }
+        }
+      }
+    }
+    all: usersPermissionsUsers(
+      filters: {
+        id: { ne: $uid }
+        blocked: { ne: true }
+        or: [
+          { skills: { skillName: { containsi: $q } } }
+          { skills: { localizations: { skillName: { containsi: $q } } } }
+          { tafkidims: { roleDescription: { containsi: $q } } }
+          { tafkidims: { localizations: { roleDescription: { containsi: $q } } } }
+        ]
+      }
+      pagination: { limit: 1 }
+    ) { meta { pagination { total } } }
+  }`,
+  // The count alone, for a backend without `findableByAgents` yet: nobody has
+  // opted in there, so nobody is named.
+  'mcpCountPartners': `query McpCountPartners($q: String, $uid: ID!) {
+    all: usersPermissionsUsers(
+      filters: {
+        id: { ne: $uid }
+        blocked: { ne: true }
+        or: [
+          { skills: { skillName: { containsi: $q } } }
+          { skills: { localizations: { skillName: { containsi: $q } } } }
+          { tafkidims: { roleDescription: { containsi: $q } } }
+          { tafkidims: { localizations: { roleDescription: { containsi: $q } } } }
+        ]
+      }
+      pagination: { limit: 1 }
+    ) { meta { pagination { total } } }
+  }`,
   ...qids_base,
   ...moachQids,
   ...digestQids,

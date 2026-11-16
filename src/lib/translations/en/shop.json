@@ -231,6 +231,8 @@
     "draft": "Waiting for the rikma's approval",
     "view": "View product page",
     "export": "Export CSV",
+    "viewSite": "View on site",
+    "viewSiteTitle": "Opens the rikma's website in a new tab",
     "exportHint": "Shopify format — opens in any sales system and in Excel",
     "col": {
       "product": "Product",

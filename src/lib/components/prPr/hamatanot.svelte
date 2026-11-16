@@ -28,6 +28,7 @@
   import Halu from './whowhat.svelte';
   import Spinner from '$lib/celim/Spinner.svelte';
   import ShopSheet from '$lib/components/shop/ShopSheet.svelte';
+  import { EXTERNAL_LINK_REL } from '$lib/links/externalUrl';
   import ShareLink from '$lib/components/share/ShareLink.svelte';
   import { toast } from 'svelte-sonner';
   import { isSiteShareNote, parseSiteShareNote } from '$lib/revenue/parseSiteShareNote';
@@ -116,7 +117,14 @@
      * report starts from it. The member still types what was actually received.
      * @type {Record<string, { price: number, listPrice: number }>}
      */
-    salePrices = {}
+    salePrices = {},
+    /**
+     * The rikma's website, already normalised (`normalizeExternalUrl`), or null.
+     * Members only reach this page, so it may follow `linkToWebsite` — the
+     * buyer-facing button never does (PLAN_RIKMA_VISIBILITY §4.2).
+     * @type {string | null}
+     */
+    siteUrl = null
   } = $props();
 
   /** @param {Matana} m */
@@ -784,6 +792,18 @@
                 <a class="sh-btn sh-btn-quiet" href="/moach/{projectId}/sales/manage/products/{data.id}">
                   {$t('project.hamatanot.fullEdit')}
                 </a>
+                {#if siteUrl}
+                  <a
+                    class="sh-btn sh-btn-quiet"
+                    href={siteUrl}
+                    target="_blank"
+                    rel={EXTERNAL_LINK_REL}
+                    title={$t('project.hamatanot.viewOnSiteTitle')}
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6" /><path d="M20 4l-9 9" /><path d="M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5" /></svg>
+                    {$t('project.hamatanot.viewOnSite')}
+                  </a>
+                {/if}
                 <div class="sp-share">
                   <ShareLink
                     path={'/gift/' + data.id}

@@ -319,6 +319,10 @@
                 <p class="text-barbi font-bold text-xl mb-2">
                   {matanot.attributes.price}
                 </p>
+                {#if matanot.attributes.hiddenFromDiscovery}
+                  <!-- Only a member's copy carries this (loadRikmaPage → hiddenProducts). -->
+                  <p class="text-xs mb-2" style="color: var(--gold-l)">{$t('rikmaLook.page.productHidden')}</p>
+                {/if}
                 <a href="/gift/{matanot.id}" class="text-sm underline text-gold hover:text-white"
                   >{$t('rikmaLook.page.productDetails')}</a
                 >

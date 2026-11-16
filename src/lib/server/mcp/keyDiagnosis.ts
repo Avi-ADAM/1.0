@@ -162,6 +162,8 @@ export interface KeyCheck {
   verdict: KeyVerdict;
   /** Strapi api-key record id when the key verifies — the rate-limit and audit identity. */
   keyId?: string;
+  /** The key's name — `MCP · <client>` marks one minted by OAuth (see mcp-connect). */
+  keyName?: string | null;
 }
 
 /**
@@ -183,6 +185,7 @@ export async function checkApiKey(rawKey: string | null | undefined): Promise<Ke
   return {
     user: scopes ? { ...detailed.user, scopes } : detailed.user,
     verdict: 'ok',
-    keyId: detailed.keyId
+    keyId: detailed.keyId,
+    keyName: detailed.name
   };
 }

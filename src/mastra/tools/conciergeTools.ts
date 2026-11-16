@@ -25,6 +25,7 @@ import { sendToSer } from '../../lib/send/sendToSer';
 import { getMcpContext } from '../../lib/server/mcpContext.js';
 import { isHiddenProject } from '../../lib/server/discovery/hiddenProjects.js';
 import { describeStrapiFailure } from '../../lib/server/mcp/strapiErrors.js';
+import { normalizeProjectCard } from '../../lib/server/discovery/normalizeCards.js';
 import { env } from '$env/dynamic/private';
 
 const SITE = 'https://www.1lev1.com';
@@ -142,6 +143,62 @@ export const searchCatalogTool = createTool({
     } catch (error) {
       console.error('[searchCatalog] failed:', error);
       return { success: false, message: 'Could not search the catalog right now. Try again shortly.' };
+    }
+  }
+});
+
+/**
+ * Pure shaping of the public rikma directory (qid 281) — PLAN_MCP_PARTNER_INTEGRATION P0.6.
+ * The same card the /project index renders (`normalizeProjectCard`), minus
+ * coordinates an agent has no use for. Hidden QA rikmas are skipped; when
+ * PLAN_RIKMA_VISIBILITY lands, a rikma hidden by vote must be skipped here too.
+ */
+export function shapeRikmaDirectory(data: any, query: string, limit: number) {
+  const out: any[] = [];
+  for (const node of rows(data?.projects)) {
+    if (isHiddenProject(String(node?.id))) continue;
+    const card = normalizeProjectCard(node);
+    if (!card) continue;
+    if (!matchesQuery([card.name, card.description, card.city], query)) continue;
+    out.push({
+      rikmaId: card.id,
+      name: card.name,
+      description: card.description ?? '',
+      city: card.city,
+      online: card.isOnline,
+      members: card.membersCount,
+      openMissions: card.openMissionsCount,
+      openResources: card.openResourcesCount,
+      products: card.productsCount,
+      url: `${SITE}/project/${card.id}`
+    });
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
+export const searchRikmasTool = createTool({
+  id: 'searchRikmas',
+  description:
+    'Search the public directory of rikmas (partnerships) by text - name, public description, city - with how ' +
+    'many members each has and how many open missions, open resources and products. For finding a rikma to join or ' +
+    'work with; getProjectDetailsTool then shows one rikma\'s public face. Public data only.',
+  inputSchema: z.object({
+    query: z.string().max(100).optional().describe('Free text. Empty: the newest rikmas.'),
+    limit: z.number().int().min(1).max(50).optional().describe('Maximum rows, default 10.')
+  }),
+  execute: async ({ query, limit }) => {
+    const ctx = getMcpContext();
+    if (!ctx?.fetchInstance) return { success: false, message: 'Not authenticated.' };
+    try {
+      const res: any = await sendToSer({}, '281discoverProjects', 0, 0, !ctx.isInternalBot, ctx.fetchInstance);
+      const failure = describeStrapiFailure(res, 'searchRikmas');
+      if (failure) return { success: false, message: failure };
+      const rikmas = shapeRikmaDirectory(res?.data, query ?? '', limit ?? 10);
+      return { success: true, note: MEMBER_WRITTEN_NOTE, query: query ?? '', totalFound: rikmas.length, rikmas };
+    } catch (error) {
+      console.error('[searchRikmas] failed:', error);
+      return { success: false, message: 'Could not search the rikmas right now. Try again shortly.' };
     }
   }
 });

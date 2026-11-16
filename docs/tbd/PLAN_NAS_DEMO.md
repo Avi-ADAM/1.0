@@ -4,7 +4,7 @@
 outreach with "send the 2-minute demo and details on how the integration would
 work; we will pass it to the relevant team".
 
-Companion to [PLAN_MCP_PARTNER_INTEGRATION](./PLAN_MCP_PARTNER_INTEGRATION.md),
+Companion to [PLAN_MCP_PARTNER_INTEGRATION](../inprogress/PLAN_MCP_PARTNER_INTEGRATION.md),
 which holds the audit and the P0 / P1 / P2 phases this file refers to. This file
 is the **script** and the **checklist**; the engineering detail of each tool
 lives there.
@@ -40,7 +40,7 @@ scene, and section 6 says what to do when a scene's tool is not ready.
 | 0:12–0:35 | Maya, a course creator, tells her agent: "I need a video editor who'll work for a share." The agent returns three people with matching skills. | "Her agent finds real people by skill." | `findPartnersTool` |
 | 0:35–0:55 | The agent proposes the partnership: roles, missions, what each side brings. Maya opens the link and confirms on an English screen. | "It drafts the partnership. She confirms with one click. The agent never signs for her." | `proposeRikmaBlueprintTool`, `createProjectTool` |
 | 0:55–1:20 | Cut to Dan, the editor. He asks his agent "Anything that fits me?", sees Maya's mission and applies. | "On the other side, Dan's agent already matched him to it. He applies." | `listMyMatchesTool`, `applyToMissionTool` |
-| 1:20–1:40 | Back to Maya: "What's waiting for me?" The agent says Dan applied and that silence approves it in 48 hours. She approves. | "No bosses, no vetoes. Agreement, discussion, or a counter-offer, on a clock the partners set." | `getMyUpdatesTool`, `getDecisionTool` |
+| 1:20–1:40 | Back to Maya: "What's waiting for me?" The agent says Dan applied and that silence approves it in 48 hours. She approves. | "No bosses, no vetoes. Agreement, discussion, or a counter-offer, on a clock the partners set." | `getMyUpdatesTool` (Dan's candidacy is an Ask, not a Decision; Dan's side: `listMyApplicationsTool`) |
 | 1:40–2:05 | Title card "3 weeks later". Dan asks "What's my stake?" and gets percentages from hours and resources. Then the first sale and its split. | "Every hour becomes ownership. The first sale splits by it, automatically and transparently." | `getMyStakeTool`, `getRikmaLedgerTool` |
 | 2:05–2:20 | Closing slide: Nas agent ↔ MCP ↔ 1lev1, and `1lev1.com/mcp` | "Nas helps one person start. Together we let them build like a company. The server is live, your team can try it today." | |
 
@@ -69,18 +69,21 @@ It is not known here exactly what the P0 build contains, so P0 items are
 
 ### 5.1 Blocks the demo — P0, verify it is live
 
-- [ ] OAuth consent screen renders in English (`/mcp-connect` through `$t()`)
+- [ ] OAuth consent screen renders in English (`/mcp-connect` through `$t()`) — built (P0.2), verify after deploy
 - [ ] `getMyUpdatesTool` returns pending votes, with no `unavailable: ["rikmaVotes"]`
-- [ ] Action messages come back in English for an English account (`lang` set on the MCP context)
-- [ ] `listMyMatchesTool`, `searchRikmasTool`, `getMyStakeTool` answer against production
+- [ ] Action messages come back in English for an English account (`lang` set on the MCP context) — built (P0.4), verify after deploy
+- [ ] `listMyMatchesTool`, `searchRikmasTool`, `getMyStakeTool` answer against production — built (P0.5–P0.7), verify after deploy
 - [ ] `MCP_OAUTH_ENABLED` is on in production
 
 ### 5.2 Blocks the demo — P1, build before filming
 
-- [ ] `findPartnersTool`, opt-in people only
-- [ ] `applyToMissionTool` and `listMyApplicationsTool` (candidacy is the person's own statement; the agent never approves it)
-- [ ] `getDecisionTool`, with the restime clock and the "silence approves in…" sentence
-- [ ] `getRikmaLedgerTool`, effective sales and splits only (never a sale whose holder claim is still open)
+- [x] `findPartnersTool` — built: counts everyone who matches, names only those who switched it on. For Maya's scene to show names, the demo accounts switch it on at `/me/settings/mcp` (**needs the 1.0b deploy**, `User.findableByAgents`). Without it she hears "3 people match, publish a mission", which also fits the script
+- [x] `applyToMissionTool` and `listMyApplicationsTool` (candidacy is the person's own statement; the agent never approves it) — built; on by default (`MCP_APPLY_ENABLED=false` turns it off)
+- [x] `getDecisionTool`, with the restime clock and the "silence approves in…" sentence — built (deadline + `silenceApproves`; the agent says the sentence)
+- [x] `getRikmaLedgerTool`, effective sales and splits only (never a sale whose holder claim is still open) — built
+
+P1 status (2026-11-16): built and unit-tested, uncommitted, not yet run on live
+Strapi. Details under "Built" in P1 of the companion plan.
 
 ### 5.3 Raises the demo — P2, build if time allows
 
@@ -97,6 +100,11 @@ It is not known here exactly what the P0 build contains, so P0 items are
 - Member-visible audit of agent actions, shared rate limits
 
 ### 5.5 Demo data
+
+Values, order and dry-run table: [NAS_DEMO_DATA](../marketing/NAS_DEMO_DATA.md).
+In short: the rikma Dan matches into stays **visible** (`listMyMatchesTool` skips
+hidden rikmas); the mission uses a new skill only Dan holds, so publishing it mails
+no real members.
 
 - [ ] Two English accounts, Maya and Dan, each with a connected agent
 - [ ] Dan's skills match Maya's mission, so the match appears on his side

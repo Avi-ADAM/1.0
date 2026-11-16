@@ -157,11 +157,13 @@
       "shown": "In discovery",
       "hidden": "Hidden",
       "showTitle": "Show this product on the public discovery page",
-      "hideTitle": "Hide this product from the public discovery page - it stays active in the rikma and by direct link",
+      "hideTitle": "Hide this product from the discovery page, the rikma's public page and search engines. Members still see it, and it stays active and reachable by direct link",
       "nowShown": "The product now appears on the discovery page",
       "nowHidden": "The product was hidden from the discovery page"
     },
     "fullEdit": "Full edit",
+    "viewOnSite": "View on site",
+    "viewOnSiteTitle": "Opens the rikma's website in a new tab",
     "createdAddVariants": "Product created",
     "addVariants": "Variants & pictures"
   },

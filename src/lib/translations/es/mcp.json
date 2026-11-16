@@ -110,5 +110,30 @@
         "desc": "Crea obligaciones para otras personas. Desactivado salvo que la clave tenga el permiso mcp:write."
       }
     }
+  },
+  "connect": {
+    "title": "Conectar un agente de IA",
+    "greeting": "Hola, {{userName}}:",
+    "askNamed": "{{clientName}} pide conectar sus herramientas a tu cuenta de 1lev1.",
+    "askAnon": "Un agente de IA pide conectar sus herramientas a tu cuenta de 1lev1.",
+    "canDo": "Podrá actuar en tu nombre: leer tus rikmas, misiones y novedades, y preparar cosas para que tú las apruebes. Nunca vota, firma ni aprueba nada por ti.",
+    "noteLabel": "Ten en cuenta:",
+    "replaceNote": "esta cuenta ya tiene una conexión de este agente. Aprobar de nuevo reemplaza la clave anterior y corta el acceso antiguo.",
+    "newNote": "se creará una nueva clave API. Puedes revocarla cuando quieras en",
+    "settingsLink": "Ajustes → Conexión de agente de IA",
+    "approve": "Aprobar y conectar",
+    "cancel": "Ahora no",
+    "errors": {
+      "authRequest": "La solicitud de conexión no es válida o ha caducado. Vuelve a conectar desde la aplicación.",
+      "callback": "Falta la dirección de callback o no es válida.",
+      "createKey": "No se pudo crear la clave. Inténtalo de nuevo en un momento."
+    }
+  },
+  "findable": {
+    "title": "Mostrar mi nombre a los agentes",
+    "desc": "Los agentes de otras personas (por MCP) pueden buscar socios por habilidad o rol. Sin este interruptor solo saben que existe alguien con tus habilidades, no quién. Tus sugerencias de misiones en el corazón siguen llegando igual.",
+    "label": "Mostrar mi nombre a los agentes de otras personas cuando buscan por mis habilidades y roles",
+    "shown": "Lo que ven: tu nombre de usuario, habilidades, roles, formas de trabajo y un enlace a tu perfil público. Nunca tu correo, teléfono o ubicación.",
+    "failed": "El cambio no se guardó. Inténtalo de nuevo en un momento."
   }
 }

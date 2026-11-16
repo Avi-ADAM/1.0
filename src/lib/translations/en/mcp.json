@@ -110,5 +110,30 @@
         "desc": "Creates obligations for other people. Off unless the key was granted the mcp:write scope."
       }
     }
+  },
+  "connect": {
+    "title": "Connect an AI agent",
+    "greeting": "Hello {{userName}},",
+    "askNamed": "{{clientName}} is asking to connect its tools to your 1lev1 account.",
+    "askAnon": "An AI agent is asking to connect its tools to your 1lev1 account.",
+    "canDo": "It will be able to act in your name: read your rikmas, missions and updates, and prepare things for you to approve. It never votes, signs or approves anything for you.",
+    "noteLabel": "Note:",
+    "replaceNote": "this account already has a connection from this agent. Approving again replaces the previous key and cuts off the old access.",
+    "newNote": "a new API key will be created. You can revoke it at any time in",
+    "settingsLink": "Settings → AI agent connection",
+    "approve": "Approve and connect",
+    "cancel": "Not now",
+    "errors": {
+      "authRequest": "This connection request is invalid or has expired. Start connecting again from the app.",
+      "callback": "The callback address is missing or invalid.",
+      "createKey": "The key could not be created. Try again in a moment."
+    }
+  },
+  "findable": {
+    "title": "Show my name to agents",
+    "desc": "Other people's agents (over MCP) can search for partners by skill or role. Without this switch they only learn that someone with your skills exists, not who. Your mission suggestions in the heart keep coming either way.",
+    "label": "Show my name to other people's agents when they search by my skills and roles",
+    "shown": "What they see: your username, skills, roles, ways of working and a link to your public profile. Never your email, phone or location.",
+    "failed": "The change was not saved. Try again in a moment."
   }
 }

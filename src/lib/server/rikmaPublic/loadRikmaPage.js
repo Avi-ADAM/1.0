@@ -11,6 +11,7 @@ import { readIdentity } from '$lib/server/rikmaIdentity/identity.js';
 import { parseLook } from '$lib/rikmaLook/look.js';
 import { rikmaPath } from '$lib/rikmaAddress/rikmaUrl.js';
 import { rtKey } from '$lib/realtime/scopes';
+import { applyHiddenProducts, hiddenIdsOf, isRikmaMember } from './hiddenProducts';
 
 /** Service read — the address and the look are public, like the page itself. */
 const read = (/** @type {string} */ qid, /** @type {Record<string, unknown>} */ vars) =>
@@ -80,10 +81,17 @@ export async function loadRikmaPage({ projectId, identity, locals, fetch, cookie
   depends(rtKey(`project:${projectId}`));
   const isRegisteredUser = tok != false;
 
-  const [projectData, ident] = await Promise.all([
+  const [rawProject, ident, hiddenRes] = await Promise.all([
     awaitapi(projectId, tok, fetch),
-    identity ? Promise.resolve(identity) : readRikmaIdentity(projectId)
+    identity ? Promise.resolve(identity) : readRikmaIdentity(projectId),
+    read('rikmaHiddenProductIds', { pid: String(projectId) }).catch(() => null)
   ]);
+
+  // Products the sellers hid from the directory leave this page too, for anyone
+  // but a member (PLAN_RIKMA_VISIBILITY S2). Before the translation lookup, so a
+  // guest's page never asks for their names. A failed read shows what the page
+  // always showed — the flag is a display choice, not a secret.
+  const projectData = applyHiddenProducts(rawProject, hiddenIdsOf(hiddenRes), isRikmaMember(rawProject, locals.uid));
 
   // UGC translation (PLAN_UGC_TRANSLATION §7.1) — the rikma's own page: its
   // description, and the names of its open missions and products. Mission

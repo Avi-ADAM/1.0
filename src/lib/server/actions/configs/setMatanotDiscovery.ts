@@ -7,8 +7,10 @@ import { scope, scopeList } from '$lib/realtime/scopes.js';
  * A rikma sells plenty of things it does not want listed on the discovery
  * page — members-only offers, a product still being shaped, a one-off for a
  * single customer. `hideFromDiscovery` is that opt-out: the product stays fully
- * alive (its own /gift/[id] page, the project page, sales reporting, sheiruts) —
- * it just stops appearing in the directory listing (QID 282).
+ * alive (its own /gift/[id] page, sales reporting, sheiruts) — it stops
+ * appearing in the directory listing (QID 282) and the map, the rikma's public
+ * page shows it to members only, and /gift/[id] is noindex
+ * (PLAN_RIKMA_VISIBILITY S2).
  *
  * Like setSupportPage this is a display gate, not a money movement, so it is a
  * direct update with no Decision. Who may flip it:

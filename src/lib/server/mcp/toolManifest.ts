@@ -45,6 +45,7 @@ import {
 } from '../../../mastra/tools/planningTools';
 import {
   searchCatalogTool,
+  searchRikmasTool,
   listMyWishesTool,
   getWishDetailsTool,
   listMyWishOffersTool,
@@ -53,6 +54,12 @@ import {
   draftWishTool,
   conciergeWriteEnabled
 } from '../../../mastra/tools/conciergeTools';
+import { listMyMatchesTool } from '../../../mastra/tools/matchTools';
+import { getMyStakeTool } from '../../../mastra/tools/stakeTools';
+import { getDecisionTool } from '../../../mastra/tools/decisionTools';
+import { applyToMissionTool, listMyApplicationsTool, mcpApplyEnabled } from '../../../mastra/tools/joinTools';
+import { getRikmaLedgerTool } from '../../../mastra/tools/ledgerTools';
+import { findPartnersTool } from '../../../mastra/tools/partnerTools';
 import {
   listRikmaProcessesTool,
   startProcessTool,
@@ -183,13 +190,39 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   getMissionDetailsTool: { tool: getMissionDetailsTool, title: "Get mission details", tier: 'read', mission: 'member' },
   // The caller's own missions across rikmot; projectId only filters them.
   listUserMissionsTool: { tool: listUserMissionsTool, title: "List my missions", tier: 'read', project: 'scope', scopedOutput: ['missions'] },
-  findMissionTool: { tool: findMissionTool, title: "Find a mission", tier: 'read', scopedOutput: ['missions'] },
+  // Reads like discovery and is not: it only looks through missions the caller already holds.
+  findMissionTool: {
+    tool: findMissionTool,
+    title: "Find one of my missions",
+    tier: 'read',
+    scopedOutput: ['missions'],
+    description:
+      'Find one of YOUR missions in progress (missions you already hold) by its name, to get its id for a timer or ' +
+      'details. It does not search openings: to discover open missions and resources use searchCatalogTool, and ' +
+      'for what fits this user use listMyMatchesTool.'
+  },
   getActiveTimersTool: { tool: getActiveTimersTool, title: "Get running timers", tier: 'read', scopedOutput: ['timers'] },
   // Aggregates can't be narrowed after the fact — a scoped key must name the rikma.
   getMissionStatsTool: { tool: getMissionStatsTool, title: "Get mission stats", tier: 'read', project: 'scope', scopedKeyNeeds: 'projectId' },
   // --- concierge reads (M7). No projectId: a wish belongs to a person, not to a
   // rikma, so each tool keys itself to the caller or checks the viewer inside.
   searchCatalogTool: { tool: searchCatalogTool, title: "Search the catalog", tier: 'read' },
+  // --- a way in (PLAN_MCP_PARTNER_INTEGRATION P0.5–P0.7) ---
+  // The public rikma directory, minus the hidden QA rikmas.
+  searchRikmasTool: { tool: searchRikmasTool, title: "Search rikmas", tier: 'read' },
+  // The caller's own precomputed suggestions; keyed to the key owner inside the tool.
+  listMyMatchesTool: { tool: listMyMatchesTool, title: "List my matches", tier: 'read' },
+  // Shares exactly as memberShares computes them; members only.
+  getMyStakeTool: { tool: getMyStakeTool, title: "Get my share in a rikma", tier: 'read', project: 'member' },
+  // --- the join loop (P1.3–P1.6) ---
+  // The caller's own candidacies; keyed to the key owner, narrowed to the key scope inside.
+  listMyApplicationsTool: { tool: listMyApplicationsTool, title: "List my applications", tier: 'read' },
+  // Members only; a saleClaim only to its two parties (checked in the tool).
+  getDecisionTool: { tool: getDecisionTool, title: "Get a decision", tier: 'read', project: 'member' },
+  // Effective sales only; an open holder claim is a count, never an amount.
+  getRikmaLedgerTool: { tool: getRikmaLedgerTool, title: "Get rikma sales and splits", tier: 'read', project: 'member' },
+  // Opted-in people only (findableByAgents); no contact details ever leave.
+  findPartnersTool: { tool: findPartnersTool, title: "Find partners by skill", tier: 'read' },
   // Its query filters by membership itself; the key scope is applied in the tool,
   // because the rows come from seven collections at once.
   searchContentTool: { tool: searchContentTool, title: "Search my rikmas", tier: 'read' },
@@ -273,6 +306,10 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   startProcessTool: { tool: startProcessTool, title: "Start a process", tier: 'communicate', project: 'member' },
   attachToProcessTool: { tool: attachToProcessTool, title: "Attach to a process", tier: 'communicate', project: 'member' },
   createTaskTool: { tool: createTaskTool, title: "Propose a task", tier: 'consentWrite', project: 'member', mission: 'member' },
+  // The person's own candidacy (P1.2): binds nobody until the rikma - and, for a deal
+  // gap, every customer of that deal - signs. No projectId input: the rikma is read
+  // from the opening, and the key scope is checked in the tool. On unless MCP_APPLY_ENABLED=false.
+  applyToMissionTool: { tool: applyToMissionTool, title: "Apply to an open mission", tier: 'consentWrite', enabled: mcpApplyEnabled },
 
   // --- sharedWrite (needs MCP_WRITE_SCOPE) ---
   createMissionTool: { tool: createMissionTool, title: "Create an open mission", tier: 'sharedWrite', project: 'member' },

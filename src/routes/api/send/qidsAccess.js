@@ -562,6 +562,7 @@ export const qidsAccess = {
   'rikmaOpenAddressProposals': { allow: ['serviceAdmin'] }, // server-only: availability check
   'rikmaOpenIdentityDecisions': { allow: ['serviceAdmin'] }, // server-only: the look editor's loader, after the moach membership check
   'rikmaIdentityDecision': { allow: ['serviceAdmin'] }, // server-only: apply + look preview (member-checked)
+  'rikmaHiddenProductIds': { allow: ['serviceAdmin'] }, // server-only: the public rikma page drops these for non-members
   'rikmaUpdateIdentity': { allow: ['serviceAdmin'] }, // server-only: applyRikmaIdentity re-validates the slug and the look
   'rikmaCreateIdentityDecision': { allow: ['serviceAdmin'] }, // server-only: proposeRikmaIdentity
   'rikmaUploadFile': { allow: ['serviceAdmin'] }, // server-only: resolveLookImages re-reads url + mime by id
@@ -1009,4 +1010,8 @@ export const qidsAccess = {
   'eventRegistrationsForCron': { allow: ['serviceAdmin'] },
   'eventLeadCustomer': { allow: ['serviceAdmin'] },
   '481backfillEvents': { allow: ['serviceAdmin'] },
+  'mcpMyApplications': { allow: ['serviceAdmin'] }, // MCP listMyApplicationsTool; the tool passes the key owner
+  'findableByAgentsFor': { allow: ['serviceAdmin'] }, // /me/settings/mcp loader, with locals.uid
+  'mcpFindPartners': { allow: ['serviceAdmin'] }, // MCP findPartnersTool; names only of the opted-in
+  'mcpCountPartners': { allow: ['serviceAdmin'] }, // MCP findPartnersTool fallback; a count, no people
 };

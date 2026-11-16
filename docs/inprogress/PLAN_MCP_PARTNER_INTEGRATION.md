@@ -1,6 +1,11 @@
 # PLAN_MCP_PARTNER_INTEGRATION — the MCP server as a door for another platform's agents
 
-**Status:** planning, nothing built. Written 2026-11-15 from a code audit, the
+**Status (2026-11-16):** P0 code half built, not yet committed or deployed —
+P0.2, P0.4, P0.5, P0.6, P0.7, P0.8 (see "Built" under P0). Open: P0.1, P0.3 and
+P0.9, which need production. P1 built except P1.1, uncommitted (see "Built"
+under P1); P1.5 needs a 1.0b deploy. Then P2.
+
+Written 2026-11-15 from a code audit, the
 existing test suites (23 files, 244 tests, all green) and four read-only calls to
 the live connector. Production env values and the public endpoints could **not**
 be probed from the audit sandbox (outbound proxy refused `*.1lev1.com`), so every
@@ -163,16 +168,96 @@ nothing that needs an apology.
 Application to a mission is **not** in P0: the demo shows the opening and hands
 the person the link, which is honest and is how rikma creation already works.
 
+**Built (2026-11-16, uncommitted):**
+
+- **P0.2** — `mcp-connect` renders only `mcp.connect.*` keys (five locales,
+  `dir` from `$isRtl`); the server returns `errorKey` (`authRequest` / `callback`
+  / `createKey`), never a sentence; the API's own message on a failed key is no
+  longer shown. "Reject" became "Not now". The `mcp` namespace's `/mcp` gate
+  already covers `/mcp-connect`. A visitor with no `lang` cookie and a
+  non-Hebrew `Accept-Language` already resolves to `en` in `hooks.server.js`,
+  so no OAuth-specific fallback was added. Tests: `src/routes/mcp-connect/page.server.test.ts`.
+- **P0.4** — `src/lib/server/mcp/lang.ts` (`resolveMcpLang`, `fetchUserLang`,
+  cached 10 min, never throws); `checkApiKey` now returns the key's name, and a
+  name `MCP · <client>` marks an OAuth key. `/api/mcp` sets `ctx.lang`; every
+  tool already read `ctx.lang ?? 'he'`, so nothing else changed. The stored
+  language is read with a separate query, **not** added to the key lookup: a
+  non-fatal GraphQL error there refuses every key (see `verifyApiKeyDetailed`).
+- **P0.5** — `listMyMatchesTool` (`src/mastra/tools/matchTools.ts`). **Deviation:**
+  no `$uid` twin qid — it reads `209levMatchSuggestions` through
+  `strapiClient.execute`, which goes straight to Strapi with the variables given
+  (no `$idL` rebind), as `assistant/kinds.ts` already does. `idL` is always the
+  key owner.
+- **P0.6** — `searchRikmasTool` beside `searchCatalogTool`, over qid 281 via
+  `normalizeProjectCard`; skips `isHiddenProject`. Still to follow
+  `Project.visibility` when PLAN_RIKMA_VISIBILITY S1 lands.
+- **P0.7** — `getMyStakeTool` (`src/mastra/tools/stakeTools.ts`): qids
+  `getProjectPeopleAndRoles` + `getProjectFinancials` → `memberShares`, unchanged;
+  `project: 'member'` in the manifest. Parity test against `memberShares` on the
+  same fixture.
+- **P0.8** — `findMissionTool` description override ("one of YOUR missions"),
+  step 0 in the server instructions, and a manifest test that every tool the
+  instructions name exists.
+
+Not verified against live Strapi: the three new reads ran only on fixtures.
+
 ### P1 — the join loop (about two weeks)
 
 | # | Work | Files | Tests |
 | --- | --- | --- | --- |
 | P1.1 | **`prepareApplicationTool`** (prepare, pure): a prefilled `/availableMission/<id>` link carrying the person's proposed hours, rate and note, as `prepareMissionTool` does for a new mission | new tool beside `prepareMissionTool.ts`, `$lib/prefill/` codec, the mission page's prefill reader | codec round-trip; the page test that a draft never auto-submits |
-| P1.2 | **`applyToMissionTool`** (`consentWrite`): wraps `applyToMission`. Behind `MCP_APPLY_ENABLED`, off by default. Refuses when the opening is a customer-deal gap unless the result states plainly that every customer of that deal must also sign | `src/mastra/tools/matchTools.ts`, `applyToMission.ts` unchanged, `toolManifest.ts` | action-level tests already exist; add tool tests for the solo case, the deal case, and that `userId` is only ever the key's owner |
+| P1.2 | **`applyToMissionTool`** (`consentWrite`): wraps `applyToMission`. On by default; `MCP_APPLY_ENABLED=false` turns it off. Refuses when the opening is a customer-deal gap unless the result states plainly that every customer of that deal must also sign | `src/mastra/tools/matchTools.ts`, `applyToMission.ts` unchanged, `toolManifest.ts` | action-level tests already exist; add tool tests for the solo case, the deal case, and that `userId` is only ever the key's owner |
 | P1.3 | **`listMyApplicationsTool`** (read): the caller's open Ask/Askm rows with the round on the table, who has signed, the deadline and `silenceApproves` | qid service twin of `80usersPermissionsUserWithAskeds`, shapes from `src/lib/generated/contentTypes.d.ts` | shape test; a countered round shows the counter, not the original |
 | P1.4 | **`getDecisionTool`** (read, members or bilateral parties only): one decision as structure, wrapping `getDecisionDetails` | `src/mastra/tools/`, `getDecisionDetails.ts` unchanged | a `saleClaim` is visible only to its two parties; a rikma-wide kind to members |
 | P1.5 | **`findPartnersTool`** (read): people by skill or role, restricted to members who opted in to being found, returning username, skills and public profile URL only | `201findUsersBySkill` + a profile opt-in flag (schema change in Strapi, then `npm run types:update`), profile settings UI text through `$t()` | opt-out is honoured; no email or phone ever leaves; rate bucket `read` |
 | P1.6 | **Money reads**: `getRikmaLedgerTool` (members only): effective sales, open splits and halukas, the caller's balance | `src/lib/revenue/`, the moach sales loaders, `parseSiteShareNote` | an `open` holder claim is excluded; a site-share sale shows parsed lines, never the note |
+
+**Built (2026-11-16, uncommitted)** — tests for all five in `src/mastra/tools/joinLoopTools.test.ts`; none run against live Strapi yet.
+
+- **P1.2** — `applyToMissionTool` (`src/mastra/tools/joinTools.ts`), `consentWrite`,
+  on by default; `MCP_APPLY_ENABLED=false` is the kill switch.
+  `confirmedWithUser: true` is required by the schema; the rikma is read from the
+  opening (no `projectId` input) and the key scope is checked in the tool, so it
+  is on the manifest test's own-record list. A deal gap (`loadOfferDeal` →
+  `clientIds`) returns `needsCustomerSignature` and applies nothing until the call
+  repeats with `customerSignatureUnderstood: true`. On the mission's stated terms
+  only — proposing other terms is P1.1, still the mission page.
+- **P1.3** — `listMyApplicationsTool`, new serviceAdmin qid `mcpMyApplications`
+  (Ask + Askm by `$uid`, with `negopendmissions` / `nego_mashes` and the
+  timegrama). The standing round is the last non-withdrawn one, so a counter
+  shows instead of the original. Narrowed to the key scope.
+- **P1.4** — `getDecisionTool` (`decisionTools.ts`) over qid 159 +
+  `getProjectPeopleAndRoles`, not over the `getDecisionDetails` action (that one
+  returns display labels, no rounds or signers). Standing round = highest vote
+  `order`; a decision of another rikma reads as not found; a `saleClaim` only for
+  its reporter and holder (`getSaleClaimDecision`). Links through
+  `$lib/notices/links` (`voteHref`).
+- **P1.5** — `findPartnersTool` (`partnerTools.ts`), two levels (decided
+  2026-11-16): everyone who matches by skill or role is **counted**, because
+  filling in skills already means "offer me what fits" (the heart's suggestions
+  run on it); a **name** leaves only with the person's own switch. The unnamed are
+  reached the way they already agreed to — an open mission, which the matching
+  engine shows them in the heart; the tool's hint says so. Email, phone and
+  location never, at either level. Qid `mcpFindPartners` = `named` (opted-in, a
+  page) + `all` (a count only), both without the caller; `mcpCountPartners` is the
+  count alone, used while the field is not deployed (then nobody is named).
+  Field `User.findableByAgents`
+  (default false) added to 1.0b's user schema — **needs a 1.0b deploy**, then
+  `npm run types:update`. The switch is on `/me/settings/mcp` (loader reads
+  `findableByAgentsFor` with `locals.uid`, hides the switch when the read fails),
+  saved through `updateUserBasic` (new `findableByAgents` param), text in
+  `mcp.findable.*` × 5 locales. Open question 2 answered: names opt-in, a count for everyone.
+- **P1.6** — `getRikmaLedgerTool` (`ledgerTools.ts`) over `getProjectFinancials`:
+  effective sales only (an open claim is a count, never an amount),
+  site-share / donation notes parsed, open tosplits with their halukas and
+  signers, and "if we split now" from `splitPreview` over the effective sales.
+  **Note:** the sales page feeds `splitPreview` every unsplit sale, open claims
+  included; the tool deliberately does not, so the two can differ while a claim
+  is open.
+- Server instructions name the five tools; `findMissionTool` stays as P0.8 left it.
+
+**Not built: P1.1** (`prepareApplicationTool`) — it needs the mission page to read
+a prefilled counter-offer, a UI change, and the demo script does not use it.
 
 ### P2 — a real third-party integration (about three to four weeks)
 

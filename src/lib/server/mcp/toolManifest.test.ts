@@ -57,7 +57,11 @@ describe('MCP tool manifest', () => {
       'startAssistantTool',
       'reviseAssistantTool',
       'applyAssistantTool',
-      'dismissOfferTool'
+      'dismissOfferTool',
+      // The caller's own candidacy, usually in a rikma they are not in yet: the
+      // rikma comes from the opening, and the tool checks the key scope itself
+      // (joinLoopTools.test.ts "outside the key scope").
+      'applyToMissionTool'
     ];
     for (const [name, entry] of entries) {
       if (entry.tier === 'read' || entry.tier === 'prepare') continue;
@@ -119,6 +123,16 @@ describe('tierAllowed', () => {
   it('everything else is always on', () => {
     for (const tier of ['read', 'prepare', 'selfWrite', 'consentWrite'] as const) {
       expect(tierAllowed(tier, [])).toBe(true);
+    }
+  });
+});
+
+describe('server instructions', () => {
+  it('name only tools the manifest exposes (an agent would go looking for the rest)', async () => {
+    const { MCP_INSTRUCTIONS } = await import('./instructions');
+    const named = new Set(MCP_INSTRUCTIONS.match(/\b[a-z][A-Za-z]+Tool\b/g) ?? []);
+    for (const name of named) {
+      expect(MCP_TOOL_MANIFEST, `instructions name ${name}`).toHaveProperty(name);
     }
   });
 });

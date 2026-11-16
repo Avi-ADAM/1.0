@@ -23,8 +23,11 @@
   import { downloadCsv } from '$lib/shop/download';
   import StockSheet from '$lib/components/shop/StockSheet.svelte';
   import ShopNotice from '$lib/components/shop/ShopNotice.svelte';
+  import { EXTERNAL_LINK_REL, normalizeExternalUrl } from '$lib/links/externalUrl';
 
   let { data } = $props();
+  // The rikma's own site (PLAN_RIKMA_VISIBILITY S0); members only reach this page.
+  let siteUrl = $derived(normalizeExternalUrl(data.projectBase?.linkToWebsite));
   const fmtMoney = useFormatMoney();
   let projectId = $derived(page.params.projectId ?? '');
   // One "new product" form for the whole rikma (simple or complex); saving it
@@ -103,6 +106,12 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12" /><path d="M7 10l5 5 5-5" /><path d="M5 21h14" /></svg>
       {$t('shop.products.export')}
     </button>
+    {#if siteUrl}
+      <a class="sh-btn sh-btn-outline" href={siteUrl} target="_blank" rel={EXTERNAL_LINK_REL} title={$t('shop.products.viewSiteTitle')}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6" /><path d="M20 4l-9 9" /><path d="M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5" /></svg>
+        {$t('shop.products.viewSite')}
+      </a>
+    {/if}
   </div>
 
   {#if list.length === 0}

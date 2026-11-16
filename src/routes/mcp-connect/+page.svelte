@@ -1,36 +1,56 @@
-<!-- src/routes/mcp-auth/+page.svelte -->
+<!-- src/routes/mcp-connect/+page.svelte — the consent screen an agent's user sees
+     first (CLI and OAuth alike). Every word goes through $t('mcp.connect.*'); the
+     server hands back error *keys*, never sentences. -->
 <script lang="ts">
   import { enhance } from '$app/forms';
-  import type { PageData } from './$types';
+  import { t, isRtl } from '$lib/translations';
+  import type { PageData, ActionData } from './$types';
 
-  let { data }: { data: PageData } = $props();
+  let { data, form }: { data: PageData; form: ActionData } = $props();
+
+  const errorKey = $derived(form?.errorKey ?? data.errorKey ?? null);
 </script>
 
-<div class="min-h-screen flex items-center justify-center bg-gray-50" dir="rtl">
+<div
+  class="min-h-screen flex items-center justify-center bg-gray-50 px-4"
+  dir={$isRtl ? 'rtl' : 'ltr'}
+>
   <div class="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
-    {#if data.error}
-      <p class="text-4xl mb-3">⚠️</p>
-      <p class="font-semibold text-red-600">{data.error}</p>
+    {#if data.errorKey}
+      <p class="text-4xl mb-3" aria-hidden="true">⚠️</p>
+      <p class="font-semibold text-red-600">{$t(`mcp.connect.errors.${data.errorKey}`)}</p>
     {:else}
-      <p class="text-5xl mb-4">🤖</p>
-      <h1 class="text-xl font-bold mb-2">Connect MCP</h1>
-      <p class="text-gray-500 text-sm mb-6">
-        שלום <strong>{data.userName}</strong>, {#if data.clientName}<strong>{data.clientName}</strong>{:else}סוכן AI{/if} מבקש לחבר את הכלים שלו
-        לחשבונך. יאפשר לו לבצע פעולות בשמך.
+      <p class="text-5xl mb-4" aria-hidden="true">🤖</p>
+      <h1 class="text-xl font-bold mb-2">{$t('mcp.connect.title')}</h1>
+      <p class="text-gray-600 text-sm mb-2">
+        {$t('mcp.connect.greeting', { userName: data.userName ?? '' })}
       </p>
+      <p class="text-gray-600 text-sm mb-2">
+        {#if data.clientName}
+          {$t('mcp.connect.askNamed', { clientName: data.clientName })}
+        {:else}
+          {$t('mcp.connect.askAnon')}
+        {/if}
+      </p>
+      <p class="text-gray-500 text-xs mb-6">{$t('mcp.connect.canDo')}</p>
 
       <div
-        class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800 mb-6 text-right"
+        class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800 mb-6 text-start"
       >
+        <strong>{$t('mcp.connect.noteLabel')}</strong>
         {#if data.hasMcpKey}
-          <strong>שים לב:</strong> כבר קיים חיבור MCP לחשבון זה. אישור מחדש
-          <strong>יחליף</strong> את המפתח הקודם ויבטל את הגישה הישנה.
+          {$t('mcp.connect.replaceNote')}
         {:else}
-          <strong>שים לב:</strong> ייווצר מפתח API חדש. תוכל לבטל גישה זו בכל עת
-          מ-
-          <a href="/me/settings/mcp" class="underline">הגדרות → חיבור סוכן AI</a>.
+          {$t('mcp.connect.newNote')}
+          <a href="/me/settings/mcp" class="underline">{$t('mcp.connect.settingsLink')}</a>.
         {/if}
       </div>
+
+      {#if errorKey}
+        <p class="text-sm text-red-600 mb-4" role="alert">
+          {$t(`mcp.connect.errors.${errorKey}`)}
+        </p>
+      {/if}
 
       <form method="POST" use:enhance>
         <input type="hidden" name="callback" value={data.callback} />
@@ -40,13 +60,13 @@
             type="submit"
             class="flex-1 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
           >
-            ✅ Approve & Connect
+            {$t('mcp.connect.approve')}
           </button>
           <a
             href="/"
             class="flex-1 py-2 border rounded-lg text-gray-600 hover:bg-gray-50 transition text-sm flex items-center justify-center"
           >
-            ❌ דחה
+            {$t('mcp.connect.cancel')}
           </a>
         </div>
       </form>

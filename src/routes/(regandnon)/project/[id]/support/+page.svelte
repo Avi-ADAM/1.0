@@ -19,6 +19,7 @@
   import WhatsappIcon from '$lib/celim/icons/whatsapp.svelte';
   import RikmaSkin from '$lib/components/rikmaPublic/RikmaSkin.svelte';
   import { lookFrame, shownLook } from '$lib/rikmaLook/frame.svelte';
+  import { EXTERNAL_LINK_REL, normalizeExternalUrl } from '$lib/links/externalUrl';
 
   let { data } = $props();
   const fmtMoney = useFormatMoney();
@@ -32,6 +33,8 @@
   let look = $derived(shownLook(data.look ?? null));
   let project = $derived(data.projectData);
   let attrs = $derived(project?.attributes);
+  // `linkToWebsite` is free text; a bare `my-cafe.co.il` was a relative link here.
+  let siteUrl = $derived(normalizeExternalUrl(attrs?.linkToWebsite));
   let coverage = $derived(data.coverage);
   let available = $derived(data.available !== false);
   let gate = $derived(data.gate ?? 'off');
@@ -239,11 +242,11 @@
         <div class="flex flex-wrap justify-center gap-3 mb-7">
           <button type="button" class="btn-primary" onclick={openDonate}>{$t('pages.projectSupport.donateCta')}</button>
           <a href="#missions" class="btn-secondary">{$t('pages.projectSupport.volunteerCta')}</a>
-          {#if attrs.linkToWebsite}
+          {#if siteUrl}
             <a
-              href={attrs.linkToWebsite}
+              href={siteUrl}
               target="_blank"
-              rel="noopener"
+              rel={EXTERNAL_LINK_REL}
               class="btn-ghost">
               <EntityIcon kind="online" size={15} /> {$t('pages.projectSupport.visitSite')}</a
             >

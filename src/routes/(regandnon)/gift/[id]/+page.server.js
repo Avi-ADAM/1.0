@@ -26,6 +26,7 @@ export async function load({ locals, params, fetch, depends }) {
   let archived = false;
   let existingRequests = [];
   let personalSeller = null;
+  let hiddenFromDiscovery = false;
 
   try {
     const res = await sendToSer({ id: mId }, '48GetServiceById', null, null, isSer, fetch);
@@ -52,6 +53,9 @@ export async function load({ locals, params, fetch, depends }) {
     try {
       const metaRes = await sendToSer({ id: mId }, '266getMatanotSellerMeta', null, null, isSer, fetch);
       const meta = metaRes?.data?.matanot?.data?.attributes;
+      // A product its seller hid from the directory stays reachable by link but
+      // is not indexed (PLAN_RIKMA_VISIBILITY S2).
+      hiddenFromDiscovery = meta?.hideFromDiscovery === true;
       if (meta?.origin === 'personal' && meta?.owner_user?.data) {
         const ownerNode = meta.owner_user.data;
         personalSeller = {
@@ -97,6 +101,7 @@ export async function load({ locals, params, fetch, depends }) {
     projectUsers,
     isMember,
     personalSeller,
+    hiddenFromDiscovery,
     promo
   };
 }

@@ -158,11 +158,13 @@
       "shown": "En descubrimiento",
       "hidden": "Oculto",
       "showTitle": "Mostrar el producto en la página pública de descubrimiento",
-      "hideTitle": "Ocultar el producto de la página pública de descubrimiento - sigue activo en la rikma y por enlace directo",
+      "hideTitle": "Ocultar el producto de la página de descubrimiento, de la página pública de la rikma y de los buscadores. Los miembros lo siguen viendo, y sigue activo y accesible con el enlace directo",
       "nowShown": "El producto aparece en la página de descubrimiento",
       "nowHidden": "El producto se ocultó de la página de descubrimiento"
     },
     "fullEdit": "Edición completa",
+    "viewOnSite": "Ver en el sitio",
+    "viewOnSiteTitle": "Abre el sitio web de la rikma en una pestaña nueva",
     "createdAddVariants": "Producto creado",
     "addVariants": "Variantes y fotos"
   },

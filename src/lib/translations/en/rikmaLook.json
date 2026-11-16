@@ -46,6 +46,7 @@
     "founded": "Since {{year}}",
     "missionsEmpty": "No open missions right now — you can still offer yourself.",
     "productDetails": "Details & purchase",
+    "productHidden": "Hidden from discovery — only the rikma's members see it here",
     "contact": {
       "email": "Email",
       "phone": "Phone",

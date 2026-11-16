@@ -8,6 +8,7 @@
   import { onMount } from 'svelte';
   import Spinner from '$lib/celim/Spinner.svelte';
   import { t } from '$lib/translations';
+  import { normalizeExternalUrl } from '$lib/links/externalUrl';
 
   let { data } = $props();
 
@@ -15,6 +16,8 @@
   let projectData = $derived(moachStore.state.projects[projectId]);
   let financials = $derived(projectData?.financials);
   let base = $derived(projectData?.base);
+  // The rikma's own site, for "view on site" beside each product (PLAN_RIKMA_VISIBILITY S0).
+  let siteUrl = $derived(normalizeExternalUrl(page.data.projectBase?.linkToWebsite ?? base?.linkToWebsite));
 
   let loading = $state(false);
 
@@ -106,6 +109,7 @@
       bmiData={financials.matanotofs?.data || []}
       uid={page.data.uid ?? null}
       {salePrices}
+      {siteUrl}
       projectName={page.data.projectBase?.projectName ?? base?.projectName ?? ''}
       top={shortcuts}
     />

@@ -23495,6 +23495,7 @@ export type UsersPermissionsUser = {
   email: Scalars['String']['output'];
   fblink?: Maybe<Scalars['String']['output']>;
   filtertags?: Maybe<FiltertagRelationResponseCollection>;
+  findableByAgents?: Maybe<Scalars['Boolean']['output']>;
   finiapruvals?: Maybe<FiniapruvalRelationResponseCollection>;
   finnished_missions?: Maybe<FinnishedMissionRelationResponseCollection>;
   forum_last_seens?: Maybe<ForumLastSeenRelationResponseCollection>;
@@ -24294,6 +24295,7 @@ export type UsersPermissionsUserFiltersInput = {
   email?: InputMaybe<StringFilterInput>;
   fblink?: InputMaybe<StringFilterInput>;
   filtertags?: InputMaybe<FiltertagFiltersInput>;
+  findableByAgents?: InputMaybe<BooleanFilterInput>;
   finiapruvals?: InputMaybe<FiniapruvalFiltersInput>;
   finnished_missions?: InputMaybe<FinnishedMissionFiltersInput>;
   forum_last_seens?: InputMaybe<ForumLastSeenFiltersInput>;
@@ -24440,6 +24442,7 @@ export type UsersPermissionsUserInput = {
   email?: InputMaybe<Scalars['String']['input']>;
   fblink?: InputMaybe<Scalars['String']['input']>;
   filtertags?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  findableByAgents?: InputMaybe<Scalars['Boolean']['input']>;
   finiapruvals?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   finnished_missions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   forum_last_seens?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
