@@ -21,7 +21,10 @@ Three facts about the code decide most of this:
   to the anonymous count.
 
 The shortest restime is `feh` = 48 hours, and that is the number the voice-over
-says ("silence approves it in 48 hours").
+says ("silence approves it in 48 hours"). It is said in Rikma B, about a mission
+Dan proposes there as a member (§2, step 7), **not** about Dan's application to
+Rikma A: an outside candidate's Ask has no clock until a member responds
+(`applyToMission.ts`), so nobody is approved by a silence they never saw.
 
 ## 1. Accounts (you: signup and passwords)
 
@@ -84,9 +87,20 @@ partner video." Restime `feh`. **Hidden**: its id goes into
 6. Maya proposes the split, and both sign it. Leave the transfer **unconfirmed**,
    so the ledger shows "Maya → Dan 400" as an open transfer on screen.
 
+7. **Within 48 hours before filming**, Dan proposes a new open mission in Rikma B:
+   "Cut the course trailer", 5 h × 100, through the rikma's normal "new mission"
+   flow, as himself. It opens a vote for Maya with the `feh` clock. Maya does
+   **not** sign it before filming. If the clock runs out first, it is approved
+   by silence and gone from her list; then propose another one ("Cut a second
+   trailer").
+
 Check with the tools as Dan:
 - `getMyStakeTool` → 40%;
 - `getRikmaLedgerTool` → income 1,000 and the open transfer.
+
+And as Maya:
+- `getMyUpdatesTool` with `projectId: 103` → Dan's mission proposal,
+  `silenceApproves: true`, a deadline about 48 h from when he proposed it.
 
 Step 4 needs no 30 hours on a timer. `completeMission` takes `hoursdon`, the hours
 stated with the finish, and the other partner's signature is what makes them
@@ -149,11 +163,12 @@ On the localhost tabs this is already set.
 | Maya | `proposeRikmaBlueprintTool` → `createProjectTool` | a link; she creates Rikma A |
 | Dan | `listMyMatchesTool` | Rikma A's mission, matched on `Course video editing` |
 | Dan | `applyToMissionTool` | `status: applied` |
-| Maya | `getMyUpdatesTool` | Dan's application, silence in 48 h, and **no** `unavailable` |
+| Maya | `getMyUpdatesTool` | Dan's application (20 h × 100, a link, no clock), and **no** `unavailable` |
 | Maya | the ask's vote page (link from `getMyUpdatesTool`) | the clock; she signs on the page |
 | Dan | `listMyApplicationsTool` | signed, or approved |
 | Dan | `getMyStakeTool` (Rikma B) | 40% |
 | Dan | `getRikmaLedgerTool` (Rikma B) | 1,000 sold, Maya → Dan 400 |
+| Maya | `getMyUpdatesTool` (Rikma B) | Dan's new mission "Cut the course trailer", silence approves it in 48 h |
 
 **Note:** Dan's application is an Ask, not a Decision, so `getDecisionTool`
 cannot read it. Maya hears about it through `getMyUpdatesTool` (sentence,
@@ -259,6 +274,19 @@ the script: "silence approves it in 48 hours" is **not** true of Dan's
 application to Rikma A. Either drop the line from scene 1:05, or say "once Maya
 responds, the clock is 48 hours".
 `getMyUpdatesTool` will show the ask only after the deploy (the code above).
+
+**Re-check 2026-11-16, after the deploy (commit 501ff1ad):** all green.
+
+| Step | Who | Call | Returned | |
+|---|---|---|---|---|
+| 3 | Maya | `findPartnersTool` "video editing" | `matching: 1`, Dan (Course video editing / Video editor), no timeout | ✅ |
+| 6 | Maya | `getMyUpdatesTool` 104 | 1 waiting: "Request from Dan to join the mission "Edit the course videos"…", 20 h · 100/h, link `/moach/104/votes/ask/182`, `deadline: null`, `unavailable: []` | ✅ |
+| 9 | Maya | `getRikmaLedgerTool` 103 | income 1,000, product "Calm Coding Course", `transfersToConfirm`: Maya → Dan 400, `senderSaysSent: false` | ✅ |
+| 10 | Maya | `getMyUpdatesTool` 103, after Dan published "Cut the course trailer" (§2 step 7, 2026-11-16 19:40) | `silenceApproves: true`, `deadline: 2026-11-18T17:40Z` (48 h), link `/lev?focus=pends&project=103`. Sentence said **"Mission application: …"**, the wrong label for a proposed mission; fixed to "New mission proposal" in all five locales (`common.feedTypes.pends`, uncommitted). No proposer name and no figures: the hub feed is the light read | ⚠️ → fixed after deploy |
+
+**Filming deadline for step 7:** the proposal is approved by silence on
+**2026-11-18 at 19:40 Israel time**. Film scene 1:40 before then, or publish
+another one.
 
 ### For the script
 

@@ -203,7 +203,7 @@
     "moach": "Rikmas"
   },
   "feedTypes": {
-    "pends": "Mission application",
+    "pends": "New mission proposal",
     "fiapp": "Completion approval",
     "askedm": "Resource request",
     "wegets": "Resource approval",

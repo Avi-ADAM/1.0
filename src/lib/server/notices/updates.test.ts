@@ -149,7 +149,7 @@ describe('toUpdateRows', () => {
 
   it('a rikma vote from the hub feed names its kind, its title and its rikma', () => {
     const [row] = toUpdateRows([hubFeedNotice(feedItem() as any)], 'he');
-    expect(row.sentence).toBe('מועמדות למשימה: "Logo" ברקמה "Gefen"');
+    expect(row.sentence).toBe('הצעה למשימה חדשה: "Logo" ברקמה "Gefen"');
     expect(row.projectId).toBe('5');
     expect(row.link).toBe('https://1lev1.com/lev?focus=pends&project=5');
   });
