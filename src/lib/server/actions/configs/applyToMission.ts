@@ -1,4 +1,4 @@
-import { noticeSubject } from '$lib/notices/links';
+import { noticeSubject, voteHref } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
@@ -23,6 +23,27 @@ function statedCommitment(params: Record<string, any>) {
   const has = (v: unknown) => v != null && v !== '';
   if (!has(params.shiftsMin) && !has(params.shiftsMax)) return null;
   return { min: has(params.shiftsMin) ? Number(params.shiftsMin) : null, max: has(params.shiftsMax) ? Number(params.shiftsMax) : null };
+}
+
+/**
+ * The applicant's Ask still on the table for this opening, if any: not
+ * archived (archived = accepted, or closed when someone else got it) and not
+ * lapsed. Null when there is none.
+ */
+export async function findStandingAsk(
+  strapi: { execute: (qid: string, vars: Record<string, unknown>, jwt?: string, fetchFn?: any) => Promise<any> },
+  context: { userId?: string | number; jwt?: string; fetch?: any },
+  openMissionId: string
+): Promise<string | null> {
+  const res = await strapi.execute(
+    'standingAskByUserAndMission',
+    { uid: String(context.userId), omId: openMissionId },
+    context.jwt,
+    context.fetch
+  );
+  const rows: any[] = res?.data?.asks?.data ?? [];
+  const open = rows.find((r) => r?.attributes?.archived !== true && !r?.attributes?.lapsedAt);
+  return open ? String(open.id) : null;
 }
 
 const applyToMissionHandler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
@@ -262,6 +283,26 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
 
   // ── NORMAL CASE: multi-member project → create Ask with vote ─────────────
 
+  // One standing candidacy per person per opening. A second call (a double
+  // click, the MCP tool and the site button, an agent retrying) returns the
+  // Ask already on the table instead of opening a parallel vote on the same
+  // terms — two of them split the members' signatures and the updates feed
+  // counts the candidate twice. A lapsed Ask is revived (reviveLapsedAsk),
+  // not duplicated either, so only an open one short-circuits here.
+  const standing = await findStandingAsk(strapi, context, String(openMissionId));
+  if (standing) {
+    return {
+      data: {
+        askId: standing,
+        openMissionId,
+        alreadyApplied: true,
+        voteUrl: voteHref(String(projectId), 'ask', standing),
+        message: 'Already applied: this candidacy is already open on this mission. Nothing new was sent.',
+      },
+      updateStrategy: { type: 'none' },
+    };
+  }
+
   // Add initial vote (current user is a project member)
   const vote = memberIds.includes(String(context.userId))
     ? [{ what: true, users_permissions_user: context.userId, ide: parseInt(String(context.userId), 10), zman: nowISO }]
@@ -306,6 +347,8 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
   // their own favorable vote already exists, so the auto-approval clock can run).
   // For an external candidate (Path A) the timegrama is deferred until a member
   // first engages — created then by addVote (the ask vote path).
+  // When silence approves this candidacy; null while nobody has engaged yet.
+  let silenceDeadline: string | null = null;
   if (memberIds.includes(String(context.userId))) {
     const resMs: Record<string, number> = {
       feh: 48 * 3_600_000,
@@ -316,6 +359,7 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
     const offsetMs = resMs[restime] ?? 0;
     if (offsetMs > 0) {
       const deadline = new Date(now.getTime() + offsetMs);
+      silenceDeadline = deadline.toISOString();
       await strapi.execute(
         '82createTimegramaForAsk',
         { date: deadline.toISOString(), whatami: 'ask', askId },
@@ -332,7 +376,7 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
   });
 
   return {
-    data: { askId, openMissionId, acceptedRules },
+    data: { askId, openMissionId, acceptedRules, silenceDeadline },
     updateStrategy: { type: 'none' },
   };
 };
@@ -357,6 +401,8 @@ export const applyToMissionConfig: ActionConfig = {
   authRules: [{ type: 'jwt' }],
 
   notification: {
+    // A repeat call that returned the standing Ask told nobody anything new.
+    when: (_p, r) => r?.data?.alreadyApplied !== true,
     recipients: { type: 'projectMembers', config: { projectIdParam: 'projectId' } },
     templates: {
       title: { he: 'בקשה לביצוע משימה', en: 'Mission application' },

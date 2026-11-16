@@ -236,6 +236,13 @@ export interface AuthorizationResult {
  * Notification configuration for an action
  */
 export interface NotificationConfig {
+  /**
+   * Whether this run notifies at all; omitted = always. False for a run that
+   * changed nothing anyone needs to hear about (a repeat call that returned
+   * what already existed).
+   */
+  when?: (params: Record<string, any>, result: any) => boolean;
+
   /** Rules for determining who receives notifications */
   recipients: RecipientRule;
 

@@ -10118,6 +10118,19 @@ ${PROMO_DECISION_FIELDS}
   'reviveLapsedAsk': `mutation ReviveLapsedAsk($askId: ID!, $vots: [ComponentProjectsVotsInput]) {
     updateAsk(id: $askId, data: { archived: false, lapsedAt: null, vots: $vots }) { data { id } }
   }`,
+  // The applicant's candidacy still on the table for one opening — applyToMission
+  // returns it instead of opening a second, parallel Ask on the same terms.
+  'standingAskByUserAndMission': `query StandingAskByUserAndMission($uid: ID!, $omId: ID!) {
+    asks(
+      filters: {
+        users_permissions_user: { id: { eq: $uid } }
+        open_mission: { id: { eq: $omId } }
+        or: [{ archived: { null: true } }, { archived: { eq: false } }]
+      }
+      sort: "id:asc"
+      pagination: { limit: 10 }
+    ) { data { id attributes { archived lapsedAt } } }
+  }`,
   'projectLapsedAsks': `query ProjectLapsedAsks($pid: ID!) {
     asks(
       filters: { project: { id: { eq: $pid } }, archived: { eq: true }, lapsedAt: { notNull: true }, open_mission: { archived: { eq: false } } }

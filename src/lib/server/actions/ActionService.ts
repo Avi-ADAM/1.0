@@ -291,7 +291,11 @@ export class ActionService {
       });
 
       // Step 5: Trigger notifications (async, don't wait)
-      if (config.notification && this.notifier) {
+      if (
+        config.notification &&
+        this.notifier &&
+        (config.notification.when?.(params, withUpdateStrategy(strapiResult, finalUpdateStrategy)) ?? true)
+      ) {
         // Fire and forget - notifications shouldn't block the response
         this.notifier.notify(
           config.notification,

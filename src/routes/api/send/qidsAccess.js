@@ -480,6 +480,7 @@ export const qidsAccess = {
   'lapsedAskForRevival': { allow: ['user', 'serviceAdmin'] },
   'reviveLapsedAsk': { allow: ['user', 'serviceAdmin'] },
   'projectLapsedAsks': { allow: ['user', 'serviceAdmin'] },
+  'standingAskByUserAndMission': { allow: ['serviceAdmin'] },
   'getActiveTimegramaForAskm': { allow: ['user', 'serviceAdmin'] },
   'getAskProjectRestime': { allow: ['user', 'serviceAdmin'] },
   'getAskmProjectRestime': { allow: ['user', 'serviceAdmin'] },

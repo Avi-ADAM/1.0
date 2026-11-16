@@ -219,6 +219,16 @@ describe('applyToMissionTool', () => {
     expect(context.userId).toBe('42');
     expect(out.status).toBe('applied');
     expect(out.url).toBe('https://www.1lev1.com/moach/5/votes/ask/11');
+    // An outside candidate: no clock yet, so silence approves nothing.
+    expect(out.message).toMatch(/silence approves nothing/);
+  });
+
+  it('names the silence deadline when the rikma clock is running', async () => {
+    execute.mockResolvedValue(openMission());
+    executeAction.mockResolvedValue({ success: true, data: { askId: '11', silenceDeadline: '2026-11-18T19:20:00.000Z' } });
+    const out = await run(applyToMissionTool, { openMissionId: '3', confirmedWithUser: true });
+    expect(out.silenceDeadline).toBe('2026-11-18T19:20:00.000Z');
+    expect(out.message).toMatch(/by 2026-11-18T19:20:00.000Z, silence approves it/);
   });
 
   it("a customer deal's gap applies nothing until the user understood she signs too", async () => {
@@ -231,6 +241,16 @@ describe('applyToMissionTool', () => {
     executeAction.mockResolvedValue({ success: true, data: { askId: '11' } });
     const second = await run(applyToMissionTool, { openMissionId: '3', confirmedWithUser: true, customerSignatureUnderstood: true });
     expect(second.status).toBe('applied');
+  });
+
+  it('a second application returns the standing candidacy, not a new one', async () => {
+    execute.mockResolvedValue(openMission());
+    executeAction.mockResolvedValue({ success: true, data: { askId: '183', alreadyApplied: true } });
+    const out = await run(applyToMissionTool, { openMissionId: '3', confirmedWithUser: true });
+    expect(out.status).toBe('alreadyApplied');
+    expect(out.applicationId).toBe('183');
+    expect(out.message).toMatch(/Already applied/);
+    expect(out.url).toBe('https://www.1lev1.com/moach/5/votes/ask/183');
   });
 
   it('the solo member takes their own mission at once', async () => {

@@ -260,14 +260,33 @@ export const applyToMissionTool = createTool({
           missionUrl
         };
       }
+      if (data.alreadyApplied) {
+        // A candidacy on this opening is already open: the action returned it
+        // instead of opening a second vote on the same terms.
+        return {
+          success: true,
+          status: 'alreadyApplied',
+          applicationId: data.askId ? String(data.askId) : null,
+          terms,
+          message:
+            'Already applied: the user already has an open candidacy on this mission, so nothing new was sent. ' +
+            'It stands until the rikma signs it, discusses it or counters it. listMyApplicationsTool shows where it stands.',
+          url: data.askId ? SITE + voteHref(projectId, 'ask', String(data.askId)) : missionUrl
+        };
+      }
       return {
         success: true,
         status: 'applied',
         applicationId: data.askId ? String(data.askId) : null,
         terms,
-        message:
-          "The candidacy was sent. The rikma's members sign it, discuss it or counter it; when the rikma's clock runs " +
-          'out with no counter, silence approves it. listMyApplicationsTool shows where it stands.',
+        silenceDeadline: data.silenceDeadline ?? null,
+        // An outside candidate has no clock yet: it starts when a member first
+        // engages (applyToMission → addVote), so silence approves nothing until then.
+        message: data.silenceDeadline
+          ? "The candidacy was sent. The rikma's members sign it, discuss it or counter it; if nobody counters it " +
+            `by ${data.silenceDeadline}, silence approves it. listMyApplicationsTool shows where it stands.`
+          : "The candidacy was sent. The rikma's members sign it, discuss it or counter it. Its clock starts only " +
+            'when a member first responds, so silence approves nothing before that. listMyApplicationsTool shows where it stands.',
         url: data.askId ? SITE + voteHref(projectId, 'ask', String(data.askId)) : missionUrl
       };
     } catch (error) {
