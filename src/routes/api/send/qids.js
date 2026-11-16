@@ -7978,7 +7978,7 @@ ${PROMO_DECISION_FIELDS}
   '136createMatanot': `mutation CreateMatanot(
     $projectcreates: ID!,
     $name: String!,
-    $desc: JSON,
+    $desc: String,
     $price: Float,
     $quant: Float,
     $kindOf: ENUM_MATANOT_KINDOF,
@@ -8667,7 +8667,7 @@ ${PROMO_DECISION_FIELDS}
    */
   '139createWishMatanot': `mutation CreateWishMatanot(
     $name: String!,
-    $desc: JSON,
+    $desc: String,
     $pricingMode: ENUM_MATANOT_PRICINGMODE,
     $estimatedPrice: Float,
     $status_of_voting: ENUM_MATANOT_STATUS_OF_VOTING,
@@ -14633,7 +14633,7 @@ ${PROMO_DECISION_FIELDS}
     $projectcreates: ID!,
     $ownerUser: ID!,
     $name: String!,
-    $desc: JSON,
+    $desc: String,
     $price: Float,
     $quant: Float,
     $kindOf: ENUM_MATANOT_KINDOF,
@@ -15316,7 +15316,7 @@ ${PROMO_DECISION_FIELDS}
   '256syncPersonalMatanotFromSp': `mutation SyncPersonalMatanotFromSp(
     $id: ID!,
     $name: String,
-    $desc: JSON,
+    $desc: String,
     $price: Float,
     $quant: Float,
     $kindOf: ENUM_MATANOT_KINDOF,
