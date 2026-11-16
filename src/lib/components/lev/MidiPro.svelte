@@ -139,21 +139,25 @@
   aria-label={$t('lev.page.heartTitle')}
   onmouseleave={() => onHover?.({ id: $t('lev.page.studsHint') })}
 >
-  <a
-    class="lmp-core"
-    href="/me"
-    data-sveltekit-preload-data
-    onmouseenter={() => onHover?.({ id: $t('lev.diamonds.toControlRoom') })}
-  >
-    <img class="lmp-face" src={picLink || pic} alt="" width="40" height="40" />
-    <span class="lmp-name">{name}</span>
-    <span class="lmp-note" class:on={soleKey}>{note}</span>
+  <!-- The view switch is a sibling of the profile link, never inside it: its
+       buttons nested in <a href="/me"> made every click navigate to /me. -->
+  <div class="lmp-core">
+    <a
+      class="lmp-link"
+      href="/me"
+      data-sveltekit-preload-data
+      onmouseenter={() => onHover?.({ id: $t('lev.diamonds.toControlRoom') })}
+    >
+      <img class="lmp-face" src={picLink || pic} alt="" width="40" height="40" />
+      <span class="lmp-name">{name}</span>
+      <span class="lmp-note" class:on={soleKey}>{note}</span>
+    </a>
     {#if low !== true}
       <span class="lmp-foot">
         <LevViewSwitch compact value="coins" onChange={(v) => onView?.(v)} />
       </span>
     {/if}
-  </a>
+  </div>
 
   {#each studs as stud (stud.key)}
     <button
@@ -212,9 +216,19 @@
     text-decoration: none;
     color: inherit;
   }
-  .lmp-core:hover,
-  .lmp-core:focus-visible {
+  .lmp-core:has(.lmp-link:hover),
+  .lmp-core:has(.lmp-link:focus-visible) {
     background: var(--s2, #f8fafc);
+  }
+
+  .lmp-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    max-width: 100%;
+    text-decoration: none;
+    color: inherit;
   }
 
   .lmp-face {
