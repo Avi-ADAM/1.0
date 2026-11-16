@@ -176,7 +176,9 @@
       sessionStorage.setItem('pendingLocation', JSON.stringify(selected));
 
     const returnUrl = encodeURIComponent(
-      window.location.origin + '/hascama?agreed=true'
+      // `lang` rides the way back too: the reader's language must survive the
+      // round trip even when no cookie holds it (a `?lang=` link, a fresh tab).
+      window.location.origin + `/hascama?agreed=true&lang=${$locale}`
     );
 
     let agreementUrl = `https://agreement.1lev1.com/hascama?return=${returnUrl}&lang=${$locale}&from=main`;

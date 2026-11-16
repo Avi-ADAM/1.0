@@ -92,7 +92,11 @@
     "skuLabel": "SKU de {{name}}",
     "unlimitedLabel": "Stock sin límite para {{name}}",
     "applyAll": "Aplicar a todas",
-    "done": "Listo"
+    "done": "Listo",
+    "removeAll": "Quitar todas las variantes",
+    "removeAllConfirm": "¿Quitar todas las opciones y variantes? El producto vuelve a venderse como un solo artículo con su propio stock. Las variantes guardadas no se borran: se desactivan y se ocultan, y los pedidos anteriores se conservan.",
+    "retiredHidden": "Sin variantes. {{count}} variantes antiguas se guardan desactivadas para los pedidos anteriores.",
+    "showRetired": "Mostrar"
   },
   "err": {
     "skuMissing": "Falta el SKU",

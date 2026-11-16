@@ -17,7 +17,12 @@ vi.mock('$lib/server/sendViaProxy.js', () => ({ sendViaProxy: vi.fn() }));
 vi.mock('$lib/server/digest/collect', () => ({ startDigestReads: reads }));
 vi.mock('$lib/server/concierge/notices', () => ({ loadWishNotices: wish }));
 vi.mock('$lib/server/deal/dealNotices', () => ({ loadDealNotices: deal }));
-vi.mock('./prefs', () => ({ loadNoticePrefs: prefs }));
+vi.mock('./prefs', () => ({
+  loadNoticePrefsChecked: async (...a: any[]) => {
+    const p = await prefs(...a);
+    return p === null ? { prefs: { dismissals: [], milon: null, mutedProjects: [], lastSeenAt: null }, ok: false } : { prefs: p, ok: true };
+  }
+}));
 
 import { userRead } from './door';
 import { serverTranslator, noticeLocale } from './translate';
@@ -55,6 +60,27 @@ const offer = wishNotice(
   NOW
 )!;
 
+const rel = (id: string | null, attributes: any = {}) => ({ data: id == null ? null : { id, attributes } });
+/** Qid 461/462: one rikma ("Studio", 104) with these asks. */
+const asksRaw = (asks: any[]) => ({
+  data: { usersPermissionsUser: { data: { id: '271', attributes: { projects_1s: { data: [
+    { id: '104', attributes: { projectName: 'Studio', asks: { data: asks } } }
+  ] } } } } }
+});
+/** Dan (270) offers to take "Edit the videos", 20 h × 100; he signed round 0 himself. */
+const danAsk = (over: Record<string, unknown> = {}) => ({
+  id: '182',
+  attributes: {
+    createdAt: '2026-10-06T09:00:00.000Z',
+    users_permissions_user: rel('270', { username: 'Dan' }),
+    timegrama: rel('9', { date: '2026-10-08T09:00:00.000Z', done: false }),
+    vots: [{ what: true, order: 0, users_permissions_user: rel('270') }],
+    open_mission: rel('301', { name: 'Edit the videos', noofhours: 20, perhour: 100 }),
+    negopendmissions: { data: [] },
+    ...over
+  }
+});
+
 const emptyWork = { missions: { active: 0, running: 0, notStarted: 0, dormantSoon: [] }, tasks: { open: 0, overdue: 0, dueSoon: 0, items: [] } };
 
 function world({ feed = [feedItem()], wishList = [offer] as any, dealList = [] as any, hubError = undefined as string | undefined } = {}) {
@@ -68,6 +94,8 @@ function world({ feed = [feedItem()], wishList = [offer] as any, dealList = [] a
   wish.mockResolvedValue(wishList);
   deal.mockResolvedValue(dealList);
   prefs.mockResolvedValue({ dismissals: [], milon: null, mutedProjects: [], lastSeenAt: null });
+  // No mission candidacy waits, unless a test says so.
+  send.mockResolvedValue(asksRaw([]));
 }
 
 beforeEach(() => {
@@ -150,6 +178,60 @@ describe('loadMyUpdates', () => {
     world({ wishList: null, hubError: 'boom' });
     const out = await loadMyUpdates('261', fetch, { door: 'service', lang: 'he', now: NOW });
     expect(out.unavailable).toEqual(['rikmaVotes', 'wishes']);
+  });
+
+  it('a mission candidacy waits for the members: who, what, the figures, the silence clock, its vote page', async () => {
+    world({ feed: [], wishList: [] });
+    send.mockResolvedValue(asksRaw([danAsk()]));
+    const out = await loadMyUpdates('271', fetch, { door: 'service', lang: 'en', now: NOW });
+    expect(send).toHaveBeenCalledWith({ uid: '271' }, '462hubAsksFor', 0, 0, true, fetch);
+    expect(out.unavailable).toEqual([]);
+    expect(out.waiting).toHaveLength(1);
+    const [row] = out.waiting;
+    expect(row.sentence).toContain('Dan');
+    expect(row.sentence).toContain('Edit the videos');
+    expect(row.figures).toEqual(['20 hours', expect.stringContaining('100')]);
+    expect(row.silenceApproves).toBe(true);
+    expect(row.deadline).toBe('2026-10-08T09:00:00.000Z');
+    expect(row.projectId).toBe('104');
+    expect(row.link).toBe('https://1lev1.com/moach/104/votes/ask/182');
+  });
+
+  it('not the candidate’s own ask, not one she signed in the standing round, not one whose clock ran out', async () => {
+    world({ feed: [], wishList: [] });
+    send.mockResolvedValue(
+      asksRaw([
+        danAsk(),
+        danAsk({ vots: [{ what: true, order: 0, users_permissions_user: rel('270') }, { what: true, order: 0, users_permissions_user: rel('271') }] }),
+        danAsk({ timegrama: rel('9', { date: '2026-10-08T09:00:00.000Z', done: true }) })
+      ])
+    );
+    expect((await loadMyUpdates('270', fetch, { door: 'service', lang: 'en', now: NOW })).waiting).toHaveLength(0);
+    expect((await loadMyUpdates('271', fetch, { door: 'service', lang: 'en', now: NOW })).waiting).toHaveLength(1);
+  });
+
+  it('a counter opens a new round she has to answer, even after she signed the first', async () => {
+    world({ feed: [], wishList: [] });
+    send.mockResolvedValue(
+      asksRaw([
+        danAsk({
+          vots: [{ what: true, order: 0, users_permissions_user: rel('271') }, { what: true, order: 1, users_permissions_user: rel('270') }],
+          negopendmissions: { data: [{ attributes: { name: 'Edit the videos', noofhours: 15, perhour: 120 } }] }
+        })
+      ])
+    );
+    const out = await loadMyUpdates('271', fetch, { door: 'service', lang: 'en', now: NOW });
+    expect(out.waiting).toHaveLength(1);
+    expect(out.waiting[0].figures[0]).toBe('15 hours');
+  });
+
+  it('when the candidacies or her hidden list cannot be read, it says so — the rest still loads', async () => {
+    world();
+    send.mockResolvedValue({ errors: [{ message: 'Forbidden access' }], data: null });
+    prefs.mockResolvedValue(null);
+    const out = await loadMyUpdates('271', fetch, { door: 'service', lang: 'en', now: NOW });
+    expect(out.unavailable).toEqual(['missionApplications', 'hiddenNotices']);
+    expect(out.waiting.length).toBeGreaterThan(0);
   });
 
   it('leaves out what she hid, and counts it', async () => {

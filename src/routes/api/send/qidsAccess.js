@@ -30,6 +30,9 @@ export const qidsAccess = {
   '431dealsForUserFor': { allow: ['serviceAdmin'] },
   // What a notification about one rikma vote says (subjectNotice.ts) — read by the orchestrator only.
   '460noticeSubject': { allow: ['serviceAdmin'] },
+  'mcpUnconfirmedTransfers': { allow: ['serviceAdmin'] }, // MCP getRikmaLedgerTool (members-only via the manifest)
+  '461hubAsks': { allow: ['user', 'serviceAdmin'] }, // $idL is rebound to the signed-in user — her own rikmas' candidacies
+  '462hubAsksFor': { allow: ['serviceAdmin'] }, // getMyUpdates for an MCP key; the tool passes the key owner
   '87levSliceSheirutp': { allow: ['user', 'serviceAdmin'] },
   '87levSliceSales': { allow: ['user', 'serviceAdmin'] },
   '87levSliceFiapp': { allow: ['user', 'serviceAdmin'] },
@@ -1012,6 +1015,7 @@ export const qidsAccess = {
   '481backfillEvents': { allow: ['serviceAdmin'] },
   'mcpMyApplications': { allow: ['serviceAdmin'] }, // MCP listMyApplicationsTool; the tool passes the key owner
   'findableByAgentsFor': { allow: ['serviceAdmin'] }, // /me/settings/mcp loader, with locals.uid
+  'mcpPartnerTerms': { allow: ['serviceAdmin'] }, // MCP findPartnersTool step 1; catalogue ids only, no people
   'mcpFindPartners': { allow: ['serviceAdmin'] }, // MCP findPartnersTool; names only of the opted-in
   'mcpCountPartners': { allow: ['serviceAdmin'] }, // MCP findPartnersTool fallback; a count, no people
 };

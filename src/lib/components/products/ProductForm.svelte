@@ -1168,7 +1168,7 @@
             <OptionRow
               icon={Layers}
               title={$t('shopEditor.form.variants')}
-              status={rows.length ? $t('shopEditor.form.variantsCount', { axes: axes.length, variants: rows.length }) : $t('shopEditor.form.none')}
+              status={byVariant ? $t('shopEditor.form.variantsCount', { axes: axes.length, variants: rows.filter((r) => r.active).length }) : $t('shopEditor.form.none')}
               bind:open={variantsOpen}
             >
               <div class="shop-ui pf-fields">

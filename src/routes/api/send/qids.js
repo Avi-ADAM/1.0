@@ -11193,6 +11193,54 @@ export const moachQids = {
     }
   }`,
 
+  // Money a signed split still has to move (MCP getRikmaLedgerTool). Once every
+  // member signs, the split is `finished` and getProjectFinancials (open splits
+  // only) no longer has it — but its transfers stay open until the receiver
+  // confirms. Without this the ledger said "nothing open" while Maya still owed
+  // Dan 400 (Nas dry run 2026-11-16). serviceAdmin only; the tool is members-only.
+  'mcpUnconfirmedTransfers': `query McpUnconfirmedTransfers($pid: ID!) {
+    project(id: $pid) { data { id attributes {
+      tosplits(
+        filters: { finished: { eq: true }, halukas: { confirmed: { eq: false } } }
+        sort: "createdAt:desc"
+        pagination: { limit: 25 }
+      ) { data { id attributes {
+        name
+        halukas(filters: { confirmed: { eq: false } }, pagination: { limit: 50 }) { data { id attributes {
+          amount senderconf
+          usersend { data { id } }
+          userrecive { data { id } }
+        } } }
+      } } }
+    } } }
+  }`,
+
+  // Mission candidacies (Ask) open in the member's rikmas — the hub summary (85)
+  // has every other vote kind but not these, so getMyUpdates never said "Dan
+  // offered to take 'Edit the videos'" (Nas dry run 2026-11-16). A read of its
+  // own on purpose: if it fails (a token without the `ask` grant), the rest of
+  // the hub still loads, and the caller names it in `unavailable`. The figures
+  // are the ones 460 words a notification with (subjectNoticeFrom('ask')).
+  '461hubAsks': `query HubAsks($idL: ID!) {
+    usersPermissionsUser(id: $idL) { data { id attributes {
+      projects_1s(pagination: { limit: 100 }) { data { id attributes {
+        projectName
+        asks(
+          filters: { or: [{ archived: { null: true } }, { archived: { eq: false } }] }
+          sort: "createdAt:desc"
+          pagination: { limit: 50 }
+        ) { data { id attributes {
+          createdAt
+          users_permissions_user { data { id attributes { username } } }
+          timegrama { data { attributes { date done } } }
+          vots { what order users_permissions_user { data { id } } }
+          open_mission { data { id attributes { name noofhours perhour } } }
+          negopendmissions(sort: "ordern:desc", pagination: { limit: 1 }) { data { attributes { name noofhours perhour } } }
+        } } }
+      } } }
+    } } }
+  }`,
+
   // What a notification about one rikma vote says (PLAN_SMART_NOTICES §6.6,
   // src/lib/server/notices/subjectNotice.ts): who asks, for what, the figures on
   // the table, and when silence completes it. One query for every kind — the
@@ -18709,24 +18757,33 @@ ${PROMO_DECISION_FIELDS}
   'findableByAgentsFor': `query FindableByAgentsFor($uid: ID!) {
     usersPermissionsUser(id: $uid) { data { id attributes { findableByAgents } } }
   }`,
-  // People by skill or role (PLAN_MCP_PARTNER_INTEGRATION P1.5). Two answers:
-  // `named` — only those who opted in (findableByAgents), with username, skills,
-  // roles and ways of working; `all` — how many match at all, as a number only.
-  // Someone who filled in skills already gets mission suggestions in the heart, so
-  // the agent may learn they exist; their name leaves only with their own switch.
-  // Never email, phone or location. The caller is never counted.
-  'mcpFindPartners': `query McpFindPartners($q: String, $uid: ID!, $limit: Int = 10) {
+  // People by skill or role (PLAN_MCP_PARTNER_INTEGRATION P1.5), in two steps.
+  // A single users query filtering four joined relations (skills, their
+  // localizations, roles, theirs) with containsi scanned every user and timed
+  // out on production (dry run 2026-11-16). So: first the catalogue entries the
+  // words match — small tables, every locale — then the users holding them, by id.
+  // A user holds the default-locale entry, so each match brings its localizations.
+  'mcpPartnerTerms': `query McpPartnerTerms($q: String) {
+    skills(locale: "all", filters: { skillName: { containsi: $q } }, pagination: { limit: 100 }) {
+      data { id attributes { localizations { data { id } } } }
+    }
+    tafkidims(locale: "all", filters: { roleDescription: { containsi: $q } }, pagination: { limit: 100 }) {
+      data { id attributes { localizations { data { id } } } }
+    }
+  }`,
+  // Two answers: `named` — only those who opted in (findableByAgents), with
+  // username, skills, roles and ways of working; `all` — how many hold the
+  // entries at all, as a number only. Someone who filled in skills already gets
+  // mission suggestions in the heart, so the agent may learn they exist; their
+  // name leaves only with their own switch. Never email, phone or location. The
+  // caller is never counted.
+  'mcpFindPartners': `query McpFindPartners($skillIds: [ID], $roleIds: [ID], $uid: ID!, $limit: Int = 10) {
     named: usersPermissionsUsers(
       filters: {
         findableByAgents: { eq: true }
         id: { ne: $uid }
         blocked: { ne: true }
-        or: [
-          { skills: { skillName: { containsi: $q } } }
-          { skills: { localizations: { skillName: { containsi: $q } } } }
-          { tafkidims: { roleDescription: { containsi: $q } } }
-          { tafkidims: { localizations: { roleDescription: { containsi: $q } } } }
-        ]
+        or: [{ skills: { id: { in: $skillIds } } }, { tafkidims: { id: { in: $roleIds } } }]
       }
       pagination: { limit: $limit }
     ) {
@@ -18746,29 +18803,19 @@ ${PROMO_DECISION_FIELDS}
       filters: {
         id: { ne: $uid }
         blocked: { ne: true }
-        or: [
-          { skills: { skillName: { containsi: $q } } }
-          { skills: { localizations: { skillName: { containsi: $q } } } }
-          { tafkidims: { roleDescription: { containsi: $q } } }
-          { tafkidims: { localizations: { roleDescription: { containsi: $q } } } }
-        ]
+        or: [{ skills: { id: { in: $skillIds } } }, { tafkidims: { id: { in: $roleIds } } }]
       }
       pagination: { limit: 1 }
     ) { meta { pagination { total } } }
   }`,
   // The count alone, for a backend without `findableByAgents` yet: nobody has
   // opted in there, so nobody is named.
-  'mcpCountPartners': `query McpCountPartners($q: String, $uid: ID!) {
+  'mcpCountPartners': `query McpCountPartners($skillIds: [ID], $roleIds: [ID], $uid: ID!) {
     all: usersPermissionsUsers(
       filters: {
         id: { ne: $uid }
         blocked: { ne: true }
-        or: [
-          { skills: { skillName: { containsi: $q } } }
-          { skills: { localizations: { skillName: { containsi: $q } } } }
-          { tafkidims: { roleDescription: { containsi: $q } } }
-          { tafkidims: { localizations: { roleDescription: { containsi: $q } } } }
-        ]
+        or: [{ skills: { id: { in: $skillIds } } }, { tafkidims: { id: { in: $roleIds } } }]
       }
       pagination: { limit: 1 }
     ) { meta { pagination { total } } }
@@ -18796,3 +18843,4 @@ qids['428myWishNoticesFor'] = serviceTwin(qids['421myWishNotices'], 'MyWishNotic
 qids['429hiddenWishProposalsFor'] = serviceTwin(qids['394hiddenWishProposals'], 'HiddenWishProposalsFor');
 qids['430myNoticePrefsFor'] = serviceTwin(qids['423myNoticePrefs'], 'MyNoticePrefsFor');
 qids['431dealsForUserFor'] = serviceTwin(qids['123dealsForUser'], 'DealsForUserFor');
+qids['462hubAsksFor'] = serviceTwin(qids['461hubAsks'], 'HubAsksFor');

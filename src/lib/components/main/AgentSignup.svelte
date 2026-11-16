@@ -77,7 +77,7 @@
 
   let extendedHref = $derived.by(() => {
     if (!nonce) return EXTENDED_SITE;
-    const back = `${window.location.origin}/hascama?agent=${encodeURIComponent(token)}&xn=${nonce}`;
+    const back = `${window.location.origin}/hascama?agent=${encodeURIComponent(token)}&xn=${nonce}&lang=${$locale}`;
     const q = new URLSearchParams({ return: back, lang: $locale });
     if (name.trim()) q.set('name', name.trim());
     if (email.trim()) q.set('email', email.trim());

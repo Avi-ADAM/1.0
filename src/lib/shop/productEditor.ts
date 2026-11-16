@@ -323,10 +323,17 @@ export function axesOfNodes(nodes: any[]): EditorAxis[] {
  * The axes a product's variants actually use, in the product's axis order —
  * an axis linked to the product but carrying a value no variant uses still
  * shows that value (the seller added it and has not generated yet).
+ *
+ * Only a row still on sale brings an axis back. A row switched off keeps the
+ * pair it was sold under (old orders point at it), but the seller who took that
+ * option off meant it gone: deriving it from the retired row put it back on
+ * every load, the next save linked it again, and the product — now "sold by
+ * variant" with every variant off — showed a stock of 0.
  */
 export function productAxesOf(linked: EditorAxis[], rows: EditorVariant[]): EditorAxis[] {
   const axes = linked.map((a) => ({ ...a, values: [...a.values] }));
   for (const v of rows) {
+    if (v.active === false) continue;
     for (const p of v.optionValues) {
       let axis = axes.find((a) => a.key === p.key);
       if (!axis) {

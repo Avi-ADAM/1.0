@@ -17,12 +17,27 @@ export async function loadNoticePrefs(
   fetch: typeof globalThis.fetch,
   door: NoticeDoor = 'session'
 ): Promise<NoticePrefs> {
-  if (!uid) return EMPTY_PREFS;
+  return (await loadNoticePrefsChecked(uid, fetch, door)).prefs;
+}
+
+/**
+ * The same read, saying whether it worked. `ok: false` still carries the
+ * defaults, so nothing breaks — but a caller that reports what it could not read
+ * (getMyUpdates' `unavailable`) can say that hidden notices were not applied,
+ * instead of quietly showing what she hid. A token without the
+ * notice-dismissal / notice-pref grants answers `Forbidden` here.
+ */
+export async function loadNoticePrefsChecked(
+  uid: unknown,
+  fetch: typeof globalThis.fetch,
+  door: NoticeDoor = 'session'
+): Promise<{ prefs: NoticePrefs; ok: boolean }> {
+  if (!uid) return { prefs: EMPTY_PREFS, ok: true };
   try {
     const res: any = await userRead(door, uid, '423myNoticePrefs', fetch);
-    if (res?.errors?.length) return EMPTY_PREFS;
-    return readNoticePrefs(res);
+    if (res?.errors?.length) return { prefs: EMPTY_PREFS, ok: false };
+    return { prefs: readNoticePrefs(res), ok: true };
   } catch {
-    return EMPTY_PREFS;
+    return { prefs: EMPTY_PREFS, ok: false };
   }
 }

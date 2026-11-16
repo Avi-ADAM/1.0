@@ -6,6 +6,7 @@
   import ScreenFrame from '$lib/components/onboard/ScreenFrame.svelte';
   import JourneyStrip from '$lib/components/onboard/JourneyStrip.svelte';
   import Plaque from '$lib/components/onboard/Plaque.svelte';
+  import LangSwitch from '$lib/components/onboard/LangSwitch.svelte';
   import { t } from '$lib/translations';
   import {
     CONCIERGE_LANDING,
@@ -52,7 +53,7 @@
 </script>
 
 <svelte:head>
-  <title>בדקו את המייל · 1💗1</title>
+  <title>{$t('reg.checkEmail.title')} · 1💗1</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700&family=Cinzel:wght@500;600;700&display=swap"
     rel="stylesheet"
@@ -68,11 +69,12 @@
         label={$t('madeForYou.reg.stepEmail')}
       />
     {:else}
-      <JourneyStrip stepIdx={2} totalSteps={6} label="שלב 2 · אישור מייל" />
+      <JourneyStrip stepIdx={2} totalSteps={6} label={$t('reg.checkEmail.journey')} />
     {/if}
   {/snippet}
 
   <div class="content" in:scale={{ duration: 600, opacity: 0.5, start: 0.96, easing: quintOut }}>
+    <div class="check-lang-row" dir="ltr"><LangSwitch /></div>
     <div class="heart-bg">
       <svg class="heart-shape" viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -108,11 +110,11 @@
       </span>
     </div>
 
-    <Plaque title="המייל בדרך" sub="ניצור חיבור - תכף תקבלו לינק" />
+    <Plaque title={$t('reg.checkEmail.plaqueTitle')} sub={$t('reg.checkEmail.plaqueSub')} />
 
     <div class="tile-info">
-      שלחנו אליכם מייל ל-{#if email}<b dir="ltr">{email}</b>{/if}<br />
-      לחצו על הקישור במייל כדי לאשר ולפתוח את הדלת. הקישור תקף שעה.
+      {$t('reg.checkEmail.sentTo')}{#if email}<b dir="ltr">{email}</b>{/if}<br />
+      {$t('reg.checkEmail.clickLink')}
     </div>
 
     {#if conciergeDraft}
@@ -123,30 +125,35 @@
     {/if}
 
     {#if resent}
-      <p class="resent-msg" in:fly={{ y: -4, duration: 300 }}>✓ מייל נשלח שוב!</p>
+      <p class="resent-msg" in:fly={{ y: -4, duration: 300 }}>{$t('reg.checkEmail.resent')}</p>
     {:else}
       <div class="actions">
         <button class="btn btn-ghost" onclick={resend} disabled={resending || !email}>
-          {#if resending}⟳ שולח...{:else}<EntityIcon kind="mail" size={14} /> לא הגיע - שליחה חוזרת{/if}
+          {#if resending}{$t('reg.checkEmail.sending')}{:else}<EntityIcon kind="mail" size={14} /> {$t('reg.checkEmail.resend')}{/if}
         </button>
-        <a href="/signup" class="btn btn-skip"><EntityIcon kind="edit" size={14} /> תיקון כתובת</a>
+        <a href="/signup" class="btn btn-skip"><EntityIcon kind="edit" size={14} /> {$t('reg.checkEmail.fixAddress')}</a>
       </div>
     {/if}
 
-    <div class="spam-tip">בודקים בתיבת הספאם? לפעמים גוגל מסתיר אותנו שם.</div>
+    <div class="spam-tip">{$t('reg.checkEmail.spamTip')}</div>
 
     <div class="footer">
-      אחרי האישור, <a
+      {$t('reg.checkEmail.afterConfirm')} <a
         href={conciergeDraft
           ? `/login?from=${encodeURIComponent(CONCIERGE_LANDING)}`
           : '/login'}
-        class="link">לחצו להתחבר</a
+        class="link">{$t('reg.checkEmail.clickToLogin')}</a
       >
     </div>
   </div>
 </ScreenFrame>
 
 <style>
+  .check-lang-row {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
   .content {
     width: 100%;
     display: flex;

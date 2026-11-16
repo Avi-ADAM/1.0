@@ -23,7 +23,7 @@ const { shapeApplications, applyRefusal, applyToMissionTool, listMyApplicationsT
   './joinTools'
 );
 const { shapeLedger, isEffectiveSale, getRikmaLedgerTool } = await import('./ledgerTools');
-const { shapePartners, findPartnersTool } = await import('./partnerTools');
+const { shapePartners, termIds, findPartnersTool } = await import('./partnerTools');
 
 const run = (tool: any, input: any) => tool.execute(input, {});
 const rel = (id: string | null, attributes: any = {}) => ({ data: id == null ? null : { id, attributes } });
@@ -256,7 +256,8 @@ describe('shapeLedger', () => {
         attributes: {
           finnished_missions: coll([fmi('42', 300), fmi('43', 100)]),
           sales: coll([
-            sale('1', '43', 1000, { holderStatus: 'self', matanot: coll([{ id: 'm', attributes: { name: 'Course' } }]) }),
+            // Sale.matanot is a single relation — the shape Strapi returns.
+            sale('1', '43', 1000, { holderStatus: 'self', matanot: rel('m', { name: 'Course' }) }),
             sale('2', '42', 400, { holderStatus: null }),
             sale('3', '43', 9999, { holderStatus: 'open' }),
             sale('4', '42', 50, { holderStatus: 'confirmed', note: 'site-share · paid=50 · from_project=9' })
@@ -273,6 +274,11 @@ describe('shapeLedger', () => {
     expect(l.totals.income).toBe(1450);
     expect(l.salesAwaitingHolderConsent).toBe(1);
     expect(JSON.stringify(l)).not.toContain('9999');
+  });
+
+  it('a product sale names its product', () => {
+    const l = shapeLedger(peopleData, financials, '42');
+    expect(l.sales.find((x) => x.saleId === '1')).toMatchObject({ source: 'product', product: 'Course' });
   });
 
   it('a site-share sale shows its parsed source, never the note', () => {
@@ -293,10 +299,64 @@ describe('shapeLedger', () => {
   });
 });
 
+// A split both signed (finished), its transfer maya → dan 400 not yet confirmed.
+const pendingTransfers = {
+  project: {
+    data: {
+      id: '5',
+      attributes: {
+        tosplits: coll([
+          {
+            id: '9',
+            attributes: {
+              name: 'Launch split',
+              halukas: coll([{ id: 'h1', attributes: { amount: 400, senderconf: false, usersend: rel('42'), userrecive: rel('43') } }])
+            }
+          }
+        ])
+      }
+    }
+  }
+};
+
+describe('transfers to confirm', () => {
+  it('a signed split is not open, but its unconfirmed transfer still shows', () => {
+    const l = shapeLedger(peopleData, { project: { data: { attributes: { tosplits: coll([]), sales: coll([]) } } } }, '43', pendingTransfers);
+    expect(l.openSplits).toEqual([]);
+    expect(l.transfersToConfirm).toEqual([
+      { splitId: '9', splitName: 'Launch split', from: 'maya', to: 'dan', amount: 400, senderSaysSent: false, involvesYou: true }
+    ]);
+  });
+
+  it('without the read, the list is empty rather than invented', () => {
+    expect(shapeLedger(peopleData, {}, '43').transfersToConfirm).toEqual([]);
+  });
+});
+
 describe('getRikmaLedgerTool', () => {
   it('reports a missing rikma', async () => {
     execute.mockResolvedValue({ data: { project: { data: null } } });
     expect((await run(getRikmaLedgerTool, { projectId: '5' })).success).toBe(false);
+  });
+
+  it('reads the transfers still to confirm, and says so when that read fails', async () => {
+    execute.mockImplementation(async (qid: string) => {
+      if (qid === 'getProjectPeopleAndRoles') return { data: peopleData };
+      if (qid === 'mcpUnconfirmedTransfers') return { data: pendingTransfers };
+      return { data: { project: { data: { attributes: { tosplits: coll([]), sales: coll([]) } } } } };
+    });
+    const ok = await run(getRikmaLedgerTool, { projectId: '5' });
+    expect(ok.transfersToConfirm).toHaveLength(1);
+    expect(ok.unavailable).toBeUndefined();
+
+    execute.mockImplementation(async (qid: string) => {
+      if (qid === 'getProjectPeopleAndRoles') return { data: peopleData };
+      if (qid === 'mcpUnconfirmedTransfers') throw new Error('Forbidden access');
+      return { data: {} };
+    });
+    const partial = await run(getRikmaLedgerTool, { projectId: '5' });
+    expect(partial.success).toBe(true);
+    expect(partial.unavailable).toEqual(['transfersToConfirm']);
   });
 });
 
@@ -324,22 +384,53 @@ describe('findPartners', () => {
     expect(JSON.stringify(out)).not.toContain('noa');
   });
 
-  it('asks for the key owner to be left out, and points at a mission for the unnamed', async () => {
-    execute.mockResolvedValue({ data });
+  // A Hebrew entry matched; members hold its default-locale sibling 12.
+  const terms = {
+    data: {
+      skills: coll([{ id: '31', attributes: { localizations: coll([{ id: '12' }]) } }]),
+      tafkidims: coll([])
+    }
+  };
+
+  it('collects matched entries with their localizations, without duplicates', () => {
+    expect(
+      termIds({
+        skills: coll([
+          { id: '31', attributes: { localizations: coll([{ id: '12' }]) } },
+          { id: '12', attributes: { localizations: coll([{ id: '31' }]) } }
+        ]),
+        tafkidims: coll([{ id: '5', attributes: {} }])
+      })
+    ).toEqual({ skillIds: ['31', '12'], roleIds: ['5'] });
+  });
+
+  it('looks people up by catalogue id, leaves the key owner out, and points at a mission for the unnamed', async () => {
+    execute.mockImplementation((qid: string) => (qid === 'mcpPartnerTerms' ? terms : { data }));
     const out = await run(findPartnersTool, { query: ' editing ', limit: 3 });
-    expect(execute.mock.calls[0][0]).toBe('mcpFindPartners');
-    expect(execute.mock.calls[0][1]).toEqual({ q: 'editing', uid: '42', limit: 3 });
+    expect(execute.mock.calls[0][0]).toBe('mcpPartnerTerms');
+    expect(execute.mock.calls[0][1]).toEqual({ q: 'editing' });
+    expect(execute.mock.calls[1][0]).toBe('mcpFindPartners');
+    // No role matched: a never-used id keeps `in` well-formed.
+    expect(execute.mock.calls[1][1]).toEqual({ skillIds: ['31', '12'], roleIds: ['0'], uid: '42', limit: 3 });
     expect(out.notNamed).toBe(2);
     expect(out.hint).toContain('prepareMissionTool');
   });
 
+  it('no matching entry: no people query at all, and a zero', async () => {
+    execute.mockResolvedValue({ data: { skills: coll([]), tafkidims: coll([]) } });
+    const out = await run(findPartnersTool, { query: 'zzz' });
+    expect(execute).toHaveBeenCalledTimes(1);
+    expect(out).toMatchObject({ success: true, matching: 0, people: [] });
+  });
+
   it('before the opt-in field is deployed, it counts and names nobody', async () => {
     execute.mockImplementation((qid: string) => {
+      if (qid === 'mcpPartnerTerms') return terms;
       if (qid === 'mcpFindPartners') throw new Error('Cannot query field "findableByAgents"');
       return { data: { all: { meta: { pagination: { total: 4 } } } } };
     });
     const out = await run(findPartnersTool, { query: 'editing' });
-    expect(execute.mock.calls[1][0]).toBe('mcpCountPartners');
+    expect(execute.mock.calls[2][0]).toBe('mcpCountPartners');
     expect(out).toMatchObject({ success: true, matching: 4, notNamed: 4, people: [] });
   });
 });

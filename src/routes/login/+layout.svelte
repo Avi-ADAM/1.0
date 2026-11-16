@@ -1,5 +1,6 @@
 <script>
   import { locale } from '$lib/translations';
+  import LangSwitch from '$lib/components/onboard/LangSwitch.svelte';
 
   /**
    * @typedef {Object} Props
@@ -34,6 +35,7 @@
         >
       </a>
       <div class="gold-divider" aria-hidden="true"></div>
+      <div class="auth-lang" dir="ltr"><LangSwitch /></div>
 
       {@render children?.()}
     </main>
@@ -41,6 +43,12 @@
 </div>
 
 <style>
+  .auth-lang {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+
   .auth-scene {
     position: relative;
     min-height: 100vh;

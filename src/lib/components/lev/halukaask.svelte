@@ -357,10 +357,10 @@
   }
 
 
-  let u = 'הצבעה על בקשה לחלוקת הרווחים שנצברו לרקמה';
+  let u = $t('lev.hoverHint.splitVote');
   function hover(id) {
     if (id == '0') {
-      u = 'הצבעה על בקשה לחלוקת הרווחים שנצברו לרקמה';
+      u = $t('lev.hoverHint.splitVote');
     } else {
       u = id;
     }
@@ -368,7 +368,7 @@
   }
   function hoverc(event) {
     if (event.x == '0') {
-      u = 'הצבעה על בקשה לחלוקת הרווחים שנצברו לרקמה';
+      u = $t('lev.hoverHint.splitVote');
     } else {
       u = event.x;
     }

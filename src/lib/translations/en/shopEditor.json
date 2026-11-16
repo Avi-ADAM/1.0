@@ -92,7 +92,11 @@
     "skuLabel": "SKU of {{name}}",
     "unlimitedLabel": "Unlimited stock for {{name}}",
     "applyAll": "Apply to all",
-    "done": "Done"
+    "done": "Done",
+    "removeAll": "Remove all variants",
+    "removeAllConfirm": "Remove every option and variant? The product goes back to being sold as one item with its own stock. Saved variants are not deleted — they are switched off and hidden, and past orders stay intact.",
+    "retiredHidden": "No variants. {{count}} old variants are kept switched off for past orders.",
+    "showRetired": "Show"
   },
   "err": {
     "skuMissing": "SKU missing",

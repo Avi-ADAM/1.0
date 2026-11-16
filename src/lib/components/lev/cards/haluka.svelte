@@ -3,7 +3,6 @@
   import Chaticon from '../../../celim/chaticon.svelte';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Lev from '../../../celim/lev.svelte';
-  import No from '../../../celim/no.svelte';
   import { lang } from '$lib/stores/lang.js';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import { getProjectData } from '$lib/stores/projectStore.js';
@@ -804,19 +803,12 @@
   >
     {#if low == false}
       {#if already === false && allr === false}
-        <button
-          class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 font-bold rounded-xl transition-all flex justify-center items-center"
-          onclick={() => decline('f')}
-          onmouseenter={() => hover('התנגדות')}
-          onmouseleave={() => hover('0')}
-        >
-          <No />
-        </button>
+        <!-- No decline button: a split is answered by approve, counter-offer or discussion (no absolute "no"). -->
 
         <button
           class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/30 font-bold rounded-xl transition-all flex justify-center items-center"
           onclick={() => nego('f')}
-          onmouseenter={() => hover('משא ומתן')}
+          onmouseenter={() => hover($t('lev.hoverHint.counter'))}
           onmouseleave={() => hover('0')}
         >
           <svg
@@ -834,7 +826,7 @@
         <button
           class="flex-2 py-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex justify-center items-center"
           onclick={() => agree('f')}
-          onmouseenter={() => hover('אישור')}
+          onmouseenter={() => hover($t('lev.halukaask.approve'))}
           onmouseleave={() => hover('0')}
         >
           <Lev />

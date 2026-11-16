@@ -137,7 +137,11 @@
       "monthlyHours": "Horas mensuales",
       "totalHoursLabel": "Total de horas",
       "completeTask": "Completar misión",
-      "taskLink": "Enlace de la misión"
+      "taskLink": "Enlace de la misión",
+      "hintEditTimer": "Haz clic para editar el temporizador",
+      "hintComplete": "Haz clic para terminar la misión",
+      "hintStartTimer": "Iniciar el temporizador",
+      "hintStopTimer": "Detener el temporizador"
     },
     "openChat": "Abrir chat",
     "withdraw": "Retirar la oferta",
@@ -1257,5 +1261,11 @@
     "failed": "No se guardó la acción",
     "passed": "Lo pasaste; esperamos su respuesta",
     "withdrawn": "Te retiraste; el recurso ahora está abierto a todos"
+  },
+  "hoverHint": {
+    "splitVote": "Votación sobre una solicitud para repartir las ganancias acumuladas de la rikma",
+    "openChat": "Abrir el chat",
+    "newChat": "Iniciar un chat nuevo",
+    "counter": "Contrapropuesta"
   }
 }

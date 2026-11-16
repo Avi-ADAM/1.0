@@ -82,11 +82,12 @@ export const actions = {
       : [];
 
     if (!email || !password) {
-      return fail(400, { error: 'נא למלא את כל השדות' });
+      return fail(400, { errorKey: 'missing', error: 'נא למלא את כל השדות' });
     }
 
     if (password.length < 8 || !/[A-Z]/.test(password)) {
       return fail(400, {
+        errorKey: 'weakPassword',
         error: 'הסיסמה חייבת להכיל לפחות 8 תווים ואות גדולה באנגלית'
       });
     }
@@ -118,10 +119,13 @@ export const actions = {
           msg.toLowerCase().includes('already exist')
         ) {
           return fail(400, {
+            errorKey: 'emailTaken',
             error: 'כתובת המייל כבר רשומה במערכת. נסו להתחבר.'
           });
         }
-        return fail(400, { error: msg });
+        // Strapi's own message is English and specific; with none, the
+        // reader's language takes over.
+        return fail(400, { errorKey: err?.error?.message ? null : 'failed', error: msg });
       }
 
       const { jwt, user } = await res.json();
@@ -195,8 +199,10 @@ export const actions = {
       throw redirect(303, '/signup/check-email');
     } catch (err) {
       if (/** @type {any} */ (err)?.status === 303) throw err;
+      const message = /** @type {any} */ (err)?.message;
       return fail(400, {
-        error: /** @type {any} */ (err)?.message || 'שגיאה לא ידועה, נסו שוב'
+        errorKey: message ? null : 'unknown',
+        error: message || 'שגיאה לא ידועה, נסו שוב'
       });
     }
   }

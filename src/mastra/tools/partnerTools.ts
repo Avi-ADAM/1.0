@@ -30,6 +30,26 @@ const total = (rel: any): number => {
   return Number.isFinite(n) && n > 0 ? n : 0;
 };
 
+/** An id no row has: keeps `id: { in: [...] }` well-formed when one side matched nothing. */
+const NO_ID = '0';
+
+/**
+ * Pure: qid mcpPartnerTerms → the skill and role ids to look people up by. A
+ * member holds the default-locale entry, so a match in another locale brings its
+ * siblings (localizations) along.
+ */
+export function termIds(data: any): { skillIds: string[]; roleIds: string[] } {
+  const ids = (rel: any) => {
+    const out = new Set<string>();
+    for (const row of rows(rel)) {
+      if (row?.id != null) out.add(String(row.id));
+      for (const loc of rows(row?.attributes?.localizations)) if (loc?.id != null) out.add(String(loc.id));
+    }
+    return [...out];
+  };
+  return { skillIds: ids(data?.skills), roleIds: ids(data?.tafkidims) };
+}
+
 /**
  * Pure: qid mcpFindPartners (or mcpCountPartners) → what an agent reads.
  * Names only the opted-in; everyone else is a number.
@@ -71,16 +91,27 @@ export const findPartnersTool = createTool({
     const ctx = getMcpContext();
     if (!ctx?.userId) return { success: false, message: 'Not authenticated.' };
     const max = limit ?? 10;
-    const vars = { q: query.trim(), uid: String(ctx.userId) };
     try {
       const { strapiClient } = await import('../../lib/server/actions/index.js');
-      let res: any;
-      try {
-        res = await strapiClient.execute('mcpFindPartners', { ...vars, limit: max }, undefined, ctx.fetchInstance);
-        if (res?.errors?.length) throw new Error('mcpFindPartners');
-      } catch {
-        // A backend without `findableByAgents` yet: nobody has opted in, so count only.
-        res = await strapiClient.execute('mcpCountPartners', vars, undefined, ctx.fetchInstance);
+      // Step 1: the catalogue entries the words match (small tables, every locale).
+      const terms = await strapiClient.execute('mcpPartnerTerms', { q: query.trim() }, undefined, ctx.fetchInstance);
+      const { skillIds, roleIds } = termIds(terms?.data);
+      let res: any = { data: {} };
+      if (skillIds.length || roleIds.length) {
+        // Step 2: who holds them, by id. An empty list would match nothing anyway;
+        // a never-used id keeps `in` well-formed.
+        const vars = {
+          skillIds: skillIds.length ? skillIds : [NO_ID],
+          roleIds: roleIds.length ? roleIds : [NO_ID],
+          uid: String(ctx.userId)
+        };
+        try {
+          res = await strapiClient.execute('mcpFindPartners', { ...vars, limit: max }, undefined, ctx.fetchInstance);
+          if (res?.errors?.length) throw new Error('mcpFindPartners');
+        } catch {
+          // A backend without `findableByAgents` yet: nobody has opted in, so count only.
+          res = await strapiClient.execute('mcpCountPartners', vars, undefined, ctx.fetchInstance);
+        }
       }
       const { people, matching, notNamed } = shapePartners(res?.data, ctx.userId, max);
       return {

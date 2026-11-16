@@ -7,6 +7,7 @@
   import ScreenFrame from '$lib/components/onboard/ScreenFrame.svelte';
   import JourneyStrip from '$lib/components/onboard/JourneyStrip.svelte';
   import Plaque from '$lib/components/onboard/Plaque.svelte';
+  import LangSwitch from '$lib/components/onboard/LangSwitch.svelte';
   import { t } from '$lib/translations';
   import { hasConciergeIntentCookie } from '$lib/concierge/regIntent.js';
 
@@ -51,7 +52,7 @@
 </script>
 
 <svelte:head>
-  <title>הרשמה · 1💗1</title>
+  <title>{$t('reg.signup.title')} · 1💗1</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700&family=Cinzel:wght@500;600;700&display=swap"
     rel="stylesheet"
@@ -67,16 +68,19 @@
         label={$t('madeForYou.reg.stepSignup')}
       />
     {:else}
-      <JourneyStrip stepIdx={1} totalSteps={6} label="שלב 1 · כניסה" />
+      <JourneyStrip stepIdx={1} totalSteps={6} label={$t('reg.signup.journey')} />
     {/if}
   {/snippet}
 
   <div class="content" in:scale={{ duration: 600, opacity: 0.5, start: 0.96, easing: quintOut }}>
+    <div class="signup-lang-row" dir="ltr"><LangSwitch /></div>
     <Plaque
-      title={displayName ? `שלום ${displayName}!` : 'שלום! יוצרים חשבון'}
+      title={displayName
+        ? $t('reg.signup.helloName', { name: displayName })
+        : $t('reg.signup.helloAnon')}
       sub={concierge
         ? $t('madeForYou.reg.signupSub')
-        : 'רק מייל וסיסמה - הכל אחר־כך'}
+        : $t('reg.signup.sub')}
     />
 
     <form
@@ -93,7 +97,7 @@
       <input type="hidden" name="displayName" value={displayName} />
 
       <div class="field">
-        <label class="field-label" for="email"><EntityIcon kind="mail" size={14} /> כתובת מייל</label>
+        <label class="field-label" for="email"><EntityIcon kind="mail" size={14} /> {$t('reg.signup.email')}</label>
         <div class="input-wrap" class:valid={emailValid && email.length > 0}>
           <input
             id="email"
@@ -114,14 +118,14 @@
       </div>
 
       <div class="field">
-        <label class="field-label" for="password"><EntityIcon kind="key" size={14} /> סיסמה</label>
+        <label class="field-label" for="password"><EntityIcon kind="key" size={14} /> {$t('reg.signup.password')}</label>
         <div class="input-wrap">
           <input
             id="password"
             type={showPassword ? 'text' : 'password'}
             name="password"
             bind:value={password}
-            placeholder="לפחות 8 תווים + אות גדולה"
+            placeholder={$t('reg.signup.passwordPlaceholder')}
             autocomplete="new-password"
             class="input"
           />
@@ -131,7 +135,7 @@
             onmousedown={() => (showPassword = true)}
             onmouseup={() => (showPassword = false)}
             onmouseleave={() => (showPassword = false)}
-            aria-label="הצג סיסמה"
+            aria-label={$t('reg.signup.showPassword')}
           >
             <EntityIcon kind={showPassword ? 'conceal' : 'reveal'} size={16} />
           </button>
@@ -143,18 +147,18 @@
           {/each}
         </div>
         <div class="reqs">
-          <span class:ok={password.length >= 8}>{password.length >= 8 ? '✓' : '◯'} 8 תווים</span>
+          <span class:ok={password.length >= 8}>{password.length >= 8 ? '✓' : '◯'} {$t('reg.signup.req8')}</span>
           <span>·</span>
-          <span class:ok={hasUppercase}>{hasUppercase ? '✓' : '◯'} אות גדולה</span>
+          <span class:ok={hasUppercase}>{hasUppercase ? '✓' : '◯'} {$t('reg.signup.reqUpper')}</span>
           <span>·</span>
-          <span class:ok={hasDigit}>{hasDigit ? '✓' : '◯'} מספר</span>
+          <span class:ok={hasDigit}>{hasDigit ? '✓' : '◯'} {$t('reg.signup.reqDigit')}</span>
           <span>·</span>
-          <span class:ok={hasSymbol}>{hasSymbol ? '✓' : '◯'} סימן</span>
+          <span class:ok={hasSymbol}>{hasSymbol ? '✓' : '◯'} {$t('reg.signup.reqSymbol')}</span>
         </div>
       </div>
 
       {#if form?.error}
-        <p class="error-msg" in:fly={{ y: -6, duration: 300 }}>{form.error}</p>
+        <p class="error-msg" in:fly={{ y: -6, duration: 300 }}>{form.errorKey ? $t(`reg.signup.err.${form.errorKey}`) : form.error}</p>
       {/if}
 
       <button
@@ -163,26 +167,33 @@
         disabled={!canSubmit || loading}
       >
         {#if loading}
-          <span class="spin">⟳</span> רגע…
+          <span class="spin">⟳</span> {$t('reg.signup.wait')}
         {:else}
-          <span>פתיחת 1💗1</span>
+          <span>{$t('reg.signup.submit')}</span>
           <EntityIcon kind="key" size={17} />
         {/if}
       </button>
 
       <div class="terms">
-        בלחיצה אתם מסכימים ל<u>תנאים</u> ול<u>מדיניות הפרטיות</u>.<br />
-        זה לוקח 15 שניות - הצעדים הבאים יחכו לכם אחרי אישור מייל.
+        {$t('reg.signup.termsBefore')}<u>{$t('reg.signup.terms')}</u>{$t('reg.signup.termsMid')}<u
+          >{$t('reg.signup.privacy')}</u
+        >{$t('reg.signup.termsAfter')}<br />
+        {$t('reg.signup.termsTime')}
       </div>
 
       <div class="footer">
-        כבר יש לכם חשבון? <a href="/login" class="link">התחברות</a>
+        {$t('reg.signup.haveAccount')} <a href="/login" class="link">{$t('reg.signup.login')}</a>
       </div>
     </form>
   </div>
 </ScreenFrame>
 
 <style>
+  .signup-lang-row {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
   .content {
     width: 100%;
     display: flex;

@@ -239,7 +239,7 @@
         onkeypress={openChat}
         tabindex="0"
         class="hover:bg-blue-500/20 dark:hover:bg-blue-400/20 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors p-2 rounded-full"
-        aria-label={forumId > 0 ? "פתיחת צ'אט קיים" : "פתיחת צ'אט חדש"}
+        aria-label={forumId > 0 ? $t('lev.hoverHint.openChat') : $t('lev.hoverHint.newChat')}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -401,7 +401,7 @@
       {#if storeTimer}
         <button
           type="button"
-          onmouseenter={() => hover('לחיצה לעריכת הטיימר')}
+          onmouseenter={() => hover($t('lev.cards.inpro.hintEditTimer'))}
           onmouseleave={() => hover('0')}
           class="flex-1 py-1.5 px-3 bg-white dark:bg-gray-800 border-2 font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 {hasUnsavedTime
             ? 'border-yellow-500 dark:border-yellow-400 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/20'
@@ -420,7 +420,7 @@
       <!-- Done Button -->
       {#if already === false}
         <button
-          onmouseenter={() => hover('לחיצה לסיום המשימה')}
+          onmouseenter={() => hover($t('lev.cards.inpro.hintComplete'))}
           onmouseleave={() => hover('0')}
           onclick={done}
           class="flex-1 py-1.5 px-3 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5"
@@ -444,7 +444,11 @@
       {#if show === true}
         <button
           onmouseenter={() =>
-            hover(`${running ? 'עצירת הטיימר' : 'הפעלת טיימר'}`)}
+            hover(
+              running
+                ? $t('lev.cards.inpro.hintStopTimer')
+                : $t('lev.cards.inpro.hintStartTimer')
+            )}
           onmouseleave={() => hover('0')}
           onclick={running ? azor : start}
           class="flex-1 py-1.5 px-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5"

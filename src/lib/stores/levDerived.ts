@@ -29,6 +29,9 @@ import {
   projectFilter
 } from './levStores';
 import { timers } from './timers';
+// applyLocalization reads the reader's language, so the stores that localize
+// vocabulary names (pends, asked, suggestions) recompute when it changes.
+import { lang } from './lang.js';
 // Shift cards come from their own server read, gated on SHIFTS (PLAN_SHIFTS §9.4).
 import { processedShiftWork } from '$lib/utils/levShifts';
 // Order automation cards — their own server read (PLAN_SHOP_OPERATIONS §2.2).
@@ -79,7 +82,7 @@ import {
  * ```
  */
 export const processedPends: Readable<DisplayItem[]> = derived(
-  [pendsStore, projectsStore],
+  [pendsStore, projectsStore, lang],
   ([$pends, $projects]) => processPends($pends, $projects)
 );
 
@@ -139,7 +142,7 @@ export const processedFiapp: Readable<DisplayItem[]> = derived(
  * Returns an array of DisplayItem objects ready for rendering.
  */
 export const processedAsked: Readable<DisplayItem[]> = derived(
-  [askedStore, projectsStore],
+  [askedStore, projectsStore, lang],
   ([$asked, $projects]) => processAsked($asked, $projects)
 );
 
@@ -171,7 +174,7 @@ export const processedResourceSuggestions: Readable<DisplayItem[]> = derived(
  * Returns an array of DisplayItem objects ready for rendering.
  */
 export const processedSuggestions: Readable<DisplayItem[]> = derived(
-  [suggestionsStore, projectsStore],
+  [suggestionsStore, projectsStore, lang],
   ([$suggestions, $projects]) => processSuggestions($suggestions, $projects)
 );
 

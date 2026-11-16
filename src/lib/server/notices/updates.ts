@@ -24,10 +24,11 @@ import {
   resolveTerm,
   type Notice
 } from '$lib/notices';
-import { hubFeedNotices } from '$lib/notices/hub';
+import { hubAskNotices, hubFeedNotices } from '$lib/notices/hub';
 import { loadWishNotices } from '$lib/server/concierge/notices';
 import { loadDealNotices } from '$lib/server/deal/dealNotices';
-import { loadNoticePrefs } from './prefs';
+import { loadNoticePrefsChecked } from './prefs';
+import { userRead } from './door';
 import { serverTranslator, noticeLocale, type NoticeLocale } from './translate';
 import type { NoticeDoor } from './door';
 import { SITE_ORIGIN } from '$lib/server/mcp/keyDiagnosis';
@@ -112,30 +113,56 @@ export function toUpdateRows(list: Notice[], lang: unknown): UpdateRow[] {
   });
 }
 
+/**
+ * Mission candidacies waiting for her (qid 461 / its twin 462), as notices. A read
+ * of its own: when it fails, the other votes still load and this answers null,
+ * which the caller names in `unavailable`. Never rejects.
+ */
+export async function loadAskNotices(
+  uid: string,
+  fetch: typeof globalThis.fetch,
+  door: NoticeDoor,
+  now?: number
+): Promise<Notice[] | null> {
+  try {
+    const raw: any = await userRead(door, uid, '461hubAsks', fetch);
+    if (!raw || raw.errors?.length || !raw.data) return null;
+    return hubAskNotices(raw, uid, now);
+  } catch {
+    return null;
+  }
+}
+
 export async function loadMyUpdates(uid: string, fetch: typeof globalThis.fetch, opts: UpdatesOptions): Promise<MyUpdates> {
   const { door, projectId = null, rikma = null, limit = 20 } = opts;
   const lang = noticeLocale(opts.lang);
   const unavailable: string[] = [];
 
   const reads = startDigestReads(uid, { fetch, door, now: opts.now });
-  const prefsPending = loadNoticePrefs(uid, fetch, door);
-  const [hub, work, suggestions, whatsNew, wish, deal, prefs] = await Promise.all([
+  const prefsChecked = loadNoticePrefsChecked(uid, fetch, door);
+  const prefsPending = prefsChecked.then((p) => p.prefs);
+  const [hub, work, suggestions, whatsNew, wish, deal, prefsRead, asks] = await Promise.all([
     reads.hub,
     reads.work,
     reads.suggestions,
     reads.whatsNew,
     loadWishNotices(uid, fetch, prefsPending, door),
     loadDealNotices(uid, fetch, prefsPending, door),
-    prefsPending
+    prefsChecked,
+    loadAskNotices(uid, fetch, door, opts.now)
   ]);
+  const prefs = prefsRead.prefs;
   if (hub.error) unavailable.push('rikmaVotes');
+  if (asks === null) unavailable.push('missionApplications');
   if (work.error) unavailable.push('work');
   if (whatsNew.error) unavailable.push('whatsNew');
   if (suggestions.error) unavailable.push('suggestions');
   if (wish === null) unavailable.push('wishes');
   if (deal === null) unavailable.push('deals');
+  // What she hid could not be read, so hidden notices may show again.
+  if (!prefsRead.ok) unavailable.push('hiddenNotices');
 
-  const rikmaVotes = applyDismissals(hubFeedNotices(hub.value.feed), prefs.dismissals, opts.now);
+  const rikmaVotes = applyDismissals([...hubFeedNotices(hub.value.feed), ...(asks ?? [])], prefs.dismissals, opts.now);
   const all = groupNotices(mergeNotices(wish ?? [], deal ?? [], rikmaVotes)).filter((n) =>
     inScope(n, projectId, rikma)
   );

@@ -468,10 +468,12 @@
   }
 
 
-  let u = 'משימה בתהליך ביצוע';
+  // The card's resting hint is its own name — not the split-vote hint it once
+  // borrowed from halukaask.svelte, which put "vote on a split" on a mission.
+  let u = $t('lev.cards.inpro.missionInProgress');
   function hover(id) {
     if (id == '0') {
-      u = 'משימה בתהליך ביצוע';
+      u = $t('lev.cards.inpro.missionInProgress');
     } else {
       u = id;
     }
@@ -481,7 +483,7 @@
 
   function hoverc(event) {
     if (event.x == '0') {
-      u = 'הצבעה על בקשה לחלוקת הרווחים שנצברו לרקמה';
+      u = $t('lev.cards.inpro.missionInProgress');
     } else {
       u = event.x;
     }

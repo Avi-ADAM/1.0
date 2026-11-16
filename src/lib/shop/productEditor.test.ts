@@ -58,6 +58,13 @@ describe('toEditorProduct', () => {
   it('an axis no option row names still shows', () => {
     expect(productAxesOf([], [{ optionValues: [{ key: 'color', value: 'red', label: 'אדום' }] } as any])[0]).toMatchObject({ key: 'color', values: [{ value: 'red' }] });
   });
+
+  it('a switched-off variant does not bring back an option the seller removed', () => {
+    const off = { active: false, optionValues: [{ key: 'color', value: 'red', label: 'אדום' }] } as any;
+    expect(productAxesOf([], [off])).toEqual([]);
+    const on = { active: true, optionValues: [{ key: 'size', value: 'm', label: 'M' }] } as any;
+    expect(productAxesOf([], [off, on]).map((a) => a.key)).toEqual(['size']);
+  });
 });
 
 describe('detailChanges', () => {

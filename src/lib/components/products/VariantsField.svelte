@@ -85,6 +85,19 @@
     rows = matrix.variants.map((v) => ({ ...v, pictures: (v as EditorRow).pictures ?? [] }));
   }
 
+  // Back to a plain product: every option off, every variant switched off.
+  // A stored variant is never deleted (old orders point at it) — it stays off
+  // and out of sight; a row not saved yet is simply dropped.
+  let anyOn = $derived(rows.some((r) => r.active));
+  let onlyRetired = $derived(!axes.length && rows.length > 0 && !anyOn);
+  let showRetired = $state(false);
+  function removeAll() {
+    if (!confirm($t('shopEditor.variants.removeAllConfirm'))) return;
+    axes = [];
+    rows = rows.filter((r) => r.id).map((r) => ({ ...r, active: false }));
+    showRetired = false;
+  }
+
   let samePrice = $state(false);
   let bulkPrice = $state('');
   function applyBulk() {
@@ -200,6 +213,11 @@
 
     {#if !rows.length}
       <p class="vf-muted">{$t('shopEditor.variants.empty')}</p>
+    {:else if onlyRetired && !showRetired}
+      <p class="vf-muted">
+        {$t('shopEditor.variants.retiredHidden', { count: rows.length })}
+        <button type="button" class="vf-link" onclick={() => (showRetired = true)}>{$t('shopEditor.variants.showRetired')}</button>
+      </p>
     {:else}
       <div class="sh-table-wrap">
         <table class="sh-table vf-table">
@@ -294,6 +312,11 @@
         </table>
       </div>
       <p class="vf-muted">{$t('shopEditor.variants.keepNote')}</p>
+    {/if}
+    {#if anyOn || axes.length}
+      <div class="vf-actions">
+        <button type="button" class="sh-btn sh-btn-quiet" onclick={removeAll}>{$t('shopEditor.variants.removeAll')}</button>
+      </div>
     {/if}
   </section>
 </div>

@@ -20,5 +20,56 @@
     "whatValues": "¿Qué valores y objetivos quieres promover?",
     "valuesInfo": "Cuando tu trabajo encarna tus valores y sirve a tus objetivos, se convierte en creación gozosa: te ayudaremos a promoverlos",
     "workwaysQuestion": "¿Cómo prefieres crear?"
+  },
+  "signup": {
+    "title": "Registro",
+    "journey": "Paso 1 · Cuenta",
+    "helloName": "¡Hola {{name}}!",
+    "helloAnon": "¡Hola! Creemos tu cuenta",
+    "sub": "Solo un correo y una contraseña - todo lo demás después",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Al menos 8 caracteres + una mayúscula",
+    "showPassword": "Mostrar contraseña",
+    "req8": "8 caracteres",
+    "reqUpper": "mayúscula",
+    "reqDigit": "número",
+    "reqSymbol": "símbolo",
+    "wait": "Un momento…",
+    "submit": "Abrir 1💗1",
+    "termsBefore": "Al hacer clic aceptas los ",
+    "terms": "términos",
+    "termsMid": " y la ",
+    "privacy": "política de privacidad",
+    "termsAfter": ".",
+    "termsTime": "Son 15 segundos - los siguientes pasos te esperarán después de confirmar tu correo.",
+    "haveAccount": "¿Ya tienes una cuenta?",
+    "login": "Iniciar sesión",
+    "err": {
+      "missing": "Por favor completa todos los campos",
+      "weakPassword": "La contraseña necesita al menos 8 caracteres y una letra mayúscula en inglés",
+      "emailTaken": "Este correo ya está registrado. Intenta iniciar sesión.",
+      "failed": "Error en el registro",
+      "unknown": "Error desconocido, inténtalo de nuevo"
+    }
+  },
+  "checkEmail": {
+    "title": "Revisa tu correo",
+    "journey": "Paso 2 · Confirmar correo",
+    "plaqueTitle": "El correo está en camino",
+    "plaqueSub": "Conectando - el enlace llega enseguida",
+    "sentTo": "Te enviamos un correo a ",
+    "clickLink": "Haz clic en el enlace del correo para confirmar y abrir la puerta. El enlace es válido por una hora.",
+    "resent": "✓ ¡Correo enviado de nuevo!",
+    "sending": "⟳ Enviando...",
+    "resend": "No llegó - reenviar",
+    "fixAddress": "Corregir dirección",
+    "spamTip": "¿Revisaste la carpeta de spam? A veces Google nos esconde allí.",
+    "afterConfirm": "Después de confirmar,",
+    "clickToLogin": "haz clic para iniciar sesión"
+  },
+  "journey": {
+    "start": "Inicio",
+    "end": "Meta"
   }
 }

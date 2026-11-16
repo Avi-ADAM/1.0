@@ -19,5 +19,56 @@
     "whatValues": "Which values and goals do you want to promote?",
     "valuesInfo": "When your work fulfils your values and advances your goals it becomes joyful creation - we will help you promote yours",
     "workwaysQuestion": "How do you prefer to create?"
+  },
+  "signup": {
+    "title": "Sign up",
+    "journey": "Step 1 · Account",
+    "helloName": "Hello {{name}}!",
+    "helloAnon": "Hello! Let's create your account",
+    "sub": "Just an email and a password - everything else later",
+    "email": "Email address",
+    "password": "Password",
+    "passwordPlaceholder": "At least 8 characters + a capital letter",
+    "showPassword": "Show password",
+    "req8": "8 characters",
+    "reqUpper": "capital letter",
+    "reqDigit": "number",
+    "reqSymbol": "symbol",
+    "wait": "One moment…",
+    "submit": "Open 1💗1",
+    "termsBefore": "By clicking you agree to the ",
+    "terms": "terms",
+    "termsMid": " and the ",
+    "privacy": "privacy policy",
+    "termsAfter": ".",
+    "termsTime": "It takes 15 seconds - the next steps will wait for you after you confirm your email.",
+    "haveAccount": "Already have an account?",
+    "login": "Log in",
+    "err": {
+      "missing": "Please fill in all the fields",
+      "weakPassword": "The password needs at least 8 characters and a capital English letter",
+      "emailTaken": "This email is already registered. Try logging in.",
+      "failed": "Sign-up failed",
+      "unknown": "Unknown error, please try again"
+    }
+  },
+  "checkEmail": {
+    "title": "Check your email",
+    "journey": "Step 2 · Confirm email",
+    "plaqueTitle": "The email is on its way",
+    "plaqueSub": "We're connecting - your link is coming",
+    "sentTo": "We sent an email to ",
+    "clickLink": "Click the link in the email to confirm and open the door. The link is valid for one hour.",
+    "resent": "✓ Email sent again!",
+    "sending": "⟳ Sending...",
+    "resend": "Didn't arrive - send again",
+    "fixAddress": "Fix address",
+    "spamTip": "Checked your spam folder? Sometimes Google hides us there.",
+    "afterConfirm": "After confirming,",
+    "clickToLogin": "click to log in"
+  },
+  "journey": {
+    "start": "Start",
+    "end": "Goal"
   }
 }

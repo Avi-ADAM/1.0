@@ -24,7 +24,8 @@ export const HIDDEN_PROJECT_IDS: string[] = [
   '86',
   '81',
   '79',
-  '88'
+  '88',
+  '103' // Nas demo, Rikma B "Demo · Calm Coding Course" (docs/marketing/NAS_DEMO_DATA.md)
   // '123',
 ];
 

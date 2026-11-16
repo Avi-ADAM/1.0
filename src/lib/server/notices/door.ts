@@ -21,7 +21,8 @@ const TWINS: Record<string, string> = {
   '421myWishNotices': '428myWishNoticesFor',
   '394hiddenWishProposals': '429hiddenWishProposalsFor',
   '423myNoticePrefs': '430myNoticePrefsFor',
-  '123dealsForUser': '431dealsForUserFor'
+  '123dealsForUser': '431dealsForUserFor',
+  '461hubAsks': '462hubAsksFor'
 };
 
 /** A read keyed on the user herself. */

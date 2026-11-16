@@ -136,7 +136,11 @@
       "monthlyHours": "ساعات شهرية",
       "totalHoursLabel": "إجمالي الساعات",
       "completeTask": "إنهاء المهمة",
-      "taskLink": "رابط المهمة"
+      "taskLink": "رابط المهمة",
+      "hintEditTimer": "انقر لتعديل المؤقّت",
+      "hintComplete": "انقر لإنهاء المهمة",
+      "hintStartTimer": "تشغيل المؤقّت",
+      "hintStopTimer": "إيقاف المؤقّت"
     },
     "openChat": "فتح الدردشة",
     "withdraw": "سحب العرض",
@@ -1256,5 +1260,11 @@
     "failed": "لم يُحفظ الإجراء",
     "passed": "تم التمرير - بانتظار رده/ا",
     "withdrawn": "انسحبت - المورد مفتوح للجميع الآن"
+  },
+  "hoverHint": {
+    "splitVote": "تصويت على طلب تقسيم الأرباح المتراكمة للريكما",
+    "openChat": "فتح المحادثة",
+    "newChat": "بدء محادثة جديدة",
+    "counter": "عرض مقابل"
   }
 }

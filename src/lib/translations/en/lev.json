@@ -136,7 +136,11 @@
       "monthlyHours": "Monthly hours",
       "totalHoursLabel": "Total hours",
       "completeTask": "Complete Task",
-      "taskLink": "Task Link"
+      "taskLink": "Task Link",
+      "hintEditTimer": "Click to edit the timer",
+      "hintComplete": "Click to finish the mission",
+      "hintStartTimer": "Start the timer",
+      "hintStopTimer": "Stop the timer"
     },
     "openChat": "Open Chat",
     "withdraw": "Withdraw",
@@ -472,7 +476,7 @@
     "from": "from",
     "success": "appruved sucssefully!",
     "error": "error: please try again, if the problem continue contact at baruch@1lev1.com",
-    "messageSent": "messege send sucsessfully",
+    "messageSent": "message sent successfully",
     "approveSend": "Approval of sending money according to the approved split",
     "approveReceive": "Approval of receiving money according to the approved split",
     "iSent": "Confirm that I sent the money",
@@ -1256,5 +1260,11 @@
     "failed": "The action was not saved",
     "passed": "Passed on - waiting for their answer",
     "withdrawn": "You stepped back - the resource is open to everyone now"
+  },
+  "hoverHint": {
+    "splitVote": "Vote on a request to split the rikma's accrued profits",
+    "openChat": "Open the chat",
+    "newChat": "Start a new chat",
+    "counter": "Counter-offer"
   }
 }

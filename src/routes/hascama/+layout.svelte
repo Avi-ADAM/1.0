@@ -1,49 +1,23 @@
 <script>
-import { lang, doesLang, langUs } from '$lib/stores/lang.js'
+  import { lang } from '$lib/stores/lang.js';
+  import { locale } from '$lib/translations';
   import { onMount } from 'svelte';
-  let { data, children } = $props();
-function getLang() {
-  console.log(data)
-    let la;
-    const fromSe = data.userAgent
-    if ($doesLang == false) {
-       
-   if (fromSe.includes("he")){
-        la = "he"
-  } else if (fromSe.includes("ar")){
-        la = "ar"
-   } else{
-      la = "en"
-    }
-   }
-    
-    else {
-        la = $langUs
-    }
-   // if (navigator.languages != undefined)
-   //     return navigator.languages[0];
-   // return navigator.language;
-    lang.set(la)
-    document.cookie = `lang=${$lang}; expires=` + new Date(2029, 0, 1).toUTCString();
-}
+  let { children } = $props();
 
-onMount(async () => {
-   getLang()
-   let x;
-   let user;
-   /*
-   if($lang != "he" && $lang != "ar" && x == null && user == 0){
-        console.log('after', $lang)
-    goto("/en")
-  } else if($lang == "ar" && x == null && user == 0){
-      console.log('Registration', $lang)
-
-    goto("/ar")
-  }
-  */
-})
+  // The language was already resolved for this request — `?lang=`, then the
+  // `lang` cookie, then Accept-Language (hooks.server.js getLanguage) — and
+  // the root layout set `locale` from it. This layout used to re-decide from
+  // Accept-Language alone and write the answer back into the cookie, so a
+  // Hebrew-browser reader who chose English came back from the agreement site
+  // to a Hebrew agreement, and the cookie it had overwritten then made
+  // /signup and /signup/check-email Hebrew too. Now it only mirrors the
+  // resolved choice, so the next screens keep it.
+  onMount(() => {
+    const code = $locale || 'he';
+    lang.set(code);
+    document.cookie =
+      `lang=${code}; path=/; SameSite=Lax; expires=` + new Date(2029, 0, 1).toUTCString();
+  });
 </script>
 
-	{@render children?.()}
-
-
+{@render children?.()}

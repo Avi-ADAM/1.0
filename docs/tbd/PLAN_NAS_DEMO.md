@@ -106,11 +106,11 @@ In short: the rikma Dan matches into stays **visible** (`listMyMatchesTool` skip
 hidden rikmas); the mission uses a new skill only Dan holds, so publishing it mails
 no real members.
 
-- [ ] Two English accounts, Maya and Dan, each with a connected agent
-- [ ] Dan's skills match Maya's mission, so the match appears on his side
-- [ ] A second rikma for "3 weeks later": approved hours, one effective sale, one split
-- [ ] A short, round restime on the demo rikma, so the clock sentence reads well
-- [ ] Demo rikmas hidden from public discovery, or clearly marked as a demo
+- [ ] Two English accounts, Maya and Dan, each with a connected agent (accounts and profiles done 2026-11-16; agents not yet connected)
+- [x] Dan's skills match Maya's mission, so the match appears on his side (seen in his heart on rikma 103)
+- [x] A second rikma for "3 weeks later": approved hours, one effective sale, one split (rikma 103)
+- [x] A short, round restime on the demo rikma, so the clock sentence reads well (48 h)
+- [x] Demo rikmas hidden from public discovery, or clearly marked as a demo (103 in `hiddenProjects.ts`, takes effect on deploy)
 - [ ] One dry run of every call in the script, in order, the day of filming
 
 ## 6. Fallback per scene

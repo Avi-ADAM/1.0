@@ -1,19 +1,26 @@
 /**
  * Localization utility functions.
- * Handles applying localized strings (e.g. Hebrew) to entities like skills, roles, and workways
- * if localized data is present in the 'localizations' field.
+ *
+ * Vocabulary entries (skills, roles, workways, values) are stored in Strapi's
+ * default locale — English — and `localizations.data[0]` holds the Hebrew
+ * version. So the localized name is applied only for a Hebrew reader; every
+ * other reader keeps the base (English) name. This is the same rule
+ * VocabSelector, hevel and oneLangAdj follow.
  */
+import { get } from 'svelte/store';
+import { lang as langStore } from '$lib/stores/lang.js';
+
+const FIELDS = ['skillName', 'roleDescription', 'workWayName', 'valueName'] as const;
 
 /**
- * Applies localization to a list of entities (skills, roles, workways).
- * Iterates through the list and replaces the primary name/description with the localized version
- * if available in the `localizations` field.
- * 
- * @param {any} entityContainer - The object containing the 'data' array (e.g. { data: [...] }) 
+ * Applies localization to a list of entities (skills, roles, workways, values).
+ *
+ * @param {any} entityContainer - The object containing the 'data' array (e.g. { data: [...] })
  *                                or the array itself if already flattened.
+ * @param {string} [lang] - The reader's UI language; defaults to the `lang` store.
  * @returns {any} A new structure with localized attributes, preserving the input shape ({data: ...} or [...]).
  */
-export function applyLocalization(entityContainer: any): any {
+export function applyLocalization(entityContainer: any, lang?: string): any {
     // Handle null/undefined
     if (!entityContainer) return { data: [] };
 
@@ -31,29 +38,21 @@ export function applyLocalization(entityContainer: any): any {
         return entityContainer;
     }
 
+    const readerLang = lang ?? get(langStore);
+    // The only localization these queries carry is Hebrew; anyone else reads the base name.
+    if (readerLang !== 'he') {
+        return isWrapper ? { data: items } : items;
+    }
+
     const localizedItems = items.map(item => {
         if (!item?.attributes) return item;
 
         const newAttributes = { ...item.attributes };
-        const localizations = newAttributes.localizations?.data;
+        const localizedAttrs = newAttributes.localizations?.data?.[0]?.attributes;
 
-        // Check if we have valid localization data
-        if (localizations && localizations.length > 0 && localizations[0]?.attributes) {
-            const localizedAttrs = localizations[0].attributes;
-
-            // 1. Skills: skillName
-            if (localizedAttrs.skillName) {
-                newAttributes.skillName = localizedAttrs.skillName;
-            }
-
-            // 2. Roles (Tafkidims): roleDescription
-            if (localizedAttrs.roleDescription) {
-                newAttributes.roleDescription = localizedAttrs.roleDescription;
-            }
-
-            // 3. WorkWays: workWayName
-            if (localizedAttrs.workWayName) {
-                newAttributes.workWayName = localizedAttrs.workWayName;
+        if (localizedAttrs) {
+            for (const field of FIELDS) {
+                if (localizedAttrs[field]) newAttributes[field] = localizedAttrs[field];
             }
         }
 
