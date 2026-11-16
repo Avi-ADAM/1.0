@@ -55,7 +55,7 @@
 </header>
 
 <h1>Connecting an AI agent to 1lev1 over MCP</h1>
-<p class="lede">How a partner platform's agent acts for its user on 1lev1: find partners, draft a partnership, apply to an opening, and read contributions and ownership. One remote MCP server, standard OAuth, no SDK.</p>
+<p class="lede">How a partner platform's agent acts for its user on 1lev1: find partners, draft a partnership, apply to an opening, follow a customer's request, and read contributions and ownership. One remote MCP server, standard OAuth, no SDK.</p>
 
 <section>
 <h2><span>1</span>At a glance</h2>
@@ -64,7 +64,7 @@
   <tr><td>Transport</td><td>Remote MCP over streamable HTTP (JSON responses, SSE passed through). Stateless: one request, one answer.</td></tr>
   <tr><td>Auth</td><td>OAuth 2.1 authorization code with PKCE (S256) and dynamic client registration (RFC 7591), or a personal bearer key.</td></tr>
   <tr><td>Identity</td><td>Every call runs as the one person who connected. The agent has that person's permissions and no more.</td></tr>
-  <tr><td>Tools</td><td><span class="todo">[TODO: tool count after P1]</span> tools, each annotated read-only or writing, with English descriptions.</td></tr>
+  <tr><td>Tools</td><td>80+ tools, each annotated read-only or writing, with English descriptions.</td></tr>
   <tr><td>Reference</td><td><a href="https://1lev1.com/mcp">1lev1.com/mcp</a>, generated from the server's own manifest, so it cannot drift from what is deployed.</td></tr>
   <tr><td>Rate limits</td><td>Per key: 120 reads / minute, 20 writes / minute, 10 AI-assisted calls / hour.</td></tr>
 </table>
@@ -77,6 +77,7 @@
   <tr><td><b>mission</b></td><td>Work a partner takes on that earns a share. Open (looking for someone) → in progress (hours logged) → finished (hours approved).</td></tr>
   <tr><td><b>resource</b></td><td>Something a partner brings: equipment, money, a service, a space.</td></tr>
   <tr><td><b>decision</b></td><td>Anything that needs the partners' consent. Each has a clock (<code>restime</code>) the rikma sets.</td></tr>
+  <tr><td><b>wish</b></td><td>A request in the concierge: a customer describes what they need, 1lev1 breaks it into missions and resources, and partners propose on the parts.</td></tr>
   <tr><td><b>sale / split</b></td><td>Income of the rikma, and its distribution between partners by their shares.</td></tr>
 </table>
 </section>
@@ -86,11 +87,11 @@
 <p><b>OAuth (recommended for a platform).</b> The server follows the MCP authorization spec, so a compliant MCP client needs no custom code.</p>
 <ol>
   <li>Discover: <code>GET https://api.1lev1.com/.well-known/oauth-protected-resource/api/mcp</code> names the authorization server. Its metadata is at <code>/.well-known/oauth-authorization-server</code>.</li>
-  <li>Register the client: <code>POST /oauth/register</code> with your redirect URIs. <span class="todo">[TODO: confirm partner redirect hosts are accepted (partner registry)]</span></li>
+  <li>Register the client: <code>POST /oauth/register</code> with your redirect URIs. Redirect hosts are allowlisted, so we add yours when we start; loopback addresses work out of the box for local testing.</li>
   <li>Authorize: send the user to <code>/oauth/authorize</code> with <code>code_challenge_method=S256</code>. The user signs in (or signs up) and sees a consent screen in their language.</li>
   <li>Exchange the code at <code>/oauth/token</code>, then call the server with <code>Authorization: Bearer &lt;token&gt;</code>.</li>
 </ol>
-<p><b>Personal key (fastest way to try it).</b> A member creates a key under Settings → API keys, or runs <code>npx 1lev1-mcp</code>, and the client sends it as the bearer token. <span class="todo">[TODO: sandbox key for the demo rikma, if issued]</span></p>
+<p><b>Personal key (fastest way to try it).</b> A member creates a key under Settings → API keys, or runs <code>npx 1lev1-mcp</code>, and the client sends it as the bearer token. On request we issue your engineers a key limited to a demo rikma.</p>
 <pre><span class="c"># List the tools</span>
 curl -s https://api.1lev1.com/api/mcp \
   -H <span class="k">"Authorization: Bearer $TOKEN"</span> \
@@ -110,17 +111,18 @@ curl -s https://api.1lev1.com/api/mcp ... \
 <table>
   <tr><th>Step</th><th>Tool</th><th>Kind</th><th>Status</th></tr>
   <tr><td>Search open missions, resources, products</td><td><code>searchCatalogTool</code></td><td>read</td><td><span class="chip live">live</span></td></tr>
-  <tr><td>Discover partnerships to join</td><td><code>searchRikmasTool</code></td><td>read</td><td><span class="chip todo">[TODO: confirm live]</span></td></tr>
-  <tr><td>Find people by skill or role (opt-in only)</td><td><code>findPartnersTool</code></td><td>read</td><td><span class="chip todo">[TODO: confirm live]</span></td></tr>
-  <tr><td>Openings matched to this person</td><td><code>listMyMatchesTool</code></td><td>read</td><td><span class="chip todo">[TODO: confirm live]</span></td></tr>
+  <tr><td>Discover partnerships to join</td><td><code>searchRikmasTool</code></td><td>read</td><td><span class="chip live">live</span></td></tr>
+  <tr><td>Find people by skill or role (opt-in only)</td><td><code>findPartnersTool</code></td><td>read</td><td><span class="chip live">live</span></td></tr>
+  <tr><td>Openings matched to this person</td><td><code>listMyMatchesTool</code></td><td>read</td><td><span class="chip live">live</span></td></tr>
   <tr><td>Draft a partnership: roles, missions, resources</td><td><code>proposeRikmaBlueprintTool</code></td><td>prepare</td><td><span class="chip live">live</span></td></tr>
   <tr><td>Create it, on the person's confirmation</td><td><code>createProjectTool</code></td><td>prepare</td><td><span class="chip live">live</span></td></tr>
-  <tr><td>Apply to an opening; follow the application</td><td><code>applyToMissionTool</code>, <code>listMyApplicationsTool</code></td><td>write (own statement)</td><td><span class="chip todo">[TODO: confirm live]</span></td></tr>
+  <tr><td>Apply to an opening; follow the application</td><td><code>applyToMissionTool</code>, <code>listMyApplicationsTool</code></td><td>write (own statement)</td><td><span class="chip live">live</span></td></tr>
   <tr><td>What is waiting for me, and what silence will approve</td><td><code>getMyUpdatesTool</code></td><td>read</td><td><span class="chip live">live</span></td></tr>
-  <tr><td>One decision: rounds, votes, time left</td><td><code>getDecisionTool</code></td><td>read</td><td><span class="chip todo">[TODO: confirm live]</span></td></tr>
+  <tr><td>One decision: rounds, votes, time left</td><td><code>getDecisionTool</code></td><td>read</td><td><span class="chip live">live</span></td></tr>
   <tr><td>Tasks, timers, conversations inside a rikma</td><td><code>createTaskTool</code>, <code>timerActionTool</code>, <code>postConversationMessageTool</code></td><td>write</td><td><span class="chip live">live</span></td></tr>
-  <tr><td>My hours, contributions and ownership share</td><td><code>getMyStakeTool</code></td><td>read</td><td><span class="chip todo">[TODO: confirm live]</span></td></tr>
-  <tr><td>Sales and profit splits of a rikma</td><td><code>getRikmaLedgerTool</code></td><td>read</td><td><span class="chip todo">[TODO: confirm live]</span></td></tr>
+  <tr><td>My hours, contributions and ownership share</td><td><code>getMyStakeTool</code></td><td>read</td><td><span class="chip live">live</span></td></tr>
+  <tr><td>Sales and profit splits of a rikma</td><td><code>getRikmaLedgerTool</code></td><td>read</td><td><span class="chip live">live</span></td></tr>
+  <tr><td>Concierge: a customer's request, its breakdown and the proposals on it</td><td><code>listMyWishesTool</code>, <code>getWishDetailsTool</code>, <code>listMyWishOffersTool</code></td><td>read</td><td><span class="chip live">live</span></td></tr>
   <tr><td>Sign up a person with no account</td><td><code>prepareSignup</code></td><td>prepare</td><td><span class="chip live">live</span></td></tr>
 </table>
 </section>
@@ -140,9 +142,9 @@ curl -s https://api.1lev1.com/api/mcp ... \
 <table class="kv">
   <tr><td>Errors</td><td>Tool results are JSON with <code>success: false</code> and a plain-English <code>message</code>. Access refusals add <code>denied: true</code>; throttling adds <code>rateLimited: true</code> and <code>retryAfterSeconds</code>.</td></tr>
   <tr><td>Scoping</td><td>A key can be limited to specific rikmas. Tools check membership per call; non-members get a rikma's public face only.</td></tr>
-  <tr><td>Scopes</td><td><span class="todo">[TODO: list OAuth scopes shown on the consent screen, or "single scope: mcp"]</span></td></tr>
-  <tr><td>Tokens</td><td><span class="todo">[TODO: token lifetime and refresh, or "long-lived, revocable by the user in Settings"]</span></td></tr>
-  <tr><td>Language</td><td>Tool descriptions are English. Platform messages follow the user's language (English, Hebrew, Arabic, Russian, Spanish). Text written by members is in the author's language. <span class="todo">[TODO: confirm translation on MCP reads]</span></td></tr>
+  <tr><td>Scopes</td><td>One OAuth scope today, <code>mcp</code>. What an agent may do is bounded by the tool kinds above and by the consent model, not by the token. Finer scopes are on the roadmap.</td></tr>
+  <tr><td>Tokens</td><td>Long-lived, and revocable by the user at any time in Settings. Expiring tokens with refresh are on the roadmap.</td></tr>
+  <tr><td>Language</td><td>Tool descriptions are English. Platform messages follow the user's account language, or the request's <code>Accept-Language</code> (English, Hebrew, Arabic, Russian, Spanish). Text written by members is in the author's language.</td></tr>
   <tr><td>Audit</td><td>Every write and every refusal is logged server-side with key, tool and outcome.</td></tr>
 </table>
 </section>
@@ -153,14 +155,14 @@ curl -s https://api.1lev1.com/api/mcp ... \
   <tr><th>From Nas</th><th>From 1lev1</th></tr>
   <tr>
     <td style="white-space:normal;width:50%">An MCP client in the agent runtime (remote server, OAuth).<br>The redirect URI(s) the agent uses.<br>A place in the agent's flow where "I need a partner" routes to these tools.</td>
-    <td>The server and tool reference above.<br>A sandbox rikma and key for your engineers. <span class="todo">[TODO: sandbox details]</span><br>Direct engineering support during the pilot.</td>
+    <td>The server and tool reference above.<br>A demo rikma and a key limited to it, for your engineers.<br>Your redirect host added to the allowlist.<br>Direct engineering support during the pilot.</td>
   </tr>
 </table>
-<div class="note"><b>On the roadmap, not required for a pilot:</b> onboarding a partner's user by signed assertion (no separate signup), expiring tokens with refresh, an action log each member can read, and per-partner rate limits. <span class="todo">[TODO: remove any item already shipped]</span></div>
+<div class="note"><b>On the roadmap, not required for a pilot:</b> onboarding a partner's user by signed assertion (no separate signup), expiring tokens with refresh, finer OAuth scopes, an action log each member can read, and per-partner rate limits.</div>
 </section>
 
 <footer>
-  <div>Baruch <span class="todo">[TODO: surname]</span> · <span class="todo">[TODO: email]</span></div>
+  <div>Baruch Babayof, founder · <a href="mailto:Baruch@1lev1.com">Baruch@1lev1.com</a></div>
   <div><a href="https://1lev1.com/mcp">1lev1.com/mcp</a></div>
 </footer>
 
