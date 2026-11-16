@@ -993,7 +993,7 @@ These are the main content types in the Strapi backend.
 | `currency` | `Maybe<MatbeaEntityResponse>` |
 | `decision` | `Maybe<DecisionEntityResponse>` |
 | `deliveryOptions` | `Maybe<Scalars['JSON']['output']>` |
-| `desc` | `Maybe<Scalars['JSON']['output']>` |
+| `desc` | `Maybe<Scalars['String']['output']>` |
 | `discoveryKeywords` | `Maybe<Scalars['String']['output']>` |
 | `entryCurrency` | `Maybe<Scalars['String']['output']>` |
 | `entryRate` | `Maybe<Scalars['Float']['output']>` |
@@ -6539,7 +6539,7 @@ Used for creating/updating content.
 | `currency` | `InputMaybe<Scalars['ID']['input']>` |
 | `decision` | `InputMaybe<Scalars['ID']['input']>` |
 | `deliveryOptions` | `InputMaybe<Scalars['JSON']['input']>` |
-| `desc` | `InputMaybe<Scalars['JSON']['input']>` |
+| `desc` | `InputMaybe<Scalars['String']['input']>` |
 | `discoveryKeywords` | `InputMaybe<Scalars['String']['input']>` |
 | `entryCurrency` | `InputMaybe<Scalars['String']['input']>` |
 | `entryRate` | `InputMaybe<Scalars['Float']['input']>` |

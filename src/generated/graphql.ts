@@ -7582,7 +7582,7 @@ export type Matanot = {
   currency?: Maybe<MatbeaEntityResponse>;
   decision?: Maybe<DecisionEntityResponse>;
   deliveryOptions?: Maybe<Scalars['JSON']['output']>;
-  desc?: Maybe<Scalars['JSON']['output']>;
+  desc?: Maybe<Scalars['String']['output']>;
   discoveryKeywords?: Maybe<Scalars['String']['output']>;
   entryCurrency?: Maybe<Scalars['String']['output']>;
   entryRate?: Maybe<Scalars['Float']['output']>;
@@ -7846,7 +7846,7 @@ export type MatanotFiltersInput = {
   currency?: InputMaybe<MatbeaFiltersInput>;
   decision?: InputMaybe<DecisionFiltersInput>;
   deliveryOptions?: InputMaybe<JsonFilterInput>;
-  desc?: InputMaybe<JsonFilterInput>;
+  desc?: InputMaybe<StringFilterInput>;
   discoveryKeywords?: InputMaybe<StringFilterInput>;
   entryCurrency?: InputMaybe<StringFilterInput>;
   entryRate?: InputMaybe<FloatFilterInput>;
@@ -7930,7 +7930,7 @@ export type MatanotInput = {
   currency?: InputMaybe<Scalars['ID']['input']>;
   decision?: InputMaybe<Scalars['ID']['input']>;
   deliveryOptions?: InputMaybe<Scalars['JSON']['input']>;
-  desc?: InputMaybe<Scalars['JSON']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
   discoveryKeywords?: InputMaybe<Scalars['String']['input']>;
   entryCurrency?: InputMaybe<Scalars['String']['input']>;
   entryRate?: InputMaybe<Scalars['Float']['input']>;
