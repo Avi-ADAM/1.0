@@ -4,7 +4,8 @@ Status: **P0 complete (app *and* backend); P1 shipped; P2 shipped, off by
 default; P3 shipped, off by default; P4 — §7.1's public surfaces are in
 (missions, resources, rikmot, products: every directory and every entity page
 except `/gift/[id]`), each with its backfill walker; `/demand` and §7.2–7.6 are
-not; P5 and P6 not started.**
+not; P5 and P6 not started. §18 — a member's own spelling of their name in
+each script — is planned, not built.**
 
 > **P3 — §15, "guests read translations" — is in.** A guest still cannot *buy*
 > a translation, deliberately (§15.2: an anonymous public page is what a
@@ -309,6 +310,13 @@ in parentheses on first display — so a name stays findable.
 This is why `mode` is a field on both the manifest and the cache row: the same
 source string can legitimately have two different outputs.
 
+> **Superseded for personal names by §18.** A machine cannot know whether
+> `בבאיוף` is spelled Babayof or Babayov — only its owner can. So a member's
+> own spelling, per script, always wins; the engine's transliteration is only
+> the fallback for a member who has not written one. §18 also drops the
+> `Name (שם)` parenthetical for names: the reader sees the name in their
+> script, the original stays one tap away like every other `<Translated>`.
+
 Anything the user did not choose to write as prose — a project *name* is a
 borderline case. Recommendation: `projectName` is **translated**, because on
 this site it is usually descriptive Hebrew prose ("רקמת פיתוח קהילתי"), not a
@@ -473,7 +481,10 @@ Ordered by (readers reached) ÷ (integration cost):
    conventions in `docs/LEV_CARD_CONVENTIONS.md`; `<Translated>` must not break
    the coins/list/cards view modes (`levView`).
 3. **Project / moach pages** — descriptions, mission names, product names.
-4. **Profiles** — `bio`, `city`, `username` (transliterated).
+4. **Profiles** — `bio`, `city`, `username` (transliterated). The name is
+   resolved by §18 (the member's own spelling first), and unlike the rest of
+   this surface it is rendered **everywhere a member's name appears**, not
+   only on the profile page.
 5. **Forum / chat messages** — highest volume, lowest value per string.
    Deliberately last, and probably **on-demand only, never backfilled**, with a
    per-message "translate" button rather than automatic translation.
@@ -907,6 +918,9 @@ the last step, and it is the same endpoint on a clock.
    buys a second free quota. Leaning: **direct fetch now, one narrow interface**
    (`translateBatch(items, targets) → results`) so a second engine is a new file
    rather than a refactor.
+6. **Own-script names (§18)** — should the member also be able to override
+   their name in their *own* script (a Hebrew speaker whose `username` is a
+   Latin login handle)? §18.6 leans yes, as the same field.
 
 ---
 
@@ -1231,3 +1245,141 @@ Nothing changed in §13's order. Add the new keys to `TRANSLATE_SURFACES` one
 at a time (or `*`), run `--status` to see the new sources go active, and let
 the identity pass run before any key is set — on a Hebrew-majority corpus it
 turns most of these pages' misses into free hits too.
+
+---
+
+## 18. A member's name in other scripts — their own spelling first *(planned)*
+
+§4.3 sends `username` to the engine in `transliterate` mode. That is the right
+*default*, and the wrong *authority*: a name is the one string on the site whose
+correct rendering is a fact only its owner knows. `בבאיוף` is Babayof to one
+family and Babayov to another; `ברוך` is Baruch or Barukh; an Arab member named
+`نور` may write it Nour, Noor or Nur. Whatever the engine picks, some of
+those people will see their own name misspelled on every card that carries it.
+
+So the member writes it. The engine only fills in for a member who has not.
+
+### 18.1 What the reader sees
+
+- A reader whose locale writes in another script than the name sees the name
+  **in their script**, and nothing else — `Baruch Babayof`, not
+  `Baruch Babayof (ברוך בבאיוף)`. The parenthetical §4.3 proposed made sense for
+  an engine guess (it kept a possibly-wrong rendering findable); for a spelling
+  the member chose it is noise on every card.
+- That includes the member: switching their own UI to English shows their
+  own name in English.
+- The original is still one tap away where the name is rendered through
+  `<Translated>` (profile header); in dense lists (lev rows, member chips, chat
+  authors) the name is plain text.
+
+### 18.2 Storage — keyed by script, not by locale
+
+Four optional fields on `UsersPermissionsUser` (1.0b,
+`src/extensions/users-permissions/content-types/user/schema.json`):
+
+| field | script | locales that read it |
+|---|---|---|
+| `nameLatin` | latin | en, es |
+| `nameArabic` | arabic | ar |
+| `nameCyrillic` | cyrillic | ru |
+| `nameHebrew` | hebrew | he |
+
+- **By script, because en and es share one.** A Spanish reader and an English
+  reader both read `Baruch`; asking the member twice would produce two spellings
+  of one name. `SCRIPT_OF` in `src/lib/translation/detect.ts` is already the
+  mapping.
+- **Not `username`.** `username` is the users-permissions login identifier
+  (required, unique); changing it to a Latin spelling would move the problem,
+  not solve it. It stays what the member typed at signup and remains the
+  source string for the engine fallback.
+- **Not a JSON blob.** Plain `String` fields can be selected by the qids that
+  already select `username` (no extra query) and filtered by member search
+  (§18.6). They must stay **public** — Strapi silently finds nothing when
+  filtering on a private field.
+- **Not the cache.** The `text-translation` cache is content-addressed and has
+  no owner; a member's own spelling is a profile fact that must survive a
+  username edit and must never be overwritten by a backfill.
+- `max: 60`, same as `username` in `fields.js`. Each field is validated to be
+  written in its own script (`detect.ts` — a `nameLatin` of `ברוך` is refused,
+  not stored) and runs through the mixed-script check (`check:script`'s
+  predicate, `src/lib/translation/mixedScript.js`).
+
+### 18.3 Resolution — one pure function
+
+`src/lib/translation/displayName.ts`:
+
+```ts
+displayName(user, readerLocale, hits?) → { text, source: 'own' | 'native' | 'engine' | 'raw' }
+```
+
+1. **own** — the member's field for `SCRIPT_OF[readerLocale]`, if set.
+2. **native** — `username` is already in the reader's script → as typed.
+3. **engine** — a `transliterate` cache row for `username` that passes
+   `isRealTranslation` (never `!!hit.text`), only when the reader's
+   `autoTranslate` preference allows it, exactly like every other T3 string.
+4. **raw** — `username` as typed.
+
+`own` is the member's own words, not a machine translation: it is shown even
+to a reader whose preference is `off`, and it carries no "translated" label.
+Only `engine` is labelled.
+
+Every place that renders a member's name calls this — never
+`user.attributes.username` at a call site. Today ~70 components under
+`src/lib/components` read `.username` directly; S3 below moves them over, and a
+grep in `check:translatable` (or a lint test) keeps new ones from appearing.
+
+### 18.4 Where the member writes it
+
+- **`/me` profile edit** — a "your name in other alphabets" group, showing only
+  the scripts other than the one `username` is in (a Hebrew name gets Latin,
+  Arabic, Cyrillic). Latin is first and open; the others are collapsed.
+- **Prefilled, never auto-saved.** If an engine row exists for the `username`
+  it is the field's *placeholder* — the member accepts it with one tap or
+  corrects it. Nothing lands in the profile without the member saving it.
+- **Onboarding** — one optional field, "how is your name written in English?",
+  only when `username` is not Latin. Skippable.
+- Written through the existing `updateUserBasic` action (its `self` rule
+  already confines it to the member's own profile) — no new write path.
+
+### 18.5 Server-side renderers
+
+Notification payloads and mail (`src/lib/components/mail/*`, action
+`NotificationConfig`) are built per **recipient** language: they call
+`displayName(actor, recipientLang)` with the cache read only, like §7.6. The MCP
+tools (`getMyUpdatesTool`, `getProjectMembersTool`, …) resolve names in the
+key owner's `lang`.
+
+### 18.6 Search finds every spelling
+
+Member search (`findPartnersTool`, the members pickers) matches `username` **or**
+any of the four fields, so an English-speaking partner who types `Baruch` finds
+the member whose username is `ברוך`. This is the job the §4.3 parenthetical
+was meant to do, done where it belongs.
+
+Open: a member whose `username` is a Latin login handle (`bbaba77`) may want a
+Hebrew display name too — `nameHebrew` covers it with the same rule (own beats
+native). §14 item 6.
+
+### 18.7 Steps
+
+| step | what | needs |
+|---|---|---|
+| **S1** | 1.0b: four fields on the user schema, public; `types:update`; `updateUserBasic` accepts them with script validation | 1.0b deploy |
+| **S2** | `displayName.ts` + tests (order, script mapping, `off` pref, identity row ≠ translation); `/me` fields with placeholder | S1 |
+| **S3** | qids that select `username` also select the four fields; components move to `displayName` — lev cards, member lists, chat authors, profile header first | S2 |
+| **S4** | mail/notifications/MCP resolve per recipient; member search over all spellings | S3 |
+| **S5** | engine fallback: a `user.username` walker in `backfillSources.ts` (members of public rikmot first), surface key under `TRANSLATE_SURFACES` | S3 + §13 switches |
+
+S1–S4 cost nothing to run — no engine, no quota — and already fix the case
+that prompted this section (a member wanting their own name in English). S5 is
+the §7.4 surface proper.
+
+### 18.8 Done means
+
+- A member with `username: 'ברוך בבאיוף'` and `nameLatin: 'Baruch Babayof'`
+  sees `Baruch Babayof` on their own pages when their UI is `en` or `es`, and so
+  does every English or Spanish reader, on cards, lists, chat and mail.
+- With `nameLatin` empty and S5 off, the same readers see `ברוך בבאיוף` — never
+  an empty string, never a guess.
+- A Hebrew reader sees `ברוך בבאיוף` regardless.
+- Searching `Babayof` finds them.

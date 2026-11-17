@@ -11,6 +11,7 @@
   import { toast } from 'svelte-sonner';
   import { confettiStore } from '$lib/stores/confettiStore';
   import { onMount, untrack } from 'svelte';
+  import { lockPageScroll } from '$lib/utils/lockPageScroll';
   let myDate = '11:00';
   import MultiSelect from 'svelte-multiselect';
   import { lang } from '$lib/stores/lang.js';
@@ -1185,6 +1186,10 @@
    * new mission opens in it; the concierge spec/publish flows open inline.
    */
   let fullscreen = $state(untrack(() => !!projectId && !specMode && !publishMode));
+  // The overlay scrolls itself; the page behind must not (no second scrollbar).
+  $effect(() => {
+    if (fullscreen) return lockPageScroll();
+  });
 
   let inviteOpen = $state(false);
 

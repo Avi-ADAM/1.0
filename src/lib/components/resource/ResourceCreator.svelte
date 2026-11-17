@@ -5,6 +5,7 @@
   import { DEFAULT_CURRENCY } from '$lib/money/currencies.js';
   import { isRtl, t } from '$lib/translations';
   import { onMount, untrack } from 'svelte';
+  import { lockPageScroll } from '$lib/utils/lockPageScroll';
   import MultiSelect from 'svelte-multiselect';
   import { lang } from '$lib/stores/lang.js';
   import { page } from '$app/state';
@@ -594,6 +595,10 @@
   const inProject = $derived(!!projectId && !specMode && !publishMode);
   /** A rikma's new resource opens full screen, like a new mission; concierge flows open inline. */
   let fullscreen = $state(untrack(() => !!projectId && !specMode && !publishMode));
+  // The overlay scrolls itself; the page behind must not (no second scrollbar).
+  $effect(() => {
+    if (fullscreen) return lockPageScroll();
+  });
   let assignOpen = $state(false);
   let inviteOpen = $state(false);
   let detailsOpen = $state(false);
