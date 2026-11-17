@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import moment from 'moment';
     import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
+    import { t } from '$lib/translations';
     let SvelteGantt, SvelteGanttTable, MomentSvelteGanttDateAdapter;
     const moachStore = getMoachStore();
 
@@ -30,23 +31,22 @@
     let currentEnd ;
     let generation = 0;
     let rowCount = bmiData.length + pmiData.length + omiData.length
-     const timeRanges = [
+     const timeRanges = $derived([
         {
             id: 0,
             from: moment("02/01/2022"),
             to: moment("07/03/2022"),
             classes: null,
-            label: 'הקמה'
+            label: $t('moach.gantt.setup')
         },
         {
             id: 1,
             from: moment("07/07/2022"),
             to: moment("12/09/2022"),
             classes: null,
-            label: 'פעילות'
+            label: $t('moach.gantt.operation')
         }
-    ];
-        console.log (timeRanges)
+    ]);
     const colors = ['blue', 'green', 'orange', 'pink']
    let data
     let gantt;

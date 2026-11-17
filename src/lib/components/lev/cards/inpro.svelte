@@ -1,4 +1,4 @@
-﻿<script>
+<script>
   import { formatTime } from './../utils.js';
   import { lang } from '$lib/stores/lang.js';
   import { t, isRtl} from '$lib/translations';
@@ -208,7 +208,7 @@
   class="{isMobileOrTablet()
     ? 'w-full h-full'
     : ' w-[90%] h-[90%]'}  lg:w-[90%] {isVisible
-    ? $lang == 'he'
+    ? $isRtl
       ? 'boxleft'
       : 'boxright'
     : ''} flex d flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isVisible
@@ -466,12 +466,8 @@
           </svg>
           <span
             >{running
-              ? $lang === 'he'
-                ? 'הפסקה'
-                : 'Stop'
-              : $lang === 'he'
-                ? 'התחלה'
-                : 'Start'}</span
+              ? $t('lev.cards.inpro.pause')
+              : $t('lev.cards.inpro.start')}</span
           >
         </button>
       {/if}

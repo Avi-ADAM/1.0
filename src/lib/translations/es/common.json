@@ -73,7 +73,17 @@
     "system": "Sistema 1💗1",
     "loading": "Cargando…",
     "onlineStatus": "Estado de disponibilidad",
-    "meetingFallback": "Reunión"
+    "meetingFallback": "Reunión",
+    "now": "ahora",
+    "minsAgo": "hace {{count}} min",
+    "hoursAgo": "hace {{count}} h",
+    "yesterday": "Ayer",
+    "receivingFrom": "Recepción de {{amount}} de {{name}}",
+    "sendingTo": "Transferencia de {{amount}} a {{name}}",
+    "saleLabel": "Venta: {{name}}",
+    "saleReport": "Informe de venta",
+    "saleReportNamed": "Informe de venta: {{name}}",
+    "meetingCreated": "Reunión creada"
   },
   "footer": {
     "brain": "Cerebro de las rikmas",
@@ -248,5 +258,7 @@
   "someoneInitials": "Mi",
   "wishNotFound": "Deseo no encontrado",
   "wishNotPublic": "Este deseo no está abierto al público",
-  "untitled": "(sin nombre)"
+  "untitled": "(sin nombre)",
+  "error": "Error",
+  "proposals": "Propuestas"
 }

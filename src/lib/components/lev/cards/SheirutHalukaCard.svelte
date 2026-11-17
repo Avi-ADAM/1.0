@@ -87,7 +87,7 @@
     senderId,
     receiverId,
     participants: [senderId, receiverId],
-    title: { he: 'סיכום העברת כספים', en: 'Money Transfer Summary' },
+    title: $t('lev.cards.sheirutHaluka.chatTitle'),
     transferDetails: `${senderName} → ${receiverName}${amount != null ? ` (${amount})` : ''}`
   });
 

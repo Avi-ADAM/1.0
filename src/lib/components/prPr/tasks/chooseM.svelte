@@ -4,7 +4,7 @@
   import Arrow from '$lib/celim/icons/arrow.svelte';
   import Button from '$lib/celim/ui/button.svelte';
   import { lang } from '$lib/stores/lang.js';
-  import { t } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { executeAction } from '$lib/client/actionClient';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import { buildPublishAsMissionUrl } from '$lib/acts/publishAsMission.js';
@@ -121,7 +121,7 @@
     </select>
     {#if selected}
       <Button onClick={add} {loading} {success} {error}>
-        <Arrow back={$lang === 'en'} />
+        <Arrow back={!$isRtl} />
       </Button>
     {/if}
   </div>

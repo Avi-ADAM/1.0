@@ -1,4 +1,4 @@
-﻿<script>
+<script>
   import { isRtl, t } from '$lib/translations';
     import { page } from '$app/state';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
@@ -165,7 +165,7 @@ function closeMobileModal() {
         maxSelect={1}
           />
           {#if selected[0]}
-        <Button onClick={add} ><Arrow back={$lang == "en" ? true : false}/></Button>
+        <Button onClick={add} ><Arrow back={!$isRtl}/></Button>
         {/if}</div>
         {/if}
 {#if before == false}

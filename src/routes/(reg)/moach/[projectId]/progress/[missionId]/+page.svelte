@@ -151,11 +151,7 @@
 
 <svelte:head>
   <title
-    >{attrs?.name ? `${attrs.name} · ` : ''}{$lang === 'he'
-      ? 'בתהליך'
-      : $lang === 'ar'
-        ? 'قيد التنفيذ'
-        : 'Progress'} · 1lev1</title
+    >{attrs?.name ? `${attrs.name} · ` : ''}{$t('moach.layout.progress')} · 1lev1</title
   >
 </svelte:head>
 

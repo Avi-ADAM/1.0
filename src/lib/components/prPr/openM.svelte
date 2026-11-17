@@ -1,6 +1,7 @@
 <script>
   let isonly = $state(false);
-   import { onMount } from 'svelte';
+  import { onMount } from 'svelte';
+  import { isRtl, t } from '$lib/translations';
   /**
    * @typedef {Object} Props
    * @property {any} [omiData]
@@ -30,48 +31,35 @@ function edit (id) {
 <div class="dd md:items-center border-2 border-gold rounded d">
   <div class="body items-center d" class:full={who == 0}>
   
-  <table dir="rtl" >
-    <caption class="sm:text-right md:text-center text-right ">  
+  <table dir={$isRtl ? 'rtl' : 'ltr'} >
+    <caption class="sm:text-start md:text-center text-start ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
-      >{isonly == true ? " פעולה פתוחה" : "פעולות פתוחות"}</h1>
+      >{isonly == true ? $t('moach.tables.openAction') : $t('moach.tables.openActions')}</h1>
     </caption>
     <thead>
            {#if isonly == false}
 
         <tr class="gg">
-          <th class="gg">משימה</th>
+          <th class="gg">{$t('moach.tables.mission')}</th>
           {#each omiData as data, i}
           <td class="gg" style="font-size: 3rem">
             {i + 1}
-           <!-- <button
-             title='הסרה'
-             onclick={remove(data.id)}><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-              <path fill="currentColor" d="M4,2H11A2,2 0 0,1 13,4V20A2,2 0 0,1 11,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2M4,10V14H11V10H4M4,16V20H11V16H4M4,4V8H11V4H4M17.59,12L15,9.41L16.41,8L19,10.59L21.59,8L23,9.41L20.41,12L23,14.59L21.59,16L19,13.41L16.41,16L15,14.59L17.59,12Z" />
-          </svg></button> 
-          <button
-          class="bg-pink-200 hover:bg-barbi text-mturk rounded-full"
-          title="עריכה"
-          onclick={edit(data.id)} 
-          ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-           <path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
-          </svg>
-          </button> -->
         </td>
           {/each}
     </tr>
   {/if}
     <tr class="ggr" style:top={isonly == true ? "1px": "77px"}>
-      <th class="ggr">שם</th>
+      <th class="ggr">{$t('moach.tables.name')}</th>
       {#each omiData as data, i}
             <td class="ggr">{data.attributes.name}</td>
             {/each}
           </tr> <tr>
-            <th>תיאור</th>
+            <th>{$t('moach.tables.description')}</th>
             {#each omiData as data, i}
             <td>{data.attributes.descrip}</td>
               {/each}
             </tr> <tr>
-              <th>כישורים נדרשים</th>
+              <th>{$t('moach.tables.requiredSkills')}</th>
               {#each omiData as data, i}
             <td>
               {#each data.attributes.skills.data as da, i}
@@ -80,7 +68,7 @@ function edit (id) {
               </td>
             {/each}
           </tr>  <tr>
-              <th>הגדרת תפקיד</th>
+              <th>{$t('moach.tables.roleDefinition')}</th>
               {#each omiData as data, i}
             <td>
               {#each data.attributes.tafkidims.data as ta, i}
@@ -90,7 +78,7 @@ function edit (id) {
             {/each}
           </tr>
           <tr>
-              <th>סוג משימה</th>
+              <th>{$t('moach.tables.missionType')}</th>
               {#each omiData as data, i}
             <td>
               {#each data.attributes.work_ways.data as dm, i}
@@ -100,7 +88,7 @@ function edit (id) {
             {/each}
           </tr>
          <tr>
-              <th>תאריך ביצוע</th>
+              <th>{$t('moach.tables.executionDate')}</th>
               {#each omiData as data, i}
             <td>              {#if data.attributes.Sqadualed}
               {data.attributes.Sqadualed}
@@ -108,7 +96,7 @@ function edit (id) {
             </td>
             {/each}
           </tr> <tr>
-            <th>קישורים ציבוריים</th>
+            <th>{$t('moach.tables.publicLinks')}</th>
             {#each omiData as data, i}
             <td>
               {#if data.attributes.publicklinks}
@@ -117,7 +105,7 @@ function edit (id) {
              </td>
              {/each}
         </tr><tr>
-          <th>הערות יחודיות לרקמה שלי</th>
+          <th>{$t('moach.tables.rikmaNotes')}</th>
           {#each omiData as data, i}
           <td>
             {#if data.attributes.hearotMeyuchadot != "undefined"}
@@ -126,7 +114,7 @@ function edit (id) {
            </td>
            {/each}
       </tr><tr>
-        <th>קישורים יחודיים לרקמה שלי</th>
+        <th>{$t('moach.tables.rikmaLinks')}</th>
         {#each omiData as data, i}
         <td>          {#if data.attributes.privatlinks != "undefined"} 
 
@@ -135,7 +123,7 @@ function edit (id) {
          </td>
          {/each}
     </tr><tr style="display:''" id="hoursD">
-          <th >כמה שעות זה אמור לקחת? </th>
+          <th >{$t('moach.tables.estimatedHours')}</th>
           {#each omiData as data, i}
           <td>
             {#if data.attributes.noofhours > 0}
@@ -145,7 +133,7 @@ function edit (id) {
           </td>
           {/each}
         </tr><tr style="display:''" id="vallueperhourN" >
-          <th>כמה שווה שעה ?</th>
+          <th>{$t('moach.tables.hourlyRate')}</th>
           {#each omiData as data, i}
           <td>
             {#if data.attributes.perhour > 0}
@@ -155,7 +143,7 @@ function edit (id) {
           </td>
           {/each}
         </tr><tr >
-      <th>שווי סך הכל למשימה </th>
+      <th>{$t('moach.tables.totalMissionValue')}</th>
       {#each omiData as data, i}
       <td>
       {#if data.attributes.perhour > 0 & data.attributes.noofhours > 0}

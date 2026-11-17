@@ -1,4 +1,4 @@
-﻿<script>
+<script>
   import CurrencySymbol from '$lib/components/money/CurrencySymbol.svelte';
   import Money from '$lib/components/money/Money.svelte';
   import Chaticon from '../../../celim/chaticon.svelte';
@@ -132,7 +132,7 @@
         type: 'name',
         old: previousOffer.name,
         new: name,
-        label: 'שם'
+        label: $t('common.name')
       });
     }
     if (descrip && previousOffer.descrip && previousOffer.descrip !== descrip) {
@@ -140,7 +140,7 @@
         type: 'descrip',
         old: previousOffer.descrip,
         new: descrip,
-        label: 'תיאור'
+        label: $t('common.description')
       });
     }
     if (price && previousOffer.price && previousOffer.price !== price) {
@@ -148,7 +148,7 @@
         type: 'price',
         old: previousOffer.price,
         new: price,
-        label: 'מחיר'
+        label: $t('lev.cards.pma.price')
       });
     }
     if (easy && previousOffer.easy && previousOffer.easy !== easy) {
@@ -156,7 +156,7 @@
         type: 'easy',
         old: previousOffer.easy,
         new: easy,
-        label: 'שווי מוצע'
+        label: $t('lev.cards.pma.offeredValue')
       });
     }
     if (hm && previousOffer.hm && previousOffer.hm !== hm) {
@@ -164,7 +164,7 @@
         type: 'hm',
         old: previousOffer.hm,
         new: hm,
-        label: 'כמות'
+        label: $t('mash.noof')
       });
     }
     const prevLoc = Array.isArray(previousOffer.location)
@@ -177,7 +177,7 @@
         type: 'location',
         old: prevLocSummary,
         new: currLocSummary,
-        label: 'מיקום'
+        label: $t('common.labels.location')
       });
     }
     // Recurring expense toggled (one-time ↔ recurring). recurring is a boolean,
@@ -187,11 +187,13 @@
       previousOffer.recurring != null &&
       Boolean(previousOffer.recurring) !== Boolean(recurring)
     ) {
+      const recurLabel = $t('lev.cards.resourcePeriod.recurring');
+      const oneTimeLabel = $t('lev.cards.hachlata.oneTime');
       changes.push({
         type: 'recurring',
-        old: previousOffer.recurring ? 'משאב חוזר' : 'חד פעמי',
-        new: recurring ? 'משאב חוזר' : 'חד פעמי',
-        label: 'סוג חיוב'
+        old: previousOffer.recurring ? recurLabel : oneTimeLabel,
+        new: recurring ? recurLabel : oneTimeLabel,
+        label: $t('lev.cards.pma.billingType')
       });
     }
     // Billing frequency (every N months/years) changed — only meaningful while
@@ -205,34 +207,38 @@
         type: 'cycleSize',
         old: cycleLabel(previousOffer.cycleSize),
         new: cycleLabel(cycleSize),
-        label: 'תדירות'
+        label: $t('lev.cards.pma.frequency')
       });
     }
     return changes;
   }
 
-  // Human label for a billing frequency: "כל חודש" / "כל 3 חודשים" (or years
-  // when the resource is yearly).
+  // Human label for a billing frequency ("Every month" / "Every 3 months", or years).
   function cycleLabel(n) {
     const num = Number(n) || 1;
-    const single = kindOf === 'yearly' ? 'שנה' : 'חודש';
-    const plural = kindOf === 'yearly' ? 'שנים' : 'חודשים';
-    return num === 1 ? `כל ${single}` : `כל ${num} ${plural}`;
+    if (kindOf === 'yearly') {
+      return num === 1
+        ? $t('lev.cards.pma.everyYear')
+        : $t('lev.cards.pma.everyYears', { count: num });
+    }
+    return num === 1
+      ? $t('lev.cards.pma.everyMonth')
+      : $t('lev.cards.pma.everyMonths', { count: num });
   }
 
   function locationSummary(loc) {
     if (!loc) return '—';
-    if (loc.location_mode === 'online') return 'אונליין';
+    if (loc.location_mode === 'online') return $t('nego.conf.online');
     const hasPoint = Number.isFinite(loc.lat) && Number.isFinite(loc.lng);
     if (hasPoint) {
       const hint = loc.location_hint?.trim();
       const r = loc.radius || 15;
-      return `${hint ? hint + ' · ' : ''}${r} ק״מ`;
+      return `${hint ? hint + ' · ' : ''}${r} ${$t('nego.conf.km')}`;
     }
     return loc.location_hint?.trim() || '—';
   }
 
-  const changes = getChanges();
+  let changes = $derived(getChanges());
 
   function isValidDate(d) {
     if (d == null || d === 'undefined' || d === 'null' || d === '') return false;
@@ -240,7 +246,7 @@
   }
 
   function formatResourceDate(d) {
-    const locale = $lang === 'he' ? 'he-IL' : $lang;
+    const locale = $lang || 'he';
     return new Date(d).toLocaleDateString(locale);
   }
 
@@ -310,7 +316,7 @@
   class="{isMobileOrTablet()
     ? 'w-full h-full'
     : ' w-[90%] h-[90%]'} lg:w-[90%] {isVisible
-    ? $lang == 'he'
+    ? $isRtl
       ? 'boxleft'
       : 'boxright'
     : ''} flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isVisible
@@ -331,10 +337,10 @@
     logoSrc={src}
     {projectName}
     cardType={hasUpdatedOffer
-      ? 'הצעה מתוקנת'
+      ? $t('lev.cards.pma.updatedOffer')
       : recurring
-        ? '🔁 משאב חוזר · אישרור חודשי'
-        : 'אישור משאב'}
+        ? $t('lev.cards.pma.recurringHead')
+        : $t('lev.cards.pma.approveHead')}
     cardTitle={name}
     memberCount={noofusersOk + noofusersWaiting + noofusersNo}
     {glowColor}
@@ -366,7 +372,7 @@
         class="flex items-center justify-between px-4 py-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700/50 rounded-xl"
       >
         <span class="text-sm font-medium text-yellow-800 dark:text-yellow-400"
-          >אישור אוטומטי בעוד:</span
+          >{$t('lev.cards.pma.autoApproveIn')}</span
         >
         <span
           class="text-lg font-bold text-red-600 dark:text-red-400 bg-white dark:bg-gray-800 px-3 py-1 rounded-lg shadow-sm"
@@ -391,7 +397,7 @@
 
         {#if recurring}
           <span
-            onmouseenter={() => hover('עלות חודשית משוערת')}
+            onmouseenter={() => hover($t('lev.cards.pma.estMonthlyCost'))}
             onmouseleave={() => hover('0')}
             class="text-barbi dark:text-pink-400 font-bold"
           >
@@ -401,36 +407,40 @@
                 ? easy
                 : price
             ).toLocaleString()}
-            <CurrencySymbol /> {kindOf === 'yearly' ? 'לשנה' : 'לחודש'}
+            <CurrencySymbol /> {kindOf === 'yearly'
+              ? $t('lev.cards.common.perYear')
+              : $t('lev.cards.common.perMonth')}
           </span>
           <span class="text-gray-400">·</span>
           <span
             onmouseenter={() =>
-              hover('בכל חודש ייפתח חיוב לאישור ההוצאה בפועל')}
+              hover($t('lev.cards.pma.monthlyChargeHint'))}
             onmouseleave={() => hover('0')}
             class="font-black text-gray-900 dark:text-white"
           >
-            {recurringNoEnd ? '♾️ ללא תאריך סיום' : 'משאב חוזר'}
+            {recurringNoEnd
+              ? `♾️ ${$t('lev.cards.resourcePeriod.noEndDate')}`
+              : $t('lev.cards.resourcePeriod.recurring')}
           </span>
         {:else if kindOf === 'perUnit'}
           <span
-            onmouseenter={() => hover('שווי ליחידה')}
+            onmouseenter={() => hover($t('lev.cards.common.perUnitValue'))}
             onmouseleave={() => hover('0')}
             class="text-barbi dark:text-pink-400 font-bold"
           >
-            {easy > 0 ? easy.toLocaleString() : price.toLocaleString()} ליחידה
+            {easy > 0 ? easy.toLocaleString() : price.toLocaleString()} {$t('lev.cards.dowegeot.perUnit')}
           </span>
           <span class="text-gray-400">×</span>
           <span
-            onmouseenter={() => hover('כמות')}
+            onmouseenter={() => hover($t('mash.noof'))}
             onmouseleave={() => hover('0')}
             class="text-barbi dark:text-pink-400 font-bold"
           >
-            {hm == 1 ? 'יחידה אחת' : `${hm.toLocaleString()} יחידות`}
+            {hm == 1 ? $t('lev.cards.dowegeot.oneUnit') : `${hm.toLocaleString()} ${$t('lev.cards.dowegeot.units')}`}
           </span>
           <span class="text-gray-400">=</span>
           <span
-            onmouseenter={() => hover('סך הכל')}
+            onmouseenter={() => hover($t('lev.cards.voteCard.inTotal'))}
             onmouseleave={() => hover('0')}
             class="font-black text-gray-900 dark:text-white"
           >
@@ -440,7 +450,7 @@
           </span>
         {:else if kindOf === 'total' || kindOf === 'rent'}
           <span
-            onmouseenter={() => hover('שווי מוצע')}
+            onmouseenter={() => hover($t('lev.cards.pma.offeredValue'))}
             onmouseleave={() => hover('0')}
             class="text-barbi dark:text-pink-400 font-bold text-lg"
           >
@@ -448,23 +458,23 @@
           </span>
         {:else if kindOf === 'monthly'}
           <span
-            onmouseenter={() => hover('שווי לחודש')}
+            onmouseenter={() => hover($t('lev.cards.common.monthlyValue'))}
             onmouseleave={() => hover('0')}
             class="text-barbi dark:text-pink-400 font-bold"
           >
-            {easy > 0 ? easy.toLocaleString() : price.toLocaleString()} לחודש
+            {easy > 0 ? easy.toLocaleString() : price.toLocaleString()} {$t('lev.cards.common.perMonth')}
           </span>
           <span class="text-gray-400">×</span>
           <span
-            onmouseenter={() => hover('כמות חודשים')}
+            onmouseenter={() => hover($t('lev.cards.common.numMonths'))}
             onmouseleave={() => hover('0')}
             class="text-barbi dark:text-pink-400 font-bold"
           >
-            {monts == 1 ? 'חודש אחד' : `${monts.toLocaleString()} חודשים`}
+            {monts == 1 ? $t('lev.cards.voteCard.oneMonth') : `${monts.toLocaleString()} ${$t('lev.cards.common.months')}`}
           </span>
           <span class="text-gray-400">=</span>
           <span
-            onmouseenter={() => hover('סך הכל')}
+            onmouseenter={() => hover($t('lev.cards.voteCard.inTotal'))}
             onmouseleave={() => hover('0')}
             class="font-black text-gray-900 dark:text-white"
           >
@@ -474,23 +484,23 @@
           </span>
         {:else if kindOf === 'yearly'}
           <span
-            onmouseenter={() => hover('שווי לשנה')}
+            onmouseenter={() => hover($t('lev.cards.common.yearlyValue'))}
             onmouseleave={() => hover('0')}
             class="text-barbi dark:text-pink-400 font-bold"
           >
-            {easy > 0 ? easy.toLocaleString() : price.toLocaleString()} לשנה
+            {easy > 0 ? easy.toLocaleString() : price.toLocaleString()} {$t('lev.cards.common.perYear')}
           </span>
           <span class="text-gray-400">×</span>
           <span
-            onmouseenter={() => hover('מספר שנים')}
+            onmouseenter={() => hover($t('lev.cards.common.numYears'))}
             onmouseleave={() => hover('0')}
             class="text-barbi dark:text-pink-400 font-bold"
           >
-            {yers === 1 ? 'שנה אחת' : `${yers.toLocaleString()} שנים`}
+            {yers === 1 ? $t('lev.cards.voteCard.oneYear') : `${yers.toLocaleString()} ${$t('lev.cards.voteCard.years')}`}
           </span>
           <span class="text-gray-400">=</span>
           <span
-            onmouseenter={() => hover('סך הכל')}
+            onmouseenter={() => hover($t('lev.cards.voteCard.inTotal'))}
             onmouseleave={() => hover('0')}
             class="font-black text-gray-900 dark:text-white"
           >
@@ -611,7 +621,7 @@
 
         {#if hearotMeyuchadot && hearotMeyuchadot !== 'undefined'}
           <div
-            onmouseenter={() => hover('הערות')}
+            onmouseenter={() => hover($t('common.notes'))}
             onmouseleave={() => hover('0')}
             class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm text-gray-700 dark:text-gray-300 italic border-l-4 border-gray-300 dark:border-gray-500 max-h-24 overflow-y-auto"
           >
@@ -628,7 +638,7 @@
     <!-- תיבת שינויים - הצעות מתוקנות -->
     {#if hasUpdatedOffer}
       <div
-        class="p-4 bg-blue-50 dark:bg-blue-900/20 border-r-4 border-blue-400 dark:border-blue-500 rounded-xl"
+        class="p-4 bg-blue-50 dark:bg-blue-900/20 border-s-4 border-blue-400 dark:border-blue-500 rounded-xl"
       >
         <h3
           class="text-base font-bold text-blue-800 dark:text-blue-300 mb-3 flex items-center gap-2"
@@ -645,14 +655,14 @@
               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             ></path></svg
           >
-          הצעה מתוקנת פעילה
+          {$t('lev.cards.pma.activeUpdatedOffer')}
         </h3>
         {#if changes.length > 0}
           <div class="text-sm text-blue-800 dark:text-blue-200">
             <strong class="block mb-2 text-blue-900 dark:text-blue-100"
-              >השיפורים שבוצעו:</strong
+              >{$t('lev.cards.pma.changesMade')}</strong
             >
-            <ul class="space-y-2 mr-1">
+            <ul class="space-y-2 ms-1">
               {#each changes as change}
                 {@const oldText =
                   change.type === 'descrip'
@@ -673,7 +683,7 @@
                     {oldText}
                   </span>
                   <span class="text-blue-500 dark:text-blue-400 font-bold"
-                    >{$lang == 'he' ? '←' : '→'}</span
+                    >{$isRtl ? '←' : '→'}</span
                   >
                   <span
                     class="text-green-600 dark:text-green-400 font-bold max-w-[120px] truncate"
@@ -687,7 +697,7 @@
           </div>
         {:else}
           <div class="text-sm text-blue-700 dark:text-blue-300">
-            הוגשה הצעה מתוקנת למשאב, אנא עברו עליה.
+            {$t('lev.cards.pma.pleaseReview')}
           </div>
         {/if}
       </div>
@@ -709,26 +719,26 @@
     <!-- תצוגת רזרבה במקרה ואין members -->
     <div class="flex items-center gap-4 text-sm font-medium pt-2 pb-2">
       <span
-        onmouseenter={() => hover('סך ההצבעות בעד')}
+        onmouseenter={() => hover($t('vots.totalin'))}
         onmouseleave={() => hover('0')}
         class="text-green-500 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-3 py-1 rounded-full"
       >
-        {noofusersOk} בעד
+        {noofusersOk} {$t('lev.cards.voteCard.inFavor')}
       </span>
       <span
-        onmouseenter={() => hover('לא הצביעו')}
+        onmouseenter={() => hover($t('lev.cards.voteCard.notVotedYet'))}
         onmouseleave={() => hover('0')}
         class="text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full"
       >
-        {noofusersWaiting} טרם
+        {noofusersWaiting} {$t('lev.cards.voteCard.notYet')}
       </span>
       {#if noofusersNo > 0}
         <span
-          onmouseenter={() => hover('כמות ההצבעות על גרסאות קודמות')}
+          onmouseenter={() => hover($t('vots.votedOn'))}
           onmouseleave={() => hover('0')}
           class="text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 px-3 py-1 rounded-full"
         >
-          {noofusersNo} גרסה קודמת
+          {noofusersNo} {$t('lev.cards.voteStatus.oldVersion')}
         </span>
       {/if}
     </div>

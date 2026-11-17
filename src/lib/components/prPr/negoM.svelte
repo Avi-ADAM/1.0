@@ -1,4 +1,4 @@
-﻿<script>
+<script>
   import { role, ww, skil } from '$lib/components/prPr/mi.js';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { onMount } from 'svelte';
@@ -318,12 +318,12 @@
       title: name1,
       projectName,
       fields: [
-        { key: 'name', label: 'שם', kind: 'text', original: name1 ?? null, proposed: name2 ?? null },
-        { key: 'descrip', label: 'תיאור', kind: 'text', original: descrip ?? null, proposed: descrip2 ?? null },
-        { key: 'noofhours', label: 'כמות שעות', kind: 'number', original: noofhours || 0, proposed: noofhours2 || 0 },
-        { key: 'perhour', label: 'שווי לשעה', kind: 'number', original: perhour || 0, proposed: perhour2 || 0 },
-        { key: 'startDate', label: 'תאריך התחלה', kind: 'date', original: toIsoDateString(mdate) ?? null, proposed: toIsoDateString(mdate2) ?? null },
-        { key: 'finishDate', label: 'תאריך סיום', kind: 'date', original: toIsoDateString(mdates) ?? null, proposed: toIsoDateString(mdates2) ?? null },
+        { key: 'name', label: $t('moach.tables.name'), kind: 'text', original: name1 ?? null, proposed: name2 ?? null },
+        { key: 'descrip', label: $t('moach.tables.description'), kind: 'text', original: descrip ?? null, proposed: descrip2 ?? null },
+        { key: 'noofhours', label: $t('common.noofhours'), kind: 'number', original: noofhours || 0, proposed: noofhours2 || 0 },
+        { key: 'perhour', label: $t('common.valph'), kind: 'number', original: perhour || 0, proposed: perhour2 || 0 },
+        { key: 'startDate', label: $t('moach.tables.startDate'), kind: 'date', original: toIsoDateString(mdate) ?? null, proposed: toIsoDateString(mdate2) ?? null },
+        { key: 'finishDate', label: $t('moach.tables.endDate'), kind: 'date', original: toIsoDateString(mdates) ?? null, proposed: toIsoDateString(mdates2) ?? null },
         ...headcountBridgeField()
       ]
     });
@@ -332,7 +332,7 @@
   /** @returns {import('$lib/func/negoBridge.js').BridgeField[]} */
   function headcountBridgeField() {
     return pendmFlow
-      ? [{ key: 'howMeny', label: 'כמה אנשים', kind: 'number', original: seats, proposed: seatsNow }]
+      ? [{ key: 'howMeny', label: $t('mission.form.headcountLabel'), kind: 'number', original: seats, proposed: seatsNow }]
       : [];
   }
 

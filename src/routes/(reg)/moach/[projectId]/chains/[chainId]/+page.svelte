@@ -1,4 +1,4 @@
-﻿<script>
+<script>
   import { isRtl, t } from '$lib/translations';
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
@@ -76,7 +76,7 @@
       next.set(id, entity);
       loadedItems = next;
     } catch {
-      toast.error($lang === 'he' ? 'שגיאה בטעינת המשימה שהסתיימה' : 'Failed to load completed mission');
+      toast.error($t('moach.chains.loadMissionError'));
     } finally {
       const next = new Set(loadingIds);
       next.delete(id);
@@ -128,7 +128,7 @@
 
     } catch (e) {
       loadError = e?.message ?? 'fetch_error';
-      toast.error($lang === 'he' ? 'שגיאה בטעינת הנתונים' : 'Failed to load project data');
+      toast.error($t('moach.process.error'));
     } finally {
       loading = false;
     }
@@ -158,7 +158,7 @@
   <div class="pp-nav">
     <button type="button" class="pp-back" onclick={() => goto(`/moach/${projectId}/chains`)}>
       <svg viewBox="0 0 24 24" aria-hidden="true">
-        {#if $lang === 'he'}
+        {#if $isRtl}
           <polyline points="9 18 15 12 9 6" />
         {:else}
           <polyline points="15 18 9 12 15 6" />

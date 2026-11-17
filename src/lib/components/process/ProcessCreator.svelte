@@ -1,4 +1,4 @@
-﻿<script>
+<script>
   import { createProcess } from '$lib/client/actionClient';
   import { lang } from '$lib/stores/lang.js';
   import { t, isRtl} from '$lib/translations';
@@ -21,7 +21,7 @@
 
   async function submit() {
     if (!name.trim()) {
-      error = $lang === 'he' ? 'צריך שם לתהליך.' : 'Process name is required.';
+      error = $t('moach.process.nameRequired');
       return;
     }
 

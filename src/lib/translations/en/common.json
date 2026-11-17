@@ -72,7 +72,17 @@
     "system": "1💗1 system",
     "loading": "Loading…",
     "onlineStatus": "Availability status",
-    "meetingFallback": "Meeting"
+    "meetingFallback": "Meeting",
+    "now": "now",
+    "minsAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "yesterday": "Yesterday",
+    "receivingFrom": "Receiving {{amount}} from {{name}}",
+    "sendingTo": "Sending {{amount}} to {{name}}",
+    "saleLabel": "Sale: {{name}}",
+    "saleReport": "Sale report",
+    "saleReportNamed": "Sale report: {{name}}",
+    "meetingCreated": "Meeting created"
   },
   "footer": {
     "brain": "Rikma brain",
@@ -247,5 +257,7 @@
   "someoneInitials": "Me",
   "wishNotFound": "Wish not found",
   "wishNotPublic": "This wish isn't open to the public",
-  "untitled": "(untitled)"
+  "untitled": "(untitled)",
+  "error": "Error",
+  "proposals": "Proposals"
 }

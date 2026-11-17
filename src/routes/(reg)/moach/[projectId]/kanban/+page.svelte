@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/translations';
   import Kanbanboard from '$lib/components/prPr/Kanbanboard.svelte';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   const moachStore = getMoachStore();
@@ -48,7 +49,7 @@
 </script>
 
 <svelte:head>
-  <title>{page.data.projectBase?.projectName ? `${page.data.projectBase.projectName} · ` : ''}{$lang === 'he' ? 'קאנבן' : $lang === 'ar' ? 'كانبان' : 'Kanban'} · 1lev1</title>
+  <title>{page.data.projectBase?.projectName ? `${page.data.projectBase.projectName} · ` : ''}{$t('moach.layout.kanban')} · 1lev1</title>
 </svelte:head>
 
 <div class="kanban-page p-2">

@@ -330,7 +330,7 @@
       }
     } else {
       console.log('decline', why);
-      alert('מינימום 20 תווים');
+      alert($t('lev.diun.minChars', { count: 20 }));
       already = false;
     }
   }

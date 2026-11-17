@@ -32,6 +32,7 @@ import { timers } from './timers';
 // applyLocalization reads the reader's language, so the stores that localize
 // vocabulary names (pends, asked, suggestions) recompute when it changes.
 import { lang } from './lang.js';
+import { t } from '$lib/translations';
 // Shift cards come from their own server read, gated on SHIFTS (PLAN_SHIFTS §9.4).
 import { processedShiftWork } from '$lib/utils/levShifts';
 // Order automation cards — their own server read (PLAN_SHOP_OPERATIONS §2.2).
@@ -82,8 +83,8 @@ import {
  * ```
  */
 export const processedPends: Readable<DisplayItem[]> = derived(
-  [pendsStore, projectsStore, lang],
-  ([$pends, $projects]) => processPends($pends, $projects)
+  [pendsStore, projectsStore, lang, t],
+  ([$pends, $projects, , $t]) => processPends($pends, $projects, $t)
 );
 
 /**
@@ -107,7 +108,7 @@ export const processedMtaha: Readable<DisplayItem[]> = (() => {
       // Build a "signature" of the timer data relevant to mtaha
       // Only zman (elapsed time) and running state matter for display
       const timerSig = $timers
-        .map(t => `${t.mId}:${t.running ? 1 : 0}:${Math.floor((t.zman || 0) / 60000)}`)
+        .map(timer => `${timer.mId}:${timer.running ? 1 : 0}:${Math.floor((timer.zman || 0) / 60000)}`)
         .join('|');
       
       // If mtaha data and timer signatures haven't changed, DO NOT call set!
@@ -142,8 +143,8 @@ export const processedFiapp: Readable<DisplayItem[]> = derived(
  * Returns an array of DisplayItem objects ready for rendering.
  */
 export const processedAsked: Readable<DisplayItem[]> = derived(
-  [askedStore, projectsStore, lang],
-  ([$asked, $projects]) => processAsked($asked, $projects)
+  [askedStore, projectsStore, lang, t],
+  ([$asked, $projects, , $t]) => processAsked($asked, $projects, $t)
 );
 
 /**
@@ -163,8 +164,9 @@ export const processedAskedResources: Readable<DisplayItem[]> = derived(
  * Automatically recomputes when resourceSuggestionsStore or projectsStore changes.
  */
 export const processedResourceSuggestions: Readable<DisplayItem[]> = derived(
-  [resourceSuggestionsStore, projectsStore],
-  ([$resourceSuggestions, $projects]) => processResourceSuggestions($resourceSuggestions, $projects)
+  [resourceSuggestionsStore, projectsStore, t],
+  ([$resourceSuggestions, $projects, $t]) =>
+    processResourceSuggestions($resourceSuggestions, $projects, $t)
 );
 
 /**
@@ -174,8 +176,8 @@ export const processedResourceSuggestions: Readable<DisplayItem[]> = derived(
  * Returns an array of DisplayItem objects ready for rendering.
  */
 export const processedSuggestions: Readable<DisplayItem[]> = derived(
-  [suggestionsStore, projectsStore, lang],
-  ([$suggestions, $projects]) => processSuggestions($suggestions, $projects)
+  [suggestionsStore, projectsStore, lang, t],
+  ([$suggestions, $projects, , $t]) => processSuggestions($suggestions, $projects, $t)
 );
 
 /**
@@ -185,8 +187,8 @@ export const processedSuggestions: Readable<DisplayItem[]> = derived(
  * Returns an array of DisplayItem objects ready for rendering.
  */
 export const processedPmashes: Readable<DisplayItem[]> = derived(
-  [pmashesStore, projectsStore],
-  ([$pmashes, $projects]) => processPmashes($pmashes, $projects)
+  [pmashesStore, projectsStore, t],
+  ([$pmashes, $projects, $t]) => processPmashes($pmashes, $projects, $t)
 );
 
 /**
@@ -240,8 +242,8 @@ export const processedTransfers: Readable<DisplayItem[]> = derived(
  * Returns an array of DisplayItem objects ready for rendering.
  */
 export const processedDecisions: Readable<DisplayItem[]> = derived(
-  [decisionsStore, projectsStore],
-  ([$decisions, $projects]) => processDecisions($decisions, $projects)
+  [decisionsStore, projectsStore, t],
+  ([$decisions, $projects, $t]) => processDecisions($decisions, $projects, $t)
 );
 
 /**
@@ -250,8 +252,8 @@ export const processedDecisions: Readable<DisplayItem[]> = derived(
  * Automatically recomputes when sheirutpStore or projectsStore changes.
  */
 export const processedSheirutp: Readable<DisplayItem[]> = derived(
-  [sheirutpStore, projectsStore],
-  ([$sheirutp, $projects]) => processProductRequests($sheirutp, $projects)
+  [sheirutpStore, projectsStore, t],
+  ([$sheirutp, $projects, $t]) => processProductRequests($sheirutp, $projects, $t)
 );
 
 /**

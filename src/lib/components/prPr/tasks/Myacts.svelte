@@ -1,4 +1,4 @@
-﻿<script>
+<script>
   import { toast } from 'svelte-sonner';
   import { updateTask } from '$lib/client/actionClient';
   import { t, isRtl} from '$lib/translations';
@@ -133,7 +133,7 @@
         toast.success('✓ ' + $t('tasks.markDone'));
         confirmingDone = null;
       } else {
-        toast.warning(res.error?.message || 'שגיאה');
+        toast.warning(res.error?.message || $t('common.error'));
       }
     } catch (e) {
       toast.warning(e.message);
@@ -149,7 +149,7 @@
         delete ep[id];
         editingProgress = ep;
       } else {
-        toast.warning('שגיאה');
+        toast.warning($t('common.error'));
       }
     } catch (e) {
       toast.warning(e.message);
@@ -190,14 +190,11 @@
 
   function formatDate(d) {
     if (!d) return '—';
-    return new Date(d).toLocaleDateString(
-      $lang === 'en' ? 'en-GB' : $lang === 'ar' ? 'ar-SA' : 'he-IL',
-      {
-        day: '2-digit',
-        month: 'short',
-        year: '2-digit'
-      }
-    );
+    return new Date(d).toLocaleDateString($lang || 'he', {
+      day: '2-digit',
+      month: 'short',
+      year: '2-digit'
+    });
   }
 
   function isOverdue(act) {
@@ -339,7 +336,7 @@
               ? 'bg-white/10 border-white/20 text-white'
               : 'bg-white/5 border-white/5 text-slate-500 hover:border-white/10'}"
           >
-            {$t('tasks.allProjects') || 'כל הפרויקטים'}
+            {$t('tasks.allProjects')}
           </button>
           {#each projects() as p}
             <button

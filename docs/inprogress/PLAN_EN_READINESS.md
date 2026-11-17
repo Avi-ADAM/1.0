@@ -1,6 +1,6 @@
 # מוכנות ללקוחות באנגלית: רשימת תיקונים
 
-> **סטטוס: inprogress, שלב 1 הושלם.** נכתב 2026-11-17, אחרי מיזוג `main` (`b23abef`). המסמך מסכם
+> **סטטוס: inprogress, שלבים 1–2 הושלמו.** נכתב 2026-11-17, אחרי מיזוג `main` (`b23abef`). המסמך מסכם
 > סריקה של טקסט עברי שנכתב ישירות בקוד, כלומר לא דרך `$t()`. לקוח שהממשק שלו
 > באנגלית רואה את הטקסט הזה בעברית. הבדיקות האוטומטיות לא תופסות את זה, כי
 > `check:i18n` בודק רק מפתחות קיימים.
@@ -71,24 +71,32 @@
 `rejected` מוצג למציע כ"לא נבחרה", לפי עיקרון "אין לא מוחלט".
 
 **נמצא בדרך, עדיין פתוח:**
-- **"Brains" בתפריט:** ב־`/concierge`, הכפתור שמוביל ל־`/moach` מוצג באנגלית
-  כ־"Brains" (`concierge.moach`), ואילו `concierge.new.nav.moach` הוא "Rikmas". צריך לאחד.
+- ~~**"Brains" בתפריט:**~~ ✅ אוחד בשלב 2: `concierge.moach` עודכן ב־5 שפות (`Rikmas` / `الريكمات` / `Рикмы` / `Rikmas`).
 - **ריבוי באנגלית:** מופיע למשל "1 Missions", כי המפתחות הקיימים לא מבחינים בין יחיד לרבים.
 
-### שלב 2: הלב והמוח, איפה שחברי רקמה עובדים כל יום (P1)
+### שלב 2: הלב והמוח, איפה שחברי רקמה עובדים כל יום (P1) — ✅ תוקן (2026-11-17)
 
-| # | קובץ | מה מופיע בעברית |
-|---|---|---|
-| 2.1 | `src/lib/utils/levProcessors.ts:254-346` | הודעות פיד ההחלטות: `'בעד'`/`'נגד'`, `'גרסה ישנה'`, `'ביצע משא ומתן'`, `` `X שעות במקום Y` ``, `'לפי שעה'`, `'סה"כ'`, `'שם … במקום'`, `'תיאור … במקום'`. ה־HTML נבנה כמחרוזת, ולכן צריך להעביר לפונקציה את `t` מבחוץ |
-| 2.2 | `src/lib/components/prPr/pendsM.svelte` | כל כותרות הטבלה: `'שם'`, `'תיאור'`, `'כישורים נדרשים'`, `'סוג משימה'`… (נטען מ־`moach/ActionModal` ומ־`MissionModal`) |
-| 2.3 | `src/lib/components/prPr/openM.svelte` | `'פעולה פתוחה'`/`'פעולות פתוחות'` וכותרות הטבלה |
-| 2.4 | `src/lib/components/prPr/mashmam.svelte` | `'משאבים נדרשים שפורסמו'` וכותרות הטבלה |
-| 2.5 | `src/lib/components/lev/cards/pma.svelte` | תוויות ההשוואה במשא ומתן על משאב: `'שם'`, `'תיאור'`, `'מחיר'`, `'שווי מוצע'`, `'כמות'`, `'מיקום'`, `'משאב חוזר'`/`'חד פעמי'` |
-| 2.6 | `src/lib/components/lev/cards/haluka.svelte:781-794` | `'בעד'`, `'טרם'`, `'נגד'`, `'סך ההצבעות בעד'`, `'לא הצביעו'` |
-| 2.7 | `src/lib/components/lev/cards/inpro.svelte:470-473` | `'הפסקה'`, `'התחלה'` |
-| 2.8 | `src/lib/components/lev/halukaask.svelte:333` | `alert('מינימום 20 תווים')` |
-| 2.9 | `src/lib/components/lev/missionInProgress.svelte:226` | ההודעה "הטיימר נעצר מפני שמכסת השעות…" שנשלחת לחבר |
-| 2.10 | `src/lib/components/timers/TimersCalendar.svelte` | `'משימה ללא שם'` ועוד |
+| # | קובץ | מה היה בעברית | סטטוס |
+|---|---|---|---|
+| 2.1 | `src/lib/utils/levProcessors.ts`, `src/lib/stores/levDerived.ts` | הודעות פיד ההחלטות/הצבעות/משא ומתן ותגיות מקור (קונסירג׳, מאגד ביקוש) ב־7 מעבדים | ✅ `TranslateFn` מועבר ריאקטיבית מ־`levDerived.ts` (`$t`). מפתחות `lev.feed.*` + `mash.*` ב־5 שפות, בריחת HTML (`escHtml`), תיקון באג `vote.what === false` ב־`processPmashes`, ובדיקת יחידה `levProcessors.i18n.test.ts` לכל 5 השפות |
+| 2.2 | `src/lib/components/prPr/pendsM.svelte` | כותרת הטבלה, כל עמודות הטבלה וכותרות כפתורים/SVG | ✅ `moach.tables.*` ו־`common.hours` ב־5 שפות, `dir={$isRtl ? 'rtl' : 'ltr'}`, תאריכים לפי `$lang`, שינוי שם משתנה לולאה `t` ל־`idx` |
+| 2.3 | `src/lib/components/prPr/openM.svelte` | `'פעולה פתוחה'`/`'פעולות פתוחות'`, עמודות הטבלה וכותרות כפתורים | ✅ `moach.tables.*` ב־5 שפות, `dir` לפי `$isRtl` |
+| 2.4 | `src/lib/components/prPr/mashmam.svelte` | `'משאבים נדרשים שפורסמו'`, כותרות עמודות, סוגי משאב ויחידות חיוב | ✅ `moach.tables.*` + `mash.*` ב־5 שפות, `dir` לפי `$isRtl` |
+| 2.5 | `src/lib/components/lev/cards/pma.svelte` | השוואת משא ומתן, תדירות/מיקום, כותרות, טיימר, הערות hover, פירוט מחיר/שווי, ספירת הצבעות | ✅ `lev.cards.pma.*` + מפתחות גלובליים קיימים ב־5 שפות, `changes` עבר ל־`$derived`, חץ וצל לפי `$isRtl` |
+| 2.6 | `src/lib/components/lev/cards/haluka.svelte` | `'בעד'`, `'טרם'`, `'נגד'` וטולטיפי hover | ✅ `lev.cards.voteCard.*`, `lev.cards.common.against`, `vots.{totalin,totalno}`, צל לפי `$isRtl` |
+| 2.7 | `src/lib/components/lev/cards/inpro.svelte` | `'הפסקה'` / `'התחלה'` במילון מקומי לפי `$lang === 'he'` | ✅ `lev.cards.inpro.{pause,start}` ב־5 שפות, צל לפי `$isRtl` |
+| 2.8 | `src/lib/components/lev/halukaask.svelte` | `alert('מינימום 20 תווים')` | ✅ `$t('lev.diun.minChars', { count: 20 })` ב־5 שפות |
+| 2.9 | `src/lib/components/lev/missionInProgress.svelte` | התראות טיימר (`10%`, `5%`, `5 דק׳`, `1 דק׳`, עצירה), שגיאות אימות/העלאה, וברירת מחדל `'לביצוע'` | ✅ `lev.missionInProgress.*`, `moach.progress.uploadFailed`, `lev.cards.inpro.taskLink` ב־5 שפות |
+| 2.10 | `src/lib/components/timers/TimersCalendar.svelte` | `'משימה ללא שם'`, כותרות, סטטיסטיקות, מקרא, טולטיפ ומודאל פרטים, ו־`locale: 'he'` קבוע | ✅ `timers.cal.*` ב־5 שפות, `locale: $lang` ו־`direction` ריאקטיבי לפי `$isRtl`, בריחת HTML בטולטיפ |
+
+**תפיסות ובאגים נוספים שתוקנו על הדרך ב־לב, מוח, `prPr` וטיימרים (0 עברית חשופה בסריקה חוזרת):**
+
+- **טופס יצירת משימה ברוסית וספרדית (`prPr/mission.svelte`):** `missionByLang` כלל רק `{ he, en, ar }` ונפל חזרה לעברית ב־`ru`/`es`. נוספו `ruMission` ו־`esMission`.
+- **טבלאות ורכיבי `prPr` נוספים:** `betaha.svelte` (טבלת פעולות בביצוע), `negoM.svelte` ו־`negoPend.svelte` (שדות גשר המו״מ), `chosNed.svelte`, `tasks/Myacts.svelte`, `tasks/taskModal.svelte`, `tasks/chooseM.svelte`, `choosMission.svelte`, `gantt/gant.svelte`, `sheirut/sheirutShow.svelte`, ותיקון ג׳יבריש קידוד (`'—'`) ב־`Kanbanboard.svelte`.
+- **כרטיסים ורכיבי הלב הנוספים:** `welcomTo.svelte` (הסרת טקסט תועה `שי` בתחילת הקובץ), `lev/+page.svelte`, `cards/{CardHeader,VoteStatusDisplay,SaleCard,CustomerSaleCard,SheirutHalukaCard,hachlata,fini,rektom}.svelte`, `{diun,didiget,mesima,pandingMesima,pmas,fiappru,mashsuggest,reqtojoin,weget,projectSuggestor,sv}.svelte`.
+- **צ׳אט וסטורים:** `celim/messeges.svelte` (זמנים יחסיים עברו ממילון `{he,en,ar}` ל־`common.chat.*` ב־5 שפות ו־`dir="auto"`), `stores/pendMisMes.js` (כותרות העברה/מכירה בצ׳אט) ו־`stores/pgishot.js` (`common.chat.meetingCreated`).
+- **טיימרים:** `timers/timer.svelte` (`aria-label` של הפעלה/עצירה/עריכה ותצוגת שעות — כולל תיקון היפוך מונה/מכנה באנגלית דרך `timers.proHoursOf`) וכותרת `routes/(reg)/timers/+page.svelte`.
+- **נתיבי המוח ודפי הזדמנויות:** 15 תגיות `<title>` ב־`moach/[projectId]/**` עברו ל־`moach.layout.*`, סטטוסי מחזיק כסף ב־`sales/[saleId]`, שגיאות וחץ RTL ב־`chains/[chainId]`, `ProcessCreator.svelte`, `object/[type]` (תאריכים ב־`$lang`), `moach/[projectId]/wishes/+page.server.ts` (`serverTranslator`), ותגיות מאגד ביקוש / קונסירג׳ ב־`availableMission/[id]` ו־`availiableResorce/[id]`.
 
 ### שלב 3: עסקאות, מוצרים ותהליכים (P1)
 

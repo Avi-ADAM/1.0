@@ -440,22 +440,14 @@ diunim = ` ${diu},`
 
   import { page } from '$app/state';
 
-  let u = 'הצבעה על בקשת משאב לרקמה';
+  let u = '';
   function hover(id) {
-    if (id == '0') {
-      u = 'הצבעה על בקשת משאב לרקמה';
-    } else {
-      u = id;
-    }
+    u = id == '0' ? $t('lev.hoverDefault.pendingResource') : id;
     onHover?.({ id: u });
   }
 
   function hoverc(event) {
-    if (event.x == '0') {
-      u = 'הצבעה על פרסום הצעת משאב לרקמה';
-    } else {
-      u = event.x;
-    }
+    u = event.x == '0' ? $t('lev.hoverDefault.pendingResource') : event.x;
     onHover?.({ id: u });
   }
 
@@ -515,7 +507,7 @@ diunim = ` ${diu},`
           onclick={close}
           style="margin: 0 auto;"
           class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-          title="ביטול"
+          title={$t('common.cancel')}
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
             <path
               fill="currentColor"
@@ -546,7 +538,7 @@ diunim = ` ${diu},`
             rect={true}
             rikmaName={projectName}
             smalldes={name}
-            nameChatPartner={`הצבעה על ${name}`}
+            nameChatPartner={$t('lev.diun.voteOn', { name })}
             nameMe={page.data.un || 'Me'}
             {mypos}
             pendId={forumId}
@@ -563,7 +555,7 @@ diunim = ` ${diu},`
             bind:clicked
             rect={true}
             smalldes={projectName}
-            nameChatPartner={`הצבעה על ${name}`}
+            nameChatPartner={$t('lev.diun.voteOn', { name })}
             {mypos}
             {pendId}
             profilePicChatPartner={src}

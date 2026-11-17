@@ -1,5 +1,6 @@
 <script>
   import { hasRtl } from '$lib/utils/rtlTextPath.js';
+  import { t } from '$lib/translations';
 
  let mainG = "matrix(.38338 0 0 .4039 -156.16 -138.46)"
  let yahaMain ="matrix(.28338 0 0 .2939 -86.16 -18.46)"
@@ -2622,7 +2623,7 @@ console.log(sml)
     <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levleveq)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevaf)" stroke-width=".16015px"/>
     </g>
      {#if sml == true}
-      <text x="222.391" y="507.71" fill="url(#levlevdd)" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">הצעות</text>
+      <text x="222.391" y="507.71" fill="url(#levlevdd)" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{$t('common.proposals')}</text>
       {/if}
     <text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#levlevag)" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{maap}</text>
 </g>

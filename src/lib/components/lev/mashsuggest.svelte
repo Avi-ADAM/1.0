@@ -135,23 +135,15 @@
 
 
   let w = $derived(0);
-  let u = 'הצעה לשיתוף משאב והצטרפות לרקמה';
+  let u = '';
 
   function hover(id) {
-    if (id == '0') {
-      u = 'הצעה לשיתוף משאב והצטרפות לרקמה';
-    } else {
-      u = id;
-    }
+    u = id == '0' ? $t('lev.hoverDefault.resourceSuggest') : id;
     onHover?.({ id: u });
   }
 
   function hoverc(event) {
-    if (event.x == '0') {
-      u = 'הצעה לשיתוף משאב והצטרפות לרקמה';
-    } else {
-      u = event.x;
-    }
+    u = event.x == '0' ? $t('lev.hoverDefault.resourceSuggest') : event.x;
     onHover?.({ id: u });
   }
   import Cards from './cards/sugestma.svelte';

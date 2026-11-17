@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   import { lang } from '$lib/stores/lang.js';
   import { t, isRtl} from '$lib/translations';
   import { toast } from 'svelte-sonner';
@@ -278,7 +278,7 @@
   class="{isMobileOrTablet()
     ? 'w-full h-full'
     : ' w-[90%] h-[90%]'}  lg:w-[90%] {isFirst
-    ? $lang == 'he'
+    ? $isRtl
       ? 'boxleft'
       : 'boxright'
     : ''} flex d flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isFirst
@@ -533,8 +533,8 @@
               >
               {#if String(u.id) === String(buble.myid)}
                 <span
-                  class="mr-auto text-[9px] bg-yellow-200 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 px-2 py-0.5 rounded-full font-bold"
-                  >אתה</span
+                  class="ms-auto text-[9px] bg-yellow-200 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 px-2 py-0.5 rounded-full font-bold"
+                  >{$t('lev.cards.saleCard.you')}</span
                 >
               {/if}
             </div>
@@ -637,12 +637,8 @@
           {$t('lev.cards.saleCard.processing')}
         {:else if buble.alreadyVoted}
           {buble.myDeliveryVote === true
-            ? $lang === 'he'
-              ? 'אישרת משלוח'
-              : 'Delivery confirmed'
-            : $lang === 'he'
-              ? 'ממתין...'
-              : 'Pending...'}
+            ? $t('lev.cards.saleCard.deliveryConfirmed')
+            : $t('lev.cards.saleCard.pendingShort')}
         {:else}
           {$t('lev.cards.saleCard.confirmDelivery')}
         {/if}

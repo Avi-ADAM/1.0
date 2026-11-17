@@ -73,7 +73,8 @@
     "resourceChain": "Процесс ресурса",
     "saleChain": "Процесс продажи",
     "loading": "Загрузка процесса…",
-    "error": "Не удалось загрузить данные"
+    "error": "Не удалось загрузить данные",
+    "nameRequired": "Укажите название процесса."
   },
   "splitDetail": {
     "participants": "Партнёры",
@@ -104,7 +105,12 @@
     "date": "Дата",
     "buyer": "Покупатель",
     "note": "Примечание",
-    "status": "Статус"
+    "status": "Статус",
+    "holderSelf": "подтверждено (лично)",
+    "holderOpen": "ожидает согласия {{name}}",
+    "holderAutoApproved": "подтверждено автоматически",
+    "holderConfirmed": "подтверждено",
+    "holderLegacy": "не подтверждено (старое)"
   },
   "acts": {
     "assignee": "Исполнитель",
@@ -133,7 +139,8 @@
     "processPage": "Страница процесса",
     "id": "ID",
     "chatSoon": "Обсуждение процесса - скоро",
-    "chatDesc": "Здесь появятся ветки обсуждений и чат."
+    "chatDesc": "Здесь появятся ветки обсуждений и чат.",
+    "loadMissionError": "Не удалось загрузить завершённую задачу"
   },
   "layout": {
     "back": "Назад к списку",
@@ -168,7 +175,9 @@
     "code": "Код",
     "stipend": "Стипендии",
     "docs": "Общая информация",
-    "events": "События"
+    "events": "События",
+    "services": "Услуги",
+    "vote": "Голосование"
   },
   "create": {
     "mission": "Создать задачу",
@@ -439,5 +448,55 @@
     "viewing": "сейчас смотрит рикму",
     "viewersOne": "Один участник сейчас смотрит рикму",
     "viewersMany": "Участников, которые сейчас смотрят рикму: {{count}}"
+  },
+  "tables": {
+    "pendingAction": "Задача на утверждении",
+    "pendingActions": "Задачи на утверждении",
+    "openAction": "Открытая задача",
+    "openActions": "Открытые задачи",
+    "inProgressAction": "Задача в работе",
+    "inProgressActions": "Задачи в работе",
+    "publishedResources": "Опубликованные необходимые ресурсы",
+    "options": "Действия",
+    "mission": "Задача",
+    "name": "Название",
+    "description": "Описание",
+    "requiredSkills": "Требуемые навыки",
+    "roleDefinition": "Определение роли",
+    "missionType": "Тип задачи",
+    "executionDate": "Дата выполнения",
+    "publicLinks": "Публичные ссылки",
+    "link": "Ссылка",
+    "rikmaNotes": "Особые заметки для моей рикмы",
+    "rikmaLinks": "Приватные ссылки для моей рикмы",
+    "privateLink": "Приватная ссылка",
+    "estimatedHours": "Сколько часов это займёт?",
+    "hourlyRate": "Ценность часа",
+    "totalMissionValue": "Общая ценность задачи",
+    "alreadyCompleted": "Уже выполнено",
+    "performedBy": "Выполняет",
+    "edit": "Редактировать",
+    "inFavor": "За",
+    "waiting": "Ожидание",
+    "against": "Против",
+    "kind": "Тип",
+    "quantity": "Количество",
+    "startDate": "Дата начала",
+    "endDate": "Дата окончания",
+    "specialNotes": "Особые примечания",
+    "cost": "Стоимость",
+    "monetaryValue": "Денежная стоимость",
+    "perMonth": "в месяц",
+    "perYear": "в год",
+    "forWholePeriod": "за весь период",
+    "perUnit": "за единицу",
+    "maxRikmaValue": "Макс. ценность для расчёта в рикме",
+    "totalCost": "Общая стоимость",
+    "totalMaxValue": "Общая макс. ценность",
+    "resourceLink": "Ссылка на описание / цену / покупку"
+  },
+  "gantt": {
+    "setup": "Запуск",
+    "operation": "Деятельность"
   }
 }

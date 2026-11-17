@@ -73,7 +73,8 @@
     "resourceChain": "תהליך משאב",
     "saleChain": "תהליך מכירה",
     "loading": "טוען תהליך…",
-    "error": "שגיאה בטעינת הנתונים"
+    "error": "שגיאה בטעינת הנתונים",
+    "nameRequired": "צריך שם לתהליך."
   },
   "splitDetail": {
     "participants": "שותפים",
@@ -104,7 +105,12 @@
     "date": "תאריך",
     "buyer": "קונה",
     "note": "הערה",
-    "status": "סטטוס"
+    "status": "סטטוס",
+    "holderSelf": "מאומת (עצמי)",
+    "holderOpen": "בהסכמה מול {{name}}",
+    "holderAutoApproved": "אושר בשתיקה",
+    "holderConfirmed": "אושר",
+    "holderLegacy": "לא מאומת (ישן)"
   },
   "acts": {
     "assignee": "מבצע",
@@ -133,7 +139,8 @@
     "processPage": "עמוד תהליך",
     "id": "מזהה",
     "chatSoon": "דיון בתהליך - בקרוב",
-    "chatDesc": "כאן יתאפשר לנהל דיון ואינטגרציה של צ׳אטים ישירות בתוך התהליך."
+    "chatDesc": "כאן יתאפשר לנהל דיון ואינטגרציה של צ׳אטים ישירות בתוך התהליך.",
+    "loadMissionError": "שגיאה בטעינת המשימה שהסתיימה"
   },
   "layout": {
     "back": "חזרה לרשימה",
@@ -168,7 +175,9 @@
     "code": "קוד",
     "stipend": "מלגות קיום",
     "docs": "מידע משותף",
-    "events": "אירועים"
+    "events": "אירועים",
+    "services": "שירותים",
+    "vote": "הצבעה"
   },
   "create": {
     "mission": "יצירת משימה",
@@ -439,5 +448,55 @@
     "viewing": "צופה ברקמה עכשיו",
     "viewersOne": "חבר אחד צופה ברקמה עכשיו",
     "viewersMany": "{{count}} חברים צופים ברקמה עכשיו"
+  },
+  "tables": {
+    "pendingAction": "פעולה בתהליך אישור",
+    "pendingActions": "פעולות בתהליך אישור",
+    "openAction": "פעולה פתוחה",
+    "openActions": "פעולות פתוחות",
+    "inProgressAction": "פעולה בתהליך ביצוע",
+    "inProgressActions": "פעולות בתהליך ביצוע",
+    "publishedResources": "משאבים נדרשים שפורסמו",
+    "options": "אפשרויות",
+    "mission": "משימה",
+    "name": "שם",
+    "description": "תיאור",
+    "requiredSkills": "כישורים נדרשים",
+    "roleDefinition": "הגדרת תפקיד",
+    "missionType": "סוג משימה",
+    "executionDate": "תאריך ביצוע",
+    "publicLinks": "קישורים ציבוריים",
+    "link": "קישור",
+    "rikmaNotes": "הערות ייחודיות לרקמה שלי",
+    "rikmaLinks": "קישורים ייחודיים לרקמה שלי",
+    "privateLink": "קישור פרטי",
+    "estimatedHours": "כמה שעות זה אמור לקחת?",
+    "hourlyRate": "כמה שווה שעה?",
+    "totalMissionValue": "שווי סך הכל למשימה",
+    "alreadyCompleted": "כבר בוצעו",
+    "performedBy": "מבוצע על ידי",
+    "edit": "עריכה",
+    "inFavor": "בעד",
+    "waiting": "בהמתנה",
+    "against": "נגד",
+    "kind": "סוג",
+    "quantity": "כמות",
+    "startDate": "תאריך התחלה",
+    "endDate": "תאריך סיום",
+    "specialNotes": "הערות מיוחדות",
+    "cost": "עלות",
+    "monetaryValue": "שווי כספי",
+    "perMonth": "לכל חודש",
+    "perYear": "לכל שנה",
+    "forWholePeriod": "לכל התקופה",
+    "perUnit": "ליחידה",
+    "maxRikmaValue": "שווי מקסימלי לחישוב ברקמה",
+    "totalCost": "עלות סה״כ",
+    "totalMaxValue": "שווי מקסימלי סה״כ",
+    "resourceLink": "קישור לפרטי מוצר / מחיר / רכישה"
+  },
+  "gantt": {
+    "setup": "הקמה",
+    "operation": "פעילות"
   }
 }

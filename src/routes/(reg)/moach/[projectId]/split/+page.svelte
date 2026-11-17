@@ -99,7 +99,7 @@
 </script>
 
 <svelte:head>
-  <title>{page.data.projectBase?.projectName ? `${page.data.projectBase.projectName} · ` : ''}{$lang === 'he' ? 'חלוקה' : $lang === 'ar' ? 'تقسيم' : 'Split'} · 1lev1</title>
+  <title>{page.data.projectBase?.projectName ? `${page.data.projectBase.projectName} · ` : ''}{$t('moach.layout.split')} · 1lev1</title>
 </svelte:head>
 
 <div class="split-page space-y-6">

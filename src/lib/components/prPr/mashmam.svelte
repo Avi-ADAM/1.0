@@ -1,8 +1,26 @@
 <script>
   import { onMount } from 'svelte';
-
   import moment from 'moment';
+  import { isRtl, t } from '$lib/translations';
+  import { lang } from '$lib/stores/lang.js';
+
   let { meData = $bindable([]) } = $props();
+
+  function formatKindOf(kind) {
+    if (kind === 'total') return $t('mash.total');
+    if (kind === 'perUnit') return $t('mash.perUnit');
+    if (kind === 'monthly') return $t('mash.monthly');
+    if (kind === 'yearly') return $t('mash.yearly');
+    if (kind === 'rent') return $t('mash.rent');
+    return kind ?? '';
+  }
+
+  function formatSchedule(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (Number.isNaN(d.getTime())) return String(dateStr);
+    return d.toLocaleString($lang, { dateStyle: 'full', timeStyle: 'medium' });
+  }
   function remove(id) {
     console.log(id);
   }
@@ -87,10 +105,10 @@
 
 <div class="dd md:items-center border-2 border-gold rounded">
   <div class="body items-center">
-    <table dir="rtl">
-      <caption class="sm:text-right md:text-center text-right">
+    <table dir={$isRtl ? 'rtl' : 'ltr'}>
+      <caption class="sm:text-start md:text-center text-start">
         <h1 class="md:text-center text-2xl md:text-2xl font-bold">
-          משאבים נדרשים שפורסמו
+          {$t('moach.tables.publishedResources')}
         </h1>
       </caption>
       <thead>
@@ -103,7 +121,7 @@
         {/each}
       </tr>
       <tr class="ggr">
-        <th class="ggr">שם</th>
+        <th class="ggr">{$t('moach.tables.name')}</th>
         {#each meData as data, i}
           <td class="ggr">
             {data.attributes.name}
@@ -111,7 +129,7 @@
         {/each}
       </tr>
       <tr>
-        <th>תיאור</th>
+        <th>{$t('moach.tables.description')}</th>
         {#each meData as data, i}
           <td>
             {#if data.attributes.descrip}
@@ -121,45 +139,41 @@
         {/each}
       </tr>
       <tr>
-        <th>סוג</th>
+        <th>{$t('moach.tables.kind')}</th>
         {#each meData as data, i}
           <td>
-            <h1>{data.attributes.kindOf}</h1>
+            <h1>{formatKindOf(data.attributes.kindOf)}</h1>
           </td>
         {/each}
       </tr>
       <tr style="display:{kc ? '' : 'none'};">
-        <th>כמות</th>
+        <th>{$t('moach.tables.quantity')}</th>
         {#each meData as data, i}
           <td>
             {data.attributes.hm}
           </td>{/each}
       </tr><tr style="display:{ky ? '' : 'none'};">
-        <th>תאריך התחלה </th>
+        <th>{$t('moach.tables.startDate')}</th>
         {#each meData as data, i}
           <td
             ><h1 style="display:{meData[i].ky ? '' : 'none'};">
-              {moment(data.attributes.sqadualed).format(
-                'dddd, MMMM Do YYYY, H:mm:ss '
-              )}
+              {formatSchedule(data.attributes.sqadualed)}
             </h1></td
           >
         {/each}
       </tr>
       <tr style="display:{ky ? '' : 'none'};">
-        <th>תאריך סיום </th>
+        <th>{$t('moach.tables.endDate')}</th>
         {#each meData as data, i}
           <td
             ><h1 style="display:{meData[i].ky ? '' : 'none'};">
-              {moment(data.attributes.sqadualedf).format(
-                'dddd, MMMM Do YYYY, H:mm:ss '
-              )}
+              {formatSchedule(data.attributes.sqadualedf)}
             </h1></td
           >
         {/each}
       </tr>
       <tr>
-        <th>הערות מיוחדות</th>
+        <th>{$t('moach.tables.specialNotes')}</th>
         {#each meData as data, i}
           <td
             >{#if data.attributes.spnot}
@@ -168,35 +182,35 @@
         {/each}
       </tr>
       <tr>
-        <th>עלות</th>
+        <th>{$t('moach.tables.cost')}</th>
         {#each meData as data, i}
           <td>
-            <small for="name"
-              >שווי כספי <span style="display:{meData[i].m ? '' : 'none'};"
-                >לכל חודש</span
-              ><span style="display:{meData[i].y ? '' : 'none'};">לכל שנה</span
+            <small
+              >{$t('moach.tables.monetaryValue')} <span style="display:{meData[i].m ? '' : 'none'};"
+                >{$t('moach.tables.perMonth')}</span
+              ><span style="display:{meData[i].y ? '' : 'none'};">{$t('moach.tables.perYear')}</span
               ><span style="display:{meData[i].r ? '' : 'none'};"
-                >לכל התקופה</span
-              ><span style="display:{meData[i].kc ? '' : 'none'};">ליחידה</span>
+                >{$t('moach.tables.forWholePeriod')}</span
+              ><span style="display:{meData[i].kc ? '' : 'none'};">{$t('moach.tables.perUnit')}</span>
             </small>
             <h2>{data.attributes.price}</h2>
           </td>{/each}
       </tr><tr>
-        <th>שווי מקסימלי לחישוב ברקמה</th>
+        <th>{$t('moach.tables.maxRikmaValue')}</th>
         {#each meData as data, i}
           <td>
-            <small for="name" 
-              >שווי כספי <span style="display:{meData[i].m ? '' : 'none'};"
-                >לכל חודש</span
-              ><span style="display:{meData[i].y ? '' : 'none'};">לכל שנה</span
+            <small
+              >{$t('moach.tables.monetaryValue')} <span style="display:{meData[i].m ? '' : 'none'};"
+                >{$t('moach.tables.perMonth')}</span
+              ><span style="display:{meData[i].y ? '' : 'none'};">{$t('moach.tables.perYear')}</span
               ><span style="display:{meData[i].r ? '' : 'none'};"
-                >לכל התקופה</span
-              ><span style="display:{meData[i].kc ? '' : 'none'};">ליחידה</span>
+                >{$t('moach.tables.forWholePeriod')}</span
+              ><span style="display:{meData[i].kc ? '' : 'none'};">{$t('moach.tables.perUnit')}</span>
             </small>
             {data.attributes.easy}
           </td>{/each}
       </tr><tr style="display:{kc || ky ? '' : 'none'};">
-        <th>עלות סה"כ</th>
+        <th>{$t('moach.tables.totalCost')}</th>
         {#each meData as data, i}
           <td>
             <h3
@@ -211,7 +225,7 @@
             </h3>
           </td>{/each}
       </tr><tr style="display:{kc || ky ? '' : 'none'};">
-        <th>שווי מקסימלי סה"כ</th>
+        <th>{$t('moach.tables.totalMaxValue')}</th>
         {#each meData as data, i}
           <td>
             <h3
@@ -227,7 +241,7 @@
           </td>{/each}
       </tr>
       <tr>
-        <th>לינק לפרטי מוצר\ מחיר \ רכישה</th>
+        <th>{$t('moach.tables.resourceLink')}</th>
         {#each meData as data, i}
           <td
             >{#if data.attributes.linkto}{data.attributes.linkto}{/if}

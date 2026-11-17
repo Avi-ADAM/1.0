@@ -576,8 +576,8 @@
             style="margin: 0 auto;"
             onclick={close}
             class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-            title="סגירה"
-            aria-label="סגירה"
+            title={$t('common.close')}
+            aria-label={$t('common.close')}
           >
             <svg
               style="width:24px;height:24px;z-index:999;"

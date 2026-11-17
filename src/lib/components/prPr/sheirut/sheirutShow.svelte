@@ -1,5 +1,5 @@
 <script>
-  import { t } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import SucssesConf from '$lib/celim/sucssesConf.svelte';
   import ShareLink from '$lib/components/share/ShareLink.svelte';
   import { requestSheirutJoin } from '$lib/client/actionClient';
@@ -66,11 +66,7 @@ onMount(()=>{
       >{$t('project.sheirut.ourServices')}</h3>
     {#each sheirutim?.data as datai, i}
     {@const data = datai.attributes}
-    {@const title = {
-                he: ` שירות "${data.name}" ברקמה: ${projectName}, באתר 1💗1 `,
-                en: 'come see this service on 1💗1'
-              }} 
-    <div dir="rtl"  style="overflow-y:auto" class="lg:w-1/2 d mb-4 pt-4 w-full d mx-auto" >
+    <div dir={$isRtl ? 'rtl' : 'ltr'}  style="overflow-y:auto" class="lg:w-1/2 d mb-4 pt-4 w-full d mx-auto" >
     <div  class=" bg-gray-700  rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal ">
          <div  class="mb-8">
               <div class="  mb-2 text-start">

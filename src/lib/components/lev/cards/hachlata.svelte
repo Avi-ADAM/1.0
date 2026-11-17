@@ -1,4 +1,4 @@
-﻿<script>
+<script>
   import { useFormatMoney } from '$lib/money/context.svelte';
   import Money from '$lib/components/money/Money.svelte';
   import { isRtl } from '$lib/translations';
@@ -1014,27 +1014,27 @@
       <div class="flex flex-wrap gap-3 text-sm sm:text-base font-medium">
         <span
           role="contentinfo"
-          onmouseenter={() => hover('סך ההצבעות בעד')}
+          onmouseenter={() => hover($t('vots.totalin'))}
           onmouseleave={() => hover('0')}
           class="text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-3 py-1 rounded-full border border-green-200 dark:border-green-800"
         >
-          {noofusersOk} - בעד
+          {noofusersOk} - {$t('lev.cards.voteCard.inFavor')}
         </span>
 
         <span
-          onmouseenter={() => hover('לא הצביעו')}
+          onmouseenter={() => hover($t('lev.cards.voteCard.notVotedYet'))}
           onmouseleave={() => hover('0')}
           class="text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-800"
         >
-          {noofusersWaiting} - טרם
+          {noofusersWaiting} - {$t('lev.cards.voteCard.notYet')}
         </span>
 
         <span
-          onmouseenter={() => hover('כמות ההצבעות נגד')}
+          onmouseenter={() => hover($t('vots.votedOn'))}
           onmouseleave={() => hover('0')}
           class="text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 px-3 py-1 rounded-full border border-purple-200 dark:border-purple-800"
         >
-          {noofusersNo} - גרסאות קודמות
+          {noofusersNo} - {$t('lev.cards.voteStatus.oldVersion')}
         </span>
       </div>
     </div>
@@ -1090,7 +1090,7 @@
                mature (D2), and this button never recorded anything. -->
           <button
             class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold rounded-xl transition-all flex justify-center items-center"
-            onmouseenter={() => hover('התנגדות')}
+            onmouseenter={() => hover($t('lev.cards.confirmDecline'))}
             onmouseleave={() => hover('0')}
             onclick={() => decline('f')}
           >
@@ -1100,7 +1100,7 @@
 
         <button
           class="flex-2 py-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex justify-center items-center"
-          onmouseenter={() => hover('אישור')}
+          onmouseenter={() => hover($t('lev.cards.confirmApprove'))}
           onmouseleave={() => hover('0')}
           onclick={() => agree('f')}
         >

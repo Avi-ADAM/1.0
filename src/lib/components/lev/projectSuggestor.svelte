@@ -457,7 +457,7 @@
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
   <div transition:fly={{ y: 40, opacity: 0, duration: 250 }}>
     <DialogContent class="nego-modal surface-dialog" aria-label="form">
-      <button class="nego-modal-close" onclick={close} aria-label="סגירה"
+      <button class="nego-modal-close" onclick={close} aria-label={$t('common.close')}
         >✕</button
       >
       {#if loading === true}

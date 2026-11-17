@@ -3,6 +3,7 @@
   import { quintOut } from "svelte/easing";
   import { slide } from "svelte/transition";
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
 
 	
 	function isToday(date) {
@@ -30,42 +31,18 @@
 		const diffHours = Math.floor(diffMs / 3600000);
 		const diffDays = Math.floor(diffMs / 86400000);
 		
-		const translations = {
-			he: {
-				now: 'עכשיו',
-				minsAgo: (n) => `לפני ${n} דק'`,
-				hoursAgo: (n) => `לפני ${n} שעות`,
-				yesterday: 'אתמול'
-			},
-			en: {
-				now: 'now',
-				minsAgo: (n) => `${n}m ago`,
-				hoursAgo: (n) => `${n}h ago`,
-				yesterday: 'Yesterday'
-			},
-			ar: {
-				now: 'الآن',
-				minsAgo: (n) => `منذ ${n} د`,
-				hoursAgo: (n) => `منذ ${n} س`,
-				yesterday: 'أمس'
-			}
-		};
-		
-		const t = translations[language] || translations.he;
-		
-		// תוך 24 שעות - הצג זמן יחסי
 		if (diffMins < 1) {
-			return t.now;
+			return $t('common.chat.now');
 		} else if (diffMins < 60) {
-			return t.minsAgo(diffMins);
+			return $t('common.chat.minsAgo', { count: diffMins });
 		} else if (diffHours < 24) {
-			return t.hoursAgo(diffHours);
+			return $t('common.chat.hoursAgo', { count: diffHours });
 		} else if (isToday(date)) {
-			return messageDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+			return messageDate.toLocaleTimeString(language || undefined, {hour: '2-digit', minute:'2-digit', hour12: false});
 		} else if (diffDays === 1) {
-			return t.yesterday + ' ' + messageDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+			return $t('common.chat.yesterday') + ' ' + messageDate.toLocaleTimeString(language || undefined, {hour: '2-digit', minute:'2-digit', hour12: false});
 		} else {
-			return messageDate.toLocaleString([], {month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit', hour12: false});
+			return messageDate.toLocaleString(language || undefined, {month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit', hour12: false});
 		}
 	}
 	/**
@@ -148,7 +125,7 @@
                      class:rounded-br-none={sentByMe === false}
                      class:line-through={changed == true}
                      class:shadow-md={sentByMe === true}
-                     dir="rtl" 
+                     dir="auto" 
                      style="word-break: break-word; overflow-wrap: break-word;"
                   >{@html message}</span>
                </div>

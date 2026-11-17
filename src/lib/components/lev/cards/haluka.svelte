@@ -1,4 +1,4 @@
-﻿<script>
+<script>
   import { isRtl, t } from '$lib/translations';
   import Chaticon from '../../../celim/chaticon.svelte';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
@@ -387,7 +387,7 @@
   class="{isMobileOrTablet()
     ? 'w-full h-full'
     : ' w-[90%] h-[90%]'} lg:w-[90%] {isVisible
-    ? $lang == 'he'
+    ? $isRtl
       ? 'boxleft'
       : 'boxright'
     : ''} flex d flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isVisible
@@ -778,20 +778,20 @@
     <div class="flex items-center text-sm font-medium dark:text-gray-300">
       <p>
         <span
-          onmouseenter={() => hover('סך ההצבעות בעד')}
+          onmouseenter={() => hover($t('vots.totalin'))}
           onmouseleave={() => hover('0')}
-          class="text-green-500 ml-2">{noofusersOk}-בעד</span
+          class="text-green-500 me-2">{noofusersOk} {$t('lev.cards.voteCard.inFavor')}</span
         >
         <span
-          onmouseenter={() => hover('לא הצביעו')}
+          onmouseenter={() => hover($t('lev.cards.voteCard.notVotedYet'))}
           onmouseleave={() => hover('0')}
-          class="text-blue-600 dark:text-blue-400 ml-2"
-          >{noofusersWaiting}-טרם</span
+          class="text-blue-600 dark:text-blue-400 me-2"
+          >{noofusersWaiting} {$t('lev.cards.voteCard.notYet')}</span
         >
         <span
-          onmouseenter={() => hover('כמות ההצבעות נגד')}
+          onmouseenter={() => hover($t('vots.totalno'))}
           onmouseleave={() => hover('0')}
-          class="text-purple-700 dark:text-purple-400">{noofusersNo}-נגד</span
+          class="text-purple-700 dark:text-purple-400">{noofusersNo} {$t('lev.cards.common.against')}</span
         >
       </p>
     </div>
