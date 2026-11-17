@@ -27,6 +27,7 @@ onMessage(messaging, (payload) => {
   import { navigating, page } from '$app/state';
   import { browser } from '$app/environment';
   import SessionExpiredBanner from '$lib/components/screens/SessionExpiredBanner.svelte';
+  import OfflineBanner from '$lib/components/screens/OfflineBanner.svelte';
   import MobileFooter from '$lib/components/footer/mobileFooter.svelte';
   import AccessibilityPanel from '$lib/components/a11y/AccessibilityPanel.svelte';
   // Importing the store wires the <html> classes for the saved display
@@ -279,6 +280,7 @@ onMessage(messaging, (payload) => {
   {#if data?.sessionExpired}
     <SessionExpiredBanner />
   {/if}
+  <OfflineBanner />
   {@render children?.()}
   <Toaster
     toastOptions={{

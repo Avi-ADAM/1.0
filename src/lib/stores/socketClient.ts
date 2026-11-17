@@ -25,6 +25,7 @@
 import { writable, get } from 'svelte/store';
 import { io, type Socket } from 'socket.io-client';
 import { browser } from '$app/environment';
+import { onBackOnline } from './network';
 
 /**
  * Notification payload structure from the server
@@ -111,6 +112,9 @@ function createSocketClient() {
   let notificationListeners: NotificationListener[] = [];
   let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   let currentUserId: string | null = null;
+  // The server refused this session — retrying on a network change would only
+  // be refused again. Cleared by the next connect().
+  let authFailed = false;
 
   // Space sync wake-ups (HANDOFF_DISTRIBUTED_DB T1). Subscriptions survive
   // reconnects: the set is replayed on every auth_success.
@@ -162,6 +166,7 @@ function createSocketClient() {
 
     // Store userId (jwt is now read by server from cookies automatically)
     currentUserId = userId;
+    authFailed = false;
     // JWT is no longer needed for client-side auth - server reads it from cookies
 
     // Disconnect existing connection if any
@@ -244,6 +249,7 @@ function createSocketClient() {
     // Authentication failed
     socket.on('auth_error', (data: { message: string }) => {
       console.error('[SocketClient] Authentication failed:', data.message);
+      authFailed = true;
       update(state => ({
         ...state,
         authenticated: false,
@@ -318,9 +324,14 @@ function createSocketClient() {
       }));
     });
 
-    // Reconnection failed
+    // Reconnection failed. With a network, giving up after MAX attempts is
+    // right — the server is down. Without one, the attempts proved nothing:
+    // resume() starts again when the network comes back.
     socket.io.on('reconnect_failed', () => {
-      console.error('[SocketClient] Reconnection failed after max attempts');
+      console.error(
+        '[SocketClient] Reconnection failed after max attempts',
+        navigator.onLine === false ? '(offline — will retry when back online)' : ''
+      );
       update(state => ({
         ...state,
         reconnecting: false,
@@ -333,6 +344,32 @@ function createSocketClient() {
       // Connection is healthy
     });
   }
+
+  /**
+   * Connectivity may be back (the `online` event, or a hidden tab shown
+   * again). Start a fresh round of attempts if the socket is down — it either
+   * gave up while there was no network, or is waiting out a long backoff.
+   * The fresh `auth_success` runs the ready listeners, and the realtime bus
+   * resyncs every screen from it: whatever was sent while we were away is
+   * fetched again, in the background.
+   */
+  function resume(reason: 'online' | 'visible'): void {
+    if (!socket || !currentUserId || authFailed || socket.connected) return;
+    // A visible tab whose socket is still retrying on its own needs no push;
+    // after an `online` event the pending backoff is just a wasted wait.
+    if (reason === 'visible' && socket.active) return;
+    console.log(`[SocketClient] Network back (${reason}) — reconnecting`);
+    if (reconnectTimer) {
+      clearTimeout(reconnectTimer);
+      reconnectTimer = null;
+    }
+    // disconnect() + connect() on the same socket resets the manager's attempt
+    // counter and backoff, and keeps every handler attached.
+    socket.disconnect();
+    socket.connect();
+  }
+
+  if (browser) onBackOnline(resume);
 
   /**
    * Schedule a manual reconnection attempt

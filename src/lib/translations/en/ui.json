@@ -145,5 +145,10 @@
     "motionPaused": "Motion: paused",
     "motionHidden": "Motion: hidden",
     "reset": "Reset settings"
+  },
+  "offline": {
+    "title": "No internet connection",
+    "body": "What you see may be out of date. We'll refresh it on our own once you're back online.",
+    "back": "Back online — refreshing what changed meanwhile"
   }
 }

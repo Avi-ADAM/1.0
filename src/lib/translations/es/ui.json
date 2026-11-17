@@ -146,5 +146,10 @@
     "motionPaused": "Movimiento: en pausa",
     "motionHidden": "Movimiento: oculto",
     "reset": "Restablecer ajustes"
+  },
+  "offline": {
+    "title": "Sin conexión a internet",
+    "body": "Lo que ves puede no estar actualizado. Lo actualizaremos solos cuando vuelva la conexión.",
+    "back": "Conexión recuperada: actualizando lo que cambió mientras tanto"
   }
 }
