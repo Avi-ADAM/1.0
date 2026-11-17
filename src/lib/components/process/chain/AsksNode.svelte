@@ -1,4 +1,6 @@
 <script>
+  import { t } from '$lib/translations';
+
   let {
     asks = [],
     lang = 'en'
@@ -6,34 +8,6 @@
 
   let expanded = $state(false);
 
-  const i18n = {
-    he: {
-      countLabel:    (n) => `${n} בקשות - לחץ להרחבה`,
-      collapseLabel: 'כווץ בקשות',
-      asks:          'בקשות',
-      noAsks:        'אין בקשות',
-      openForum:     'פתח פורום',
-      noForum:       'אין פורום'
-    },
-    en: {
-      countLabel:    (n) => `${n} ${n === 1 ? 'ask' : 'asks'} - expand`,
-      collapseLabel: 'Collapse',
-      asks:          'Asks',
-      noAsks:        'No asks',
-      openForum:     'Open forum',
-      noForum:       'No forum'
-    },
-    ar: {
-      countLabel:    (n) => `${n} طلبات - توسيع`,
-      collapseLabel: 'طي',
-      asks:          'طلبات',
-      noAsks:        'لا توجد طلبات',
-      openForum:     'فتح المنتدى',
-      noForum:       'لا يوجد منتدى'
-    }
-  };
-
-  let t     = $derived(i18n[lang] ?? i18n.en);
   let count = $derived(asks.length);
 </script>
 
@@ -41,7 +15,7 @@
   <button
     type="button"
     class="asks-badge"
-    aria-label={expanded ? t.collapseLabel : t.countLabel(count)}
+    aria-label={expanded ? $t('moach.asksNode.collapseLabel') : $t('moach.asksNode.countLabel', { count })}
     aria-expanded={expanded}
     onclick={() => (expanded = !expanded)}
   >
@@ -52,7 +26,7 @@
       <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
     </svg>
 
-    <span class="asks-label">{t.asks}</span>
+    <span class="asks-label">{$t('moach.asksNode.asks')}</span>
     <span role="status" class="asks-count">{count}</span>
 
     <svg
@@ -68,7 +42,7 @@
   {#if expanded}
     <div class="asks-list" role="list">
       {#if count === 0}
-        <p class="asks-empty">{t.noAsks}</p>
+        <p class="asks-empty">{$t('moach.asksNode.noAsks')}</p>
       {:else}
         {#each asks as ask (ask.userId)}
           <div class="ask-item" role="listitem">
@@ -77,7 +51,7 @@
               <button
                 type="button"
                 class="ask-forum-btn"
-                aria-label="{t.openForum}: {ask.username}"
+                aria-label="{$t('moach.asksNode.openForum')}: {ask.username}"
                 onclick={(e) => {
                   e.stopPropagation();
                   e.currentTarget.dispatchEvent(
@@ -93,7 +67,7 @@
                 </svg>
               </button>
             {:else}
-              <span class="ask-no-forum">{t.noForum}</span>
+              <span class="ask-no-forum">{$t('moach.asksNode.noForum')}</span>
             {/if}
           </div>
         {/each}

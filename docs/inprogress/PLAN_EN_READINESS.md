@@ -1,6 +1,6 @@
 # מוכנות ללקוחות באנגלית: רשימת תיקונים
 
-> **סטטוס: inprogress, שלבים 1–2 הושלמו.** נכתב 2026-11-17, אחרי מיזוג `main` (`b23abef`). המסמך מסכם
+> **סטטוס: inprogress, שלבים 1–3 הושלמו.** נכתב 2026-11-17, אחרי מיזוג `main` (`b23abef`). המסמך מסכם
 > סריקה של טקסט עברי שנכתב ישירות בקוד, כלומר לא דרך `$t()`. לקוח שהממשק שלו
 > באנגלית רואה את הטקסט הזה בעברית. הבדיקות האוטומטיות לא תופסות את זה, כי
 > `check:i18n` בודק רק מפתחות קיימים.
@@ -12,6 +12,7 @@
 | `npm run check:i18n` | ✓ 84 קבצי תרגום × 5 שפות. אזהרה: אף מסך לא משתמש ב־`ask` ו־`nuti` |
 | `npm run check:script` | ✓ אין מילים שמערבבות אותיות משתי שפות |
 | `npm run check:translatable` | ✓ |
+| `npm run check:ui-hebrew` | ✓ אין עברית ב־markup ב־153 רכיבים (חדש בשלב 3) |
 | התאמה בין `he` ל־`en` | ✓ אין מפתח חסר ואין טקסט עברי בקבצי `en`. `offerings.storefront.empty` ריק בכל השפות, וזה מכוון |
 
 ## מה כבר תוקן ✅
@@ -98,16 +99,56 @@
 - **טיימרים:** `timers/timer.svelte` (`aria-label` של הפעלה/עצירה/עריכה ותצוגת שעות — כולל תיקון היפוך מונה/מכנה באנגלית דרך `timers.proHoursOf`) וכותרת `routes/(reg)/timers/+page.svelte`.
 - **נתיבי המוח ודפי הזדמנויות:** 15 תגיות `<title>` ב־`moach/[projectId]/**` עברו ל־`moach.layout.*`, סטטוסי מחזיק כסף ב־`sales/[saleId]`, שגיאות וחץ RTL ב־`chains/[chainId]`, `ProcessCreator.svelte`, `object/[type]` (תאריכים ב־`$lang`), `moach/[projectId]/wishes/+page.server.ts` (`serverTranslator`), ותגיות מאגד ביקוש / קונסירג׳ ב־`availableMission/[id]` ו־`availiableResorce/[id]`.
 
-### שלב 3: עסקאות, מוצרים ותהליכים (P1)
+### שלב 3: עסקאות, מוצרים ותהליכים (P1) — ✅ תוקן (2026-11-17)
 
-| # | קובץ | מה מופיע בעברית |
-|---|---|---|
-| 3.1 | `src/routes/deals/request/[id]/+page.svelte` | סוגי התשלום (`'מינוי חודשי'`…) וכל הודעות ה־toast (`'הבקשה אושרה'`, `'שגיאה באישור הבקשה'`…) |
-| 3.2 | `src/routes/deals/[id]/+page.svelte` | סטטוסים: `'בביצוע'`, `'ממתין לאישור'`… |
-| 3.3 | `src/lib/services/dealsService.ts` | אותן תוויות סוגי תשלום. כדאי לאחד ל־`$t()` אחד עם 3.1 |
-| 3.4 | `src/routes/negotiation/+layout.svelte`, `src/routes/negotiation/[id]/+page.svelte` | תוויות לשוניות (`'ספקטרום'`, `'הוסף עמדה'`) |
-| 3.5 | `src/lib/components/products/MatanotPublicView.svelte`, `MissionPickerList.svelte`, `ResourcePickerList.svelte`, `MissionDetailsModal.svelte`, `ResourceDetailsModal.svelte` | **מוצגים באנגלית** דרך `$lang === 'he' ? … : …`, אבל זה מילון מקומי. אם השפה היא `ar`, `ru` או `es`, הקורא מקבל אנגלית. להעביר ל־JSON |
-| 3.6 | `src/lib/components/process/lifecycle/ProcessLifecycle.svelte`, `SaleLifecycle.svelte`, `process/chain/MissionChainRow.svelte`, `ResourceChainRow.svelte` | אותו דפוס בדיוק: מילון `{he, en}` מקומי |
+| # | קובץ | מה היה בעברית | סטטוס |
+|---|---|---|---|
+| 3.1 | `src/routes/deals/request/[id]/+page.svelte` | סוגי התשלום (`'מינוי חודשי'`…), כל ה־toast, תגי הסטטוס, כרטיסי הפרטים, `dir="rtl"` קבוע, ותאריך בפורמט `d.m.y` | ✅ `deals.request.*`; סוגי התשלום קוראים ל־`deals.kind*` הקיימים; תאריכים דרך `toLocaleDateString($lang)`; `dir` לפי `$isRtl` |
+| 3.2 | `src/routes/deals/[id]/+page.svelte` | `STATUS_LABEL`, שני ה־toast, הודעות „לא נמצאה”, תגי קונה/מוכר, תאריכי התחלה וסיום ושלושת מדדי הכותרת | ✅ ממופה ל־`deals.statusInProgress` / `statusCoordination` / `pendingApproval` / `statusDone` הקיימים, ונוספו `deals.dealPage.*` |
+| 3.3 | `src/lib/services/dealsService.ts` | סוגי תשלום, ציר הזמן, שמות הצדדים, „אתה”/„לקוח”, וכותרות האישורים הממתינים | ✅ מקבל `TranslateFn` (`$t`) כמו מעבדי הלב בשלב 2, עם `identityT` כברירת מחדל; `/deals` ו־`/deals/[id]` מעבירים `$t` ריאקטיבית. המפתחות: `deals.service.*` |
+| 3.4 | `src/routes/negotiation/+layout.svelte`, `[id]/+page.svelte` | כותרת הדף, מטא־תגיות השיתוף, תוכן קורא־המסך, תוויות הלשוניות, צירי הספקטרום, מצבי הריק והכפתורים העליונים; `dir="rtl"` בכל ששת השורשים | ✅ `negotiation.layout.*` ו־`negotiation.view.*`; השאר משתמש במפתחות הקיימים (`spectrum`, `add_position`, `overall_consensus`…); `onMount` שהוסיף `document.title` הוחלף ב־`<title>` ב־`svelte:head` |
+| 3.5 | `src/lib/components/products/MatanotPublicView.svelte`, `MissionPickerList.svelte`, `ResourcePickerList.svelte`, `MissionDetailsModal.svelte`, `ResourceDetailsModal.svelte` | חמישה מילונים מקומיים `$lang === 'he' ? … : …` — קורא ב־`ar`/`ru`/`es` קיבל אנגלית | ✅ namespace חדש `products` (101 מפתחות × 5 שפות): `view.*`, `mission.*`, `resource.*`, `missionDetails.*`, `resourceDetails.*`. נשמר ב־`routes.js` ל־`/lev`, `/gift`, `/deals`, `/moach/<project>` |
+| 3.6 | `src/lib/components/process/lifecycle/{ProcessLifecycle,SaleLifecycle}.svelte`, `process/chain/{MissionChainRow,ResourceChainRow}.svelte` | מילוני `{he, en, ar}` מקומיים (בלי `ru`/`es`) + טרנרים `lang === 'he' ? 'ארכיון' : 'Archived'` בכל תג | ✅ `moach.lifecycle.*`, `moach.saleLife.*`, `moach.chainMission.*`, `moach.chainResource.*`; ריבוי „הצעה אחת/הצעות” דרך `offersOne`/`offersMany` במקום „1 offers” |
+
+**שכבות נוספות שנוקו בדרך (0 עברית חשופה ב־markup בכל התיקיות האלה):**
+
+- **מסך מרכז המכירות** (`routes/deals/sales-center/+page.svelte`): תשעה טרנרים `$lang === 'he' ? … : …`
+  (toast של מכירה, שיתוף מוצר, העתקת קישור, רענון, שם פרויקט לא מזוהה, ושני באנרים של דיווחים
+  ממתינים) — `pages.salesCenter.*` + `deals.cycles.*`. הריבוי עבר למפתחות `claimsMineOne/Many`
+  ו־`claimsWaitingOne/Many`, כי `דיווח/דיווחים` ו־`report/reports` אינם אותו דבר.
+- **`routes/deals/+page.svelte`**: כותרת והסבר של „הוראות קבע” — `deals.cycles.titleCustomer` / `subCustomer`.
+- **`src/lib/components/sales/SaleComponent.svelte`**: ארבע שורות של „לקוח (אופציונלי)” נכתבו
+  ב־`$lang === 'en' ? … : עברית`, כלומר `ar`/`ru`/`es` קיבלו עברית. הן עברו למפתחות
+  `sales.shopSkin.*` **שכבר היו קיימים** ולא היו מחוברים.
+- **`src/lib/components/process/ProcessChainView.svelte`, `chain/{ActsGroup,AsksNode,ChainConnector}.svelte`,
+  `lifecycle/LifecycleStation.svelte`, `VoteRounds.svelte`**: אותה משפחת מילונים; עברו ל־`moach.chainView.*`,
+  `moach.actsGroup.*`, `moach.asksNode.*`, `moach.voteRounds.*`, וחץ המחבר + כיווניות לפי `$isRtl`.
+  תאריכים ומספרים לפי `$lang` במקום `en-GB`/`en-US` קבועים.
+- **`src/routes/negotiation/[id]/+page.server.js` + `[id]/+page.svelte`**: שני מסרי שגיאה בעברית
+  הוחלפו ב־`errorKey` (`discussion_not_found`, `error_loading`), **והמסך מחובר אליהם** —
+  `serverError` נגזר מה־`data.errorKey` ומוצג ב־toast השגיאה הקיים (אפשר לסגור אותו).
+- **`src/lib/negotiation/RoundFeedback.svelte`**: `יח'` — `negotiation.unitsShort` בחמש שפות.
+- **שלושת העמודים הציבוריים** (`gift/[id]`, `availableMission/[id]`, `availiableResorce/[id]`):
+  „כבר שלחת בקשת רכישה”, „עריכת BOM / מוצר”, `'he' === $lang ? 'לצפיה במשאלה' : 'See the wish'`,
+  הודעות ה־toast של שליחת בקשה/הצעה, `aria-label="סגירה"`, טולטיפ „הערות”, כותרת `error | שגיאה`
+  שהציגה אנגלית ועברית יחד, ו־`toLocaleString('en-US')` על מספרים — `offerings.page.*` ו־`pages.avail{Resource,Mission}.*`.
+
+**בדיקה חדשה שמונעת רגרסיה ✅:** `npm run check:ui-hebrew` (`scripts/check-ui-hebrew.mjs`) קורא רק את
+חצי ה־markup של `.svelte` (מחרוזת עברית בתוך `<script>` היא השוואת נתונים או ערך לפי שפת הנמען,
+וזה מותר), מסיר הערות, ונכשל על כל אות עברית שנשארה. הוא מכסה 153 רכיבים ב־17 תיקיות: מסכי
+שלבים 1–3 (`concierge`, `wish`, `moach`, `lev`, `timers`, `deals`, `negotiation`), שלושת
+העמודים הציבוריים (`gift`, `availableMission`, `availiableResorce`), והרכיבים שלהם.
+ה־allowlist היחיד הוא שם של שפה בתצוגת התרגום של AI (`עברית:`), כי שם של שפה אינו מתורגם.
+תיקייה חדשה מתווספת ל־`ROOTS` אחרי שהיא מתורגמת — ומאותו רגע אי אפשר להחזיר לשם עברית.
+
+**מה שנשאר פתוח בשלב הזה (ולא שייך למסך):**
+
+- **`src/lib/sheirut/dealDue.ts:347`**: שם חלופי לשורת משימה — `` `${productName} - משימה` ``.
+  `buildDealLines` לא נקרא בפרודקשן (רק בבדיקות), ולכן לא הוחלף: שינוי השם החלופי עלול לשבש
+  את התאמת השורות לפי שם. אם וכאשר הוא יחובר, לתת לו `TranslateFn` כמו ל־`dealsService`.
+- **`src/lib/services/{salesService,projectMembershipService}.js`** ו־`src/lib/utils/errorHandling.js`:
+  מפות `{ he, en }` ל־`getErrorMessage`. אין להן קוראים בקוד היום, ולכן הן לא מגיעות למסך; אם
+  יחוברו, צריך להעביר אותן למפתחות `$t()` (שלוש השפות הנוספות חסרות בהן).
 
 ### שלב 4: הודעות מהשרת שמגיעות למשתמש (P1)
 
@@ -138,6 +179,9 @@
 הנמען, שה־CLAUDE.md מתיר. הרשימה שלמעלה היא מה שמגיע בפועל למסך של קורא
 באנגלית.
 
-כדאי להוסיף לבדיקות בדיקה בסגנון `check:script` שנכשלת על טקסט עברי ב־markup
-של `.svelte` בתוך `src/routes` ו־`src/lib/components`, עם allowlist לקבצים
-שמוחרגים בכוונה. כך אי אפשר להכניס רגרסיות חדשות.
+~~כדאי להוסיף לבדיקות בדיקה בסגנון `check:script` שנכשלת על טקסט עברי ב־markup
+של `.svelte`~~ ✅ **נוסף בשלב 3:** `npm run check:ui-hebrew`. הוא לא סורק את כל
+`src/routes` ו־`src/lib/components` אלא את `ROOTS` — התיקיות שכבר תורגמו (שלבים
+1–3). זו הבחירה הנכונה: בדיקה על כל הריפו הייתה נכשלת על עשרות מסכים שעוד לא
+תורגמו, ומדליקה אזהרה שכולם לומדים להתעלם ממנה. סיום שלב 4 או 5 = הוספת התיקייה
+ל־`ROOTS`, וזה כל מה שצריך כדי לנעול אותה.

@@ -147,7 +147,9 @@
     "times": "times",
     "hours_done": "hours done",
     "empty_doing": "No missions in progress right now",
-    "empty_done": "No completed missions yet"
+    "empty_done": "No completed missions yet",
+    "pendingRequest": "Вы уже отправили запрос на покупку — посмотреть его",
+    "editBom": "Изменить состав / продукт"
   },
   "compose": {
     "title": "Создать продукт",

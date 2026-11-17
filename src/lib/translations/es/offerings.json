@@ -148,7 +148,9 @@
     "times": "veces",
     "hours_done": "horas hechas",
     "empty_doing": "No hay misiones en curso ahora mismo",
-    "empty_done": "Aún no hay misiones completadas"
+    "empty_done": "Aún no hay misiones completadas",
+    "pendingRequest": "Ya enviaste una solicitud de compra: verla",
+    "editBom": "Editar materiales / producto"
   },
   "compose": {
     "title": "Crear producto",

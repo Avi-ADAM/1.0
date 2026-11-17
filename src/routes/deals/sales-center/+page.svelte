@@ -99,14 +99,10 @@
       // Show success message with details
       const productName = products[productIndex].attributes.name;
       toast.success(
-        $lang === 'he'
-          ? `מכירה של ${saleData.unit} יחידות מ"${productName}" בוצעה בהצלחה!`
-          : `Sale of ${saleData.unit} units of "${productName}" completed successfully!`
+        $t('pages.salesCenter.saleDoneUnits', { units: saleData.unit, name: productName })
       );
     } else {
-      toast.success(
-        $lang === 'he' ? 'המכירה בוצעה בהצלחה!' : 'Sale completed successfully!'
-      );
+      toast.success($t('pages.salesCenter.saleDone'));
     }
   }
 
@@ -121,9 +117,7 @@
     activeSales.delete(productId);
 
     // Show error message
-    const errorMessage =
-      error ||
-      ($lang === 'he' ? 'שגיאה בביצוע המכירה' : 'Error processing sale');
+    const errorMessage = error || $t('pages.salesCenter.saleFailed');
     toast.error(errorMessage);
   }
 
@@ -151,10 +145,7 @@
       navigator
         .share({
           title: productName,
-          text:
-            $lang === 'he'
-              ? `צפה במוצר: ${productName}`
-              : `Check out this product: ${productName}`,
+          text: $t('pages.salesCenter.shareText', { name: productName }),
           url: url
         })
         .catch(console.error);
@@ -163,14 +154,10 @@
       navigator.clipboard
         .writeText(url)
         .then(() => {
-          toast.success(
-            $lang === 'he' ? 'הקישור הועתק ללוח' : 'Link copied to clipboard'
-          );
+          toast.success($t('pages.salesCenter.linkCopied'));
         })
         .catch(() => {
-          toast.error(
-            $lang === 'he' ? 'שגיאה בהעתקת הקישור' : 'Failed to copy link'
-          );
+          toast.error($t('pages.salesCenter.linkCopyFailed'));
         });
     }
   }
@@ -183,7 +170,7 @@
     loading = true;
     try {
       await invalidateAll();
-      toast.success($lang === 'he' ? 'נתוני המוצרים עודכנו' : 'Product data refreshed');
+      toast.success($t('pages.salesCenter.refreshed'));
     } catch {
       toast.error($t('pages.salesCenter.error'));
     } finally {
@@ -194,7 +181,7 @@
   function getProjectName(product) {
     return (
       product.attributes.projectcreates?.data?.[0]?.attributes?.projectName ||
-      'Unknown Project'
+      $t('pages.salesCenter.unknownProject')
     );
   }
 </script>
@@ -222,16 +209,22 @@
     <div class="claims-banner anim">
       {#if myTurnClaims.length > 0}
         <p class="claims-line claims-turn">
-          {$lang === 'he'
-            ? `יש לך ${myTurnClaims.length} דיווח${myTurnClaims.length > 1 ? 'ים' : ''} שממתין${myTurnClaims.length > 1 ? 'ים' : ''} לתגובתך בעמוד הלב`
-            : `You have ${myTurnClaims.length} sale report${myTurnClaims.length > 1 ? 's' : ''} awaiting your response on the heart page`}
+          {$t(
+            myTurnClaims.length === 1
+              ? 'pages.salesCenter.claimsMineOne'
+              : 'pages.salesCenter.claimsMineMany',
+            { count: myTurnClaims.length }
+          )}
         </p>
       {/if}
       {#if waitingClaims.length > 0}
         <p class="claims-line claims-waiting">
-          {$lang === 'he'
-            ? `${waitingClaims.length} דיווח${waitingClaims.length > 1 ? 'ים' : ''} ממתין${waitingClaims.length > 1 ? 'ים' : ''} להסכמת מחזיק הכסף`
-            : `${waitingClaims.length} sale report${waitingClaims.length > 1 ? 's' : ''} awaiting the holder's consent`}
+          {$t(
+            waitingClaims.length === 1
+              ? 'pages.salesCenter.claimsWaitingOne'
+              : 'pages.salesCenter.claimsWaitingMany',
+            { count: waitingClaims.length }
+          )}
         </p>
       {/if}
     </div>
@@ -240,15 +233,9 @@
   {#if pendingCycles.length > 0}
     <section class="cycles-section anim">
       <h2 class="cycles-title">
-        {$lang === 'he'
-          ? `מכירות מתחדשות - דיווח חודשי (${pendingCycles.length})`
-          : `Recurring sales - monthly report (${pendingCycles.length})`}
+        {$t('deals.cycles.titleHolder', { count: pendingCycles.length })}
       </h2>
-      <p class="cycles-sub">
-        {$lang === 'he'
-          ? 'כמה נכנס החודש מכל הוראת קבע? גם 0 הוא דיווח - והוראה שבוטלה אפשר לסגור כאן.'
-          : 'How much came in this month from each standing order? 0 is a valid report - and a cancelled order can be closed here.'}
-      </p>
+      <p class="cycles-sub">{$t('deals.cycles.subHolder')}</p>
       <div class="cycles-grid">
         {#each pendingCycles as cycle (cycle.id)}
           <RecurringCycleCard {cycle} role="holder" onDone={() => invalidateAll()} />

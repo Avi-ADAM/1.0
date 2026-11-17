@@ -101,7 +101,7 @@
           // projectId intentionally omitted — server detects concierge path
         });
         if (!result.success) {
-          toast.error(result.error?.message ?? 'שגיאה בשליחת הבקשה');
+          toast.error(result.error?.message ?? $t('pages.availMission.sendRequestError'));
           alr = false;
           return;
         }
@@ -109,15 +109,15 @@
         setTimeout(() => { success = false; }, 15000);
         toast.success($t('lev.cards.wishApplied') || $t('pages.availMission.fnnn'));
       } catch (error) {
-        console.error('שגיאה:', error);
-        toast.error('אירעה שגיאה');
+        console.error(error);
+        toast.error($t('pages.availMission.genericError'));
         alr = false;
       }
       return;
     }
 
     if (!inD?.attributes?.project?.data) {
-      toast.error('שגיאה בטעינת נתוני הפרויקט');
+      toast.error($t('pages.availMission.projectLoadError'));
       alr = false;
       return;
     }
@@ -133,7 +133,7 @@
       });
 
       if (!result.success) {
-        toast.error(result.error?.message ?? 'שגיאה בשליחת הבקשה');
+        toast.error(result.error?.message ?? $t('pages.availMission.sendRequestError'));
         alr = false;
         return;
       }
@@ -144,8 +144,8 @@
       setTimeout(() => { success = false; }, 15000);
       toast.success(`${$t('pages.availMission.fnnn')}`);
     } catch (error) {
-      console.error('שגיאה:', error);
-      toast.error('אירעה שגיאה');
+      console.error(error);
+      toast.error($t('pages.availMission.genericError'));
       alr = false;
     }
   }
@@ -162,7 +162,7 @@
     const inD = data.alld;
     if (!inD?.attributes?.project?.data) {
       // Concierge missions don't support nego yet
-      toast.error('מו"מ אינו זמין עבור משימות קונסיירז\'');
+      toast.error($t('pages.availMission.negoUnavailable'));
       negoLoading = false;
       return;
     }
@@ -175,7 +175,7 @@
         ...(acceptedRuleIds.length ? { acceptedRuleIds } : {})
       });
       if (!result.success) {
-        toast.error(result.error?.message ?? 'שגיאה בשליחת ההצעה');
+        toast.error(result.error?.message ?? $t('pages.availMission.sendOfferError'));
         negoLoading = false;
         return;
       }
@@ -187,8 +187,8 @@
       setTimeout(() => { success = false; }, 15000);
       toast.success(`${$t('pages.availMission.fnnn')}`);
     } catch (error) {
-      console.error('שגיאה:', error);
-      toast.error('אירעה שגיאה');
+      console.error(error);
+      toast.error($t('pages.availMission.genericError'));
       negoLoading = false;
     }
   }
@@ -413,7 +413,7 @@
             <a
               href="/wish/{data.alld.attributes.ratson.data.id}"
               class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4"
-              >{'he' === $lang ? 'לצפיה במשאלה' : 'See the wish'}</a
+              >{$t('pages.availMission.seeWish')}</a
             >
             {/if}
           </div>
@@ -869,7 +869,7 @@
                         onclick={closeNego}
                         style="margin: 0 auto;"
                         class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-                        aria-label="סגירה">✕</button
+                        aria-label={$t('common.close')}>✕</button
                       >
                       {#if negoLoading}
                         <Spinner size="lg" />
@@ -900,7 +900,7 @@
                           isAsk={1}
                         />
                       {:else if negoOpen}
-                        <p class="text-barbi text-center p-4">מו"מ אינו זמין עבור משימות קונסיירז'</p>
+                        <p class="text-barbi text-center p-4">{$t('pages.availMission.negoUnavailable')}</p>
                       {/if}
                     </DialogContent>
                   </div>

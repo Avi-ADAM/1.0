@@ -1,6 +1,6 @@
 <script lang="ts">
   import Money from '$lib/components/money/Money.svelte';
-  import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import ResourceDetailsModal from './ResourceDetailsModal.svelte';
   import CostShapePicker from './CostShapePicker.svelte';
   import type {
@@ -82,85 +82,6 @@
       };
     });
   }
-
-  const t = $derived(
-    $lang === 'he'
-      ? {
-          empty: 'אין משאבים נדרשים. אפשר להשאיר ריק או להוסיף שורה.',
-          add: '+ הוספת משאב',
-          modeExisting: 'משאב בתהליך בפרויקט',
-          modeNew: 'משאב חדש',
-          pickExisting: 'בחר משאב פעיל',
-          pickExistingPh: '— בחר משאב בתהליך —',
-          noExisting: 'אין משאבים פעילים בפרויקט. צור משאב חדש.',
-          nameph: 'שם המשאב',
-          desc: 'תיאור קצר',
-          quantityPerUnit: 'כמות ליחידה',
-          pricePerUnit: 'מחיר ליחידה',
-          kindOf: 'סוג',
-          kindService: 'שירות',
-          kindGood: 'מוצר',
-          kindSubscription: 'מנוי',
-          kindOther: 'אחר',
-          assignedTo: 'אחראי',
-          chooseMember: '— בחר חבר פרויקט —',
-          unassigned: 'טרם שויך',
-          unassignedWarning:
-            'ללא אחראי → המשאב יוצג ללקוחות כתלוי בספק שעדיין לא נמצא',
-          onlyPartOfTag: 'לא מנוצל עד מכירה',
-          onlyPartOfHelp:
-            'המשאב יוקם כסקיצה (onlyPartOf=true) וייצא לרכש רק כשמישהו יקנה את המוצר',
-          pendmFlow:
-            '⚠ פרויקט עם 2+ חברים - כל משאב חדש ייווצר ראשית כ-pmash להצבעה',
-          singleFlow: '👤 חבר יחיד בפרויקט - המשאב ייווצר ישירות אצלך',
-          ownerFromExisting: 'האחראי יורש מהמשאב הקיים',
-          fullDetails: '⚙ פרטים מלאים (קישור, מפרט, תאריכים...)',
-          fullDetailsSet: '✓ פרטים מלאים נשמרו',
-          detailsSubtitle: 'אופציונלי - אפשר להשאיר ריק ולהמשיך',
-          rowTotal: 'סה"כ לשורה',
-          remove: 'הסר שורה',
-          fromPmash: 'בתהליך הצבעה',
-          fromOpen: 'בקשה פתוחה'
-        }
-      : {
-          empty: 'No resources required. Leave empty or add a row.',
-          add: '+ Add resource',
-          modeExisting: 'Existing project resource',
-          modeNew: 'New resource',
-          pickExisting: 'Pick an active resource',
-          pickExistingPh: '— Select resource in progress —',
-          noExisting: 'No active resources in the project. Create a new one.',
-          nameph: 'Resource name',
-          desc: 'Short description',
-          quantityPerUnit: 'Qty/unit',
-          pricePerUnit: 'Price/unit',
-          kindOf: 'Kind',
-          kindService: 'Service',
-          kindGood: 'Good',
-          kindSubscription: 'Subscription',
-          kindOther: 'Other',
-          assignedTo: 'Owner',
-          chooseMember: '— Choose project member —',
-          unassigned: 'Unassigned',
-          unassignedWarning:
-            'No owner → the resource will be flagged to customers as "supplier not yet found"',
-          onlyPartOfTag: 'Idle until purchase',
-          onlyPartOfHelp:
-            'Resource is created as a draft (onlyPartOf=true) - procurement triggered only when product is sold',
-          pendmFlow:
-            '⚠ Multi-member project - every new resource first becomes a pmash for vote',
-          singleFlow:
-            '👤 Single project member - the resource will be created directly under you',
-          ownerFromExisting: 'Owner is inherited from the existing resource',
-          fullDetails: '⚙ Full details (link, spec, dates...)',
-          fullDetailsSet: '✓ Full details saved',
-          detailsSubtitle: 'optional - you can skip and continue',
-          rowTotal: 'Row total',
-          remove: 'Remove row',
-          fromPmash: 'pending vote',
-          fromOpen: 'open request'
-        }
-  );
 
   function add() {
     rows = [
@@ -250,7 +171,7 @@
   }
 
   function memberLabel(id: string | null): string {
-    if (!id) return t.unassigned;
+    if (!id) return $t('products.resource.unassigned');
     const m = projectMembers.find((u) => u.id === id);
     return m?.attributes.username ?? `#${id}`;
   }
@@ -274,14 +195,14 @@
 
 <div class="picker">
   {#if rows.length === 0 && !adding}
-    <div class="empty">{t.empty}</div>
+    <div class="empty">{$t('products.resource.empty')}</div>
   {/if}
 
   {#if rows.length > 0 && !adding}
     {#if multiMember}
-      <div class="flow-note flow-multi">{t.pendmFlow}</div>
+      <div class="flow-note flow-multi">{$t('products.resource.pendmFlow')}</div>
     {:else}
-      <div class="flow-note flow-single">{t.singleFlow}</div>
+      <div class="flow-note flow-single">{$t('products.resource.singleFlow')}</div>
     {/if}
   {/if}
 
@@ -297,37 +218,37 @@
             class:active={r.mode === 'consumeExisting'}
             onclick={() => setMode(i, 'consumeExisting')}
           >
-            {t.modeExisting}
+            {$t('products.resource.modeExisting')}
           </button>
           <button
             type="button"
             class:active={r.mode === 'createNew'}
             onclick={() => setMode(i, 'createNew')}
           >
-            {t.modeNew}
+            {$t('products.resource.modeNew')}
           </button>
         </div>
-        <button class="x" type="button" aria-label={t.remove} onclick={() => remove(i)}>
+        <button class="x" type="button" aria-label={$t('products.resource.remove')} onclick={() => remove(i)}>
           ×
         </button>
       </div>
 
       {#if r.mode === 'consumeExisting'}
         {#if availableResources.length === 0}
-          <div class="empty-inline">{t.noExisting}</div>
+          <div class="empty-inline">{$t('products.resource.noExisting')}</div>
         {:else}
           <label class="field">
-            <span>{t.pickExisting}</span>
+            <span>{$t('products.resource.pickExisting')}</span>
             <select
               class="input"
               value={currentExistingKey(r)}
               onchange={(e) => pickExisting(i, (e.currentTarget as HTMLSelectElement).value)}
             >
-              <option value="">{t.pickExistingPh}</option>
+              <option value="">{$t('products.resource.pickExistingPh')}</option>
               {#each availableResources as res (existingKey(res))}
                 <option value={existingKey(res)}>
                   {res.attributes.name}
-                  {' '}— {res.source === 'pmash' ? t.fromPmash : t.fromOpen}
+                  {' '}— {res.source === 'pmash' ? $t('products.resource.fromPmash') : $t('products.resource.fromOpen')}
                 </option>
               {/each}
             </select>
@@ -335,43 +256,43 @@
         {/if}
       {:else}
         <label class="field">
-          <span>{t.nameph}</span>
+          <span>{$t('products.resource.nameph')}</span>
           <input
             class="input"
             bind:value={r.name}
-            placeholder={t.nameph}
+            placeholder={$t('products.resource.nameph')}
             list={resourceTemplates.length > 0 ? 'compose-resource-name-options' : undefined}
             onchange={(e) =>
               hydrateFromTemplate(i, (e.currentTarget as HTMLInputElement).value)}
           />
         </label>
         <label class="field">
-          <span>{t.desc} <small class="hint">{t.detailsSubtitle}</small></span>
+          <span>{$t('products.resource.desc')} <small class="hint">{$t('products.resource.detailsSubtitle')}</small></span>
           <textarea
             class="input textarea"
             rows="2"
             bind:value={r.notes}
-            placeholder={t.desc}
+            placeholder={$t('products.resource.desc')}
           ></textarea>
         </label>
       {/if}
 
       <div class="grid">
         <label class="field">
-          <span>{t.quantityPerUnit}</span>
+          <span>{$t('products.resource.quantityPerUnit')}</span>
           <input class="input" type="number" min="0" step="0.5" bind:value={r.quantityPerUnit} />
         </label>
         <label class="field">
-          <span>{t.pricePerUnit}</span>
+          <span>{$t('products.resource.pricePerUnit')}</span>
           <input class="input" type="number" min="0" step="1" bind:value={r.pricePerUnit} />
         </label>
         <label class="field">
-          <span>{t.kindOf}</span>
+          <span>{$t('products.resource.kindOf')}</span>
           <select class="input" bind:value={r.kindOf}>
-            <option value="good">{t.kindGood}</option>
-            <option value="service">{t.kindService}</option>
-            <option value="subscription">{t.kindSubscription}</option>
-            <option value="other">{t.kindOther}</option>
+            <option value="good">{$t('products.resource.kindGood')}</option>
+            <option value="service">{$t('products.resource.kindService')}</option>
+            <option value="subscription">{$t('products.resource.kindSubscription')}</option>
+            <option value="other">{$t('products.resource.kindOther')}</option>
           </select>
         </label>
       </div>
@@ -382,9 +303,9 @@
 
       {#if r.mode === 'createNew'}
         <label class="field">
-          <span>{t.assignedTo}</span>
+          <span>{$t('products.resource.assignedTo')}</span>
           <select class="input" bind:value={r.assignedMemberId}>
-            <option value={null}>{t.chooseMember}</option>
+            <option value={null}>{$t('products.resource.chooseMember')}</option>
             {#each projectMembers as m (m.id)}
               <option value={m.id}>{m.attributes.username}</option>
             {/each}
@@ -393,11 +314,11 @@
 
         {#if !adding}
         <div class="badges">
-          <span class="badge badge-info" title={t.onlyPartOfHelp}>
-            🏷 {t.onlyPartOfTag}
+          <span class="badge badge-info" title={$t('products.resource.onlyPartOfHelp')}>
+            🏷 {$t('products.resource.onlyPartOfTag')}
           </span>
           {#if r.extraDetails}
-            <span class="badge badge-success">{t.fullDetailsSet}</span>
+            <span class="badge badge-success">{$t('products.resource.fullDetailsSet')}</span>
           {/if}
         </div>
 
@@ -407,15 +328,15 @@
           class:filled={!!r.extraDetails}
           onclick={() => (detailsOpenFor = i)}
         >
-          {t.fullDetails}
+          {$t('products.resource.fullDetails')}
         </button>
 
         {#if !r.assignedMemberId}
-          <div class="warning">⚠ {t.unassignedWarning}</div>
+          <div class="warning">⚠ {$t('products.resource.unassignedWarning')}</div>
         {/if}
         {/if}
       {:else if r.pmashId || r.openMashaabimId}
-        <div class="info-line">👤 {memberLabel(r.assignedMemberId)} - {t.ownerFromExisting}</div>
+        <div class="info-line">👤 {memberLabel(r.assignedMemberId)} - {$t('products.resource.ownerFromExisting')}</div>
       {/if}
 
       <div class="row-foot">
@@ -424,19 +345,19 @@
             {#if r.assignedMemberId}
               👤 {memberLabel(r.assignedMemberId)}
             {:else}
-              ⚡ {t.unassigned}
+              ⚡ {$t('products.resource.unassigned')}
             {/if}
           </span>
         {/if}
         <span class="row-total">
-          {t.rowTotal}:
+          {$t('products.resource.rowTotal')}:
           <strong><Money amount={rowTotal(r)} {currency} /></strong>
         </span>
       </div>
     </div>
   {/each}
 
-  <button class="add" type="button" onclick={add}>{t.add}</button>
+  <button class="add" type="button" onclick={add}>{$t('products.resource.add')}</button>
 
   {#if resourceTemplates.length > 0}
     <datalist id="compose-resource-name-options">

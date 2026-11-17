@@ -9,123 +9,11 @@
   import LifecycleStation from './LifecycleStation.svelte';
   import { mediaUrl, saleEffective } from '$lib/utils/processLifecycle';
   import { parseSiteShareNote } from '$lib/revenue/parseSiteShareNote';
+  import { isRtl, t } from '$lib/translations';
+  import { lang as uiLang } from '$lib/stores/lang.js';
 
   let { chain, projectId, lang = 'en' } = $props();
 
-  const i18n = {
-    he: {
-      product: 'מוצר',
-      recipe: 'מתכון המוצר - משימות ומשאבים',
-      recipeMissions: 'משימות במתכון',
-      recipeResources: 'משאבים במתכון',
-      sales: 'מכירות',
-      split: 'חלוקת הכנסות',
-      objectPage: 'לעמוד האובייקט',
-      processOf: 'לתהליך',
-      fixPrice: 'מחיר קבוע',
-      dynamicPrice: 'מחיר מתגבש בתהליך',
-      price: 'מחיר',
-      estimated: 'מחיר משוער',
-      quant: 'כמות',
-      approved: 'מאושר',
-      pendingApproval: 'ממתין לאישור',
-      archived: 'ארכיון',
-      active: 'פעיל',
-      perUnit: 'ליחידה',
-      hours: 'שעות',
-      amount: 'סכום',
-      holder: 'הכסף אצל',
-      selfReport: 'דיווח עצמי',
-      holderConfirmed: 'אושר ע״י מחזיק/ת הכסף',
-      awaitingHolder: 'ממתין להסכמת מחזיק/ת הכסף',
-      counted: 'נספר במאזן',
-      donation: 'תרומה',
-      siteShare: 'חלק האתר',
-      siteSharePaid: 'שולם',
-      siteShareFrom: 'מרקמה',
-      splited: 'חולק',
-      notSplited: 'טרם חולק',
-      toSplit: 'למחשבון החלוקה',
-      salesBoard: 'ללוח המכירות',
-      noSales: 'אין מכירות עדיין',
-      by: 'אחראי/ת'
-    },
-    en: {
-      product: 'Product',
-      recipe: 'Product recipe - missions & resources',
-      recipeMissions: 'Recipe missions',
-      recipeResources: 'Recipe resources',
-      sales: 'Sales',
-      split: 'Revenue split',
-      objectPage: 'Object page',
-      processOf: 'Process',
-      fixPrice: 'Fixed price',
-      dynamicPrice: 'Price shaped in process',
-      price: 'Price',
-      estimated: 'Estimated price',
-      quant: 'Quantity',
-      approved: 'Approved',
-      pendingApproval: 'Awaiting approval',
-      archived: 'Archived',
-      active: 'Active',
-      perUnit: 'per unit',
-      hours: 'hours',
-      amount: 'Amount',
-      holder: 'Money held by',
-      selfReport: 'Self report',
-      holderConfirmed: 'Confirmed by holder',
-      awaitingHolder: 'Awaiting holder consent',
-      counted: 'Counted in balance',
-      donation: 'Donation',
-      siteShare: 'Site share',
-      siteSharePaid: 'Paid',
-      siteShareFrom: 'From rikma',
-      splited: 'Split done',
-      notSplited: 'Not split yet',
-      toSplit: 'Split calculator',
-      salesBoard: 'Sales board',
-      noSales: 'No sales yet',
-      by: 'Owner'
-    },
-    ar: {
-      product: 'منتج',
-      recipe: 'وصفة المنتج - مهام وموارد',
-      recipeMissions: 'مهام الوصفة',
-      recipeResources: 'موارد الوصفة',
-      sales: 'مبيعات',
-      split: 'توزيع الإيرادات',
-      objectPage: 'صفحة الكائن',
-      processOf: 'العملية',
-      fixPrice: 'سعر ثابت',
-      dynamicPrice: 'سعر يتشكل في العملية',
-      price: 'السعر',
-      estimated: 'سعر تقديري',
-      quant: 'الكمية',
-      approved: 'معتمد',
-      pendingApproval: 'بانتظار الموافقة',
-      archived: 'أرشيف',
-      active: 'نشط',
-      perUnit: 'للوحدة',
-      hours: 'ساعات',
-      amount: 'المبلغ',
-      holder: 'المال لدى',
-      selfReport: 'تقرير ذاتي',
-      holderConfirmed: 'أكده حائز المال',
-      awaitingHolder: 'بانتظار موافقة حائز المال',
-      counted: 'محسوب في الرصيد',
-      donation: 'تبرع',
-      siteShare: 'حصة الموقع',
-      siteSharePaid: 'مدفوع',
-      siteShareFrom: 'من مجموعة',
-      splited: 'تم التوزيع',
-      notSplited: 'لم يوزع بعد',
-      toSplit: 'حاسبة التوزيع',
-      salesBoard: 'لوحة المبيعات',
-      noSales: 'لا مبيعات بعد',
-      by: 'مسؤول'
-    }
-  };
-  let t = $derived(i18n[lang] ?? i18n.en);
 
   let base = $derived(`/moach/${projectId}`);
 
@@ -152,7 +40,7 @@
     if (!value) return '';
     try {
       return new Date(value).toLocaleDateString(
-        lang === 'he' ? 'he-IL' : lang === 'ar' ? 'ar' : 'en-GB',
+        $uiLang,
         { day: 'numeric', month: 'short', year: 'numeric' }
       );
     } catch {
@@ -187,39 +75,39 @@
   }
 
   function saleBadge(attrs) {
-    if (attrs.holderStatus === 'open') return { text: t.awaitingHolder, cls: 'pl-badge--gold' };
-    if (attrs.holderStatus === 'self') return { text: t.selfReport, cls: 'pl-badge--green' };
-    if (attrs.holderStatus === 'confirmed') return { text: t.holderConfirmed, cls: 'pl-badge--green' };
-    return { text: t.counted, cls: 'pl-badge--green' };
+    if (attrs.holderStatus === 'open') return { text: $t('moach.saleLife.awaitingHolder'), cls: 'pl-badge--gold' };
+    if (attrs.holderStatus === 'self') return { text: $t('moach.saleLife.selfReport'), cls: 'pl-badge--green' };
+    if (attrs.holderStatus === 'confirmed') return { text: $t('moach.saleLife.holderConfirmed'), cls: 'pl-badge--green' };
+    return { text: $t('moach.saleLife.counted'), cls: 'pl-badge--green' };
   }
 </script>
 
-<div class="pl" dir={lang === 'he' || lang === 'ar' ? 'rtl' : 'ltr'}>
+<div class="pl" dir={$isRtl ? 'rtl' : 'ltr'}>
   <!-- ── 1 · Product ──────────────────────────────────────────────────────── -->
   {#if matanot}
     {@const attrs = matanot.attributes ?? {}}
     <LifecycleStation
-      label={t.product}
+      label={$t('moach.saleLife.product')}
       name={attrs.name ?? `#${matanot.id}`}
       status={attrs.archived
-        ? { text: t.archived, tone: 'grey' }
+        ? { text: $t('moach.saleLife.archived'), tone: 'grey' }
         : attrs.appruved
-          ? { text: t.approved, tone: 'green' }
-          : { text: t.pendingApproval, tone: 'gold' }}
+          ? { text: $t('moach.saleLife.approved'), tone: 'green' }
+          : { text: $t('moach.saleLife.pendingApproval'), tone: 'gold' }}
       createdAt={attrs.createdAt}
       href={`${base}/object/matanot/${matanot.id}`}
-      hrefLabel={t.objectPage}
+      hrefLabel={$t('moach.saleLife.objectPage')}
       tone="gold"
       isLast={isLast('product')}
       {lang}
     >
       <div class="pl-facts">
-        <span class="pl-fact">{attrs.fixPrice ? t.fixPrice : t.dynamicPrice}</span>
-        {#if attrs.price != null}<span class="pl-fact">{t.price}: {attrs.price}</span>{/if}
+        <span class="pl-fact">{attrs.fixPrice ? $t('moach.saleLife.fixPrice') : $t('moach.saleLife.dynamicPrice')}</span>
+        {#if attrs.price != null}<span class="pl-fact">{$t('moach.saleLife.price')}: {attrs.price}</span>{/if}
         {#if attrs.estimatedPrice != null && attrs.price == null}
-          <span class="pl-fact">{t.estimated}: {attrs.estimatedPrice}</span>
+          <span class="pl-fact">{$t('moach.saleLife.estimated')}: {attrs.estimatedPrice}</span>
         {/if}
-        {#if attrs.quant != null}<span class="pl-fact">{t.quant}: {attrs.quant}</span>{/if}
+        {#if attrs.quant != null}<span class="pl-fact">{$t('moach.saleLife.quant')}: {attrs.quant}</span>{/if}
         {#if attrs.kindOf}<span class="pl-fact">{attrs.kindOf}</span>{/if}
       </div>
     </LifecycleStation>
@@ -227,10 +115,10 @@
 
   <!-- ── 2 · Recipe — the missions & resources the product is made of ────── -->
   {#if hasRecipe}
-    <LifecycleStation label={t.recipe} name="" tone="sky" isLast={isLast('recipe')} {lang}>
+    <LifecycleStation label={$t('moach.saleLife.recipe')} name="" tone="sky" isLast={isLast('recipe')} {lang}>
       {#if recipeMissions.length > 0}
         <div class="pl-votes">
-          <h4 class="pl-subheading">{t.recipeMissions} ({recipeMissions.length})</h4>
+          <h4 class="pl-subheading">{$t('moach.saleLife.recipeMissions')} ({recipeMissions.length})</h4>
           <div class="pl-cards">
             {#each recipeMissions as recipe (recipe.id)}
               {@const attrs = recipe.attributes ?? {}}
@@ -239,14 +127,14 @@
                 <div class="pl-card-head">
                   <span class="pl-card-name">{recipeMissionName(recipe)}</span>
                   {#if attrs.hoursPerUnit != null}
-                    <span class="pl-fact">{attrs.hoursPerUnit} {t.hours} {t.perUnit}</span>
+                    <span class="pl-fact">{attrs.hoursPerUnit} {$t('moach.saleLife.hours')} {$t('moach.saleLife.perUnit')}</span>
                   {/if}
                   {#if attrs.assignedMember?.data?.attributes?.username}
-                    <span class="pl-fact">{t.by}: {attrs.assignedMember.data.attributes.username}</span>
+                    <span class="pl-fact">{$t('moach.saleLife.by')}: {attrs.assignedMember.data.attributes.username}</span>
                   {/if}
                   <span class="pl-card-links">
                     {#if ref}
-                      <a class="pl-action" href={`${base}/processes/${ref}`}>{t.processOf}</a>
+                      <a class="pl-action" href={`${base}/processes/${ref}`}>{$t('moach.saleLife.processOf')}</a>
                     {/if}
                   </span>
                 </div>
@@ -257,7 +145,7 @@
       {/if}
       {#if recipeResources.length > 0}
         <div class="pl-votes">
-          <h4 class="pl-subheading">{t.recipeResources} ({recipeResources.length})</h4>
+          <h4 class="pl-subheading">{$t('moach.saleLife.recipeResources')} ({recipeResources.length})</h4>
           <div class="pl-cards">
             {#each recipeResources as recipe (recipe.id)}
               {@const attrs = recipe.attributes ?? {}}
@@ -266,14 +154,14 @@
                 <div class="pl-card-head">
                   <span class="pl-card-name">{recipeResourceName(recipe)}</span>
                   {#if attrs.quantityPerUnit != null}
-                    <span class="pl-fact">{attrs.quantityPerUnit} {t.perUnit}</span>
+                    <span class="pl-fact">{attrs.quantityPerUnit} {$t('moach.saleLife.perUnit')}</span>
                   {/if}
                   {#if attrs.pricePerUnit != null}
-                    <span class="pl-fact">{t.price}: {attrs.pricePerUnit}</span>
+                    <span class="pl-fact">{$t('moach.saleLife.price')}: {attrs.pricePerUnit}</span>
                   {/if}
                   <span class="pl-card-links">
                     {#if ref}
-                      <a class="pl-action" href={`${base}/processes/${ref}`}>{t.processOf}</a>
+                      <a class="pl-action" href={`${base}/processes/${ref}`}>{$t('moach.saleLife.processOf')}</a>
                     {/if}
                   </span>
                 </div>
@@ -287,7 +175,7 @@
 
   <!-- ── 3 · Sale records — holder consent, donations, site-share ─────────── -->
   {#if sales.length > 0}
-    <LifecycleStation label={t.sales} name="" tone="rose" isLast={isLast('sales')} {lang}>
+    <LifecycleStation label={$t('moach.saleLife.sales')} name="" tone="rose" isLast={isLast('sales')} {lang}>
       <div class="pl-cards">
         {#each sales as sale (sale.id)}
           {@const attrs = sale.attributes ?? {}}
@@ -303,24 +191,24 @@
                   {#if holder.attributes?.profilePic?.data?.attributes?.url}
                     <img class="pl-avatar" src={mediaUrl(holder.attributes.profilePic.data.attributes.url)} alt={holder.attributes.username} loading="lazy" />
                   {/if}
-                  {t.holder}: {holder.attributes?.username}
+                  {$t('moach.saleLife.holder')}: {holder.attributes?.username}
                 </span>
               {/if}
               <span class="pl-badge {badge.cls}">{badge.text}</span>
-              {#if attrs.isDonation}<span class="pl-badge pl-badge--blue">💗 {t.donation}</span>{/if}
-              {#if attrs.isSiteShareIncome}<span class="pl-badge pl-badge--blue">{t.siteShare}</span>{/if}
+              {#if attrs.isDonation}<span class="pl-badge pl-badge--blue">💗 {$t('moach.saleLife.donation')}</span>{/if}
+              {#if attrs.isSiteShareIncome}<span class="pl-badge pl-badge--blue">{$t('moach.saleLife.siteShare')}</span>{/if}
               <span class="pl-badge {attrs.splited ? 'pl-badge--green' : 'pl-badge--grey'}">
-                {attrs.splited ? t.splited : t.notSplited}
+                {attrs.splited ? $t('moach.saleLife.splited') : $t('moach.saleLife.notSplited')}
               </span>
               <span class="pl-card-links">
-                <a class="pl-action" href={`${base}/object/sale/${sale.id}`}>{t.objectPage}</a>
+                <a class="pl-action" href={`${base}/object/sale/${sale.id}`}>{$t('moach.saleLife.objectPage')}</a>
               </span>
             </div>
             {#if siteShare}
               <p class="pl-note">
-                {t.siteShare} · {t.siteSharePaid}: {siteShare.paid ?? '—'}
+                {$t('moach.saleLife.siteShare')} · {$t('moach.saleLife.siteSharePaid')}: {siteShare.paid ?? '—'}
                 {#if siteShare.fromProjectId}
-                  · {t.siteShareFrom} #{siteShare.fromProjectId}
+                  · {$t('moach.saleLife.siteShareFrom')} #{siteShare.fromProjectId}
                 {/if}
                 {#if siteShare.reason}
                   · {siteShare.reason}
@@ -337,7 +225,7 @@
 
   <!-- ── 4 · Revenue split ────────────────────────────────────────────────── -->
   {#if splitSales.length > 0}
-    <LifecycleStation label={t.split} name="" tone="green" isLast={isLast('split')} {lang}>
+    <LifecycleStation label={$t('moach.saleLife.split')} name="" tone="green" isLast={isLast('split')} {lang}>
       <div class="pl-cards">
         {#each splitSales as sale (sale.id)}
           {#each sale.attributes?.tosplits?.data ?? [] as tosplit (tosplit.id)}
@@ -345,10 +233,10 @@
               <div class="pl-card-head">
                 <span class="pl-card-name">#{tosplit.id}</span>
                 <span class="pl-badge {tosplit.attributes?.finished ? 'pl-badge--green' : 'pl-badge--gold'}">
-                  {tosplit.attributes?.finished ? t.splited : t.notSplited}
+                  {tosplit.attributes?.finished ? $t('moach.saleLife.splited') : $t('moach.saleLife.notSplited')}
                 </span>
                 <span class="pl-card-links">
-                  <a class="pl-action" href={`${base}/splits/${tosplit.id}`}>{t.toSplit}</a>
+                  <a class="pl-action" href={`${base}/splits/${tosplit.id}`}>{$t('moach.saleLife.toSplit')}</a>
                 </span>
               </div>
             </div>
