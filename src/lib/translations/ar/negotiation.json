@@ -76,5 +76,20 @@
   "discussion_not_found": "النقاش غير موجود",
   "loading": "جاري التحميل...",
   "anonymous": "مجهول",
-  "discussion_created_by": "فتح النقاش"
+  "discussion_created_by": "فتح النقاش",
+  "layout": {
+    "docOpen": "نقاش: {{topic}} - نظام حل الخلافات",
+    "docNew": "نقاش جديد - نظام حل الخلافات",
+    "docDefault": "نظام حل الخلافات",
+    "joinDesc": "انضم إلى نقاش مفتوح لحل الخلاف",
+    "newDesc": "افتح نقاشًا جديدًا وادعُ آخرين للمشاركة",
+    "srTopic": "نقاش مفتوح حول: {{topic}}",
+    "srNew": "إنشاء نقاش جديد"
+  },
+  "view": {
+    "addMinLine1": "أضف موقفين على الأقل",
+    "addMinLine2": "لعرض تحليل الأبعاد",
+    "refreshAi": "تحديث تحليل الذكاء الاصطناعي"
+  },
+  "unitsShort": "وحدة"
 }

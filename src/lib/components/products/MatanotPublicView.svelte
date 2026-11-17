@@ -3,7 +3,6 @@
   import { useMoney, useRikmaCurrency } from '$lib/money/context.svelte';
   import Money from '$lib/components/money/Money.svelte';
   import { isRtl, t as translate } from '$lib/translations';
-  import { lang } from '$lib/stores/lang.js';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { costAt, effectiveShape, hasGroupCurve, toBomLines, type CostShape } from '$lib/pooling/priceCurve';
   import { isEssenceOnly } from '$lib/pooling/bomPrice';
@@ -87,55 +86,11 @@
     return shape === 'stepped' ? $translate('pooling.tag.stepped', { capacity: k }) : $translate(`pooling.tag.${shape}`);
   }
 
-  const t = $derived(
-    $lang === 'he'
-      ? {
-          bomTitle: 'הרכב המוצר',
-          missions: 'משימות',
-          resources: 'משאבים',
-          hoursPerUnit: 'שעות ליחידה',
-          unitsPerProduct: 'יחידות',
-          ratePerHour: `${sym}/שעה`,
-          quantity: 'כמות',
-          pricePer: `${sym}/יחידה`,
-          subtotal: 'סך עלות BOM',
-          margin: 'אחוז רווח',
-          estimated: 'מחיר משוער',
-          status: 'מצב',
-          statusDraft: 'טיוטה',
-          statusVoting: 'בהצבעה',
-          statusActive: 'פתוח לרכישה',
-          statusArchived: 'בארכיון',
-          noBom: 'אין פריטים ב-BOM',
-          openTag: 'מחפשים ספק'
-        }
-      : {
-          bomTitle: 'Bill of materials',
-          missions: 'Missions',
-          resources: 'Resources',
-          hoursPerUnit: 'hours / unit',
-          unitsPerProduct: 'units',
-          ratePerHour: `${sym}/h`,
-          quantity: 'qty',
-          pricePer: `${sym}/unit`,
-          subtotal: 'BOM subtotal',
-          margin: 'Margin',
-          estimated: 'Estimated price',
-          status: 'Status',
-          statusDraft: 'Draft',
-          statusVoting: 'In vote',
-          statusActive: 'Open for sale',
-          statusArchived: 'Archived',
-          noBom: 'No BOM rows',
-          openTag: 'Looking for provider'
-        }
-  );
-
   function statusLabel(s?: string) {
-    if (s === 'draft') return t.statusDraft;
-    if (s === 'voting') return t.statusVoting;
-    if (s === 'active') return t.statusActive;
-    if (s === 'archived') return t.statusArchived;
+    if (s === 'draft') return $translate('products.view.statusDraft');
+    if (s === 'voting') return $translate('products.view.statusVoting');
+    if (s === 'active') return $translate('products.view.statusActive');
+    if (s === 'archived') return $translate('products.view.statusArchived');
     return s ?? '';
   }
 </script>
@@ -162,20 +117,20 @@
 
   {#if showBom}
     <section class="bom">
-      <h2>{t.bomTitle}</h2>
+      <h2>{$translate('products.view.bomTitle')}</h2>
 
       <div class="bom-group">
-        <h3>{t.missions}</h3>
+        <h3>{$translate('products.view.missions')}</h3>
         {#if missionRows.length === 0}
-          <div class="empty">{t.noBom}</div>
+          <div class="empty">{$translate('products.view.noBom')}</div>
         {:else}
           <table>
             <thead>
               <tr>
                 <th></th>
-                <th>{t.hoursPerUnit}</th>
-                <th>{t.unitsPerProduct}</th>
-                <th>{t.ratePerHour}</th>
+                <th>{$translate('products.view.hoursPerUnit')}</th>
+                <th>{$translate('products.view.unitsPerProduct')}</th>
+                <th>{$translate('products.view.ratePerHour', { sym })}</th>
               </tr>
             </thead>
             <tbody>
@@ -198,16 +153,16 @@
       </div>
 
       <div class="bom-group">
-        <h3>{t.resources}</h3>
+        <h3>{$translate('products.view.resources')}</h3>
         {#if resourceRows.length === 0}
-          <div class="empty">{t.noBom}</div>
+          <div class="empty">{$translate('products.view.noBom')}</div>
         {:else}
           <table>
             <thead>
               <tr>
                 <th></th>
-                <th>{t.quantity}</th>
-                <th>{t.pricePer}</th>
+                <th>{$translate('products.view.quantity')}</th>
+                <th>{$translate('products.view.pricePer', { sym })}</th>
               </tr>
             </thead>
             <tbody>
@@ -230,17 +185,17 @@
 
       <div class="summary">
         <div class="row">
-          <span>{t.subtotal}</span>
+          <span>{$translate('products.view.subtotal')}</span>
           <strong><Money amount={bomSubtotal} /></strong>
         </div>
         {#if matanot.marginPct}
           <div class="row">
-            <span>{t.margin}</span>
+            <span>{$translate('products.view.margin')}</span>
             <strong>{matanot.marginPct}%</strong>
           </div>
         {/if}
         <div class="row total">
-          <span>{t.estimated}</span>
+          <span>{$translate('products.view.estimated')}</span>
           <strong>
             <Money amount={Number(matanot.estimatedPrice ?? 0)} entry={matanot} />
           </strong>

@@ -1,67 +1,62 @@
 <script>
     import { page } from '$app/state';
-    import { onMount } from 'svelte';
-    
+    import { t, isRtl } from '$lib/translations';
+
     let {data,children} = $props()
-    
-    // מידע על הדיון הנוכחי
+
+    // The discussion this route shows (see +page.svelte: reference only — real
+    // negotiations run on the consensus site).
     let negotiationId = $derived(page.params.id);
     let isNewNegotiation = $derived(negotiationId === '0');
-    
-    onMount(() => {
-      // עדכון כותרת הדף
-      if (data?.negotiation?.topic) {
-        document.title = `דיון: ${data.negotiation.topic} - מערכת יישוב מחלוקות`;
-      } else if (isNewNegotiation) {
-        document.title = 'דיון חדש - מערכת יישוב מחלוקות';
-      } else {
-        document.title = 'מערכת יישוב מחלוקות';
-      }
-    });
   </script>
-  
+
   <svelte:head>
+    <title>{data?.negotiation?.topic
+      ? $t('negotiation.layout.docOpen', { topic: data.negotiation.topic })
+      : isNewNegotiation
+        ? $t('negotiation.layout.docNew')
+        : $t('negotiation.layout.docDefault')}</title>
     <!-- Meta tags for sharing -->
     {#if data?.negotiation?.topic}
-      <meta property="og:title" content="דיון: {data.negotiation.topic}" />
-      <meta property="og:description" content="הצטרף לדיון פתוח ויישוב מחלוקות" />
+      <meta property="og:title" content={$t('negotiation.layout.docOpen', { topic: data.negotiation.topic })} />
+      <meta property="og:description" content={$t('negotiation.layout.joinDesc')} />
       <meta property="og:type" content="website" />
       <meta property="og:url" content="{page.url.href}" />
-      
+
       <meta name="twitter:card" content="summary" />
-      <meta name="twitter:title" content="דיון: {data.negotiation.topic}" />
-      <meta name="twitter:description" content="הצטרף לדיון פתוח ויישוב מחלוקות" />
+      <meta name="twitter:title" content={$t('negotiation.layout.docOpen', { topic: data.negotiation.topic })} />
+      <meta name="twitter:description" content={$t('negotiation.layout.joinDesc')} />
     {:else if isNewNegotiation}
-      <meta property="og:title" content="צור דיון חדש - מערכת יישוב מחלוקות" />
-      <meta property="og:description" content="פתח דיון חדש וזמן אחרים להשתתף" />
+      <meta property="og:title" content={$t('negotiation.layout.docNew')} />
+      <meta property="og:description" content={$t('negotiation.layout.newDesc')} />
       <meta property="og:type" content="website" />
-      
+
       <meta name="twitter:card" content="summary" />
-      <meta name="twitter:title" content="צור דיון חדש - מערכת יישוב מחלוקות" />
-      <meta name="twitter:description" content="פתח דיון חדש וזמן אחרים להשתתף" />
+      <meta name="twitter:title" content={$t('negotiation.layout.docNew')} />
+      <meta name="twitter:description" content={$t('negotiation.layout.newDesc')} />
     {/if}
-    
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta charset="utf-8" />
   </svelte:head>
-  
-  <!-- הודעת ניווט לצורך נגישות -->
+
+  <!-- Screen-reader outline of where you are -->
   <div class="sr-only">
-    <h1>מערכת יישוב מחלוקות</h1>
+    <h1>{$t('negotiation.layout.docDefault')}</h1>
     {#if data?.negotiation?.topic}
-      <p>דיון פתוח בנושא: {data.negotiation.topic}</p>
+      <p>{$t('negotiation.layout.srTopic', { topic: data.negotiation.topic })}</p>
     {:else if isNewNegotiation}
-      <p>יצירת דיון חדש</p>
+      <p>{$t('negotiation.layout.srNew')}</p>
     {/if}
   </div>
-  
-  <!-- תוכן הדף -->
-  <main class="min-h-screen">
+
+  <!-- Page content -->
+  <main class="min-h-screen" dir={$isRtl ? 'rtl' : 'ltr'}>
     {@render children()}
   </main>
-  
+
   <style>
-    /* מחלקה לקוראי מסך */
+    /* screen-reader-only */
     .sr-only {
       position: absolute;
       width: 1px;
@@ -73,11 +68,7 @@
       white-space: nowrap;
       border: 0;
     }
-    
-    main {
-      direction: rtl;
-    }
-    
+
     :global(body) {
       margin: 0;
       padding: 0;

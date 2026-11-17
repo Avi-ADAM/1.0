@@ -14,6 +14,12 @@ import type {
 
 export type DealKind = 'sale' | 'purchase';
 
+/** Translator callback (`$t` from `$lib/translations`), passed in by the page so this module stays pure. */
+export type TranslateFn = (key: string, payload?: Record<string, any>) => string;
+
+/** Fallback when a caller has no translator: the key itself, never Hebrew on an English screen. */
+const identityT: TranslateFn = (key) => key;
+
 const KIND_ICON: Record<string, string> = {
   monthly: '📅',
   yearly: '📆',
@@ -31,11 +37,11 @@ const KIND_BG: Record<string, string> = {
 };
 
 const KIND_CATEGORY: Record<string, string> = {
-  monthly: 'מינוי חודשי',
-  yearly: 'מינוי שנתי',
-  total: 'תשלום חד פעמי',
-  unlimited: 'ליחידה - ללא הגבלה',
-  daily: 'יומי'
+  monthly: 'deals.kindMonthly',
+  yearly: 'deals.kindYearly',
+  total: 'deals.kindTotal',
+  unlimited: 'deals.kindUnlimited',
+  daily: 'deals.kindDaily'
 };
 
 function formatDate(iso?: string): string {
@@ -96,45 +102,45 @@ function pickAvatarStyle(seed: string): string {
   return palette[h % palette.length];
 }
 
-function buildTimeline(s: SaleData): TimelineEvent[] {
+function buildTimeline(s: SaleData, t: TranslateFn): TimelineEvent[] {
   const events: TimelineEvent[] = [];
   if (s.startDate) {
     events.push({
       date: formatDate(s.startDate),
-      label: 'פתיחת עסקה',
-      desc: 'המכירה אושרה במערכת',
+      label: t('deals.service.tlStart'),
+      desc: t('deals.service.tlStartDesc'),
       status: 'done'
     });
   }
   if (Array.isArray(s.weFinnish) && s.weFinnish.length > 0) {
     events.push({
-      date: 'אחרונה',
-      label: 'המוכר.ים אישרו מסירה',
-      desc: `${s.weFinnish.length} אישורי מסירה`,
+      date: t('deals.service.last'),
+      label: t('deals.service.tlDelivered'),
+      desc: t('deals.service.tlDeliveredDesc', { count: s.weFinnish.length }),
       status: 'done'
     });
   }
   if (s.iGotIt) {
     events.push({
-      date: 'אחרונה',
-      label: 'הלקוח אישר קבלה',
-      desc: 'הלקוח דיווח שהמוצר התקבל',
+      date: t('deals.service.last'),
+      label: t('deals.service.tlReceived'),
+      desc: t('deals.service.tlReceivedDesc'),
       status: 'done'
     });
   }
   if (s.iTransferMoney && !s.moneyTransfered) {
     events.push({
-      date: 'עכשיו',
-      label: 'העברת כסף בתהליך',
-      desc: 'הלקוח התחיל את ההעברה, ממתין לאישור המקבל',
+      date: t('deals.service.now'),
+      label: t('deals.service.tlTransfer'),
+      desc: t('deals.service.tlTransferDesc'),
       status: 'active'
     });
   }
   if (s.moneyTransfered) {
     events.push({
-      date: 'אחרונה',
-      label: 'הכסף התקבל',
-      desc: 'מקבל הכסף אישר את הקבלה',
+      date: t('deals.service.last'),
+      label: t('deals.service.tlMoneyIn'),
+      desc: t('deals.service.tlMoneyInDesc'),
       status: 'done'
     });
   }
@@ -142,22 +148,25 @@ function buildTimeline(s: SaleData): TimelineEvent[] {
     const isFuture = new Date(s.finnishDate).getTime() > Date.now();
     events.push({
       date: formatDate(s.finnishDate),
-      label: 'מועד סיום',
-      desc: s.kindOf === 'monthly' || s.kindOf === 'yearly' ? 'סוף תקופת המינוי' : 'מועד סיום מתוכנן',
+      label: t('deals.service.tlEnd'),
+      desc:
+        s.kindOf === 'monthly' || s.kindOf === 'yearly'
+          ? t('deals.service.tlEndSubPeriod')
+          : t('deals.service.tlEndSubPlanned'),
       status: isFuture ? 'future' : 'done'
     });
   }
   return events;
 }
 
-function buildMessages(s: SaleData): ForumMessage[] {
+function buildMessages(s: SaleData, t: TranslateFn): ForumMessage[] {
   if (!Array.isArray(s.messages)) return [];
   return s.messages.map((m: any) => {
-    const username = m.username || 'משתמש';
+    const username = m.username || t('deals.service.user');
     const isMine = String(m.userId) === String(s.myid);
     return {
       id: String(m.id),
-      author: isMine ? 'אתה' : username,
+      author: isMine ? t('deals.service.you') : username,
       initials: initials(isMine ? username : username),
       authorType: isMine ? 'client' : 'creator',
       content: m.content || '',
@@ -166,17 +175,17 @@ function buildMessages(s: SaleData): ForumMessage[] {
   });
 }
 
-function buildParties(s: SaleData, kind: DealKind): Party[] {
+function buildParties(s: SaleData, kind: DealKind, t: TranslateFn): Party[] {
   const parties: Party[] = [];
   const myId = String(s.myid || '');
 
   parties.push({
     name:
       String(s.customerId) === myId
-        ? `${s.customerName || 'אתה'} (אתה · לקוח)`
-        : `${s.customerName || 'לקוח'} (לקוח)`,
-    initials: initials(s.customerName || 'לקוח'),
-    role: kind === 'purchase' ? 'אתה הלקוח' : 'הלקוח של העסקה',
+        ? `${s.customerName || t('deals.service.you')} ${t('deals.service.youCustomerSuffix')}`
+        : `${s.customerName || t('deals.service.customer')} ${t('deals.service.customerSuffix')}`,
+    initials: initials(s.customerName || t('deals.service.customer')),
+    role: kind === 'purchase' ? t('deals.service.roleYouCustomer') : t('deals.service.roleCustomerOfDeal'),
     avatarStyle: pickAvatarStyle(String(s.customerId || s.customerName || 'c')),
     status: 'active'
   });
@@ -186,9 +195,11 @@ function buildParties(s: SaleData, kind: DealKind): Party[] {
     if (!m?.id) continue;
     const isMe = String(m.id) === myId;
     parties.push({
-      name: isMe ? `${m.username || 'אתה'} (אתה · מוכר)` : m.username || 'חבר צוות',
+      name: isMe
+        ? `${m.username || t('deals.service.you')} ${t('deals.service.youSellerSuffix')}`
+        : m.username || t('deals.service.teamMember'),
       initials: initials(m.username || ''),
-      role: isMe ? 'אתה במוכר' : 'חבר/ת צוות הפרויקט',
+      role: isMe ? t('deals.service.roleYouSeller') : t('deals.service.roleProjectMember'),
       avatarStyle: pickAvatarStyle(String(m.id)),
       status: 'active'
     });
@@ -197,14 +208,14 @@ function buildParties(s: SaleData, kind: DealKind): Party[] {
   return parties;
 }
 
-function buildPendingApprovals(s: SaleData, kind: DealKind): PendingApproval[] {
+function buildPendingApprovals(s: SaleData, kind: DealKind, t: TranslateFn): PendingApproval[] {
   const approvals: PendingApproval[] = [];
 
   if (kind === 'purchase') {
     if (!s.iGotIt && Array.isArray(s.weFinnish) && s.weFinnish.length > 0) {
       approvals.push({
         id: `recv-${s.id}`,
-        name: `אישור קבלת ${s.name || 'המוצר'}`,
+        name: t('deals.service.approveReceipt', { name: s.name || t('deals.service.theProduct') }),
         type: 'resource',
         cost: s.total || s.price || 0
       });
@@ -218,7 +229,7 @@ function buildPendingApprovals(s: SaleData, kind: DealKind): PendingApproval[] {
     if (!alreadyVoted) {
       approvals.push({
         id: `deliver-${s.id}`,
-        name: `אישור משלוח של ${s.name || 'המוצר'}`,
+        name: t('deals.service.approveDelivery', { name: s.name || t('deals.service.theProduct') }),
         type: 'mission',
         cost: s.total || s.price || 0
       });
@@ -228,7 +239,11 @@ function buildPendingApprovals(s: SaleData, kind: DealKind): PendingApproval[] {
   return approvals;
 }
 
-export function saleToDeal(s: SaleData, kind: DealKind): Deal & {
+export function saleToDeal(
+  s: SaleData,
+  kind: DealKind,
+  t: TranslateFn = identityT
+): Deal & {
   kind: DealKind;
   sheirutId: string;
 } {
@@ -240,9 +255,9 @@ export function saleToDeal(s: SaleData, kind: DealKind): Deal & {
     id: String(s.id),
     sheirutId: String(s.id),
     kind,
-    product: s.name || 'מוצר',
-    project: s.projectName || 'פרויקט',
-    category: KIND_CATEGORY[kindOfKey] || 'מכירה',
+    product: s.name || t('deals.service.product'),
+    project: s.projectName || t('deals.service.project'),
+    category: KIND_CATEGORY[kindOfKey] ? t(KIND_CATEGORY[kindOfKey]) : t('deals.service.sale'),
     icon: KIND_ICON[kindOfKey] || '🎁',
     iconBg: KIND_BG[kindOfKey] || 'linear-gradient(135deg,#1a1200,#2e2000)',
     status: computeStatus(s, kind),
@@ -253,21 +268,22 @@ export function saleToDeal(s: SaleData, kind: DealKind): Deal & {
     paid,
     startDate: formatDate(s.startDate),
     endDate: formatDate(s.finnishDate),
-    pendingApprovalCount: buildPendingApprovals(s, kind).length,
+    pendingApprovalCount: buildPendingApprovals(s, kind, t).length,
     progressPct: computeProgress(s)
   };
 }
 
 export function saleToDealDetail(
   s: SaleData,
-  kind: DealKind
+  kind: DealKind,
+  t: TranslateFn = identityT
 ): DealDetailData & { kind: DealKind; sheirutId: string; raw: SaleData } {
-  const base = saleToDeal(s, kind);
+  const base = saleToDeal(s, kind, t);
   const total = base.totalCost;
 
   const productResource: Resource = {
     id: `product-${s.id}`,
-    name: s.name || 'המוצר',
+    name: s.name || t('deals.service.theProduct'),
     cost: total,
     maxCost: total,
     needsApproval: kind === 'purchase' && !s.iGotIt
@@ -279,10 +295,10 @@ export function saleToDealDetail(
     ...base,
     missionList,
     resourceList: [productResource],
-    timeline: buildTimeline(s),
-    messages: buildMessages(s),
-    parties: buildParties(s, kind),
-    pendingApprovals: buildPendingApprovals(s, kind),
+    timeline: buildTimeline(s, t),
+    messages: buildMessages(s, t),
+    parties: buildParties(s, kind, t),
+    pendingApprovals: buildPendingApprovals(s, kind, t),
     costBreakdown: { missions: 0, resources: total },
     raw: s
   };

@@ -11,6 +11,8 @@
   import TimersPanel from './TimersPanel.svelte';
   import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
   import { mediaUrl } from '$lib/utils/processLifecycle';
+  import { isRtl, t } from '$lib/translations';
+  import { lang as uiLang } from '$lib/stores/lang.js';
 
   let {
     kind = 'mission', // 'mission' | 'resource'
@@ -19,132 +21,6 @@
     lang = 'en'
   } = $props();
 
-  const i18n = {
-    he: {
-      pendm: 'החלטה ראשונית - משימה',
-      pmash: 'החלטה ראשונית - משאב',
-      openMission: 'הצעה פתוחה',
-      openMashaabim: 'משאב פתוח',
-      asks: 'בקשות הצטרפות',
-      askms: 'הצעות אספקה',
-      execution: 'ביצוע',
-      acts: 'מטלות',
-      approvals: 'אשרורי סיום',
-      maap: 'אספקה בתהליך',
-      archive: 'ארכיון רשמי',
-      rikmash: 'התקבל - ארכיון',
-      votes: 'הצבעות ומו״מ',
-      chat: 'צ׳אט',
-      objectPage: 'לעמוד האובייקט',
-      votePage: 'לעמוד ההצבעה',
-      active: 'פעיל',
-      open: 'פתוח',
-      pending: 'ממתין',
-      archived: 'ארכיון',
-      resolved: 'הוכרע',
-      completed: 'הושלם',
-      inProgress: 'בתהליך',
-      hours: 'שעות',
-      perhour: 'לשעה',
-      of: 'מתוך',
-      deadline: 'מועד מענה (שתיקה = הסכמה)',
-      price: 'מחיר',
-      amount: 'כמות',
-      total: 'סה״כ',
-      why: 'סיכום',
-      done: 'בוצע',
-      notDone: 'טרם בוצע',
-      approvedBy: 'אושר ע״י שני הצדדים',
-      awaiting: 'ממתין לאישור',
-      by: 'ע״י',
-      start: 'התחלה',
-      finish: 'סיום',
-      noEntity: '—'
-    },
-    en: {
-      pendm: 'Initial decision - mission',
-      pmash: 'Initial decision - resource',
-      openMission: 'Open offer',
-      openMashaabim: 'Open resource',
-      asks: 'Join requests',
-      askms: 'Supply proposals',
-      execution: 'Execution',
-      acts: 'Tasks',
-      approvals: 'Finish approvals',
-      maap: 'Delivery in progress',
-      archive: 'Official archive',
-      rikmash: 'Received - archive',
-      votes: 'Votes & negotiation',
-      chat: 'Chat',
-      objectPage: 'Object page',
-      votePage: 'Vote page',
-      active: 'Active',
-      open: 'Open',
-      pending: 'Pending',
-      archived: 'Archived',
-      resolved: 'Resolved',
-      completed: 'Completed',
-      inProgress: 'In progress',
-      hours: 'hours',
-      perhour: 'per hour',
-      of: 'of',
-      deadline: 'Response deadline (silence = consent)',
-      price: 'Price',
-      amount: 'Amount',
-      total: 'Total',
-      why: 'Summary',
-      done: 'Done',
-      notDone: 'Not done yet',
-      approvedBy: 'Approved by both sides',
-      awaiting: 'Awaiting approval',
-      by: 'by',
-      start: 'Start',
-      finish: 'Finish',
-      noEntity: '—'
-    },
-    ar: {
-      pendm: 'قرار أولي - مهمة',
-      pmash: 'قرار أولي - مورد',
-      openMission: 'عرض مفتوح',
-      openMashaabim: 'مورد مفتوح',
-      asks: 'طلبات انضمام',
-      askms: 'عروض توريد',
-      execution: 'تنفيذ',
-      acts: 'مهام',
-      approvals: 'موافقات الإنهاء',
-      maap: 'توريد قيد التنفيذ',
-      archive: 'الأرشيف الرسمي',
-      rikmash: 'تم الاستلام - أرشيف',
-      votes: 'التصويت والتفاوض',
-      chat: 'دردشة',
-      objectPage: 'صفحة الكائن',
-      votePage: 'صفحة التصويت',
-      active: 'نشط',
-      open: 'مفتوح',
-      pending: 'معلق',
-      archived: 'أرشيف',
-      resolved: 'محسوم',
-      completed: 'مكتمل',
-      inProgress: 'قيد التنفيذ',
-      hours: 'ساعات',
-      perhour: 'للساعة',
-      of: 'من',
-      deadline: 'موعد الرد (الصمت = موافقة)',
-      price: 'السعر',
-      amount: 'الكمية',
-      total: 'المجموع',
-      why: 'ملخص',
-      done: 'تم',
-      notDone: 'لم يتم بعد',
-      approvedBy: 'وافق الطرفان',
-      awaiting: 'بانتظار الموافقة',
-      by: 'بواسطة',
-      start: 'بداية',
-      finish: 'نهاية',
-      noEntity: '—'
-    }
-  };
-  let t = $derived(i18n[lang] ?? i18n.en);
 
   let base = $derived(`/moach/${projectId}`);
 
@@ -195,7 +71,7 @@
     if (!value) return '';
     try {
       return new Date(value).toLocaleDateString(
-        lang === 'he' ? 'he-IL' : lang === 'ar' ? 'ar' : 'en-GB',
+        $uiLang,
         { day: 'numeric', month: 'short', year: 'numeric' }
       );
     } catch {
@@ -206,30 +82,30 @@
   function formatNum(value) {
     const n = Number(value);
     if (!Number.isFinite(n)) return '';
-    return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    return n.toLocaleString($uiLang, { maximumFractionDigits: 2 });
   }
 
   function archStatus(archived, activeText, activeTone) {
     return archived
-      ? { text: t.archived, tone: 'grey' }
+      ? { text: $t('moach.lifecycle.archived'), tone: 'grey' }
       : { text: activeText, tone: activeTone };
   }
 </script>
 
-<div class="pl" dir={lang === 'he' || lang === 'ar' ? 'rtl' : 'ltr'}>
+<div class="pl" dir={$isRtl ? 'rtl' : 'ltr'}>
   {#if kind === 'mission'}
     <!-- ── 1 · Initial decision (pendm) ──────────────────────────────────── -->
     {#if pendm}
       {@const attrs = pendm.attributes ?? {}}
       <LifecycleStation
-        label={t.pendm}
+        label={$t('moach.lifecycle.pendm')}
         name={attrs.name ?? `#${pendm.id}`}
-        status={archStatus(attrs.archived, t.pending, 'gold')}
+        status={archStatus(attrs.archived, $t('moach.lifecycle.pending'), 'gold')}
         createdAt={attrs.createdAt}
         href={`${base}/object/pendm/${pendm.id}`}
-        hrefLabel={t.objectPage}
+        hrefLabel={$t('moach.lifecycle.objectPage')}
         forumId={attrs.forums?.data?.[0]?.id ?? null}
-        chatLabel={t.chat}
+        chatLabel={$t('moach.lifecycle.chat')}
         tone="gold"
         isLast={isLast('pendm')}
         {lang}
@@ -239,17 +115,17 @@
         {/if}
         <div class="pl-facts">
           {#if attrs.noofhours}
-            <span class="pl-fact">{attrs.noofhours} {t.hours}{attrs.perhour ? ` · ${attrs.perhour} ${t.perhour}` : ''}</span>
+            <span class="pl-fact">{attrs.noofhours} {$t('moach.lifecycle.hours')}{attrs.perhour ? ` · ${attrs.perhour} ${$t('moach.lifecycle.perhour')}` : ''}</span>
           {/if}
           {#if attrs.timegrama?.data?.attributes?.date}
-            <span class="pl-fact">{t.deadline}: {formatDate(attrs.timegrama.data.attributes.date)}</span>
+            <span class="pl-fact">{$t('moach.lifecycle.deadline')}: {formatDate(attrs.timegrama.data.attributes.date)}</span>
           {/if}
         </div>
         <div class="pl-votes">
-          <h4 class="pl-subheading">{t.votes}</h4>
+          <h4 class="pl-subheading">{$t('moach.lifecycle.votes')}</h4>
           <VoteRounds vots={attrs.users} {lang} />
           {#if !attrs.archived}
-            <a class="pl-action" href={`${base}/votes/pendm/${pendm.id}`}>{t.votePage} ←</a>
+            <a class="pl-action" href={`${base}/votes/pendm/${pendm.id}`}>{$t('moach.lifecycle.votePage')} ←</a>
           {/if}
         </div>
       </LifecycleStation>
@@ -259,12 +135,12 @@
     {#if openMission}
       {@const attrs = openMission.attributes ?? {}}
       <LifecycleStation
-        label={t.openMission}
+        label={$t('moach.lifecycle.openMission')}
         name={attrs.name ?? `#${openMission.id}`}
-        status={archStatus(attrs.archived, t.open, 'sky')}
+        status={archStatus(attrs.archived, $t('moach.lifecycle.open'), 'sky')}
         createdAt={attrs.createdAt}
         href={`${base}/object/openMission/${openMission.id}`}
-        hrefLabel={t.objectPage}
+        hrefLabel={$t('moach.lifecycle.objectPage')}
         tone="sky"
         isLast={isLast('openMission')}
         {lang}
@@ -288,7 +164,7 @@
 
         {#if asks.length > 0}
           <div class="pl-votes">
-            <h4 class="pl-subheading">{t.asks} ({asks.length})</h4>
+            <h4 class="pl-subheading">{$t('moach.lifecycle.asks')} ({asks.length})</h4>
             <div class="pl-cards">
               {#each asks as ask (ask.id)}
                 {@const askUser = ask.attributes?.users_permissions_user?.data}
@@ -304,16 +180,16 @@
                     {/if}
                     <span class="pl-card-name">{askUser?.attributes?.username ?? `#${ask.id}`}</span>
                     <span class="pl-badge {ask.attributes?.archived ? 'pl-badge--grey' : 'pl-badge--blue'}">
-                      {ask.attributes?.archived ? t.resolved : t.open}
+                      {ask.attributes?.archived ? $t('moach.lifecycle.resolved') : $t('moach.lifecycle.open')}
                     </span>
                     <span class="pl-card-links">
                       {#if ask.attributes?.forums?.data?.[0]?.id}
-                        <a class="pl-action" href={`/forum/${ask.attributes.forums.data[0].id}`}>{t.chat}</a>
+                        <a class="pl-action" href={`/forum/${ask.attributes.forums.data[0].id}`}>{$t('moach.lifecycle.chat')}</a>
                       {/if}
                       {#if !ask.attributes?.archived}
-                        <a class="pl-action" href={`${base}/votes/ask/${ask.id}`}>{t.votePage}</a>
+                        <a class="pl-action" href={`${base}/votes/ask/${ask.id}`}>{$t('moach.lifecycle.votePage')}</a>
                       {/if}
-                      <a class="pl-action" href={`${base}/object/ask/${ask.id}`}>{t.objectPage}</a>
+                      <a class="pl-action" href={`${base}/object/ask/${ask.id}`}>{$t('moach.lifecycle.objectPage')}</a>
                     </span>
                   </div>
                   <VoteRounds vots={ask.attributes?.vots} {lang} />
@@ -330,16 +206,16 @@
       {@const attrs = betahalich.attributes ?? {}}
       {@const bUser = attrs.users_permissions_user?.data}
       <LifecycleStation
-        label={t.execution}
+        label={$t('moach.lifecycle.execution')}
         name={attrs.name ?? `#${betahalich.id}`}
         status={attrs.finnished
-          ? { text: t.completed, tone: 'grey' }
-          : { text: t.active, tone: 'rose' }}
+          ? { text: $t('moach.lifecycle.completed'), tone: 'grey' }
+          : { text: $t('moach.lifecycle.active'), tone: 'rose' }}
         createdAt={attrs.createdAt}
         href={`${base}/object/betahalich/${betahalich.id}`}
-        hrefLabel={t.objectPage}
+        hrefLabel={$t('moach.lifecycle.objectPage')}
         forumId={attrs.forums?.data?.[0]?.id ?? null}
-        chatLabel={t.chat}
+        chatLabel={$t('moach.lifecycle.chat')}
         tone="rose"
         isLast={isLast('betahalich')}
         {lang}
@@ -355,31 +231,31 @@
           {/if}
           <span class="pl-fact">
             {Math.round((attrs.howmanyhoursalready ?? 0) * 100) / 100}
-            {#if attrs.hoursassinged}&nbsp;{t.of} {attrs.hoursassinged}{/if}
-            {t.hours}
+            {#if attrs.hoursassinged}&nbsp;{$t('moach.lifecycle.of')} {attrs.hoursassinged}{/if}
+            {$t('moach.lifecycle.hours')}
           </span>
         </div>
 
         {#if acts.length > 0}
           <div class="pl-votes">
-            <h4 class="pl-subheading">{t.acts} ({acts.length})</h4>
+            <h4 class="pl-subheading">{$t('moach.lifecycle.acts')} ({acts.length})</h4>
             <ul class="pl-acts">
               {#each acts as act (act.id)}
                 {@const actAttrs = act.attributes ?? {}}
                 <li class="pl-act">
                   <a class="pl-act-name" href={`${base}/object/act/${act.id}`}>{actAttrs.shem ?? `#${act.id}`}</a>
                   {#if actAttrs.my?.data?.attributes?.username}
-                    <span class="pl-act-user">{t.by} {actAttrs.my.data.attributes.username}</span>
+                    <span class="pl-act-user">{$t('moach.lifecycle.by')} {actAttrs.my.data.attributes.username}</span>
                   {/if}
                   {#if actAttrs.dateF}
                     <span class="pl-act-date">{formatDate(actAttrs.dateF)}</span>
                   {/if}
                   {#if actAttrs.naasa && actAttrs.myIshur && actAttrs.valiIshur}
-                    <span class="pl-badge pl-badge--green">{t.approvedBy}</span>
+                    <span class="pl-badge pl-badge--green">{$t('moach.lifecycle.approvedBy')}</span>
                   {:else if actAttrs.naasa}
-                    <span class="pl-badge pl-badge--gold">{t.done} · {t.awaiting}</span>
+                    <span class="pl-badge pl-badge--gold">{$t('moach.lifecycle.done')} · {$t('moach.lifecycle.awaiting')}</span>
                   {:else}
-                    <span class="pl-badge pl-badge--grey">{t.notDone}</span>
+                    <span class="pl-badge pl-badge--grey">{$t('moach.lifecycle.notDone')}</span>
                   {/if}
                 </li>
               {/each}
@@ -416,7 +292,7 @@
     <!-- ── 4 · Finish approvals ──────────────────────────────────────────── -->
     {#if finiapruvals.length > 0}
       <LifecycleStation
-        label={t.approvals}
+        label={$t('moach.lifecycle.approvals')}
         name=""
         tone="violet"
         isLast={isLast('approvals')}
@@ -432,13 +308,13 @@
                   <span class="pl-fact">{formatDate(fAttrs.month)}</span>
                 {/if}
                 {#if fAttrs.noofhours}
-                  <span class="pl-fact">{fAttrs.noofhours} {t.hours}</span>
+                  <span class="pl-fact">{fAttrs.noofhours} {$t('moach.lifecycle.hours')}</span>
                 {/if}
                 <span class="pl-badge {fAttrs.archived ? 'pl-badge--green' : 'pl-badge--gold'}">
-                  {fAttrs.archived ? t.resolved : t.pending}
+                  {fAttrs.archived ? $t('moach.lifecycle.resolved') : $t('moach.lifecycle.pending')}
                 </span>
                 <span class="pl-card-links">
-                  <a class="pl-action" href={`${base}/object/finiapruval/${fini.id}`}>{t.objectPage}</a>
+                  <a class="pl-action" href={`${base}/object/finiapruval/${fini.id}`}>{$t('moach.lifecycle.objectPage')}</a>
                 </span>
               </div>
               <VoteRounds vots={fAttrs.vots} {lang} />
@@ -452,12 +328,12 @@
     {#if finnished || chain?.finnishedMissionId}
       {@const fAttrs = finnished?.attributes ?? null}
       <LifecycleStation
-        label={t.archive}
-        name={fAttrs?.missionName ?? (chain?.finnishedMissionId ? `#${chain.finnishedMissionId}` : t.noEntity)}
-        status={{ text: t.completed, tone: 'green' }}
+        label={$t('moach.lifecycle.archive')}
+        name={fAttrs?.missionName ?? (chain?.finnishedMissionId ? `#${chain.finnishedMissionId}` : $t('moach.lifecycle.noEntity'))}
+        status={{ text: $t('moach.lifecycle.completed'), tone: 'green' }}
         createdAt={fAttrs?.createdAt}
         href={`${base}/object/finnished/${finnished?.id ?? chain?.finnishedMissionId}`}
-        hrefLabel={t.objectPage}
+        hrefLabel={$t('moach.lifecycle.objectPage')}
         tone="green"
         isLast={isLast('archive')}
         {lang}
@@ -468,18 +344,18 @@
           {@const fTotal =
             fAttrs.total ?? (fHours != null && fRate != null ? fHours * fRate : null)}
           <div class="pl-facts">
-            {#if fAttrs.start}<span class="pl-fact">{t.start}: {formatDate(fAttrs.start)}</span>{/if}
-            {#if fAttrs.finish}<span class="pl-fact">{t.finish}: {formatDate(fAttrs.finish)}</span>{/if}
+            {#if fAttrs.start}<span class="pl-fact">{$t('moach.lifecycle.start')}: {formatDate(fAttrs.start)}</span>{/if}
+            {#if fAttrs.finish}<span class="pl-fact">{$t('moach.lifecycle.finish')}: {formatDate(fAttrs.finish)}</span>{/if}
             <!-- hours × rate = money. `total` is the money value, never hours. -->
             {#if fHours != null}
               <span class="pl-fact">
-                {formatNum(fHours)} {t.hours}{fRate != null ? ` × ${formatNum(fRate)} ${t.perhour}` : ''}
+                {formatNum(fHours)} {$t('moach.lifecycle.hours')}{fRate != null ? ` × ${formatNum(fRate)} ${$t('moach.lifecycle.perhour')}` : ''}
               </span>
             {/if}
-            {#if fTotal != null}<span class="pl-fact">{t.total}: {formatNum(fTotal)}</span>{/if}
+            {#if fTotal != null}<span class="pl-fact">{$t('moach.lifecycle.total')}: {formatNum(fTotal)}</span>{/if}
           </div>
           {#if plainText(fAttrs.why || fAttrs.descrip)}
-            <p class="pl-desc">{t.why}: {plainText(fAttrs.why || fAttrs.descrip)}</p>
+            <p class="pl-desc">{$t('moach.lifecycle.why')}: {plainText(fAttrs.why || fAttrs.descrip)}</p>
           {/if}
         {/if}
       </LifecycleStation>
@@ -492,14 +368,14 @@
     {#if pmash}
       {@const attrs = pmash.attributes ?? {}}
       <LifecycleStation
-        label={t.pmash}
+        label={$t('moach.lifecycle.pmash')}
         name={attrs.name ?? `#${pmash.id}`}
-        status={archStatus(attrs.archived, t.pending, 'gold')}
+        status={archStatus(attrs.archived, $t('moach.lifecycle.pending'), 'gold')}
         createdAt={attrs.createdAt}
         href={`${base}/object/pmash/${pmash.id}`}
-        hrefLabel={t.objectPage}
+        hrefLabel={$t('moach.lifecycle.objectPage')}
         forumId={attrs.forums?.data?.[0]?.id ?? null}
-        chatLabel={t.chat}
+        chatLabel={$t('moach.lifecycle.chat')}
         tone="gold"
         isLast={isLast('pmash')}
         {lang}
@@ -508,17 +384,17 @@
           <p class="pl-desc">{plainText(attrs.descrip || attrs.spnot)}</p>
         {/if}
         <div class="pl-facts">
-          {#if attrs.price}<span class="pl-fact">{t.price}: {attrs.price}</span>{/if}
-          {#if attrs.hm}<span class="pl-fact">{t.amount}: {attrs.hm}</span>{/if}
+          {#if attrs.price}<span class="pl-fact">{$t('moach.lifecycle.price')}: {attrs.price}</span>{/if}
+          {#if attrs.hm}<span class="pl-fact">{$t('moach.lifecycle.amount')}: {attrs.hm}</span>{/if}
           {#if attrs.timegrama?.data?.attributes?.date}
-            <span class="pl-fact">{t.deadline}: {formatDate(attrs.timegrama.data.attributes.date)}</span>
+            <span class="pl-fact">{$t('moach.lifecycle.deadline')}: {formatDate(attrs.timegrama.data.attributes.date)}</span>
           {/if}
         </div>
         <div class="pl-votes">
-          <h4 class="pl-subheading">{t.votes}</h4>
+          <h4 class="pl-subheading">{$t('moach.lifecycle.votes')}</h4>
           <VoteRounds vots={attrs.users} {lang} />
           {#if !attrs.archived}
-            <a class="pl-action" href={`${base}/votes/pmash/${pmash.id}`}>{t.votePage} ←</a>
+            <a class="pl-action" href={`${base}/votes/pmash/${pmash.id}`}>{$t('moach.lifecycle.votePage')} ←</a>
           {/if}
         </div>
       </LifecycleStation>
@@ -528,12 +404,12 @@
     {#if openMashaabim}
       {@const attrs = openMashaabim.attributes ?? {}}
       <LifecycleStation
-        label={t.openMashaabim}
+        label={$t('moach.lifecycle.openMashaabim')}
         name={attrs.name ?? `#${openMashaabim.id}`}
-        status={archStatus(attrs.archived, t.open, 'sky')}
+        status={archStatus(attrs.archived, $t('moach.lifecycle.open'), 'sky')}
         createdAt={attrs.createdAt}
         href={`${base}/object/openMashaabim/${openMashaabim.id}`}
-        hrefLabel={t.objectPage}
+        hrefLabel={$t('moach.lifecycle.objectPage')}
         tone="sky"
         isLast={isLast('openMashaabim')}
         {lang}
@@ -543,8 +419,8 @@
         {/if}
         <div class="pl-facts">
           {#if attrs.kindOf}<span class="pl-fact">{attrs.kindOf}</span>{/if}
-          {#if attrs.price}<span class="pl-fact">{t.price}: {attrs.price}</span>{/if}
-          {#if attrs.hm}<span class="pl-fact">{t.amount}: {attrs.hm}</span>{/if}
+          {#if attrs.price}<span class="pl-fact">{$t('moach.lifecycle.price')}: {attrs.price}</span>{/if}
+          {#if attrs.hm}<span class="pl-fact">{$t('moach.lifecycle.amount')}: {attrs.hm}</span>{/if}
         </div>
       </LifecycleStation>
     {/if}
@@ -552,7 +428,7 @@
     <!-- ── 3 · Supply proposals (askms) ──────────────────────────────────── -->
     {#if askms.length > 0}
       <LifecycleStation
-        label={t.askms}
+        label={$t('moach.lifecycle.askms')}
         name=""
         tone="blue"
         isLast={isLast('askms')}
@@ -571,16 +447,16 @@
                 {/if}
                 <span class="pl-card-name">{aUser?.attributes?.username ?? `#${askm.id}`}</span>
                 <span class="pl-badge {aAttrs.archived ? 'pl-badge--grey' : 'pl-badge--blue'}">
-                  {aAttrs.archived ? t.resolved : t.open}
+                  {aAttrs.archived ? $t('moach.lifecycle.resolved') : $t('moach.lifecycle.open')}
                 </span>
                 <span class="pl-card-links">
                   {#if aAttrs.forum?.data?.id}
-                    <a class="pl-action" href={`/forum/${aAttrs.forum.data.id}`}>{t.chat}</a>
+                    <a class="pl-action" href={`/forum/${aAttrs.forum.data.id}`}>{$t('moach.lifecycle.chat')}</a>
                   {/if}
                   {#if !aAttrs.archived}
-                    <a class="pl-action" href={`${base}/votes/askm/${askm.id}`}>{t.votePage}</a>
+                    <a class="pl-action" href={`${base}/votes/askm/${askm.id}`}>{$t('moach.lifecycle.votePage')}</a>
                   {/if}
-                  <a class="pl-action" href={`${base}/object/askm/${askm.id}`}>{t.objectPage}</a>
+                  <a class="pl-action" href={`${base}/object/askm/${askm.id}`}>{$t('moach.lifecycle.objectPage')}</a>
                 </span>
               </div>
               <VoteRounds vots={aAttrs.vots} {lang} />
@@ -594,25 +470,25 @@
     {#if maap}
       {@const attrs = maap.attributes ?? {}}
       <LifecycleStation
-        label={t.maap}
+        label={$t('moach.lifecycle.maap')}
         name={attrs.name ?? `#${maap.id}`}
-        status={archStatus(attrs.archived, t.inProgress, 'rose')}
+        status={archStatus(attrs.archived, $t('moach.lifecycle.inProgress'), 'rose')}
         createdAt={attrs.createdAt}
         href={`${base}/object/maap/${maap.id}`}
-        hrefLabel={t.objectPage}
+        hrefLabel={$t('moach.lifecycle.objectPage')}
         forumId={attrs.forum?.data?.id ?? null}
-        chatLabel={t.chat}
+        chatLabel={$t('moach.lifecycle.chat')}
         tone="rose"
         isLast={isLast('maap')}
         {lang}
       >
         <div class="pl-facts">
           {#if attrs.quantityDelivered != null}
-            <span class="pl-fact">{t.amount}: {attrs.quantityDelivered}{attrs.unit ? ` ${attrs.unit}` : ''}</span>
+            <span class="pl-fact">{$t('moach.lifecycle.amount')}: {attrs.quantityDelivered}{attrs.unit ? ` ${attrs.unit}` : ''}</span>
           {/if}
         </div>
         <div class="pl-votes">
-          <h4 class="pl-subheading">{t.votes}</h4>
+          <h4 class="pl-subheading">{$t('moach.lifecycle.votes')}</h4>
           <VoteRounds vots={attrs.vots} {lang} />
         </div>
       </LifecycleStation>
@@ -621,7 +497,7 @@
     <!-- ── 5 · Received (rikmashes) ──────────────────────────────────────── -->
     {#if rikmashes.length > 0}
       <LifecycleStation
-        label={t.rikmash}
+        label={$t('moach.lifecycle.rikmash')}
         name=""
         tone="green"
         isLast={isLast('rikmash')}
@@ -633,11 +509,11 @@
             <div class="pl-card">
               <div class="pl-card-head">
                 <span class="pl-card-name">{rAttrs.name ?? `#${rikmash.id}`}</span>
-                {#if rAttrs.total != null}<span class="pl-fact">{t.total}: {rAttrs.total}</span>{/if}
-                {#if rAttrs.price != null}<span class="pl-fact">{t.price}: {rAttrs.price}</span>{/if}
+                {#if rAttrs.total != null}<span class="pl-fact">{$t('moach.lifecycle.total')}: {rAttrs.total}</span>{/if}
+                {#if rAttrs.price != null}<span class="pl-fact">{$t('moach.lifecycle.price')}: {rAttrs.price}</span>{/if}
                 {#if rAttrs.createdAt}<span class="pl-fact">{formatDate(rAttrs.createdAt)}</span>{/if}
                 <span class="pl-card-links">
-                  <a class="pl-action" href={`${base}/object/rikmash/${rikmash.id}`}>{t.objectPage}</a>
+                  <a class="pl-action" href={`${base}/object/rikmash/${rikmash.id}`}>{$t('moach.lifecycle.objectPage')}</a>
                 </span>
               </div>
             </div>

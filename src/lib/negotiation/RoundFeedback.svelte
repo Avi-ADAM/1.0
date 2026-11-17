@@ -209,8 +209,8 @@
                   class="text-xs font-medium text-violet-700 bg-violet-100 px-2 py-0.5 rounded-full"
                 >
                   {directionIcon(feedback.consensusMoveDirection)}
-                  {#if feedback.consensusMoveAmount}({feedback.consensusMoveAmount}
-                    יח'){/if}
+                  {#if feedback.consensusMoveAmount}
+                    ({feedback.consensusMoveAmount} {$t('negotiation.unitsShort')}){/if}
                 </span>
               </div>
             {/if}

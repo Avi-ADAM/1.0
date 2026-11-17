@@ -1,6 +1,5 @@
 ﻿<script lang="ts">
-  import { isRtl } from '$lib/translations';
-  import { lang } from '$lib/stores/lang.js';
+  import { isRtl, t } from '$lib/translations';
   import { fade, fly } from 'svelte/transition';
   import SkillSelector from '$lib/components/ui/SkillSelector.svelte';
   import MultiSelect from 'svelte-multiselect';
@@ -44,45 +43,6 @@
     ($ww ?? []).map((w: any) => w.attributes?.workWayName).filter(Boolean)
   );
 
-  const t = $derived(
-    $lang === 'he'
-      ? {
-          title: 'פרטים מלאים למשימה',
-          subtitle: 'הנתונים האלה נשמרים עם המוצר ויועברו ליצירת המשימה בעת המכירה',
-          desc: 'תיאור מפורט',
-          skills: 'כישורים נדרשים',
-          roles: 'תפקיד מבוקש',
-          workways: 'אופן עבודה',
-          notes: 'הערות מיוחדות',
-          publicLinks: 'קישורים ציבוריים',
-          privateLinks: 'קישורים פרטיים',
-          startDate: 'תחילת ביצוע מתוכננת',
-          endDate: 'סיום ביצוע מתוכנן',
-          save: 'שמור פרטים',
-          cancel: 'ביטול',
-          rolesPh: 'בחר תפקיד',
-          workwaysPh: 'בחר אופני עבודה'
-        }
-      : {
-          title: 'Full mission details',
-          subtitle:
-            'These details are stored with the product and applied when the mission is actually created on purchase',
-          desc: 'Description',
-          skills: 'Required skills',
-          roles: 'Role',
-          workways: 'Work way',
-          notes: 'Special notes',
-          publicLinks: 'Public links',
-          privateLinks: 'Private links',
-          startDate: 'Planned start',
-          endDate: 'Planned end',
-          save: 'Save details',
-          cancel: 'Cancel',
-          rolesPh: 'pick role',
-          workwaysPh: 'pick work ways'
-        }
-  );
-
   function save() {
     onSave({ ...draft });
   }
@@ -101,73 +61,73 @@
       onclick={(e) => e.stopPropagation()}
       role="dialog"
       aria-modal="true"
-      aria-label={t.title}
+      aria-label={$t('products.missionDetails.title')}
     >
       <header>
         <div>
-          <h2>{t.title}</h2>
+          <h2>{$t('products.missionDetails.title')}</h2>
           {#if missionName}
             <p class="mission-name">📋 {missionName}</p>
           {/if}
-          <p class="sub">{t.subtitle}</p>
+          <p class="sub">{$t('products.missionDetails.subtitle')}</p>
         </div>
         <button class="x" type="button" aria-label="close" onclick={onClose}>×</button>
       </header>
 
       <div class="body" dir={$isRtl ? 'rtl' : 'ltr'}>
         <label class="field">
-          <span>{t.desc}</span>
+          <span>{$t('products.missionDetails.desc')}</span>
           <textarea
             class="input textarea"
             rows="4"
             bind:value={draft.descripRich}
-            placeholder={t.desc}
+            placeholder={$t('products.missionDetails.desc')}
           ></textarea>
         </label>
 
         <div class="field">
-          <span>{t.skills}</span>
+          <span>{$t('products.missionDetails.skills')}</span>
           <SkillSelector bind:selectedSkills={draft.skills} color="--gold" />
         </div>
 
         <div class="field">
-          <span>{t.roles}</span>
+          <span>{$t('products.missionDetails.roles')}</span>
           <MultiSelect
             bind:selected={draft.roles}
             options={roleOptions}
-            placeholder={t.rolesPh}
+            placeholder={$t('products.missionDetails.rolesPh')}
             maxSelect={3}
           />
         </div>
 
         <div class="field">
-          <span>{t.workways}</span>
+          <span>{$t('products.missionDetails.workways')}</span>
           <MultiSelect
             bind:selected={draft.workways}
             options={workwayOptions}
-            placeholder={t.workwaysPh}
+            placeholder={$t('products.missionDetails.workwaysPh')}
           />
         </div>
 
         <label class="field">
-          <span>{t.notes}</span>
+          <span>{$t('products.missionDetails.notes')}</span>
           <textarea class="input textarea" rows="2" bind:value={draft.hearotMeyuchadot}></textarea>
         </label>
 
         <div class="grid">
           <label class="field">
-            <span>{t.publicLinks}</span>
+            <span>{$t('products.missionDetails.publicLinks')}</span>
             <input class="input" bind:value={draft.publicklinks} />
           </label>
           <label class="field">
-            <span>{t.privateLinks}</span>
+            <span>{$t('products.missionDetails.privateLinks')}</span>
             <input class="input" bind:value={draft.privatlinks} />
           </label>
         </div>
 
         <div class="grid">
           <label class="field">
-            <span>{t.startDate}</span>
+            <span>{$t('products.missionDetails.startDate')}</span>
             <input
               class="input"
               type="datetime-local"
@@ -175,7 +135,7 @@
             />
           </label>
           <label class="field">
-            <span>{t.endDate}</span>
+            <span>{$t('products.missionDetails.endDate')}</span>
             <input
               class="input"
               type="datetime-local"
@@ -187,8 +147,8 @@
       </div>
 
       <footer>
-        <button class="secondary" type="button" onclick={onClose}>{t.cancel}</button>
-        <button class="primary" type="button" onclick={save}>{t.save}</button>
+        <button class="secondary" type="button" onclick={onClose}>{$t('products.missionDetails.cancel')}</button>
+        <button class="primary" type="button" onclick={save}>{$t('products.missionDetails.save')}</button>
       </footer>
     </div>
   </div>

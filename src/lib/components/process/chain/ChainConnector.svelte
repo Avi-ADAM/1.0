@@ -1,10 +1,10 @@
 <script>
-  let { lang } = $props();
+  import { isRtl } from '$lib/translations';
 </script>
 
 <span class="conn" aria-hidden="true">
   <svg viewBox="0 0 16 16" class="conn-arrow">
-    {#if lang === 'he'}
+    {#if $isRtl}
       <polyline points="11 3 5 8 11 13" />
     {:else}
       <polyline points="5 3 11 8 5 13" />

@@ -14,6 +14,7 @@
   import { reconstructMissionChains, reconstructResourceChains } from '$lib/utils/reconstructChains.js';
   import MissionChainRow from './chain/MissionChainRow.svelte';
   import ResourceChainRow from './chain/ResourceChainRow.svelte';
+  import { isRtl, t } from '$lib/translations';
 
   // ---------------------------------------------------------------------------
   // Props
@@ -84,7 +85,7 @@
       next.set(id, entity);
       loadedItems = next;
     } catch {
-      toast.error(lang === 'he' ? 'שגיאה בטעינת המשימה שהסתיימה' : 'Failed to load completed mission');
+      toast.error($t('moach.chains.loadMissionError'));
     } finally {
       const next = new Set(loadingIds);
       next.delete(id);
@@ -95,31 +96,6 @@
   // ---------------------------------------------------------------------------
   // i18n
   // ---------------------------------------------------------------------------
-  const i18n = {
-    he: {
-      missionSection:  'שרשראות משימות',
-      resourceSection: 'שרשראות משאבים',
-      archiveSection:  'ארכיון - תהליכים שהסתיימו',
-      empty:           'לא נמצאו שרשראות תהליך לפרויקט זה',
-      loadingExtra:    'טוען נתונים נוספים…'
-    },
-    en: {
-      missionSection:  'Mission Chains',
-      resourceSection: 'Resource Chains',
-      archiveSection:  'Archive - Completed Processes',
-      empty:           'No process chains found for this project',
-      loadingExtra:    'Loading additional data…'
-    },
-    ar: {
-      missionSection:  'سلاسل المهام',
-      resourceSection: 'سلاسل الموارد',
-      archiveSection:  'الأرشيف - العمليات المكتملة',
-      empty:           'لم يتم العثور على سلاسل عمليات لهذا المشروع',
-      loadingExtra:    'جارٍ تحميل بيانات إضافية…'
-    }
-  };
-
-  let t       = $derived(i18n[lang] ?? i18n.en);
   let isEmpty = $derived(activeChains.length === 0 && archivedChains.length === 0 && resourceChains.length === 0 && !isLoadingExtra);
 </script>
 
@@ -127,7 +103,7 @@
   dir is set on root — all children inherit RTL/LTR.
   CSS custom properties cascade from .pcv to all descendant components.
 -->
-<div class="pcv" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+<div class="pcv" dir={$isRtl ? 'rtl' : 'ltr'}>
 
   <!-- Loading banner — visible even when partial chains already exist -->
   {#if isLoadingExtra}
@@ -136,7 +112,7 @@
         <circle cx="12" cy="12" r="10" />
         <path d="M4 12a8 8 0 018-8v8H4z" />
       </svg>
-      <span class="pcv-loading-text">{t.loadingExtra}</span>
+      <span class="pcv-loading-text">{$t('moach.chainView.loadingExtra')}</span>
     </div>
   {/if}
 
@@ -146,7 +122,7 @@
         <rect x="3" y="3" width="18" height="18" rx="2" />
         <path d="M9 9h6M9 12h6M9 15h4" />
       </svg>
-      <p class="pcv-empty-text">{t.empty}</p>
+      <p class="pcv-empty-text">{$t('moach.chainView.empty')}</p>
     </div>
 
   {:else}
@@ -156,7 +132,7 @@
       <section class="pcv-section" aria-labelledby="mission-heading">
         <h2 id="mission-heading" class="pcv-heading">
           <span class="pcv-heading-icon" aria-hidden="true">◈</span>
-          {t.missionSection}
+          {$t('moach.chainView.missionSection')}
           <span class="pcv-heading-count">{activeChains.length}</span>
         </h2>
 
@@ -192,7 +168,7 @@
       <section class="pcv-section" aria-labelledby="resource-heading">
         <h2 id="resource-heading" class="pcv-heading pcv-heading--resource">
           <span class="pcv-heading-icon" aria-hidden="true">◇</span>
-          {t.resourceSection}
+          {$t('moach.chainView.resourceSection')}
           <span class="pcv-heading-count pcv-heading-count--sky">{resourceChains.length}</span>
         </h2>
 
@@ -228,7 +204,7 @@
           aria-expanded={archiveOpen}
         >
           <span class="pcv-heading-icon pcv-heading-icon--archive" aria-hidden="true">◫</span>
-          <span class="pcv-heading-text">{t.archiveSection}</span>
+          <span class="pcv-heading-text">{$t('moach.chainView.archiveSection')}</span>
           <span class="pcv-heading-count pcv-heading-count--grey">{archivedChains.length}</span>
           <svg class="pcv-archive-chevron" class:pcv-archive-chevron--open={archiveOpen} viewBox="0 0 24 24" aria-hidden="true">
             <polyline points="6 9 12 15 18 9" />

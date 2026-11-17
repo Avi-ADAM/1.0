@@ -147,7 +147,9 @@
     "times": "times",
     "hours_done": "hours done",
     "empty_doing": "No missions in progress right now",
-    "empty_done": "No completed missions yet"
+    "empty_done": "No completed missions yet",
+    "pendingRequest": "You already sent a purchase request - view it",
+    "editBom": "Edit BOM / product"
   },
   "compose": {
     "title": "Create Product",

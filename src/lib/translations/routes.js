@@ -59,6 +59,11 @@ export const ROUTED = {
     // The seller's product editor (sales/manage/products/[productId]) and the
     // "full edit" link on the products tab.
     shopEditor: at(/\/moach\/[^/]+\/sales/),
+    // The product composer's recipe pickers and their detail dialogs, and the
+    // public "what the product is made of" view (MatanotPublicView) — on a
+    // product request under /deals, on the public product page under /gift,
+    // and in the heart's product-request card under /lev.
+    products: at('/lev', '/gift', '/deals', /\/moach\/[^/]+/),
     // The public "how to build a shop with 1💗1" landing page (/shop).
     shopPage: at('/shop'),
     offerings: at('/me', '/onboard', '/gift', '/user', '/deals/sales-center', /\/moach\/[^/]+\/sales/),

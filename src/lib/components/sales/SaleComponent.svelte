@@ -415,25 +415,20 @@
        already moved (paid — no customer confirmation); on a standing order the
        customer confirms the transfer every month. -->
   <small class="text-barbi text-center mt-2">
-    {$lang === 'en'
-      ? `Customer (optional${isRecurring ? '' : ' · paid'}) - exact 1lev1 username or email`
-      : `לקוח (אופציונלי${isRecurring ? '' : ' · שולם'}) - שם משתמש או אימייל מדויק ב-1lev1`}
+    {$t(isRecurring ? 'sales.shopSkin.customer' : 'sales.shopSkin.customerPaid')} -
+    {$t('sales.shopSkin.customerLabel')}
   </small>
   <input
     class="bg-gold hover:bg-mtork border-2 border-barbi rounded text-barbi placeholder-barbi/70 p-1"
     type="text"
-    placeholder={$lang === 'en' ? 'username or email' : 'שם משתמש או אימייל'}
+    placeholder={$t('sales.shopSkin.customerPh')}
     bind:value={customerIdentifier}
   />
   <small class="text-barbi/70 text-center text-xs">
     {#if isRecurring}
-      {$lang === 'en'
-        ? 'A standing order opens a monthly report card; a named customer also confirms their transfer each month.'
-        : 'מכירה מתחדשת פותחת כרטיס דיווח חודשי; לקוח מזוהה גם יעדכן כל חודש כמה העביר.'}
+      {$t('sales.shopSkin.customerHintRecurring')}
     {:else}
-      {$lang === 'en'
-        ? 'The sale is recorded as already paid - the purchase appears on the customer\'s deals page, no confirmation needed.'
-        : 'המכירה נרשמת כשולמה - הרכישה תופיע בעמוד העסקאות של הלקוח, ללא צורך באשרור.'}
+      {$t('sales.shopSkin.customerHintPaid')}
     {/if}
   </small>
 

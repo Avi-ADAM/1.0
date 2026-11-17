@@ -27,6 +27,7 @@ SvelteKit + Svelte 5 app, npm, Node 22.
 | `npm run check:i18n` | Verifies every `$t('ns.…')` is reachable on the routes that use it (see i18n section). |
 | `npm run check:script` | Flags words that mix alphabets (a Cyrillic `г` inside a Hebrew word, …). |
 | `npm run check:translatable` | Verifies the UGC translation manifest (`src/lib/translation/fields.js`) against the generated Strapi schema. |
+| `npm run check:ui-hebrew` | Fails on Hebrew typed straight into `.svelte` markup on the screens localised so far (see i18n section). |
 
 Tests are colocated (`*.test.ts` / `*.integration.test.ts` / `*.pbt.test.ts`
 property-based via fast-check) and run on the `happy-dom`/`jsdom` environment.
@@ -141,6 +142,12 @@ routes listed there.
 >
 > `npm run check:i18n` catches all four. Run it after moving a component between
 > routes, after removing an inline dictionary, or after adding an interpolation.
+>
+> A fifth failure has no key to check at all: text typed straight into the
+> template. `npm run check:ui-hebrew` reads the markup half of the screens
+> localised in `docs/inprogress/PLAN_EN_READINESS.md` and fails on Hebrew left
+> there. Add a screen to its `ROOTS` when you finish localising it, so it stays
+> clean.
 
 Interpolation is `$t('ns.key', { count })` against `"… {{count}} …"`. A few
 older call sites substitute by hand instead — `$t(k).replace('{restime}', v)` —

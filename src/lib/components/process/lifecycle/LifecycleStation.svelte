@@ -4,6 +4,8 @@
    * Renders the rail dot + connector, a header (label, name, status badge,
    * creation date, link to the object page) and arbitrary detail content.
    */
+  import { lang as uiLang } from '$lib/stores/lang.js';
+
   let {
     label,
     name = '',
@@ -23,7 +25,7 @@
     if (!value) return '';
     try {
       return new Date(value).toLocaleDateString(
-        lang === 'he' ? 'he-IL' : lang === 'ar' ? 'ar' : 'en-GB',
+        $uiLang,
         { day: 'numeric', month: 'short', year: 'numeric' }
       );
     } catch {

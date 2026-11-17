@@ -1,6 +1,7 @@
 <script>
   import ChainNode from './ChainNode.svelte';
   import ChainConnector from './ChainConnector.svelte';
+  import { t } from '$lib/translations';
 
   let {
     chain,
@@ -14,49 +15,6 @@
   // ---------------------------------------------------------------------------
   // Localized labels
   // ---------------------------------------------------------------------------
-  const labels = {
-    he: {
-      pmash:          'משאב ממתין',
-      open_mashaabim: 'משאב פתוח',
-      askms:          'הצעות',
-      maap:           'הצבעת אישור',
-      rikmash:        'אושר/הושלם',
-      offers:         (n) => `${n} הצעות`,
-      offersLabel:    (n) => `${n} הצעות - הרחב`,
-      collapseOffers: 'כווץ',
-      noOffers:       'אין הצעות',
-      collapse:       'כווץ',
-      openPage:       'פתח עמוד תהליך'
-    },
-    en: {
-      pmash:          'Pending Resource',
-      open_mashaabim: 'Open Resource',
-      askms:          'Offers',
-      maap:           'Approval Vote',
-      rikmash:        'Approved',
-      offers:         (n) => `${n} ${n === 1 ? 'offer' : 'offers'}`,
-      offersLabel:    (n) => `${n} ${n === 1 ? 'offer' : 'offers'} - expand`,
-      collapseOffers: 'Collapse',
-      noOffers:       'No offers',
-      collapse:       'Collapse',
-      openPage:       'Open process page'
-    },
-    ar: {
-      pmash:          'مورد معلق',
-      open_mashaabim: 'مورد مفتوح',
-      askms:          'عروض',
-      maap:           'تصويت الموافقة',
-      rikmash:        'معتمد',
-      offers:         (n) => `${n} عروض`,
-      offersLabel:    (n) => `${n} عروض - توسيع`,
-      collapseOffers: 'طي',
-      noOffers:       'لا توجد عروض',
-      collapse:       'طي',
-      openPage:       'فتح صفحة العملية'
-    }
-  };
-
-  let t = $derived(labels[lang] ?? labels.en);
 
   // ---------------------------------------------------------------------------
   // Visibility flags
@@ -104,11 +62,11 @@
   });
 
   let currentStage = $derived(() => {
-    if (showRikmashes)     return { label: t.rikmash,        cls: 'stage-green' };
-    if (showMaap)          return { label: t.maap,            cls: 'stage-gold'  };
-    if (showAskms)         return { label: t.askms,           cls: 'stage-violet'};
-    if (showOpenMashaabim) return { label: t.open_mashaabim,  cls: 'stage-sky'   };
-    if (showPmash)         return { label: t.pmash,           cls: 'stage-gold'  };
+    if (showRikmashes)     return { label: $t('moach.chainResource.approved'),        cls: 'stage-green' };
+    if (showMaap)          return { label: $t('moach.chainResource.approvalVote'),            cls: 'stage-gold'  };
+    if (showAskms)         return { label: $t('moach.chainResource.offers'),           cls: 'stage-violet'};
+    if (showOpenMashaabim) return { label: $t('moach.chainResource.open'),  cls: 'stage-sky'   };
+    if (showPmash)         return { label: $t('moach.chainResource.pmash'),           cls: 'stage-gold'  };
     return null;
   });
 
@@ -170,7 +128,7 @@
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <polyline points="18 15 12 9 6 15" />
         </svg>
-        {t.collapse}
+        {$t('moach.chainResource.collapse')}
       </button>
     </div>
 
@@ -180,9 +138,9 @@
         {#if showPmash}
           {#if needsConnectorBefore('pmash')}<ChainConnector {lang} />{/if}
           <ChainNode
-            label={t.pmash}
+            label={$t('moach.chainResource.pmash')}
             name={chain.pmash.attributes?.name ?? chain.pmash.id}
-            status={chain.pmash.attributes?.archived ? (lang === 'he' ? 'ארכיון' : 'Archived') : (lang === 'he' ? 'ממתין' : 'Pending')}
+            status={chain.pmash.attributes?.archived ? ($t('moach.chainResource.statusArchived')) : ($t('moach.chainResource.statusPending'))}
             statusColor={chain.pmash.attributes?.archived ? 'grey' : 'yellow'}
             user={null}
             hasForum={false}
@@ -194,9 +152,9 @@
         {#if showOpenMashaabim}
           {#if needsConnectorBefore('open_mashaabim')}<ChainConnector {lang} />{/if}
           <ChainNode
-            label={t.open_mashaabim}
+            label={$t('moach.chainResource.open')}
             name={chain.openMashaabim.attributes?.name ?? chain.openMashaabim.id}
-            status={chain.openMashaabim.attributes?.archived ? (lang === 'he' ? 'ארכיון' : 'Archived') : (lang === 'he' ? 'פתוח' : 'Open')}
+            status={chain.openMashaabim.attributes?.archived ? ($t('moach.chainResource.statusArchived')) : ($t('moach.chainResource.statusOpen'))}
             statusColor={chain.openMashaabim.attributes?.archived ? 'grey' : 'blue'}
             user={null}
             hasForum={false}
@@ -211,7 +169,7 @@
             <button
               type="button"
               class="askms-badge"
-              aria-label={askmsExpanded ? t.collapseOffers : t.offersLabel(askmsCount)}
+              aria-label={askmsExpanded ? $t('moach.chainResource.collapseOffers') : $t(askmsCount === 1 ? 'moach.chainResource.offersLabelOne' : 'moach.chainResource.offersLabelMany', { count: askmsCount })}
               aria-expanded={askmsExpanded}
               onclick={() => (askmsExpanded = !askmsExpanded)}
             >
@@ -219,7 +177,7 @@
                 <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
                 <line x1="7" y1="7" x2="7.01" y2="7" />
               </svg>
-              <span class="askms-label">{t.askms}</span>
+              <span class="askms-label">{$t('moach.chainResource.offers')}</span>
               <span role="status" class="askms-count">{askmsCount}</span>
               <svg
                 viewBox="0 0 24 24"
@@ -234,7 +192,7 @@
             {#if askmsExpanded}
               <div class="askms-list" role="list">
                 {#if askmsCount === 0}
-                  <p class="askms-empty">{t.noOffers}</p>
+                  <p class="askms-empty">{$t('moach.chainResource.noOffers')}</p>
                 {:else}
                   {#each chain.askms as askm (askm.id)}
                     <div class="askm-item" role="listitem">
@@ -250,9 +208,9 @@
         {#if showMaap}
           {#if needsConnectorBefore('maap')}<ChainConnector {lang} />{/if}
           <ChainNode
-            label={t.maap}
+            label={$t('moach.chainResource.approvalVote')}
             name={chain.maap.attributes?.name ?? chain.maap.id}
-            status={chain.maap.attributes?.archived ? (lang === 'he' ? 'ארכיון' : 'Archived') : (lang === 'he' ? 'ממתין' : 'Pending')}
+            status={chain.maap.attributes?.archived ? ($t('moach.chainResource.statusArchived')) : ($t('moach.chainResource.statusPending'))}
             statusColor={chain.maap.attributes?.archived ? 'grey' : 'yellow'}
             user={null}
             hasForum={false}
@@ -266,9 +224,9 @@
           <div class="rikmashes-group">
             {#each chain.rikmashes as rikmash (rikmash.id)}
               <ChainNode
-                label={t.rikmash}
+                label={$t('moach.chainResource.approved')}
                 name={rikmash.attributes?.name ?? rikmash.id}
-                status={lang === 'he' ? 'אושר' : 'Approved'}
+                status={$t('moach.chainResource.statusApproved')}
                 statusColor="green"
                 user={null}
                 hasForum={false}
@@ -283,7 +241,7 @@
 
       <div class="exp-footer">
         <a href="/moach/{projectId}/processes/{chain.id}" class="open-page-link">
-          {t.openPage}
+          {$t('moach.chainResource.openPage')}
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
             <polyline points="15 3 21 3 21 9" />
