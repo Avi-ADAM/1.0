@@ -243,5 +243,10 @@
     "onlyMine": "Todas las misiones en curso de esta rikma son tuyas.",
     "titleAll": "Reunión de oro · {{rikma}}",
     "titleScoped": "{{scope}} · {{rikma}}"
-  }
+  },
+  "someone": "Miembro",
+  "someoneInitials": "Mi",
+  "wishNotFound": "Deseo no encontrado",
+  "wishNotPublic": "Este deseo no está abierto al público",
+  "untitled": "(sin nombre)"
 }

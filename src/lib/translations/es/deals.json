@@ -327,5 +327,22 @@
     "remove": "Se quita: {{name}}",
     "raise": "Aumento del coste:",
     "keepHint": "Marca lo que necesitas. Lo que no marques queda fuera de tu propuesta."
+  },
+  "acceptOffer": {
+    "titleM": "Una propuesta de misión para ti",
+    "titleR": "Una propuesta de recurso para ti",
+    "intro": "La propuesta está lista para ti. Puedes ver el panorama completo o aprobar tu asignación aquí.",
+    "hours": "horas",
+    "full": "Panorama completo",
+    "approve": "Me sumo: aprobar asignación",
+    "decline": "No es para mí",
+    "submitting": "Aprobando tu asignación…",
+    "doneTitle": "Asignación aprobada",
+    "doneBody": "Te uniste a la misión como proveedor. Se avisó a quien pidió el deseo. La rikma se crea cuando se completen todos los lugares.",
+    "close": "Cerrar",
+    "errTitle": "Algo salió mal",
+    "retry": "Intentar de nuevo",
+    "declined": "Rechazado",
+    "declineFailed": "No se pudo rechazar"
   }
 }

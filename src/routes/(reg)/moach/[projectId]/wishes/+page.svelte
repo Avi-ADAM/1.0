@@ -1,7 +1,7 @@
 <script>
   import { useFormatMoney } from '$lib/money/context.svelte';
   import { lang } from '$lib/stores/lang.js';
-  import { t } from '$lib/translations';
+  import { t, isRtl } from '$lib/translations';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
@@ -22,10 +22,10 @@
   }
 
   const FILTERS = [
-    { id: 'all',       he: 'הכל' },
-    { id: 'active',    he: 'פעילות' },
-    { id: 'won',       he: 'הצלחות' },
-    { id: 'dismissed', he: 'דחויות' }
+    { id: 'all',       key: 'filter_all' },
+    { id: 'active',    key: 'filter_active' },
+    { id: 'won',       key: 'filter_won' },
+    { id: 'dismissed', key: 'filter_dismissed' }
   ];
 
   let activeFilter = $state('active');
@@ -49,26 +49,25 @@
   });
 
   function fmtBudget(n) {
-    if (n == null || !Number.isFinite(+n)) return 'לפי הצעה';
+    if (n == null || !Number.isFinite(+n)) return $t('moach.wishes.by_proposal');
     return fmtMoney(+n);
   }
-  const HE_MONTHS = ['ינו','פבר','מרץ','אפר','מאי','יוני','יולי','אוג','ספט','אוק','נוב','דצמ'];
   function fmtDate(iso) {
-    if (!iso) return 'גמיש';
+    if (!iso) return $t('moach.wishes.flexible');
     const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return 'גמיש';
-    return `${d.getDate()} ב${HE_MONTHS[d.getMonth()]}`;
+    if (Number.isNaN(d.getTime())) return $t('moach.wishes.flexible');
+    return d.toLocaleDateString($lang, { day: 'numeric', month: 'short' });
   }
   function relativeTime(iso) {
     if (!iso) return '';
     const d = new Date(iso).getTime();
     if (!d) return '';
     const diff = (Date.now() - d) / 1000;
-    if (diff < 60)     return 'הרגע';
-    if (diff < 3600)   return `לפני ${Math.round(diff/60)}ד׳`;
-    if (diff < 86400)  return `לפני ${Math.round(diff/3600)} שעות`;
-    if (diff < 604800) return `לפני ${Math.round(diff/86400)} ימים`;
-    return `לפני ${Math.round(diff/604800)} שבועות`;
+    if (diff < 60)     return $t('moach.wishes.just_now');
+    if (diff < 3600)   return $t('moach.wishes.minutes_ago', { count: Math.round(diff/60) });
+    if (diff < 86400)  return $t('moach.wishes.hours_ago', { count: Math.round(diff/3600) });
+    if (diff < 604800) return $t('moach.wishes.days_ago', { count: Math.round(diff/86400) });
+    return $t('moach.wishes.weeks_ago', { count: Math.round(diff/604800) });
   }
   function scorePct(s) {
     if (typeof s !== 'number') return 0;
@@ -77,29 +76,29 @@
 </script>
 
 <svelte:head>
-  <title>{$lang === 'he' ? 'משאלות נכנסות' : $lang === 'ar' ? 'الرغبات الواردة' : 'Incoming wishes'} · 1lev1</title>
+  <title>{$t('moach.wishes.page_title')} · 1lev1</title>
 </svelte:head>
 
-<div class="incoming-wishes p-4 sm:p-8 bg-white rounded-xl shadow-sm" dir="rtl">
+<div class="incoming-wishes p-4 sm:p-8 bg-white rounded-xl shadow-sm" dir={$isRtl ? 'rtl' : 'ltr'}>
 
   <!-- Header -->
   <div class="flex items-start justify-between gap-4 mb-6 flex-wrap">
     <div>
-      <div class="text-xs tracking-[.22em] uppercase text-rose-500 font-semibold mb-1">CONCIERGE · קונסיירז׳</div>
-      <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">משאלות שהפרויקט מועמד לספק</h1>
+      <div class="text-xs tracking-[.22em] uppercase text-rose-500 font-semibold mb-1">{$t('moach.wishes.eyebrow')}</div>
+      <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">{$t('moach.wishes.title')}</h1>
       <p class="text-sm text-slate-500 mt-2 max-w-xl">
-        המוצרים שלכם הותאמו על־ידי Lev למשאלות לקוחות פתוחות. אין צורך בפעולה - אם אחד מהם ייבחר, תקבלו התראה במסך הדילים.
+        {$t('moach.wishes.intro')}
       </p>
     </div>
     <div class="flex items-center gap-3 text-sm text-slate-500">
       <span class="inline-flex items-center gap-2 px-3 py-1.5 bg-rose-50 text-rose-600 rounded-full border border-rose-200 font-medium">
         <span class="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.5)]"></span>
-        {counts.active} פעילות
+        {$t('moach.wishes.active_n', { count: counts.active })}
       </span>
       {#if counts.won > 0}
         <span class="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-200 font-medium">
           <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-          {counts.won} נסגרו
+          {$t('moach.wishes.won_n', { count: counts.won })}
         </span>
       {/if}
     </div>
@@ -115,7 +114,7 @@
                   : 'bg-white text-slate-600 border-slate-200 hover:border-rose-300 hover:text-rose-500'}"
         onclick={() => activeFilter = f.id}
       >
-        {f.he}
+        {$t(`moach.wishes.${f.key}`)}
         <span class="ms-1 opacity-70 text-xs">{counts[f.id] ?? 0}</span>
       </button>
     {/each}
@@ -124,19 +123,19 @@
   <!-- List -->
   {#if !data.loadOk}
     <div class="p-6 border border-amber-200 bg-amber-50 rounded-xl text-amber-800 text-sm">
-      לא הצלחנו לטעון משאלות. ייתכן שאתם עוד לא רשומים כספק לאף משאלה, או שיש בעיית רשת.
+      {$t('moach.wishes.load_failed')}
     </div>
   {:else if filtered.length === 0}
     <div class="p-10 border border-dashed border-slate-300 rounded-xl text-center text-slate-500 bg-slate-50">
       <div class="text-3xl text-rose-400 mb-2">✶</div>
-      <div class="font-medium text-slate-700 mb-1">אין משאלות במסך הזה</div>
+      <div class="font-medium text-slate-700 mb-1">{$t('moach.wishes.empty_title')}</div>
       <div class="text-sm">
         {#if activeFilter === 'active'}
-          ברגע שאחד המוצרים שלכם יותאם למשאלה - היא תופיע כאן.
+          {$t('moach.wishes.empty_active')}
         {:else if activeFilter === 'won'}
-          טרם נסגר דיל ממשאלה. הצלחות יופיעו כאן.
+          {$t('moach.wishes.empty_won')}
         {:else}
-          אין משאלות בקבוצה הזו.
+          {$t('moach.wishes.empty_other')}
         {/if}
       </div>
     </div>
@@ -201,10 +200,10 @@
             <button
               class="text-sm text-rose-600 hover:text-rose-700 font-medium hover:underline"
               onclick={() => goto(`/concierge/${p.ratsonId}`)}
-            >פתיחת המשאלה ›</button>
+            >{$t('moach.wishes.open_wish')}</button>
             {#if p.status === 'accepted'}
               <a href="/deals" class="text-xs font-semibold tracking-wider uppercase text-emerald-600 hover:text-emerald-700">
-                לדילים ⤴
+                {$t('moach.wishes.to_deals')}
               </a>
             {/if}
           </div>

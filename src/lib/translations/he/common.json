@@ -242,5 +242,10 @@
     "onlyMine": "כל המשימות שבביצוע כרגע ברקמה הן שלך.",
     "titleAll": "פגישת זהב · {{rikma}}",
     "titleScoped": "{{scope}} · {{rikma}}"
-  }
+  },
+  "someone": "משתמש/ת",
+  "someoneInitials": "מש",
+  "wishNotFound": "משאלה לא נמצאה",
+  "wishNotPublic": "משאלה זו אינה פתוחה לציבור",
+  "untitled": "(ללא שם)"
 }

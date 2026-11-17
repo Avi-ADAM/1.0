@@ -242,5 +242,10 @@
     "onlyMine": "Every mission in progress in this rikma is yours.",
     "titleAll": "Golden meeting · {{rikma}}",
     "titleScoped": "{{scope}} · {{rikma}}"
-  }
+  },
+  "someone": "Member",
+  "someoneInitials": "Me",
+  "wishNotFound": "Wish not found",
+  "wishNotPublic": "This wish isn't open to the public",
+  "untitled": "(untitled)"
 }

@@ -242,5 +242,10 @@
     "onlyMine": "كل المهام قيد التنفيذ في هذه الريكما هي مهامك.",
     "titleAll": "اجتماع ذهبي · {{rikma}}",
     "titleScoped": "{{scope}} · {{rikma}}"
-  }
+  },
+  "someone": "عضو",
+  "someoneInitials": "عض",
+  "wishNotFound": "لم يتم العثور على الأمنية",
+  "wishNotPublic": "هذه الأمنية غير مفتوحة للعامة",
+  "untitled": "(بلا اسم)"
 }

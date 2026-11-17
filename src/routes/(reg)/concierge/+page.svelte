@@ -21,7 +21,7 @@
 
 
   function getUserInitials(name) {
-    if (!name) return 'מש';
+    if (!name) return $t('concierge.new.avatarFallback');
     const parts = name.trim().split(/\s+/);
     if (parts.length === 1) {
       return parts[0].slice(0, 2);
@@ -30,28 +30,14 @@
   }
 
   /* ===== Format helpers ===== */
-  const HE_MONTHS = [
-    'ינו',
-    'פבר',
-    'מרץ',
-    'אפר',
-    'מאי',
-    'יוני',
-    'יולי',
-    'אוג',
-    'ספט',
-    'אוק',
-    'נוב',
-    'דצמ'
-  ];
   function fmtDate(iso) {
-    if (!iso) return 'בלי תאריך';
+    if (!iso) return $t('concierge.no_date');
     const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return 'בלי תאריך';
-    return `${d.getDate()} ב${HE_MONTHS[d.getMonth()]}`;
+    if (Number.isNaN(d.getTime())) return $t('concierge.no_date');
+    return d.toLocaleDateString($lang, { day: 'numeric', month: 'short' });
   }
   function fmtBudget(n) {
-    if (n == null || !Number.isFinite(+n)) return 'לפי הצעה';
+    if (n == null || !Number.isFinite(+n)) return $t('concierge.by_proposal');
     return fmtMoney(+n);
   }
   function relativeTime(iso) {
@@ -59,27 +45,27 @@
     const d = new Date(iso).getTime();
     if (!d) return '';
     const diff = (Date.now() - d) / 1000;
-    if (diff < 60) return 'הרגע';
-    if (diff < 3600) return `לפני ${Math.round(diff / 60)}ד׳`;
-    if (diff < 86400) return `לפני ${Math.round(diff / 3600)} שעות`;
-    if (diff < 604800) return `לפני ${Math.round(diff / 86400)} ימים`;
-    return `לפני ${Math.round(diff / 604800)} שבועות`;
+    if (diff < 60) return $t('concierge.just_now');
+    if (diff < 3600) return $t('concierge.minutes_ago', { count: Math.round(diff / 60) });
+    if (diff < 86400) return $t('concierge.hours_ago', { count: Math.round(diff / 3600) });
+    if (diff < 604800) return $t('concierge.days_ago', { count: Math.round(diff / 86400) });
+    return $t('concierge.weeks_ago', { count: Math.round(diff / 604800) });
   }
   function coveredFromScore(score) {
     if (typeof score !== 'number') return 0;
     return Math.max(0, Math.min(100, Math.round(score * 100)));
   }
   function eventFromStatus(status, hasProposals) {
-    if (status === 'fulfilled') return 'המשאלה הוגשמה';
+    if (status === 'fulfilled') return $t('concierge.event.fulfilled');
     if (status === 'negotiating')
-      return hasProposals ? 'יש הצעות בתהליך הסכמה' : 'בהסכמה';
-    if (status === 'matching') return 'מתבצע חיפוש התאמות';
+      return $t(hasProposals ? 'concierge.event.negotiating_offers' : 'concierge.event.negotiating');
+    if (status === 'matching') return $t('concierge.event.matching');
     if (status === 'open')
-      return hasProposals ? 'יש הצעות חדשות' : 'פורסמה לקהילה';
-    if (status === 'draft') return 'טיוטה - לא פורסמה';
-    if (status === 'expired') return 'פג תוקף המשאלה';
-    if (status === 'cancelled') return 'המשאלה בוטלה';
-    return 'פעילה';
+      return $t(hasProposals ? 'concierge.event.open_offers' : 'concierge.event.open');
+    if (status === 'draft') return $t('concierge.event.draft');
+    if (status === 'expired') return $t('concierge.event.expired');
+    if (status === 'cancelled') return $t('concierge.event.cancelled');
+    return $t('concierge.event.active');
   }
 
   /* ===== Bridge server cards → display cards ===== */
@@ -121,124 +107,103 @@
     };
   }
 
-  /* ===== Mock fallback (used when server query empty / fails) ===== */
-  const MOCK_MINE = [
+  /* ===== Mock fallback (used when the server query fails) =====
+     The words live in concierge.demo.* so the demo reads in the visitor's
+     language; dates and budgets are formatted the same way real ones are. */
+  const D = (k, vars) => $t(`concierge.demo.${k}`, vars);
+  // Fixed calendar days whose weekday is part of the story (Thu / Sun / Fri).
+  const demoDay = (y, m, d) =>
+    new Date(y, m - 1, d).toLocaleDateString($lang, { weekday: 'short', day: 'numeric', month: 'long' });
+  const demoRange = (lo, hi) => `${fmtMoney(lo)}–${fmtMoney(hi)}`;
+  const initialsOf = (name) =>
+    String(name || '')
+      .replace(/\./g, ' ')
+      .trim()
+      .split(/\s+/)
+      .map((w) => w[0] || '')
+      .join('')
+      .slice(0, 2);
+
+  const MOCK_MINE = $derived([
     {
       id: 'demo-wish-id',
       code: 'R-7f3a91',
-      title: 'יום חופש לאמא ליום הולדתה',
-      excerpt:
-        'אמא שלי מטפלת בילדים כל יום ובקרוב יום הולדתה. אני רוצה לתת לה יום שלם משוחרר…',
+      title: D('mine.w1.title'),
+      excerpt: D('mine.w1.excerpt'),
       status: 'negotiating',
       coveredPct: 75,
       proposalsCount: 6,
       missionsCount: 4,
       resourcesCount: 3,
-      lastEvent: 'תמר ל. אישרה את הצעת ההשגחה',
-      lastEventTime: 'לפני 15ד׳',
-      budget: '₪ 850–1,200',
-      whenStr: 'ה׳, 19 ביוני',
-      values: ['הדדיות', 'נדיבות'],
+      lastEvent: D('mine.w1.lastEvent'),
+      lastEventTime: $t('concierge.minutes_ago', { count: 15 }),
+      budget: demoRange(850, 1200),
+      whenStr: demoDay(2025, 6, 19),
+      values: [D('values.reciprocity'), D('values.generosity')],
       pinkAccent: true
     },
     {
       id: 'wish-2',
       code: 'R-2c9d44',
-      title: 'מישהו שיעזור לי להוביל ארון מהדרך',
-      excerpt:
-        'יש לי ארון בגדים גדול וכבד שצריך לעלות לקומה שלישית בלי מעלית. צריך 2 ידיים חזקות לשעה.',
+      title: D('mine.w2.title'),
+      excerpt: D('mine.w2.excerpt'),
       status: 'matching',
       coveredPct: 33,
       proposalsCount: 2,
       missionsCount: 1,
       resourcesCount: 2,
-      lastEvent: 'נמצאו 2 התאמות מ־1 רקמה',
-      lastEventTime: 'לפני 4 שעות',
-      budget: '₪ 80–150',
-      whenStr: 'שבוע הקרוב',
-      values: ['קהילתיות']
+      lastEvent: D('mine.w2.lastEvent'),
+      lastEventTime: $t('concierge.hours_ago', { count: 4 }),
+      budget: demoRange(80, 150),
+      whenStr: D('mine.w2.when'),
+      values: [D('values.community')]
     },
     {
       id: 'wish-3',
       code: 'R-91ef02',
-      title: 'סדנת יצירה לכיתה של בני',
-      excerpt:
-        'מורה לאמנות שתעביר סדנה של שעתיים לכיתה ב׳, נושא חופשי, כל הציוד בידינו.',
+      title: D('mine.w3.title'),
+      excerpt: D('mine.w3.excerpt'),
       status: 'open',
       coveredPct: 0,
       proposalsCount: 0,
       missionsCount: 1,
       resourcesCount: 0,
-      lastEvent: 'פורסמה לקהילה',
-      lastEventTime: 'לפני 2 ימים',
-      budget: '₪ 400',
-      whenStr: 'תוך חודש',
-      values: ['יצירתיות', 'קהילתיות']
+      lastEvent: $t('concierge.event.open'),
+      lastEventTime: $t('concierge.days_ago', { count: 2 }),
+      budget: fmtMoney(400),
+      whenStr: D('mine.w3.when'),
+      values: [D('values.creativity'), D('values.community')]
     }
-  ];
+  ]);
 
-  const MOCK_PUBLIC = [
-    {
-      id: 'pub-1',
-      code: 'R-44a1b0',
-      author: 'מ.כ.',
-      avatar: 'מכ',
-      title: 'תיקון אופניים חשמליים',
-      excerpt:
-        'הסוללה מתפרקת אחרי 8 ק״מ. שמעתי שאפשר לשפץ אותה במקום לקנות חדשה - מחפש מישהו שיודע.',
-      whenStr: 'גמיש',
-      budget: '₪ 250–600',
-      values: ['קיימות', 'אקולוגיה'],
-      proposalsCount: 1,
-      tags: ['תיקון', 'אופניים'],
-      distanceKm: 4.2
-    },
-    {
-      id: 'pub-2',
-      code: 'R-c812d1',
-      author: 'ת.ש.',
-      avatar: 'תש',
-      title: 'ליווי לבית הקברות ביום השנה',
-      excerpt:
-        'אני זקנה וקשה לי לבד. אשמח שמישהי תיסע איתי לחיפה לבית הקברות, נדבר על אמא בדרך.',
-      whenStr: 'ראשון, 22 ביוני',
-      budget: 'תרומה לפי לב',
-      values: ['הדדיות', 'נדיבות'],
-      proposalsCount: 3,
-      tags: ['ליווי', 'נוכחות'],
-      distanceKm: 1.1
-    },
-    {
-      id: 'pub-3',
-      code: 'R-7e3014',
-      author: 'נ.פ.',
-      avatar: 'נפ',
-      title: 'בישול שבת לעובדי קו ראשון',
-      excerpt:
-        'מארגנים בכל שבוע 40 מנות חמות לצוות בית חולים. מחפשים מטבחים שיתפסו בכל פעם שורה אחת מהתפריט.',
-      whenStr: 'שבועי',
-      budget: 'מומן על־ידי קרן',
-      values: ['קהילתיות', 'נדיבות'],
-      proposalsCount: 7,
-      tags: ['בישול', 'התנדבות'],
-      distanceKm: 12.4
-    },
-    {
-      id: 'pub-4',
-      code: 'R-5a8b09',
-      author: 'י.מ.',
-      avatar: 'ימ',
-      title: 'מסיבת יום הולדת לבן 8',
-      excerpt:
-        'רוצה משהו שאני לא יודעת לעשות לבד - קוסם, סדנת יצירה, מישהו שיהיה כיף עם 12 ילדים בחצר.',
-      whenStr: 'שישי, 14 ביוני',
-      budget: '₪ 600–900',
-      values: ['יצירתיות', 'משפחתיות'],
-      proposalsCount: 2,
-      tags: ['ילדים', 'אירוע'],
-      distanceKm: 7.8
-    }
-  ];
+  const MOCK_PUBLIC = $derived(
+    [
+      { n: 'p1', code: 'R-44a1b0', when: $t('concierge.pub.flexible'), budget: demoRange(250, 600),
+        values: ['sustainability', 'ecology'], proposalsCount: 1, distanceKm: 4.2 },
+      { n: 'p2', code: 'R-c812d1', when: demoDay(2025, 6, 22), budget: D('pub.p2.budget'),
+        values: ['reciprocity', 'generosity'], proposalsCount: 3, distanceKm: 1.1 },
+      { n: 'p3', code: 'R-7e3014', when: D('pub.p3.when'), budget: D('pub.p3.budget'),
+        values: ['community', 'generosity'], proposalsCount: 7, distanceKm: 12.4 },
+      { n: 'p4', code: 'R-5a8b09', when: demoDay(2024, 6, 14), budget: demoRange(600, 900),
+        values: ['creativity', 'family'], proposalsCount: 2, distanceKm: 7.8 }
+    ].map((w, i) => {
+      const author = D(`pub.${w.n}.author`);
+      return {
+        id: `pub-${i + 1}`,
+        code: w.code,
+        author,
+        avatar: initialsOf(author),
+        title: D(`pub.${w.n}.title`),
+        excerpt: D(`pub.${w.n}.excerpt`),
+        whenStr: w.when,
+        budget: w.budget,
+        values: w.values.map((v) => D(`values.${v}`)),
+        proposalsCount: w.proposalsCount,
+        tags: [D(`pub.${w.n}.tag1`), D(`pub.${w.n}.tag2`)],
+        distanceKm: w.distanceKm
+      };
+    })
+  );
 
   /* ===== Resolved lists: real data when present, mock otherwise ===== */
   /* The design mock stands in only when the query itself failed. A real
@@ -250,18 +215,22 @@
   );
   const MY_WISHES = $derived(ALL_MINE.filter((w) => w.status !== 'draft'));
   const MY_DRAFTS = $derived(ALL_MINE.filter((w) => w.status === 'draft'));
+  /* Same rule for the community board: an empty board is an empty board. Filling
+     it with the Hebrew design mock showed every reader invented wishes. */
   const PUBLIC_FEED = $derived(
-    data?.publicFeed?.length ? data.publicFeed.map(toPublicCard) : MOCK_PUBLIC
+    data?.queryOk?.public === false
+      ? MOCK_PUBLIC
+      : (data?.publicFeed ?? []).map(toPublicCard)
   );
 
   const STATUS_META = {
-    draft: { label: 'טיוטה', color: 'var(--cg-muted)', dot: 'rgb(var(--cg-muted-rgb) / 0.6)' },
-    open: { label: 'פתוחה', color: 'var(--cg-goldhi)', dot: 'var(--cg-goldhi)' },
-    matching: { label: 'מחפשת התאמות', color: 'var(--cg-sky)', dot: 'var(--cg-sky)' },
-    negotiating: { label: 'בהסכמה', color: 'var(--cg-pink)', dot: 'var(--cg-pink)' },
-    fulfilled: { label: 'הוגשמה', color: 'var(--cg-mint)', dot: 'var(--cg-mint)' },
-    expired: { label: 'פגה', color: 'var(--cg-dim)', dot: 'rgb(var(--cg-dim-rgb) / 0.6)' },
-    cancelled: { label: 'בוטלה', color: 'var(--cg-dim)', dot: 'rgb(var(--cg-dim-rgb) / 0.6)' }
+    draft: { color: 'var(--cg-muted)', dot: 'rgb(var(--cg-muted-rgb) / 0.6)' },
+    open: { color: 'var(--cg-goldhi)', dot: 'var(--cg-goldhi)' },
+    matching: { color: 'var(--cg-sky)', dot: 'var(--cg-sky)' },
+    negotiating: { color: 'var(--cg-pink)', dot: 'var(--cg-pink)' },
+    fulfilled: { color: 'var(--cg-mint)', dot: 'var(--cg-mint)' },
+    expired: { color: 'var(--cg-dim)', dot: 'rgb(var(--cg-dim-rgb) / 0.6)' },
+    cancelled: { color: 'var(--cg-dim)', dot: 'rgb(var(--cg-dim-rgb) / 0.6)' }
   };
 
   const TABS = $derived([
@@ -318,23 +287,11 @@
       : 0
   });
 
-  const LEV_TIPS = [
-    {
-      icon: '✶',
-      kind: 'suggestion',
-      text: 'משאלה אחת ממתינה להחלטה - יום חופש לאמא. נותרה שורה אחת פתוחה.'
-    },
-    {
-      icon: '?',
-      kind: 'question',
-      text: 'האם לחפש שותפויות נוספות לבישול שבת? יש 3 רקמות חדשות בקרבת מקום.'
-    },
-    {
-      icon: '✦',
-      kind: 'suggestion',
-      text: 'ניתן לפרסם כעת את "סדנת יצירה" לקהילה - מורות אמנות פעילות באזור.'
-    }
-  ];
+  const LEV_TIPS = $derived([
+    { icon: '✶', kind: 'suggestion', text: D('tips.t1') },
+    { icon: '?', kind: 'question', text: D('tips.t2') },
+    { icon: '✦', kind: 'suggestion', text: D('tips.t3') }
+  ]);
 
   const SAMPLE_SEEDS = $derived([
     { icon: '🎁', label: $t('concierge.seed_gift') },
@@ -355,7 +312,7 @@
     return STATUS_META[s]?.dot || 'rgb(var(--cg-muted-rgb) / 0.6)';
   }
   function statusLabel(s) {
-    return STATUS_META[s]?.label || s;
+    return STATUS_META[s] ? $t(`concierge.status_short.${s}`) : s;
   }
 
   function openWish(id) {
@@ -409,7 +366,7 @@
       <ConciergeBell items={data?.bell ?? []} notices={data?.notices ?? null} />
       <button class="av-btn" onclick={() => goto('/me')}>
         {#if $uPic}
-          <img src={$uPic} alt="פרופיל" class="av-img" />
+          <img src={$uPic} alt={$t('concierge.new.profileAlt')} class="av-img" />
         {:else}
           {getUserInitials(data?.un)}
         {/if}

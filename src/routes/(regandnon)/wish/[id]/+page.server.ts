@@ -2,27 +2,31 @@ import { sendToSer } from '$lib/send/sendToSer.js';
 import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { rtKey } from '$lib/realtime/scopes';
+import { serverTranslator } from '$lib/server/notices/translate';
 
 function shortCode(id: string | number): string {
   const s = String(id).padStart(6, '0');
   return `R-${s.slice(-6)}`;
 }
 
-function nameOf(user: any): string {
-  if (!user) return 'משתמש/ת';
+type Tr = ReturnType<typeof serverTranslator>;
+
+function nameOf(user: any, tr: Tr): string {
+  if (!user) return tr('common.someone');
   const a = user.attributes || user;
-  return a.username || 'משתמש/ת';
+  return a.username || tr('common.someone');
 }
 
-function initials(name: string): string {
+function initials(name: string, tr: Tr): string {
   const parts = String(name || '').trim().split(/\s+/);
-  return ((parts[0]?.[0] || '') + (parts[1]?.[0] || parts[0]?.[1] || '')).slice(0, 2) || 'מש';
+  return ((parts[0]?.[0] || '') + (parts[1]?.[0] || parts[0]?.[1] || '')).slice(0, 2) || tr('common.someoneInitials');
 }
 
 export const load: PageServerLoad = async ({ params, locals, fetch, depends }) => {
   // Runs again when an action says this wish or its proposals changed.
   depends(rtKey(`wish:${params.id}`));
   const uid = (locals as any)?.uid ?? null;
+  const tr = serverTranslator((locals as any)?.lang);
 
   let wish: any = null;
   let proposalsCount = 0;
@@ -41,7 +45,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
 
     const node = res?.data?.ratson?.data;
     if (!node) {
-      throw error(404, 'משאלה לא נמצאה');
+      throw error(404, tr('common.wishNotFound'));
     }
 
     const a = node.attributes || {};
@@ -52,7 +56,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
       if (owners.some((o: any) => String(o.id) === String(uid))) {
         throw redirect(302, `/concierge/new?draft=${params.id}`);
       }
-      throw error(404, 'משאלה לא נמצאה');
+      throw error(404, tr('common.wishNotFound'));
     }
 
     // Public access guard — `personal` means private.
@@ -72,11 +76,11 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
         (res?.data?.ratsonProposals?.data ?? []).some((p: any) =>
           (p.attributes?.proposer_users?.data ?? []).some((u: any) => String(u.id) === String(uid))
         );
-      if (!isParty) throw error(403, 'משאלה זו אינה פתוחה לציבור');
+      if (!isParty) throw error(403, tr('common.wishNotPublic'));
     }
 
     const owners = a.users_permissions_users?.data ?? [];
-    const ownerName = nameOf(owners[0]);
+    const ownerName = nameOf(owners[0], tr);
 
     // Owner always manages from the concierge view.
     const isOwner = owners.some((o: any) => String(o.id) === String(uid));
@@ -87,7 +91,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
     wish = {
       id: node.id,
       code: shortCode(node.id),
-      name: a.name || '(ללא שם)',
+      name: a.name || tr('common.untitled'),
       longDes: a.longDes || a.desc || '',
       status: a.status_ratson || (a.fulfilled ? 'fulfilled' : 'open'),
       fulfilled: !!a.fulfilled,
@@ -97,7 +101,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
       accessMode: a.access_mode ?? 'public',
       locationHint: a.location_hint ?? null,
       ownerName,
-      ownerAvatar: initials(ownerName),
+      ownerAvatar: initials(ownerName, tr),
       values: (a.vallues?.data ?? []).map((v: any) => v.attributes?.valueName).filter(Boolean),
       categories: (a.categories?.data ?? []).map((c: any) => c.attributes?.name).filter(Boolean),
       extractedMissions: (a.extracted_missions ?? []).map((e: any) => ({
