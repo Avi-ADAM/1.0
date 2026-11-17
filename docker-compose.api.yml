@@ -8,9 +8,10 @@
 #   docker-compose.api.yml   <- this file (pushed by the script)
 #   vector.toml              <- log-shipper config (pushed by the script)
 #   .env                     <- runtime env, lives ONLY on the server:
-#                               STRAPI_URL=http://strapi:1337  (stable alias, always the
-#                               active blue/green color — deploy.ps1 in the Strapi repo
-#                               keeps it pointed correctly on every deploy, see below)
+#                               STRAPI_URL=http://strapi:1337  (stable alias of the nginx
+#                               container in the Strapi repo's compose: an internal
+#                               listener balancing strapi-1..3, docs/inprogress/
+#                               PLAN_VPS_ONLY.md V1 — it never moves on a deploy)
 #                               ORIGIN=https://api.1lev1.com
 #                               ADMINMONTHER=..., cookies secrets, etc.
 #                               MASTRA_PG_PASSWORD=...   (postgres service, below)
@@ -83,17 +84,24 @@ services:
     networks:
       - app-network
 
-  # ---- Mastra persistence (docs/done/PLAN_MASTRA_STORAGE.md) ----
-  # Strapi's Postgres is a managed Aiven service, NOT a container here, so
-  # Mastra gets its own local instance. Never published to a host port: only
-  # containers on app-network can reach it, as `postgres:5432`.
-  # Tuned for the box, not for throughput — 1.9GB RAM total, shared with
-  # Strapi, nginx, socket-server and the API. Postgres would otherwise size
-  # its caches off the host's total RAM and push everything into swap.
+  # ---- The box's Postgres (docs/done/PLAN_MASTRA_STORAGE.md) ----
+  # Started as Mastra's store; since the 2026-11 server move it also holds
+  # Strapi's database (`tov`) and barbi's. Never published to a host port: only
+  # containers on app-network can reach it, as `postgres:5432` /
+  # `mastra-postgres:5432`.
+  #
+  # Sized for vps2 (6 vCPU, 11GB), docs/inprogress/PLAN_VPS_ONLY.md V0. The connection
+  # budget is the part that breaks first: every Strapi replica holds a knex pool
+  # of up to DATABASE_POOL_MAX (default 10), three replicas plus a rolling-deploy
+  # spare are 40, and barbi, Mastra and psql need room beside them. 25 — the old
+  # 1.9GB box's value — would refuse the third Strapi at boot.
   postgres:
     image: postgres:16-alpine
     container_name: mastra-postgres
     restart: unless-stopped
+    # Parallel queries use dynamic shared memory in /dev/shm; docker's 64MB
+    # default makes a big sort fail with "could not resize shared memory".
+    shm_size: 256mb
     environment:
       - POSTGRES_DB=mastra
       - POSTGRES_USER=mastra_user
@@ -101,15 +109,15 @@ services:
     command:
       - postgres
       - -c
-      - max_connections=25
+      - max_connections=120
       - -c
-      - shared_buffers=96MB
+      - shared_buffers=1GB
       - -c
-      - effective_cache_size=256MB
+      - effective_cache_size=4GB
       - -c
-      - work_mem=4MB
+      - work_mem=8MB
       - -c
-      - maintenance_work_mem=32MB
+      - maintenance_work_mem=256MB
     volumes:
       - mastra-pgdata:/var/lib/postgresql/data
     logging: *json-log
