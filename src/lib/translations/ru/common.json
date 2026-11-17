@@ -242,5 +242,10 @@
     "onlyMine": "Все миссии в работе в этой рикме — ваши.",
     "titleAll": "Золотая встреча · {{rikma}}",
     "titleScoped": "{{scope}} · {{rikma}}"
-  }
+  },
+  "someone": "Участник",
+  "someoneInitials": "Уч",
+  "wishNotFound": "Желание не найдено",
+  "wishNotPublic": "Это желание закрыто для публики",
+  "untitled": "(без названия)"
 }

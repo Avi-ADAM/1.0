@@ -21,7 +21,7 @@
 
 
   function getUserInitials(name) {
-    if (!name) return 'מש';
+    if (!name) return $t('concierge.new.avatarFallback');
     const parts = name.trim().split(/\s+/);
     if (parts.length === 1) {
       return parts[0].slice(0, 2);
@@ -30,28 +30,14 @@
   }
 
   /* ===== Format helpers ===== */
-  const HE_MONTHS = [
-    'ינו',
-    'פבר',
-    'מרץ',
-    'אפר',
-    'מאי',
-    'יוני',
-    'יולי',
-    'אוג',
-    'ספט',
-    'אוק',
-    'נוב',
-    'דצמ'
-  ];
   function fmtDate(iso) {
-    if (!iso) return 'בלי תאריך';
+    if (!iso) return $t('concierge.no_date');
     const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return 'בלי תאריך';
-    return `${d.getDate()} ב${HE_MONTHS[d.getMonth()]}`;
+    if (Number.isNaN(d.getTime())) return $t('concierge.no_date');
+    return d.toLocaleDateString($lang, { day: 'numeric', month: 'short' });
   }
   function fmtBudget(n) {
-    if (n == null || !Number.isFinite(+n)) return 'לפי הצעה';
+    if (n == null || !Number.isFinite(+n)) return $t('concierge.by_proposal');
     return fmtMoney(+n);
   }
   function relativeTime(iso) {
@@ -59,27 +45,27 @@
     const d = new Date(iso).getTime();
     if (!d) return '';
     const diff = (Date.now() - d) / 1000;
-    if (diff < 60) return 'הרגע';
-    if (diff < 3600) return `לפני ${Math.round(diff / 60)}ד׳`;
-    if (diff < 86400) return `לפני ${Math.round(diff / 3600)} שעות`;
-    if (diff < 604800) return `לפני ${Math.round(diff / 86400)} ימים`;
-    return `לפני ${Math.round(diff / 604800)} שבועות`;
+    if (diff < 60) return $t('concierge.just_now');
+    if (diff < 3600) return $t('concierge.minutes_ago', { count: Math.round(diff / 60) });
+    if (diff < 86400) return $t('concierge.hours_ago', { count: Math.round(diff / 3600) });
+    if (diff < 604800) return $t('concierge.days_ago', { count: Math.round(diff / 86400) });
+    return $t('concierge.weeks_ago', { count: Math.round(diff / 604800) });
   }
   function coveredFromScore(score) {
     if (typeof score !== 'number') return 0;
     return Math.max(0, Math.min(100, Math.round(score * 100)));
   }
   function eventFromStatus(status, hasProposals) {
-    if (status === 'fulfilled') return 'המשאלה הוגשמה';
+    if (status === 'fulfilled') return $t('concierge.event.fulfilled');
     if (status === 'negotiating')
-      return hasProposals ? 'יש הצעות בתהליך הסכמה' : 'בהסכמה';
-    if (status === 'matching') return 'מתבצע חיפוש התאמות';
+      return $t(hasProposals ? 'concierge.event.negotiating_offers' : 'concierge.event.negotiating');
+    if (status === 'matching') return $t('concierge.event.matching');
     if (status === 'open')
-      return hasProposals ? 'יש הצעות חדשות' : 'פורסמה לקהילה';
-    if (status === 'draft') return 'טיוטה - לא פורסמה';
-    if (status === 'expired') return 'פג תוקף המשאלה';
-    if (status === 'cancelled') return 'המשאלה בוטלה';
-    return 'פעילה';
+      return $t(hasProposals ? 'concierge.event.open_offers' : 'concierge.event.open');
+    if (status === 'draft') return $t('concierge.event.draft');
+    if (status === 'expired') return $t('concierge.event.expired');
+    if (status === 'cancelled') return $t('concierge.event.cancelled');
+    return $t('concierge.event.active');
   }
 
   /* ===== Bridge server cards → display cards ===== */
@@ -250,18 +236,22 @@
   );
   const MY_WISHES = $derived(ALL_MINE.filter((w) => w.status !== 'draft'));
   const MY_DRAFTS = $derived(ALL_MINE.filter((w) => w.status === 'draft'));
+  /* Same rule for the community board: an empty board is an empty board. Filling
+     it with the Hebrew design mock showed every reader invented wishes. */
   const PUBLIC_FEED = $derived(
-    data?.publicFeed?.length ? data.publicFeed.map(toPublicCard) : MOCK_PUBLIC
+    data?.queryOk?.public === false
+      ? MOCK_PUBLIC
+      : (data?.publicFeed ?? []).map(toPublicCard)
   );
 
   const STATUS_META = {
-    draft: { label: 'טיוטה', color: 'var(--cg-muted)', dot: 'rgb(var(--cg-muted-rgb) / 0.6)' },
-    open: { label: 'פתוחה', color: 'var(--cg-goldhi)', dot: 'var(--cg-goldhi)' },
-    matching: { label: 'מחפשת התאמות', color: 'var(--cg-sky)', dot: 'var(--cg-sky)' },
-    negotiating: { label: 'בהסכמה', color: 'var(--cg-pink)', dot: 'var(--cg-pink)' },
-    fulfilled: { label: 'הוגשמה', color: 'var(--cg-mint)', dot: 'var(--cg-mint)' },
-    expired: { label: 'פגה', color: 'var(--cg-dim)', dot: 'rgb(var(--cg-dim-rgb) / 0.6)' },
-    cancelled: { label: 'בוטלה', color: 'var(--cg-dim)', dot: 'rgb(var(--cg-dim-rgb) / 0.6)' }
+    draft: { color: 'var(--cg-muted)', dot: 'rgb(var(--cg-muted-rgb) / 0.6)' },
+    open: { color: 'var(--cg-goldhi)', dot: 'var(--cg-goldhi)' },
+    matching: { color: 'var(--cg-sky)', dot: 'var(--cg-sky)' },
+    negotiating: { color: 'var(--cg-pink)', dot: 'var(--cg-pink)' },
+    fulfilled: { color: 'var(--cg-mint)', dot: 'var(--cg-mint)' },
+    expired: { color: 'var(--cg-dim)', dot: 'rgb(var(--cg-dim-rgb) / 0.6)' },
+    cancelled: { color: 'var(--cg-dim)', dot: 'rgb(var(--cg-dim-rgb) / 0.6)' }
   };
 
   const TABS = $derived([
@@ -355,7 +345,7 @@
     return STATUS_META[s]?.dot || 'rgb(var(--cg-muted-rgb) / 0.6)';
   }
   function statusLabel(s) {
-    return STATUS_META[s]?.label || s;
+    return STATUS_META[s] ? $t(`concierge.status_short.${s}`) : s;
   }
 
   function openWish(id) {
@@ -409,7 +399,7 @@
       <ConciergeBell items={data?.bell ?? []} notices={data?.notices ?? null} />
       <button class="av-btn" onclick={() => goto('/me')}>
         {#if $uPic}
-          <img src={$uPic} alt="פרופיל" class="av-img" />
+          <img src={$uPic} alt={$t('concierge.new.profileAlt')} class="av-img" />
         {:else}
           {getUserInitials(data?.un)}
         {/if}

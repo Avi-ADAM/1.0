@@ -20,28 +20,14 @@
   const myProposals = $derived(data?.myProposals ?? []);
 
 
-  const HE_MONTHS = [
-    'ינו',
-    'פבר',
-    'מרץ',
-    'אפר',
-    'מאי',
-    'יוני',
-    'יולי',
-    'אוג',
-    'ספט',
-    'אוק',
-    'נוב',
-    'דצמ'
-  ];
   function fmtDate(iso) {
-    if (!iso) return 'גמיש';
+    if (!iso) return $t('concierge.pub.flexible');
     const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return 'גמיש';
-    return `${d.getDate()} ב${HE_MONTHS[d.getMonth()]}`;
+    if (Number.isNaN(d.getTime())) return $t('concierge.pub.flexible');
+    return d.toLocaleDateString($locale, { day: 'numeric', month: 'short' });
   }
   function fmtBudget(n) {
-    if (n == null || !Number.isFinite(+n)) return 'לפי הצעה';
+    if (n == null || !Number.isFinite(+n)) return $t('concierge.by_proposal');
     return fmtMoney(+n);
   }
   function relativePublishedAt(iso) {
@@ -49,10 +35,10 @@
     const d = new Date(iso).getTime();
     if (!d) return '';
     const diff = (Date.now() - d) / 1000;
-    if (diff < 3600) return `פורסמה לפני ${Math.round(diff / 60)} דקות`;
-    if (diff < 86400) return `פורסמה לפני ${Math.round(diff / 3600)} שעות`;
-    if (diff < 604800) return `פורסמה לפני ${Math.round(diff / 86400)} ימים`;
-    return `פורסמה לפני ${Math.round(diff / 604800)} שבועות`;
+    if (diff < 3600) return $t('concierge.pub.published_min', { count: Math.round(diff / 60) });
+    if (diff < 86400) return $t('concierge.pub.published_hours', { count: Math.round(diff / 3600) });
+    if (diff < 604800) return $t('concierge.pub.published_days', { count: Math.round(diff / 86400) });
+    return $t('concierge.pub.published_weeks', { count: Math.round(diff / 604800) });
   }
 
   /* ===== Mock fallback — used when no real data ===== */
@@ -98,14 +84,14 @@
           where: data.wish.locationHint || '',
           budget: fmtBudget(data.wish.totalBounti),
           proposalsCount: data.proposalsCount ?? 0,
-          accessNote: 'משאלה ציבורית · נראית לכל מבקר/ת'
+          accessNote: $t('concierge.pub.access_note')
         }
       : MOCK_WISH
   );
 
   const MISSIONS = $derived(
-    data?.wish?.extractedMissions?.length
-      ? data.wish.extractedMissions.map((m) => ({
+    data?.wish
+      ? (data.wish.extractedMissions ?? []).map((m) => ({
           id: m.id,
           name: m.name,
           hours: m.hoursEst ?? 0,
@@ -114,8 +100,8 @@
       : MOCK_MISSIONS
   );
   const RESOURCES = $derived(
-    data?.wish?.extractedResources?.length
-      ? data.wish.extractedResources.map((r) => ({
+    data?.wish
+      ? (data.wish.extractedResources ?? []).map((r) => ({
           id: r.id,
           name: r.name,
           qty: r.quantityEst ?? 1,
@@ -124,7 +110,7 @@
       : MOCK_RESOURCES
   );
   const VALUES = $derived(
-    data?.wish?.values?.length ? data.wish.values : MOCK_VALUES
+    data?.wish ? (data.wish.values ?? []) : MOCK_VALUES
   );
 
   const SUPPORTERS = [
@@ -157,10 +143,10 @@
   const lang = $derived(askedLang($page.url));
   const canonical = $derived(canonicalFor(`/wish/${wishId}`, lang));
   const fulfilled = $derived(data?.wish?.status === 'fulfilled');
-  const pageTitle = $derived(`${wish.title} · משאלה · 1💗1`);
+  const pageTitle = $derived($t('concierge.pub.page_title', { title: wish.title }));
   const pageDesc = $derived(
     oneLine(
-      `${wish.proposalsCount} הצעות · ${wish.when}${wish.where ? ` · ${wish.where}` : ''}. ${wish.long || 'משאלה פתוחה לקהילה ב-1💗1 — כל חלק יכול להיות מאויש בנפרד.'}`,
+      `${$t('concierge.pub.desc_count', { count: wish.proposalsCount })} · ${wish.when}${wish.where ? ` · ${wish.where}` : ''}. ${wish.long || $t('concierge.pub.desc_fallback')}`,
       200
     )
   );
@@ -173,7 +159,7 @@
   // piece covered, and she knows who else could cover the rest.
   const shareUrl = $derived(canonicalFor(`/wish/${wishId}`, $locale));
   const shareMessage = $derived(
-    `${wish.title} — משאלה של ${wish.author}, ${wish.proposalsCount} הצעות עד עכשיו. כל חלק אפשר לאייש בנפרד, בלי התחייבות עד שיש הסכמה: ${shareUrl}`
+    $t('concierge.pub.share_msg', { title: wish.title, author: wish.author, count: wish.proposalsCount, url: shareUrl })
   );
   let sharePromptHidden = $state(false);
 
@@ -213,12 +199,12 @@
         missionIds: [...offerSelected],
         resourceIds: [...offerResourceSelected]
       });
-      if (!res?.success) throw new Error(res?.error?.message || 'שגיאה');
+      if (!res?.success) throw new Error(res?.error?.message || $t('concierge.pub.err_short'));
       offerDone = true;
-      toast.success('ההצעה נשלחה!');
+      toast.success($t('concierge.pub.offer_sent_toast'));
       offerOpen = false;
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'שגיאה בשליחה');
+      toast.error(e instanceof Error ? e.message : $t('concierge.pub.err_send'));
     } finally {
       offerSubmitting = false;
     }
@@ -247,7 +233,7 @@
   <meta property="og:image" content={ogImage} />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content={`${wish.title} — ${wish.proposalsCount} הצעות`} />
+  <meta property="og:image:alt" content={$t('concierge.pub.og_alt', { title: wish.title, count: wish.proposalsCount })} />
   <meta name="twitter:title" content={pageTitle} />
   <meta name="twitter:description" content={pageDesc} />
   <meta name="twitter:image" content={ogImage} />
@@ -267,22 +253,22 @@
       <div class="hdr-brand">
         <span class="hdr-dot"></span>
         <span class="hdr-name">Concierge</span>
-        <span class="hdr-sub hide-xs">· משאלה ציבורית</span>
+        <span class="hdr-sub hide-xs">{$t('concierge.pub.hdr_sub')}</span>
       </div>
     </div>
 
     <nav class="hdr-nav hide-sm">
-      <a href="/concierge" class="nav-lnk">משאלות</a>
-      <a href="/about" class="nav-lnk">מה זה 1💗1</a>
+      <a href="/concierge" class="nav-lnk">{$t('concierge.new.nav.wishes')}</a>
+      <a href="/about" class="nav-lnk">{$t('concierge.pub.what_is')}</a>
     </nav>
 
     <div class="hdr-right">
       {#if isLoggedIn}
-        <a href="/lev" class="btn-ghost btn-xs">הלב שלי</a>
-        <a href="/deals" class="btn-ghost btn-xs hide-xs">עסקאות</a>
+        <a href="/lev" class="btn-ghost btn-xs">{$t('concierge.pub.my_heart')}</a>
+        <a href="/deals" class="btn-ghost btn-xs hide-xs">{$t('concierge.pub.deals')}</a>
       {:else}
-        <a href="/login" class="btn-ghost btn-xs">התחברות</a>
-        <a href="/register" class="btn-ghost btn-xs hide-xs">הצטרפות</a>
+        <a href="/login" class="btn-ghost btn-xs">{$t('concierge.pub.login')}</a>
+        <a href="/signup" class="btn-ghost btn-xs hide-xs">{$t('concierge.pub.join')}</a>
       {/if}
     </div>
   </header>
@@ -292,12 +278,12 @@
     <div class="wrap">
       <!-- TOP BAR -->
       <div class="topbar anim anim-d1">
-        <a href="/concierge" class="btn-ghost btn-xs">⟵ חזרה למשאלות</a>
+        <a href="/concierge" class="btn-ghost btn-xs">{$t('concierge.pub.back')}</a>
         <div class="topbar-right">
-          <span class="code-lbl hide-xs">קוד משאלה</span>
+          <span class="code-lbl hide-xs">{$t('concierge.wp.code_label')}</span>
           <code class="wish-code">{wish.code}</code>
           <button class="btn-ghost btn-xs" onclick={copyLink}>
-            {#if copied}✓ הועתק{:else}<EntityIcon kind="share" size={13} /> שיתוף{/if}
+            {#if copied}{$t('concierge.pub.copied')}{:else}<EntityIcon kind="share" size={13} /> {$t('concierge.pub.share')}{/if}
           </button>
         </div>
       </div>
@@ -308,12 +294,12 @@
           <div class="hero-av">{wish.avatar}</div>
           <div class="hero-body">
             <div class="hero-meta">
-              <span class="badge-open">משאלה פתוחה לעזרה</span>
+              <span class="badge-open">{$t('concierge.pub.badge_open')}</span>
               <span class="dim">·</span>
               <span class="muted">{wish.publishedAt}</span>
               <span class="dim hide-xs">·</span>
               <span class="muted hide-xs"
-                >מאת {wish.author} · {wish.project}</span
+                >{$t('concierge.pub.by', { author: wish.author, project: wish.project })}</span
               >
             </div>
             <div class="hero-titlerow">
@@ -338,7 +324,7 @@
         </div>
         <div class="hero-footer">
           <div class="hero-metas">
-            {#each [['date', 'ליום', wish.when], ['place', 'באזור', wish.where], ['money', 'תקציב', wish.budget]] as [icon, lbl, val] (lbl)}
+            {#each [['date', $t('concierge.pub.meta_when'), wish.when], ['place', $t('concierge.pub.meta_where'), wish.where], ['money', $t('concierge.pub.meta_budget'), wish.budget]] as [icon, lbl, val] (icon)}
               <div class="metai">
                 <span class="mi-icon"><EntityIcon kind={icon} size={16} /></span>
                 <div>
@@ -351,14 +337,14 @@
           <div class="hero-cta-wrap">
             {#if isLoggedIn}
               {#if offerDone}
-                <span class="badge-open" style="font-size:13px">✓ ההצעה שלך נשלחה ליוצר/ת המשאלה</span>
+                <span class="badge-open" style="font-size:13px">{$t('concierge.pub.your_offer_sent_owner')}</span>
               {:else if myProposals.length}
-                <button class="btn-jewel" onclick={() => (offerOpen = true)}><EntityIcon kind="offers" size={14} /> ההצעות שלי</button>
+                <button class="btn-jewel" onclick={() => (offerOpen = true)}><EntityIcon kind="offers" size={14} /> {$t('concierge.pub.my_offers')}</button>
               {:else}
-                <button class="btn-jewel" onclick={() => (offerOpen = true)}><EntityIcon kind="support" size={14} /> באפשרותי לעזור</button>
+                <button class="btn-jewel" onclick={() => (offerOpen = true)}><EntityIcon kind="support" size={14} /> {$t('concierge.pub.i_can_help')}</button>
               {/if}
             {:else}
-              <a href={`/login?next=/wish/${wishId}`} class="btn-jewel"><EntityIcon kind="support" size={14} /> באפשרותי לעזור</a>
+              <a href={`/login?next=/wish/${wishId}`} class="btn-jewel"><EntityIcon kind="support" size={14} /> {$t('concierge.pub.i_can_help')}</a>
             {/if}
           </div>
         </div>
@@ -369,29 +355,28 @@
         <div class="extstrip-hdr">
           <img src="/botlogo.png" class="bot-av" alt="Lev" />
           <div class="ext-labels">
-            <div class="lev-title">הפירוק של Lev למענה</div>
+            <div class="lev-title">{$t('concierge.pub.lev_title')}</div>
             <div class="lev-sub">
-              ככה חילקנו את המשאלה עם {wish.author}. כל חלק יכול להיות מאוייש
-              בנפרד.
+              {$t('concierge.pub.lev_sub', { author: wish.author })}
             </div>
           </div>
-          <span class="sbadge ready">{wish.proposalsCount} הצעות פעילות</span>
+          <span class="sbadge ready">{$t('concierge.pub.active_offers', { count: wish.proposalsCount })}</span>
         </div>
         <div class="extgrid">
           <div>
-            <div class="extcol-lbl">✦ משימות</div>
+            <div class="extcol-lbl">{$t('concierge.wp.missions')}</div>
             <div class="chips">
               {#each MISSIONS as m (m.name)}
                 <span class="chip {m.imp}">
                   <span class={gemCls(m.imp)} style="width:6px;height:6px"
                   ></span>
-                  {m.name} · <span style="opacity:.7">{m.hours} שע׳</span>
+                  {m.name} · <span style="opacity:.7">{$t('concierge.wp.hours_short', { count: m.hours })}</span>
                 </span>
               {/each}
             </div>
           </div>
           <div>
-            <div class="extcol-lbl">◐ משאבים</div>
+            <div class="extcol-lbl">{$t('concierge.wp.resources')}</div>
             <div class="chips">
               {#each RESOURCES as r (r.name)}
                 <span class="chip {r.imp}">
@@ -410,21 +395,21 @@
       <div class="dual-grid anim anim-d3">
         <!-- Values -->
         <div class="panel">
-          <h4>הערכים שמובילים את המשאלה</h4>
+          <h4>{$t('concierge.pub.values_title')}</h4>
           <div class="values-row">
             {#each VALUES as v (v)}
               <span class="val-pill">{v}</span>
             {/each}
           </div>
           <p class="panel-note">
-            בעת הצעת עזרה - חשוב להגיד אם הערכים האלה משקפים גם אותך. זה מה
-            שיעזור ל־{wish.author} לבחור.
+            {$t('concierge.pub.values_note', { author: wish.author })}
           </p>
         </div>
 
-        <!-- Supporters preview -->
+        <!-- Supporters preview: invented people, so only on the design mock -->
+        {#if !data?.wish}
         <div class="panel">
-          <h4>כבר עמך</h4>
+          <h4>{$t('concierge.pub.supporters_title')}</h4>
           <div class="supp-strip">
             {#each SUPPORTERS as s (s.name)}
               <div class="supp-item">
@@ -444,42 +429,40 @@
             {/each}
           </div>
           <p class="panel-note">
-            יש מקום לעוד שותף/ה - במיוחד לחלקים שעדיין לא אוישו.
+            {$t('concierge.pub.supporters_note')}
           </p>
         </div>
+        {/if}
       </div>
 
       <!-- INVITE STRIP -->
       <div class="invite anim anim-d3">
         <div class="invite-decor"></div>
         <div class="invite-body">
-          <div class="invite-eyebrow">◈ ───── איך לעזור ───── ◈</div>
-          <h2 class="invite-h2">יש לך פיסה לתת? בואו נחבר.</h2>
+          <div class="invite-eyebrow">{$t('concierge.pub.how_to_help')}</div>
+          <h2 class="invite-h2">{$t('concierge.pub.invite_h2')}</h2>
           <p class="invite-p">
-            פתחנו את המשאלה לקהילה כדי שהעזרה תגיע ממקומות בלתי־צפויים. אם יש
-            לך זמן, מיומנות, מרחב או חיבור שיכול לעזור לחלק כלשהו - בעזרת Lev
-            אפשר להציע בלי לחץ ובלי התחייבות. הסכמה תיווצר רק לאחר אישור של
-            {wish.author}.
+            {$t('concierge.pub.invite_p', { author: wish.author })}
           </p>
           <div class="invite-cta">
             {#if isLoggedIn}
               {#if offerDone}
-                <span class="badge-open" style="font-size:13px">✓ ההצעה שלך נשלחה</span>
+                <span class="badge-open" style="font-size:13px">{$t('concierge.pub.your_offer_sent')}</span>
               {:else}
-                <button class="btn-jewel" onclick={() => (offerOpen = true)}><EntityIcon kind="support" size={14} /> באפשרותי לעזור</button>
+                <button class="btn-jewel" onclick={() => (offerOpen = true)}><EntityIcon kind="support" size={14} /> {$t('concierge.pub.i_can_help')}</button>
               {/if}
             {:else}
-              <a href={`/login?next=/wish/${wishId}`} class="btn-jewel"><EntityIcon kind="support" size={14} /> באפשרותי לעזור</a>
+              <a href={`/login?next=/wish/${wishId}`} class="btn-jewel"><EntityIcon kind="support" size={14} /> {$t('concierge.pub.i_can_help')}</a>
             {/if}
-            <a href="/concierge" class="btn-ghost">משאלות אחרות בקהילה</a>
+            <a href="/concierge" class="btn-ghost">{$t('concierge.pub.other_wishes')}</a>
           </div>
           {#if offerDone && !sharePromptHidden}
             <div class="invite-share">
               <SharePrompt
                 url={shareUrl}
                 message={shareMessage}
-                title="ההצעה שלך בפנים. מי עוד יכול לאייש חלק?"
-                body="שלחו את המשאלה למישהי/ו שיש להם את מה שחסר — התצוגה המקדימה כבר מראה מה פתוח."
+                title={$t('concierge.pub.share_title')}
+                body={$t('concierge.pub.share_body')}
                 variant="celebrate"
                 onDismiss={() => (sharePromptHidden = true)}
               />
@@ -491,13 +474,12 @@
       <!-- YOUR OWN WISH — the reader who came for someone else's wish (plan §4, loop 1) -->
       <div class="own-wish anim anim-d3">
         <div class="own-wish-text">
-          <h3 class="own-wish-h3">יש לך משאלה משלך?</h3>
+          <h3 class="own-wish-h3">{$t('concierge.pub.own_h3')}</h3>
           <p class="own-wish-p">
-            כותבים מה רוצים שיקרה, Lev מפרק לחלקים, ואנשים שיש להם מה לתת מציעים — בלי קבוצה,
-            בלי תיווך, ועם הסכמה שלך על כל חלק.
+            {$t('concierge.pub.own_p')}
           </p>
         </div>
-        <a href="/wish/new" class="btn-jewel own-wish-cta"><EntityIcon kind="wish" size={14} /> לפתוח משאלה</a>
+        <a href="/wish/new" class="btn-jewel own-wish-cta"><EntityIcon kind="wish" size={14} /> {$t('concierge.pub.open_wish')}</a>
       </div>
 
       <!-- ── MY PROPOSALS (logged-in provider) ──────────────────────────── -->
@@ -505,12 +487,12 @@
         <div class="my-proposals anim anim-d3">
           <div class="mp-hdr">
             <span class="mp-icon"><EntityIcon kind="offers" size={16} /></span>
-            <h4 class="mp-title">ההצעות שלי לגבי משאלה זו</h4>
+            <h4 class="mp-title">{$t('concierge.pub.my_offers_title')}</h4>
           </div>
           {#each myProposals as p (p.id)}
             <div class="mp-card">
               <div class="mp-row">
-                <span class="mp-kind">{p.kind === 'custom_offer' ? 'הצעה יוזמת' : 'הזמנה'}</span>
+                <span class="mp-kind">{p.kind === 'custom_offer' ? $t('concierge.pub.kind_custom') : $t('concierge.pub.kind_invite')}</span>
                 <span class="mp-status mp-status--{p.status}">{p.status}</span>
               </div>
               {#if p.coveredMissions?.length}
@@ -519,7 +501,7 @@
                     {@const mission = MISSIONS.find(
                       (m) => String(m.id ?? '') === String(cm.extractedMissionIdx)
                     ) ?? { name: cm.extractedMissionIdx }}
-                    <span class="mp-chip">✦ {mission.name}{cm.hours ? ` · ${cm.hours} שע׳` : ''}</span>
+                    <span class="mp-chip">✦ {mission.name}{cm.hours ? ` · ${$t('concierge.wp.hours_short', { count: cm.hours })}` : ''}</span>
                   {/each}
                 </div>
               {/if}
@@ -535,7 +517,7 @@
               {/if}
               {#if p.status === 'suggested' || p.status === 'viewed'}
                 <div class="mp-actions">
-                  <a href="/deals" class="btn-ghost btn-xs">לצפות ולאשר ב-Deals</a>
+                  <a href="/deals" class="btn-ghost btn-xs">{$t('concierge.pub.view_in_deals')}</a>
                 </div>
               {/if}
             </div>
@@ -549,8 +531,7 @@
         <div>
           <div class="privacy-title">{wish.accessNote}</div>
           <div class="privacy-sub">
-            רק יוצר/ת המשאלה רואה את ההצעות שלך - בלי חשיפה לקהל. אם ברצונך לכתוב,
-            נצטרך התחברות קלה כדי שיהיה ל־{wish.author} עם מי לדבר.
+            {$t('concierge.pub.privacy_sub', { author: wish.author })}
           </div>
         </div>
       </div>
@@ -564,15 +545,15 @@
 {#if offerOpen}
   <div class="ofr-overlay" role="dialog" aria-modal="true" dir="rtl">
     <div class="ofr-card">
-      <button class="ofr-x" onclick={() => (offerOpen = false)} aria-label="סגירה">✕</button>
+      <button class="ofr-x" onclick={() => (offerOpen = false)} aria-label={$t('concierge.pub.close')}>✕</button>
       <div class="ofr-head">
         <span class="ofr-gem"></span>
-        <h2 class="ofr-title">במה ברצונך לעזור?</h2>
+        <h2 class="ofr-title">{$t('concierge.pub.ofr_title')}</h2>
       </div>
-      <p class="ofr-intro">אפשר לבחור את המשימות והמשאבים שבהם ברצונך לסייע. על ההצעה תישלח התראה, ופרטים נוספים יועברו אליך בהמשך.</p>
+      <p class="ofr-intro">{$t('concierge.pub.ofr_intro')}</p>
 
       {#if MISSIONS.length}
-        <div class="ofr-section-lbl">✦ משימות</div>
+        <div class="ofr-section-lbl">{$t('concierge.wp.missions')}</div>
         <div class="ofr-chips">
           {#each MISSIONS as m (m.name)}
             <button
@@ -580,14 +561,14 @@
               onclick={() => toggleMission(String(m.id ?? m.name))}
               type="button"
             >
-              {m.name}{m.hours ? ` · ${m.hours} שע׳` : ''}
+              {m.name}{m.hours ? ` · ${$t('concierge.wp.hours_short', { count: m.hours })}` : ''}
             </button>
           {/each}
         </div>
       {/if}
 
       {#if RESOURCES.length}
-        <div class="ofr-section-lbl" style="margin-top:12px">◐ משאבים</div>
+        <div class="ofr-section-lbl" style="margin-top:12px">{$t('concierge.wp.resources')}</div>
         <div class="ofr-chips">
           {#each RESOURCES as r (r.name)}
             <button
@@ -602,13 +583,13 @@
       {/if}
 
       <div class="ofr-actions" style="margin-top:20px">
-        <button class="ofr-btn ofr-btn--ghost" onclick={() => (offerOpen = false)}>ביטול</button>
+        <button class="ofr-btn ofr-btn--ghost" onclick={() => (offerOpen = false)}>{$t('concierge.wp.cancel')}</button>
         <button
           class="ofr-btn ofr-btn--primary"
           onclick={submitOffer}
           disabled={offerSubmitting || (!offerSelected.size && !offerResourceSelected.size)}
         >
-          {#if offerSubmitting}שולח…{:else}<EntityIcon kind="send" size={14} /> שליחת הצעה{/if}
+          {#if offerSubmitting}{$t('concierge.pub.sending')}{:else}<EntityIcon kind="send" size={14} /> {$t('concierge.pub.send_offer')}{/if}
         </button>
       </div>
     </div>

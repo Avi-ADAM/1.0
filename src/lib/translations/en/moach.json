@@ -353,7 +353,31 @@
         "label": "Expired",
         "desc": "Window expired."
       }
-    }
+    },
+    "filter_all": "All",
+    "filter_active": "Active",
+    "filter_won": "Won",
+    "filter_dismissed": "Dismissed",
+    "by_proposal": "By proposal",
+    "flexible": "Flexible",
+    "just_now": "Just now",
+    "minutes_ago": "{{count}}m ago",
+    "hours_ago": "{{count}} hours ago",
+    "days_ago": "{{count}} days ago",
+    "weeks_ago": "{{count}} weeks ago",
+    "page_title": "Incoming wishes",
+    "eyebrow": "CONCIERGE",
+    "title": "Wishes this rikma is a candidate to supply",
+    "intro": "Lev matched your products to open customer wishes. Nothing to do - if one is chosen, you'll get a notice on the deals screen.",
+    "active_n": "{{count}} active",
+    "won_n": "{{count}} closed",
+    "load_failed": "We couldn't load wishes. You may not be listed as a provider for any wish yet, or there's a network problem.",
+    "empty_title": "No wishes on this screen",
+    "empty_active": "As soon as one of your products matches a wish, it will show up here.",
+    "empty_won": "No deal has closed from a wish yet. Wins will show up here.",
+    "empty_other": "No wishes in this group.",
+    "open_wish": "Open the wish ›",
+    "to_deals": "To deals ⤴"
   },
   "open": {
     "title": "Open for partners",

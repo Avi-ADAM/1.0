@@ -353,7 +353,31 @@
         "label": "Caducado",
         "desc": "La ventana de tiempo expiró."
       }
-    }
+    },
+    "filter_all": "Todos",
+    "filter_active": "Activos",
+    "filter_won": "Ganados",
+    "filter_dismissed": "Descartados",
+    "by_proposal": "Por propuesta",
+    "flexible": "Flexible",
+    "just_now": "Justo ahora",
+    "minutes_ago": "hace {{count}} min",
+    "hours_ago": "hace {{count}} horas",
+    "days_ago": "hace {{count}} días",
+    "weeks_ago": "hace {{count}} semanas",
+    "page_title": "Deseos entrantes",
+    "eyebrow": "CONCIERGE · conserje",
+    "title": "Deseos que esta rikma puede atender",
+    "intro": "Lev emparejó sus productos con deseos abiertos de clientes. No hace falta hacer nada: si eligen uno, recibirán un aviso en la pantalla de tratos.",
+    "active_n": "{{count}} activos",
+    "won_n": "{{count}} cerrados",
+    "load_failed": "No pudimos cargar los deseos. Puede que aún no figuren como proveedores de ningún deseo o que haya un problema de red.",
+    "empty_title": "No hay deseos en esta pantalla",
+    "empty_active": "En cuanto uno de sus productos coincida con un deseo, aparecerá aquí.",
+    "empty_won": "Aún no se cerró ningún trato desde un deseo. Los logros aparecerán aquí.",
+    "empty_other": "No hay deseos en este grupo.",
+    "open_wish": "Abrir el deseo ›",
+    "to_deals": "A los tratos ⤴"
   },
   "open": {
     "title": "Abierto a socios",

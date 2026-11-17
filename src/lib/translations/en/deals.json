@@ -326,5 +326,22 @@
     "remove": "Removed: {{name}}",
     "raise": "Added to the cost:",
     "keepHint": "Mark what you need. Anything you leave unmarked stays out of your proposal."
+  },
+  "acceptOffer": {
+    "titleM": "A mission offer for you",
+    "titleR": "A resource offer for you",
+    "intro": "The wisher prepared a ready offer for you. See the full picture, or approve your placement here.",
+    "hours": "hours",
+    "full": "Full picture",
+    "approve": "I'm in - approve placement",
+    "decline": "Not for me",
+    "submitting": "Approving your placement…",
+    "doneTitle": "Placement approved",
+    "doneBody": "You joined the mission as a provider. The wisher was notified. The rikma is created once all slots are filled.",
+    "close": "Close",
+    "errTitle": "Something went wrong",
+    "retry": "Try again",
+    "declined": "Declined",
+    "declineFailed": "Could not decline"
   }
 }

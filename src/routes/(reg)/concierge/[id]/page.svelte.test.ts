@@ -19,9 +19,15 @@ vi.mock('$app/navigation', () => ({ goto: vi.fn(), invalidateAll: vi.fn() }));
 vi.mock('svelte-sonner', () => ({ toast: { success: vi.fn(), error: vi.fn(), message: vi.fn() } }));
 vi.mock('$lib/stores/uPic.js', () => ({ uPic: readable('') }));
 vi.mock('$lib/translations', () => {
-  const dict = he as Record<string, string>;
+  // Nested keys (`concierge.wp.choose`) resolve by path, the way the real store does.
+  const lookup = (key: string): unknown =>
+    key
+      .replace(/^concierge\./, '')
+      .split('.')
+      .reduce<unknown>((node, part) => (node && typeof node === 'object' ? (node as any)[part] : undefined), he);
   const t = readable((key: string, vars: Record<string, unknown> = {}) => {
-    const raw = dict[key.replace(/^concierge\./, '')] ?? key;
+    const hit = lookup(key);
+    const raw = typeof hit === 'string' ? hit : key;
     return raw.replace(/\{\{(\w+)\}\}/g, (_, k) => String(vars[k] ?? ''));
   });
   return { t, locale: readable('he') };

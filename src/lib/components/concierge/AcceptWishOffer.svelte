@@ -13,7 +13,6 @@
    *
    * Reusable from /deals, /lev and the wish page — owns no page state.
    */
-  import { lang } from '$lib/stores/lang.js';
   import { executeAction } from '$lib/client/actionClient';
   import { toast } from 'svelte-sonner';
   // `t` below is this component's own dictionary; the shared translations are `tr`.
@@ -145,41 +144,6 @@
     }
   }
 
-  const T = {
-    he: {
-      titleM: 'הצעת משימה עבורך',
-      titleR: 'הצעת משאב עבורך',
-      intro: 'ההצעה מוכנה עבורך. אפשר לראות את התמונה המלאה, או לאשר את ההשמה שלך כאן.',
-      hours: 'שעות',
-      budget: 'תקציב',
-      full: 'לתמונה המלאה',
-      approve: 'אני בפנים - אישור השמה',
-      decline: 'לא מתאים לי',
-      submitting: 'אישור ההשמה…',
-      doneTitle: 'אישרת את ההשמה',
-      doneBody: 'נכנסת כספק/ית למשימה. נשלחה התראה ליוזמ/ת המשאלה. הרקמה תיווצר כשכל המקומות יתמלאו.',
-      close: 'סגירה',
-      errTitle: 'משהו השתבש',
-      retry: 'נסו שוב'
-    },
-    en: {
-      titleM: 'A task offer for you',
-      titleR: 'A resource offer for you',
-      intro: 'The wisher prepared a ready offer for you. See the full picture, or approve your placement here.',
-      hours: 'hours',
-      budget: 'Budget',
-      full: 'Full picture',
-      approve: "I'm in - approve placement",
-      decline: 'Not for me',
-      submitting: 'Approving your placement…',
-      doneTitle: 'Placement approved',
-      doneBody: "You joined the task as provider. The wisher was notified. The weave is created once all slots are filled.",
-      close: 'Close',
-      errTitle: 'Something went wrong',
-      retry: 'Try again'
-    }
-  } as const;
-  const t = $derived($lang === 'en' ? T.en : T.he);
   const dir = $derived($isRtl ? 'rtl' : 'ltr');
   const wishHref = $derived(`/wish/${ratsonId}`);
 
@@ -202,11 +166,11 @@
     try {
       const res = await executeAction('declineWishOffer' as any, { proposalId, ratsonId });
       if (!res?.success) throw new Error(res?.error?.message || 'failed');
-      toast.success($lang === 'en' ? 'Declined' : 'נדחה');
+      toast.success($tr('deals.acceptOffer.declined'));
       onDone?.({ accepted: false });
       onClose?.();
     } catch (e) {
-      toast.error($lang === 'en' ? 'Could not decline' : 'הדחייה נכשלה');
+      toast.error($tr('deals.acceptOffer.declineFailed'));
     } finally {
       declining = false;
     }
@@ -215,20 +179,20 @@
 
 <div class="ofr-overlay" role="dialog" aria-modal="true" {dir}>
   <div class="ofr-card">
-    <button class="ofr-x" onclick={() => onClose?.()} aria-label={t.close}>✕</button>
+    <button class="ofr-x" onclick={() => onClose?.()} aria-label={$tr('deals.acceptOffer.close')}>✕</button>
 
     <div class="ofr-head">
       <span class="ofr-gem"></span>
-      <h2 class="ofr-title">{item.kind === 'mission' ? t.titleM : t.titleR}</h2>
+      <h2 class="ofr-title">{item.kind === 'mission' ? $tr('deals.acceptOffer.titleM') : $tr('deals.acceptOffer.titleR')}</h2>
     </div>
 
     {#if step === 'view'}
-      <p class="ofr-intro">{t.intro}</p>
+      <p class="ofr-intro">{$tr('deals.acceptOffer.intro')}</p>
 
       <div class="ofr-offer">
         <div class="ofr-offer-name">{item.name}</div>
         <div class="ofr-offer-meta">
-          {#if item.hours}<span><EntityIcon kind="timer" size={13} /> {item.hours} {t.hours}</span>{/if}
+          {#if item.hours}<span><EntityIcon kind="timer" size={13} /> {item.hours} {$tr('deals.acceptOffer.hours')}</span>{/if}
           {#if item.price != null}<span><EntityIcon kind="money" size={13} /> <Money amount={item.price} /></span>{/if}
           {#if pricingTrack}<span>{$tr(`deals.pricingTrack.${pricingTrack}`)}</span>{/if}
         </div>
@@ -255,7 +219,7 @@
         <div class="ofr-neg-log">
           {#each negotiation.counters as c (c.round)}
             <p>
-              ⇄ {c.amount ?? '—'}{item.kind === 'mission' ? ` ${t.hours}` : ' ×'}
+              ⇄ {c.amount ?? '—'}{item.kind === 'mission' ? ` ${$tr('deals.acceptOffer.hours')}` : ' ×'}
               · {c.price ?? '—'}
               {#if c.note}— {c.note}{/if}
             </p>
@@ -272,13 +236,13 @@
 
       {#if myTurn}
         <div class="ofr-actions">
-          <a class="ofr-btn ofr-btn--ghost" href={wishHref}>{t.full}</a>
+          <a class="ofr-btn ofr-btn--ghost" href={wishHref}>{$tr('deals.acceptOffer.full')}</a>
           <button class="ofr-btn ofr-btn--primary" onclick={approve}>
             {negotiation?.termsChanged
               ? $tr('deals.negApproveNewTerms')
               : negotiation && negotiation.round > 0
                 ? $tr('deals.negApproveTheirs')
-                : t.approve}
+                : $tr('deals.acceptOffer.approve')}
           </button>
         </div>
         {#if canCounter}
@@ -290,10 +254,10 @@
         <p class="ofr-waiting">{$tr('deals.negWaiting')}</p>
         {#if lastNote}<p class="ofr-waiting-note">“{lastNote}”</p>{/if}
         <div class="ofr-actions">
-          <a class="ofr-btn ofr-btn--ghost" href={wishHref}>{t.full}</a>
+          <a class="ofr-btn ofr-btn--ghost" href={wishHref}>{$tr('deals.acceptOffer.full')}</a>
         </div>
       {/if}
-      <button class="ofr-decline" onclick={decline} disabled={declining}>{t.decline}</button>
+      <button class="ofr-decline" onclick={decline} disabled={declining}>{$tr('deals.acceptOffer.decline')}</button>
 
     {:else if step === 'counter'}
       <p class="ofr-intro">{$tr('deals.negHint')}</p>
@@ -355,26 +319,26 @@
           onclick={() => {
             onDone?.({ accepted: false });
             onClose?.();
-          }}>{t.close}</button
+          }}>{$tr('deals.acceptOffer.close')}</button
         >
       </div>
 
     {:else if step === 'submitting'}
-      <div class="ofr-state">{t.submitting}</div>
+      <div class="ofr-state">{$tr('deals.acceptOffer.submitting')}</div>
 
     {:else if step === 'done'}
       <div class="ofr-done">
         <div class="ofr-done-icon"><EntityIcon kind="done" size={40} /></div>
-        <h3 class="ofr-done-title">{t.doneTitle}</h3>
-        <p class="ofr-done-body">{t.doneBody}</p>
-        <button class="ofr-btn ofr-btn--primary" onclick={() => onClose?.()}>{t.close}</button>
+        <h3 class="ofr-done-title">{$tr('deals.acceptOffer.doneTitle')}</h3>
+        <p class="ofr-done-body">{$tr('deals.acceptOffer.doneBody')}</p>
+        <button class="ofr-btn ofr-btn--primary" onclick={() => onClose?.()}>{$tr('deals.acceptOffer.close')}</button>
       </div>
 
     {:else if step === 'error'}
       <div class="ofr-state">
-        <div class="ofr-err-title">{t.errTitle}</div>
+        <div class="ofr-err-title">{$tr('deals.acceptOffer.errTitle')}</div>
         <div class="ofr-err-msg">{errorMsg}</div>
-        <button class="ofr-btn ofr-btn--primary" onclick={() => (step = 'view')}>{t.retry}</button>
+        <button class="ofr-btn ofr-btn--primary" onclick={() => (step = 'view')}>{$tr('deals.acceptOffer.retry')}</button>
       </div>
     {/if}
   </div>
