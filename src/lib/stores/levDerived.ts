@@ -36,6 +36,7 @@ import { lang } from './lang.js';
 import { processedShiftWork } from '$lib/utils/levShifts';
 // Order automation cards — their own server read (PLAN_SHOP_OPERATIONS §2.2).
 import { processedFulfillWork } from '$lib/utils/levFulfill';
+import { processedMyApplications } from '$lib/utils/levMyApplications';
 import {
   processPends,
   processMtaha,
@@ -382,7 +383,8 @@ export const mergedFeed: Readable<DisplayItem[]> = derived(
     processedStipendAccruals,
     processedStipendTransfers,
     processedShiftWork,
-    processedFulfillWork
+    processedFulfillWork,
+    processedMyApplications
   ],
   ([
     $pends,
@@ -409,7 +411,8 @@ export const mergedFeed: Readable<DisplayItem[]> = derived(
     $stipendAccruals,
     $stipendTransfers,
     $shiftWork,
-    $fulfillWork
+    $fulfillWork,
+    $myApplications
   ]) => {
     return mergeAndSort(
       $pends,
@@ -436,7 +439,8 @@ export const mergedFeed: Readable<DisplayItem[]> = derived(
       $stipendAccruals,
       $stipendTransfers,
       $shiftWork,
-      $fulfillWork
+      $fulfillWork,
+      $myApplications
     );
   }
 );

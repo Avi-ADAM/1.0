@@ -119,7 +119,9 @@ const SAMPLES: Record<string, any> = {
   shiftLog: { planName: 'עמדת קבלה', hours: 4 },
   // Order automation (PLAN_SHOP_OPERATIONS §2.2–2.3).
   fulfill: { actId: '31', stepName: 'משלוח', name: 'משלוח · הזמנה K7Q4XM', orderNumber: 'K7Q4XM', mine: true, kind: 'order', wave: null },
-  fulfillRule: { stepId: '4', name: 'משלוח', proposedByName: 'דנה', target: 'role', roleName: 'שליח', deadline: '2026-10-23T09:00:00Z' }
+  fulfillRule: { stepId: '4', name: 'משלוח', proposedByName: 'דנה', target: 'role', roleName: 'שליח', deadline: '2026-10-23T09:00:00Z' },
+  // A candidacy I sent (the hub's "my requests").
+  myapp: { applicationId: '11', kind: 'mission', name: 'אפיית לחם', rikmaName: 'מאפייה', terms: { hours: 10, rate: 50 } }
 };
 
 const base = (ani: string) => ({
@@ -335,6 +337,12 @@ describe('fulfil rows (PLAN_SHOP_OPERATIONS A2–A3)', () => {
       key: 'lev.list.sub.fulfillRuleAnon',
       params: undefined
     });
+  });
+
+  it('names my request and the rikma it went to', () => {
+    const row = rowContent(base('myapp'));
+    expect(row.title).toEqual({ text: 'אפיית לחם' });
+    expect(row.subtitle).toEqual({ key: 'lev.list.sub.myappMission', params: { name: 'מאפייה' } });
   });
 
   it('on my own rule, says who countered it — not "Dana proposes" about myself', () => {

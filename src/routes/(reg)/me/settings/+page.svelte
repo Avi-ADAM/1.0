@@ -190,7 +190,7 @@
       isGuidMe={!isG}
       onGuidMeChange={(value) => (isG = !value)}
       checked={cards}
-      lango={$lang}
+      lango={meData?.lang || $lang}
       location={locationVal}
       uid={data.uid}
       {fblink}

@@ -1,0 +1,56 @@
+NAS DEMO — VOICE-OVER (about 2:20)
+Read in your own voice. Lines in [brackets] are what is on screen, not read aloud.
+Script source: docs/tbd/PLAN_NAS_DEMO.md section 3. Data: docs/marketing/NAS_DEMO_DATA.md.
+
+
+0:00 – 0:12   [You, on camera]
+
+A one-person business is fragile. Big companies win because they combine people.
+Watch two solo creators become partners, through their agents.
+
+
+0:12 – 0:35   [Maya's chat: "I need a video editor who'll work for a share." The agent finds Dan.]
+
+Maya teaches coding courses. She tells her agent she needs a video editor who'll
+work for a share. Her agent finds real people, by skill.
+
+
+0:35 – 0:55   [The agent drafts the rikma. Maya opens the link and creates it with one click.]
+
+It drafts the partnership: her mission, the editor's mission, the hours and the rate.
+She confirms with one click. The agent never signs for her.
+
+
+0:55 – 1:20   [Dan's chat: "Anything that fits me?" One match. "Apply."]
+
+On the other side, Dan's agent has already matched him to Maya's mission,
+on his skill. Twenty hours, a hundred an hour. He applies.
+
+
+1:20 – 1:40   [Maya's chat: "What's waiting for me?" Dan's request. She opens it and signs.]
+
+Back to Maya. Dan asked to join. No bosses, no vetoes:
+she approves, asks, or counters, and nothing binds her until she does.
+
+
+1:40 – 2:05   [Title card "3 weeks later". Dan: "What's my stake?" 40%. "And the money?" 1,000 sold, 400 to Dan.
+               Maya: "What's waiting for me?" Dan's new mission, approved by silence in 48 hours.]
+
+Three weeks later. Every approved hour became ownership: Dan holds forty percent.
+The first sale was split by it, automatically and transparently, and his part is on its way.
+And when Dan proposes new work, silence is consent, on a clock the partners set.
+
+
+2:05 – 2:20   [Closing slide: Nas agent <-> MCP <-> 1lev1 · 1lev1.com/mcp]
+
+Nas helps one person start. Together, we let them build like a company.
+The server is live. Your team can try it today, at 1lev1.com/mcp.
+
+
+---
+NOTES FOR THE RECORDING
+- Do not say "silence approves" in the 1:20 scene: an outside candidate's request has
+  no clock until a member responds. The silence line belongs to 1:40 only.
+- Amounts in Rikma B are in shekels on screen; the voice-over says the numbers only.
+- The silence proposal in 1:40 ("Cut the course trailer") expires on 2026-11-18 at 19:40
+  Israel time. Re-film that shot before then, or publish a new one as Dan.

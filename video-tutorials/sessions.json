@@ -24,6 +24,16 @@
       "envUser": "claude_user_2",
       "userId": 258,
       "label": "קלוד בודק 2 — ספק (נגרות)"
+    },
+    "maya": {
+      "host": "maya.localhost",
+      "userId": 271,
+      "label": "Maya — Nas demo, course creator (personal theme)"
+    },
+    "dan": {
+      "host": "dan.localhost",
+      "userId": 270,
+      "label": "Dan — Nas demo, video editor (business theme)"
     }
   }
 }

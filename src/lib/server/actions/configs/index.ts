@@ -173,6 +173,8 @@ import { counterOnAskConfig } from './counterOnAsk.js';
 import { acceptCounterOnAskmConfig } from './acceptCounterOnAskm.js';
 import { acceptCounterOnAskConfig } from './acceptCounterOnAsk.js';
 import { reviveLapsedAskConfig } from './reviveLapsedAsk.js';
+import { withdrawCandidacyConfig } from './withdrawCandidacy.js';
+import { getMyApplicationsConfig } from './getMyApplications.js';
 import { candidateCounterOnAskmConfig } from './candidateCounterOnAskm.js';
 import { candidateCounterOnAskConfig } from './candidateCounterOnAsk.js';
 import { customizeOpenMashaabimConfig } from './customizeOpenMashaabim.js';
@@ -532,6 +534,8 @@ export function registerAllActions(): void {
   registerAction(acceptCounterOnAskmConfig);
   registerAction(acceptCounterOnAskConfig);
   registerAction(reviveLapsedAskConfig);
+  registerAction(withdrawCandidacyConfig);
+  registerAction(getMyApplicationsConfig);
   registerAction(candidateCounterOnAskmConfig);
   registerAction(candidateCounterOnAskConfig);
   registerAction(customizeOpenMashaabimConfig);

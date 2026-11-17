@@ -902,7 +902,8 @@
       "shiftLog": "ساعات المناوبة",
       "fulfill": "مهمة طلب",
       "fulfillRule": "قاعدة أتمتة",
-      "promotion": "عرض في المتجر"
+      "promotion": "عرض في المتجر",
+      "myapp": "طلبي"
     },
     "fact": {
       "hours": "{{value}} ساعات",
@@ -975,7 +976,9 @@
       "fulfillStock": "مخزون منخفض: {{name}}",
       "fulfillRule": "اقتراح من {{name}} — بانتظار ردّك",
       "fulfillRuleAnon": "قاعدة تقع عليك — بانتظار ردّك",
-      "fulfillRuleCounter": "اقترح/ت {{name}} تغييرًا — بانتظار ردّك"
+      "fulfillRuleCounter": "اقترح/ت {{name}} تغييرًا — بانتظار ردّك",
+      "myappMission": "مهمة في {{name}}",
+      "myappResource": "مورد لـ{{name}}"
     },
     "title": {
       "transfer": "{{from}} ← {{to}}",
@@ -1027,7 +1030,8 @@
     "stipend": "فُتح {{time}}",
     "sheirutp": "أُرسل {{time}}",
     "wishoffer": "قُدّم {{time}}",
-    "promotion": "اقتُرح {{time}}"
+    "promotion": "اقتُرح {{time}}",
+    "myapp": "أُرسل {{time}}"
   },
   "fulfill": {
     "type": "مهمة لطلب من موقعك",
@@ -1266,5 +1270,26 @@
     "openChat": "فتح المحادثة",
     "newChat": "بدء محادثة جديدة",
     "counter": "عرض مقابل"
+  },
+  "myapp": {
+    "cardType": "طلبي",
+    "mission": "عرضت أن تتولى هذه المهمة في الريكما {{name}}.",
+    "resource": "عرضت أن تقدّم هذا المورد للريكما {{name}}.",
+    "missionTerms": "{{hours}} ساعة · {{rate}} للساعة",
+    "resourceTerms": "بسعر {{rate}}",
+    "countered": "اقتُرحت شروط أخرى، وهذه هي الشروط المطروحة الآن.",
+    "signed": "وافق بالفعل: {{names}}",
+    "waiting": "لم يردّ بعد: {{names}}",
+    "silence": "إذا لم يقترح أحد شروطًا أخرى حتى {{time}}، فإن الصمت يوافق على ترشّحك.",
+    "noClock": "يبدأ العدّ عندما يردّ أحد أعضاء الريكما لأول مرة.",
+    "toOpening": "إلى صفحة الفرصة",
+    "toVote": "إلى صفحة التصويت",
+    "withdraw": "سحب ترشّحي",
+    "confirm": "هل تريد سحب ترشّحك؟ سيُبلَّغ أعضاء الريكما. يمكنك التقدّم مجددًا لاحقًا.",
+    "confirmYes": "نعم، اسحبه",
+    "cancel": "إلغاء",
+    "withdrawn": "تم سحب ترشّحك.",
+    "failed": "تعذّر سحب الترشّح الآن. يُرجى المحاولة مرة أخرى بعد قليل.",
+    "loadFailed": "تعذّر تحميل طلباتك الآن."
   }
 }

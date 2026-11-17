@@ -902,7 +902,8 @@
       "shiftLog": "שעות משמרת",
       "fulfill": "מטלה להזמנה",
       "fulfillRule": "כלל אוטומציה",
-      "promotion": "מבצע בחנות"
+      "promotion": "מבצע בחנות",
+      "myapp": "הבקשה שלי"
     },
     "fact": {
       "hours": "{{value}} שעות",
@@ -975,7 +976,9 @@
       "fulfillStock": "מלאי נמוך: {{name}}",
       "fulfillRule": "הצעה של {{name}} — מחכה לתשובתך",
       "fulfillRuleAnon": "כלל שנוחת עליך — מחכה לתשובתך",
-      "fulfillRuleCounter": "{{name}} הציע/ה שינוי — מחכה לתשובתך"
+      "fulfillRuleCounter": "{{name}} הציע/ה שינוי — מחכה לתשובתך",
+      "myappMission": "משימה ברקמה {{name}}",
+      "myappResource": "משאב לרקמה {{name}}"
     },
     "title": {
       "transfer": "{{from}} ← {{to}}",
@@ -1027,7 +1030,8 @@
     "stipend": "נפתחה {{time}}",
     "sheirutp": "נשלחה {{time}}",
     "wishoffer": "הוגשה {{time}}",
-    "promotion": "הוצע {{time}}"
+    "promotion": "הוצע {{time}}",
+    "myapp": "נשלחה {{time}}"
   },
   "fulfill": {
     "type": "מטלה להזמנה מהאתר",
@@ -1266,5 +1270,26 @@
     "openChat": "פתיחת הצ׳אט",
     "newChat": "פתיחת צ׳אט חדש",
     "counter": "הצעה נגדית"
+  },
+  "myapp": {
+    "cardType": "הבקשה שלי",
+    "mission": "הצעת לקחת את המשימה הזו ברקמה {{name}}.",
+    "resource": "הצעת להביא את המשאב הזה לרקמה {{name}}.",
+    "missionTerms": "{{hours}} שעות · {{rate}} לשעה",
+    "resourceTerms": "במחיר {{rate}}",
+    "countered": "הוצעו תנאים אחרים, ואלה התנאים שעל השולחן עכשיו.",
+    "signed": "כבר אישרו: {{names}}",
+    "waiting": "עוד לא ענו: {{names}}",
+    "silence": "אם אף אחד לא יציע תנאים אחרים עד {{time}}, השתיקה תאשר את המועמדות.",
+    "noClock": "השעון יתחיל כשמישהו ברקמה יגיב לראשונה.",
+    "toOpening": "לדף ההזדמנות",
+    "toVote": "לדף ההצבעה",
+    "withdraw": "משיכת המועמדות",
+    "confirm": "למשוך את המועמדות? חברי הרקמה יקבלו הודעה. אפשר להגיש מועמדות שוב בהמשך.",
+    "confirmYes": "כן, למשוך",
+    "cancel": "ביטול",
+    "withdrawn": "המועמדות נמשכה.",
+    "failed": "לא הצלחנו למשוך את המועמדות כרגע. כדאי לנסות שוב בעוד רגע.",
+    "loadFailed": "לא הצלחנו לטעון את הבקשות שלך כרגע."
   }
 }

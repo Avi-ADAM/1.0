@@ -145,6 +145,7 @@ async function awaitapi(mId, lang, tok, fetch) {
  *   tok: boolean,
  *   alld: any | null,
  *   roleRules: import('$lib/fulfillment/ruleTerms').RoleRuleView[],
+ *   myAskId: string | null,
  *   authExpired: boolean,
  *   loadError: 'auth'|'notfound'|'server'|null,
  *   sessionExpired: boolean,
@@ -200,6 +201,29 @@ export async function load({ locals, params, fetch, cookies, depends }) {
     }
   }
 
+  // My own candidacy still on the table for this opening, if any — so the page
+  // says "you applied" and offers to withdraw it, instead of a second "I want
+  // to" (the rikma's vote page is members only; a candidate from outside has
+  // only this page). Never a reason to fail the page.
+  /** @type {string | null} */
+  let myAskId = null;
+  if (tok !== false && !authExpired && uid && rulesProjectId) {
+    try {
+      const { strapiClient } = await import('$lib/server/actions/index.js');
+      const res = await strapiClient.execute(
+        'standingAskByUserAndMission',
+        { uid: String(uid), omId: String(mId) },
+        undefined,
+        fetch
+      );
+      const rows = res?.data?.asks?.data ?? [];
+      const open = rows.find((/** @type {any} */ r) => r?.attributes?.archived !== true && !r?.attributes?.lapsedAt);
+      myAskId = open ? String(open.id) : null;
+    } catch (e) {
+      console.warn(`[availableMission/${mId}] own candidacy unavailable:`, e);
+    }
+  }
+
   // UGC translation (PLAN_UGC_TRANSLATION §7) — the mission's own page. The
   // directory already bought this mission's *name* and its rikma's name, so
   // those two arrive as cache hits at no cost; the full description is the one
@@ -224,6 +248,7 @@ export async function load({ locals, params, fetch, cookies, depends }) {
     tok: tok !== false && !authExpired,
     alld,
     roleRules,
+    myAskId,
     authExpired,
     loadError,
     // Set once, on the request that found the dead cookie (hooks.server.js).

@@ -10118,6 +10118,32 @@ ${PROMO_DECISION_FIELDS}
   'reviveLapsedAsk': `mutation ReviveLapsedAsk($askId: ID!, $vots: [ComponentProjectsVotsInput]) {
     updateAsk(id: $askId, data: { archived: false, lapsedAt: null, vots: $vots }) { data { id } }
   }`,
+  // A candidate taking back their own open candidacy (withdrawCandidacy). The
+  // handler checks the owner from this read, never from the params.
+  'askForWithdrawal': `query AskForWithdrawal($id: ID!) {
+    ask(id: $id) { data { id attributes {
+      archived lapsedAt
+      users_permissions_user { data { id attributes { username } } }
+      project { data { id attributes { projectName } } }
+      open_mission { data { id attributes { name archived isRishon } } }
+    } } }
+  }`,
+  'askmForWithdrawal': `query AskmForWithdrawal($id: ID!) {
+    askm(id: $id) { data { id attributes {
+      archived isSelfProposal
+      users_permissions_user { data { id attributes { username } } }
+      project { data { id attributes { projectName } } }
+      open_mashaabim { data { id attributes { name } } }
+      pmash { data { id } }
+    } } }
+  }`,
+  // Archive, never delete: the withdrawn candidacy stays on record.
+  'withdrawAsk': `mutation WithdrawAsk($id: ID!) {
+    updateAsk(id: $id, data: { archived: true }) { data { id attributes { archived } } }
+  }`,
+  'withdrawAskm': `mutation WithdrawAskm($id: ID!) {
+    updateAskm(id: $id, data: { archived: true }) { data { id attributes { archived } } }
+  }`,
   // The applicant's candidacy still on the table for one opening — applyToMission
   // returns it instead of opening a second, parallel Ask on the same terms.
   'standingAskByUserAndMission': `query StandingAskByUserAndMission($uid: ID!, $omId: ID!) {
@@ -11060,6 +11086,7 @@ export const moachQids = {
         id
         attributes {
           project { data { id } }
+          archived lapsedAt
           vots { what why zman order id users_permissions_user { data { id } } }
           timegrama { data { id attributes { date done } } }
           negopendmissions(sort: "ordern:desc") {
@@ -11114,6 +11141,7 @@ export const moachQids = {
         id
         attributes {
           project { data { id } }
+          archived
           isSelfProposal
           pendingMainVote
           vots { what zman why id users_permissions_user { data { id } } }
@@ -18739,7 +18767,7 @@ ${PROMO_DECISION_FIELDS}
       pagination: { limit: 50 }
     ) {
       data { id attributes {
-        createdAt
+        createdAt lapsedAt
         vots { what order zman users_permissions_user { data { id } } }
         timegrama { data { attributes { date done } } }
         open_mission { data { id attributes { name noofhours perhour } } }

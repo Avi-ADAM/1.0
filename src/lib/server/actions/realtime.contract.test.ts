@@ -45,6 +45,7 @@ const READ_ONLY = new Set([
   'getSiteSharePayables',
   'getStipendOverview',
   'getStipendWork',
+  'getMyApplications',
   'getUserForums',
   // Write nothing: they exist for the notification they send.
   'githubIssueClosed',

@@ -12,5 +12,14 @@
     "recorded": "Tu voto quedó registrado. La propuesta espera la respuesta de los demás miembros.",
     "recordedNo": "Tu objeción quedó registrada. La propuesta no se aprobará con estos términos: puedes proponer otros en una ronda de negociación.",
     "missing": "Este elemento no se encontró o ya fue archivado."
+  },
+  "withdraw": {
+    "hint": "Esta es tu candidatura. Mientras la rikma no la apruebe, puedes retirarla.",
+    "button": "Retirar mi candidatura",
+    "confirm": "¿Retirar tu candidatura? Se avisará a los miembros de la rikma y se cerrará la votación sobre ella. Puedes volver a postularte más adelante.",
+    "confirmYes": "Sí, retirar",
+    "cancel": "Cancelar",
+    "done": "Tu candidatura fue retirada. La vacante sigue abierta y puedes volver a postularte cuando quieras.",
+    "failed": "No pudimos retirar la candidatura ahora. Inténtalo de nuevo en un momento."
   }
 }

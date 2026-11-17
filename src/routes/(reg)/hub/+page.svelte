@@ -66,7 +66,9 @@
   const shortcuts = $derived([
     { icon: '💗', label: $t('hub.nav.lev'),   href: '/lev',   badge: 0 },
     { icon: '🧠', label: $t('hub.nav.moach'), href: '/moach', badge: 0 },
-    { icon: '👤', label: $t('hub.nav.me'),    href: '/me',    badge: 0 }
+    { icon: '👤', label: $t('hub.nav.me'),    href: '/me',    badge: 0 },
+    // The candidacies I sent and the rikma has not answered — each with a way to withdraw.
+    { icon: '📨', label: $t('hub.nav.myRequests'), href: '/lev?focus=myapp', badge: 0 }
   ]);
 
   onMount(() => {

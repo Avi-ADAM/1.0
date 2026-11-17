@@ -19,7 +19,7 @@ vi.mock('../../lib/server/deal/offerDeal', () => ({ loadOfferDeal: (...a: any[])
 vi.mock('$env/dynamic/private', () => ({ env }));
 
 const { shapeDecision, getDecisionTool } = await import('./decisionTools');
-const { shapeApplications, applyRefusal, applyToMissionTool, listMyApplicationsTool, mcpApplyEnabled } = await import(
+const { shapeApplications, applyRefusal, applyToMissionTool, listMyApplicationsTool, mcpApplyEnabled, withdrawRefusal, withdrawCandidacyTool } = await import(
   './joinTools'
 );
 const { shapeLedger, isEffectiveSale, getRikmaLedgerTool } = await import('./ledgerTools');
@@ -452,5 +452,70 @@ describe('findPartners', () => {
     const out = await run(findPartnersTool, { query: 'editing' });
     expect(execute.mock.calls[2][0]).toBe('mcpCountPartners');
     expect(out).toMatchObject({ success: true, matching: 4, notNamed: 4, people: [] });
+  });
+});
+
+// ── withdrawCandidacy ──────────────────────────────────────────────────────
+
+const askRow = (attrs: any = {}) => ({
+  data: {
+    ask: {
+      data: {
+        id: '11',
+        attributes: {
+          archived: false,
+          users_permissions_user: rel('42'),
+          project: rel('5', { projectName: 'Bakery' }),
+          open_mission: rel('3', { name: 'Edit' }),
+          ...attrs
+        }
+      }
+    }
+  }
+});
+
+describe('withdrawCandidacyTool', () => {
+  it('refuses what is not the caller’s, what is closed, and what is outside the key scope', () => {
+    const node = askRow().data.ask.data;
+    expect(withdrawRefusal(null, '42')).toBe('not-found');
+    expect(withdrawRefusal(node, '43')).toBe('not-yours');
+    expect(withdrawRefusal({ attributes: { ...node.attributes, archived: true } }, '42')).toBe('closed');
+    expect(withdrawRefusal(node, '42', ['6'])).toBe('out-of-scope');
+    expect(withdrawRefusal(node, '42', ['5'])).toBeNull();
+  });
+
+  it('runs the action as the key owner, with the rikma read from the candidacy', async () => {
+    execute.mockResolvedValue(askRow());
+    executeAction.mockResolvedValue({ success: true, data: { withdrawn: true } });
+    const out = await run(withdrawCandidacyTool, { applicationId: '11', kind: 'mission', confirmedWithUser: true });
+    expect(execute.mock.calls[0][0]).toBe('askForWithdrawal');
+    const [key, params, context] = executeAction.mock.calls[0];
+    expect(key).toBe('withdrawCandidacy');
+    expect(params).toEqual({ side: 'ask', id: '11', projectId: '5' });
+    expect(context.userId).toBe('42');
+    expect(out).toMatchObject({ success: true, status: 'withdrawn', name: 'Edit', rikmaName: 'Bakery' });
+  });
+
+  it('withdraws nothing for someone else’s candidacy', async () => {
+    execute.mockResolvedValue(askRow({ users_permissions_user: rel('99') }));
+    const out = await run(withdrawCandidacyTool, { applicationId: '11', kind: 'mission', confirmedWithUser: true });
+    expect(out.success).toBe(false);
+    expect(executeAction).not.toHaveBeenCalled();
+  });
+
+  it('a resource candidacy goes through the Askm side', async () => {
+    execute.mockResolvedValue({
+      data: { askm: { data: { id: '7', attributes: { archived: false, users_permissions_user: rel('42'), project: rel('5'), open_mashaabim: rel('2', { name: 'Oven' }) } } } }
+    });
+    executeAction.mockResolvedValue({ success: true, data: {} });
+    await run(withdrawCandidacyTool, { applicationId: '7', kind: 'resource', confirmedWithUser: true });
+    expect(execute.mock.calls[0][0]).toBe('askmForWithdrawal');
+    expect(executeAction.mock.calls[0][1]).toEqual({ side: 'askm', id: '7', projectId: '5' });
+  });
+
+  it('needs the user’s explicit yes', () => {
+    const schema: any = (withdrawCandidacyTool as any).inputSchema;
+    expect(schema.safeParse({ applicationId: '11', kind: 'mission' }).success).toBe(false);
+    expect(schema.safeParse({ applicationId: '11', kind: 'mission', confirmedWithUser: true }).success).toBe(true);
   });
 });

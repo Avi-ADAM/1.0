@@ -47,6 +47,7 @@
   import ShiftHoursCard from './ShiftHoursCard.svelte';
   import FulfillCard from './FulfillCard.svelte';
   import FulfillRuleCard from './FulfillRuleCard.svelte';
+  import MyApplicationCard from './MyApplicationCard.svelte';
   import { setLevItem } from '../levItemContext.js';
 
   /**
@@ -209,6 +210,8 @@
   <FulfillCard {buble} isFirst={isVisible} onProj={proj} onDone={delo} />
 {:else if buble.ani === 'fulfillRule'}
   <FulfillRuleCard {buble} isFirst={isVisible} onProj={proj} onDone={delo} />
+{:else if buble.ani === 'myapp'}
+  <MyApplicationCard {buble} isFirst={isVisible} onProj={proj} onDone={delo} />
 {:else if buble.ani === 'sitesharedecide'}
   <SiteShareAutoApprovedCard
       {buble}

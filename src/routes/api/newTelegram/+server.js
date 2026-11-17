@@ -13,6 +13,14 @@ import { actionService } from '$lib/server/actions/index.js';
 import { normalizeAdminToken } from '$lib/server/adminToken.js';
 import { checkTelegramWebhook } from '$lib/server/telegramWebhookAuth.js';
 import { trackTelegramCalls } from '$lib/server/telegramPendingCalls.js';
+import {
+    botText,
+    botDateLocale,
+    resolveBotLang,
+    isCancelWord,
+    relativeDayWord,
+    NONE_WORDS
+} from '$lib/server/telegram/botTexts.js';
 // createServer is likely not needed when using SvelteKit endpoint for webhook
 // import { createServer } from 'https';
 
@@ -27,221 +35,7 @@ const SITE_CONTEXT = `
 חזון: יצירת עולם טוב יותר באמצעות שיתוף פעולה מבוסס ערכים, כישורים והסכמה.
 `;
 
-// --- תרגומים וקבועים ---
-const translations = {
-    he: {
-        welcome: 'ברוך בואך ל-1💗1',
-        welcomeRegistered: '{{username}}, ברוך בואך ל-1💗1', // Changed for clarity
-        login: '<<login להתחברות>>',
-        register: '<<to registration להרשמה>>',
-        registerNotify: '<<register for nutification הרשמה לעדכונים>>',
-        startTimerBtn: '<<start timer ⏳ הפעלת טיימר>>',
-        stopTimerBtn: '<<stop timer ⌛ עצירת טיימר>>',
-        helpText: 'כאן תוכל להירשם לעדכונים מפלטפורמת 1💗1 שלנו, או להשתמש בי כעוזר לניהול הטיימרים שלך.',
-        timerStarted: 'טיימר הופעל בהצלחה',
-        timerStartedMission: 'טיימר הופעל בהצלחה למשימה "{{missionName}}"',
-        chooseStart: 'בחירת משימה להפעלת טיימר',
-        timerStopped: 'טיימר נעצר בהצלחה',
-        chooseStop: 'בחירת משימה לעצירת טיימר',
-        selectTasks: 'בחירת המטלות שברצונך לקשר לטיימר:',
-        taskAdded: 'המטלה "{{name}}" נוספה בהצלחה',
-        taskRemoved: 'המטלה "{{name}}" הוסרה בהצלחה',
-        tasksUpdated: 'המטלות עודכנו בהצלחה',
-        viewTimer: '<< 👁️ צפייה בטיימר>>',
-        saveTasksBtn: '<< 💾 שמירת מטלות>>',
-        editTimerBtn: '<<edit timer ✏️ עריכת טיימר>>',
-        updateTasksBtn: '<<update tasks 📝 עדכון משימות>>',
-        saveTimerBtn: '<<save timer 🕒 שמירת טיימר>>',
-        timerSaved: 'הטיימר נשמר בהצלחה',
-        timerSaveNotePrompt: '✍️ שלח/י תיאור קצר של מה שעשית בזמן הזה (טקסט חופשי).\nלמחיקת התיאור שלח/י "-", לביטול שלח/י "ביטול".',
-        timerSaveLinkPrompt: '🔗 שלח/י קישור שמגבה את העבודה (PR, מסמך, הקלטה).\nלביטול שלח/י "ביטול".',
-        timerSaveInvalidLink: '❌ הקישור אינו תקין. יש לשלוח כתובת http/https.',
-        timerSaveLinksFull: '❌ אין מקום לקישור נוסף (עד {{count}} קישורים). אפשר לנקות ולהתחיל מחדש.',
-        timerSaveCancelled: 'השמירה בוטלה. השעות נשארו בטיימר וניתן לשמור אותן מאוחר יותר.',
-        timerSaveExpired: 'הכרטיס כבר אינו פעיל. יש להתחיל שמירה מחדש.',
-        aiUnderstandError: 'מצטער, לא הצלחתי להבין את בקשתך. נסה/י לנסח אחרת או השתמש/י בכפתורים.',
-        aiActionFailed: 'אופסס, אירעה שגיאה בעת ביצוע הפעולה המבוקשת.',
-        notRegisteredWelcome: `ברוך הבא לבוט של 1💗1!\n1💗1 היא פלטפורמה לשיתוף פעולה מבוסס הסכמה (${SITE_CONTEXT.split('\n')[1].trim()}).\nנראה שחשבון הטלגרם שלך אינו מקושר עדיין לחשבון משתמש פעיל.`,
-        notRegisteredPrompt: 'ניתן להירשם לאתר, להתחבר אם יש לך חשבון, או לשאול אותי שאלות על הפלטפורמה.',
-        askAboutPlatform: '<< 🤔 שאלות על הפלטפורמה >>', // New button text
-        noTasksToStart: 'לא נמצאו משימות פעילות שניתן להתחיל עבורן טיימר.',
-        noTasksToStop: 'לא נמצאו טיימרים פעילים שניתן לעצור.',
-        askWhichTaskToStart: 'לאיזו משימה ברצונך להתחיל טיימר?',
-        askWhichTaskToStop: 'לאיזו משימה ברצונך לעצור את הטיימר?',
-        generalError: 'אירעה שגיאה, יש לנסות שוב מאוחר יותר.',
-        timerNotFound: 'הטיימר המבוקש לא נמצא או שאינו פעיל.',
-        missionNotFound: 'המשימה המבוקשת לא נמצאה.',
-        taskNotFound: 'המטלה המבוקשת לא נמצאה.',
-        updateFailed: 'עדכון המטלות נכשל.',
-        unauthorized: 'פעולה לא מורשית.',
-        askMeAnything: 'את/ה יכול/ה לשאול אותי כל דבר על 1lev1.com!',
-        infoSent: 'הנה מידע נוסף על 1lev1:',
-        backToStart: '<< חזרה >>',
-        editIntervalsBtn: '✏️ עריכת קטעי זמן',
-        chooseInterval: 'בחר/י קטע זמן לעריכה:',
-        editStartBtn: '✏️ שנה שעת התחלה',
-        editEndBtn: '✏️ שנה שעת סיום',
-        editIntervalPrompt: 'שלח/י תאריך ושעה חדשים בפורמט:\nDD/MM/YYYY HH:MM\nלדוגמא: 22/05/2026 14:30',
-        intervalUpdated: '✅ הקטע עודכן בהצלחה',
-        invalidDateTime: '❌ תאריך/שעה לא תקינים. השתמש/י בפורמט: DD/MM/YYYY HH:MM',
-        endBeforeStart: '❌ שעת הסיום חייבת להיות אחרי שעת ההתחלה',
-        noIntervals: 'אין קטעי זמן מוגמרים לעריכה.',
-        backToIntervals: '<< חזרה לרשימת קטעים',
-        cancelEdit: '❌ ביטול עריכה',
-        reportSaleBtn: '🛍️ דיווח מכירה',
-        chooseProduct: 'בחר/י מוצר למכירה:',
-        noProducts: 'לא נמצאו מוצרים זמינים.',
-        saleDatePrompt: 'שלח/י תאריך בפורמט DD/MM/YYYY\nלדוגמה: 29/06/2026\nאו: "היום" / "אתמול"',
-        saleQuantityPrompt: 'שלח/י כמות (מספר שלם חיובי):',
-        salePricePrompt: 'שלח/י מחיר ליחידה (₪):',
-        saleNotePrompt: '📋 שלח/י הערה (טקסט חופשי, עד 500 תווים):\nלביטול שלח/י "-"',
-        saleStartDatePrompt: '📅 שלח/י תאריך התחלה בפורמט DD/MM/YYYY:',
-        saleFinishDatePrompt: '📅 שלח/י תאריך סיום בפורמט DD/MM/YYYY\nלמנוי פתוח (ללא תאריך סיום) שלח/י "-"',
-        saleCreated: '✅ המכירה נרשמה בהצלחה!',
-        saleCancelled: 'המכירה בוטלה.',
-        saleError: '❌ שגיאה ברישום המכירה. נסה/י שוב.',
-        invalidSaleQty: '❌ כמות לא תקינה. הכנס/י מספר שלם חיובי.',
-        invalidSalePrice: '❌ מחיר לא תקין. הכנס/י מספר חיובי.',
-        invalidSaleDate: '❌ תאריך לא תקין. השתמש/י בפורמט: DD/MM/YYYY',
-        chooseHolder: '👤 בחר/י מי יחזיק את הכסף:',
-        newTaskBtn: '📝 מטלה חדשה',
-        chooseTaskProject: '📂 בחר/י פרויקט למטלה:',
-        noProjectsForTask: 'לא נמצאו פרויקטים שאת/ה חבר/ה בהם.',
-        chooseAssigneeType: '👥 למי לשייך את המטלה?',
-        assignToPersonBtn: '👤 לאדם',
-        assignToRoleBtn: '🏷️ לתפקיד',
-        assignToNoneBtn: '📋 ללא שיוך',
-        chooseTaskPerson: '👤 בחר/י אדם:',
-        chooseTaskRole: '🏷️ בחר/י תפקיד:',
-        noPeopleInProject: 'לא נמצאו חברים בפרויקט זה.',
-        noRolesInProject: 'לא נמצאו תפקידים בפרויקט זה.',
-        taskNamePrompt: '✍️ שלח/י את שם המטלה (טקסט חופשי):',
-        taskCreated: '✅ המטלה "{{name}}" נוצרה בהצלחה!',
-        taskError: '❌ שגיאה ביצירת המטלה. נסה/י שוב.',
-        taskCancelled: 'יצירת המטלה בוטלה.',
-        chooseTaskMission: '🎯 לאיזו משימה בתהליך לקשר את המטלה?',
-        noMissionsForMember: 'לאדם זה אין משימות בתהליך בפרויקט. המטלה תיווצר ללא קישור למשימה.',
-        taskMissionNoneBtn: '➖ ללא משימה',
-        meetAvailBtn: '📅 זמינות לפגישה',
-        meetAvailTitle: '📅 זמינות לפגישות\n✅ = סימנת זמינות · 💤 = לא זמין/ה\nלחיצה על פגישה מסמנת או מבטלת את הזמינות שלך בה.',
-        meetAvailNone: 'לא נמצאו פגישות שאת/ה משתתף/ת בהן.',
-        meetAvailAllOnBtn: '🟢 זמין/ה לכל הפגישות',
-        meetAvailAllOffBtn: '💤 ביטול זמינות לכל הפגישות',
-        meetAvailOn: '✅ סימנת זמינות לפגישה "{{name}}". שאר המשתתפים קיבלו עדכון.',
-        meetAvailOff: '💤 הזמינות שלך לפגישה "{{name}}" בוטלה.',
-        meetAvailAllOn: '✅ סימנת זמינות לכל הפגישות שלך.',
-        meetAvailAllOff: '💤 הזמינות שלך בכל הפגישות בוטלה.',
-        meetAvailReady: '✨ כל המשתתפים בפגישה "{{name}}" זמינים — אפשר להתחיל!',
-        meetAvailError: '❌ עדכון הזמינות נכשל. נסה/י שוב.',
-        meetAvailOpenSite: '🌐 פתיחת הפגישות באתר'
-    },
-    en: {
-        welcome: 'Welcome to 1💗1',
-        welcomeRegistered: '{{username}}, Welcome to 1💗1',
-        login: '<<login>>',
-        register: '<<to registration>>',
-        registerNotify: '<<register for notifications>>',
-        startTimerBtn: '<<start timer ⏳>>',
-        stopTimerBtn: '<<stop timer ⌛>>',
-        helpText: 'Here you can register for updates from our 1💗1 platform, or use me as an assistant to manage your timers.',
-        timerStarted: 'Timer started successfully',
-        timerStartedMission: 'Timer started successfully for mission "{{missionName}}"',
-        chooseStart: 'Choose mission to start timer',
-        timerStopped: 'Timer stopped successfully',
-        chooseStop: 'Choose mission to stop timer',
-        selectTasks: 'Select the tasks you want to link to the timer:',
-        taskAdded: 'Task "{{name}}" added successfully',
-        taskRemoved: 'Task "{{name}}" removed successfully',
-        tasksUpdated: 'Tasks updated successfully',
-        viewTimer: '<<view timer 👁️>>',
-        saveTasksBtn: '<< 💾 save tasks>>',
-        editTimerBtn: '<<edit timer ✏️>>',
-        updateTasksBtn: '<<update tasks 📝>>',
-        saveTimerBtn: '<<save timer 🕒>>',
-        timerSaved: 'Timer saved successfully',
-        timerSaveNotePrompt: '✍️ Send a short account of what you did in this time (free text).\nSend "-" to clear it, "cancel" to go back.',
-        timerSaveLinkPrompt: '🔗 Send a link backing up the work (PR, document, recording).\nSend "cancel" to go back.',
-        timerSaveInvalidLink: '❌ That is not a valid link. Send an http/https address.',
-        timerSaveLinksFull: '❌ No room for another link (up to {{count}}). You can clear them and start over.',
-        timerSaveCancelled: 'Save cancelled. The hours are still on the timer and can be saved later.',
-        timerSaveExpired: 'This card is no longer active. Start the save again.',
-        aiUnderstandError: 'Sorry, I couldn\'t understand your request. Please try rephrasing or use the buttons.',
-        aiActionFailed: 'Sorry, an error occurred while performing the requested action.',
-        notRegisteredWelcome: `Welcome to the 1💗1 Bot!\n1💗1 is a platform for consent-based collaboration (${SITE_CONTEXT.split('\n')[1].trim()}).\nIt seems your Telegram account is not yet linked to an active user account.`,
-        notRegisteredPrompt: 'You can register on the website, log in if you have an account, or ask me questions about the platform.',
-        askAboutPlatform: '<< 🤔 Ask About the Platform >>',
-        noTasksToStart: 'No active missions found to start a timer for.',
-        noTasksToStop: 'No active timers found to stop.',
-        askWhichTaskToStart: 'Which mission would you like to start a timer for?',
-        askWhichTaskToStop: 'Which mission would you like to stop the timer for?',
-        generalError: 'An error occurred, please try again later.',
-        timerNotFound: 'The requested timer was not found or is inactive.',
-        missionNotFound: 'The requested mission was not found.',
-        taskNotFound: 'The requested task was not found.',
-        updateFailed: 'Failed to update tasks.',
-        unauthorized: 'Unauthorized action.',
-        askMeAnything: 'You can ask me anything about 1lev1.com!',
-        infoSent: 'Here is more information about 1lev1:',
-        backToStart: '<< Back >>',
-        editIntervalsBtn: '✏️ Edit Time Intervals',
-        chooseInterval: 'Choose an interval to edit:',
-        editStartBtn: '✏️ Edit Start Time',
-        editEndBtn: '✏️ Edit End Time',
-        editIntervalPrompt: 'Send new date and time in format:\nDD/MM/YYYY HH:MM\nExample: 22/05/2026 14:30',
-        intervalUpdated: '✅ Interval updated successfully',
-        invalidDateTime: '❌ Invalid date/time. Use format: DD/MM/YYYY HH:MM',
-        endBeforeStart: '❌ End time must be after start time',
-        noIntervals: 'No completed intervals to edit.',
-        backToIntervals: '<< Back to intervals list',
-        cancelEdit: '❌ Cancel edit',
-        reportSaleBtn: '🛍️ Report Sale',
-        chooseProduct: 'Choose a product to sell:',
-        noProducts: 'No available products found.',
-        saleDatePrompt: 'Send date in format DD/MM/YYYY\nExample: 29/06/2026\nOr: "today" / "yesterday"',
-        saleQuantityPrompt: 'Send quantity (positive integer):',
-        salePricePrompt: 'Send price per unit (₪):',
-        saleNotePrompt: '📋 Send a note (free text, up to 500 chars):\nTo clear send "-"',
-        saleStartDatePrompt: '📅 Send start date in format DD/MM/YYYY:',
-        saleFinishDatePrompt: '📅 Send end date in format DD/MM/YYYY\nFor open-ended subscription send "-"',
-        saleCreated: '✅ Sale recorded successfully!',
-        saleCancelled: 'Sale cancelled.',
-        saleError: '❌ Error recording sale. Please try again.',
-        invalidSaleQty: '❌ Invalid quantity. Please enter a positive integer.',
-        invalidSalePrice: '❌ Invalid price. Please enter a positive number.',
-        invalidSaleDate: '❌ Invalid date. Use format: DD/MM/YYYY',
-        chooseHolder: '👤 Choose who holds the money:',
-        newTaskBtn: '📝 New Task',
-        chooseTaskProject: '📂 Choose a project for the task:',
-        noProjectsForTask: 'No projects found that you are a member of.',
-        chooseAssigneeType: '👥 Who should the task be assigned to?',
-        assignToPersonBtn: '👤 A person',
-        assignToRoleBtn: '🏷️ A role',
-        assignToNoneBtn: '📋 Unassigned',
-        chooseTaskPerson: '👤 Choose a person:',
-        chooseTaskRole: '🏷️ Choose a role:',
-        noPeopleInProject: 'No members found in this project.',
-        noRolesInProject: 'No roles found in this project.',
-        taskNamePrompt: '✍️ Send the task name (free text):',
-        taskCreated: '✅ Task "{{name}}" created successfully!',
-        taskError: '❌ Error creating the task. Please try again.',
-        taskCancelled: 'Task creation cancelled.',
-        chooseTaskMission: '🎯 Which in-progress mission should the task be linked to?',
-        noMissionsForMember: 'This person has no in-progress missions in the project. The task will be created without a mission link.',
-        taskMissionNoneBtn: '➖ No mission',
-        meetAvailBtn: '📅 Meeting availability',
-        meetAvailTitle: '📅 Meeting availability\n✅ = you are available · 💤 = not available\nTap a meeting to mark or cancel your availability for it.',
-        meetAvailNone: 'No meetings found that you take part in.',
-        meetAvailAllOnBtn: '🟢 Available for all meetings',
-        meetAvailAllOffBtn: '💤 Cancel availability for all meetings',
-        meetAvailOn: '✅ You are now available for "{{name}}". The other participants were notified.',
-        meetAvailOff: '💤 Your availability for "{{name}}" was cancelled.',
-        meetAvailAllOn: '✅ You are now available for all your meetings.',
-        meetAvailAllOff: '💤 Your availability was cancelled in all meetings.',
-        meetAvailReady: '✨ Everyone in "{{name}}" is available — you can start!',
-        meetAvailError: '❌ Updating your availability failed. Please try again.',
-        meetAvailOpenSite: '🌐 Open meetings on the site'
-    } // Add other EN translations if needed
-};
+// --- תרגומים: src/lib/server/telegram/botTexts.js (he/en/ar/ru/es) ---
 
 import { env } from '$env/dynamic/private';
 
@@ -290,7 +84,7 @@ const pendingSale = new Map();
 function formatInterval(interval, index, lang) {
     const start = new Date(interval.start);
     const stop = interval.stop ? new Date(interval.stop) : null;
-    const dateStr = start.toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US', { day: '2-digit', month: '2-digit' });
+    const dateStr = start.toLocaleDateString(botDateLocale(lang), { day: '2-digit', month: '2-digit' });
     const startTime = start.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', hour12: false });
     const stopTime = stop
         ? stop.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', hour12: false })
@@ -337,16 +131,14 @@ function getUserInfo(chatId) {
     return {
         username: userData.attributes.username,
         uid: userData.id,
-        lang: userData.attributes.lang || 'he',
+        // null when the account never chose — the middleware then falls back
+        // to the language the person's Telegram app reports.
+        lang: userData.attributes.lang || null,
     };
 }
 
 function getText(key, lang = 'he', replacements = {}) {
-    let text = translations[lang]?.[key] ?? translations['he']?.[key] ?? translations['en']?.[key] ?? key;
-    for (const placeholder in replacements) {
-        text = text.replace(`{{${placeholder}}}`, replacements[placeholder]);
-    }
-    return text;
+    return botText(key, lang, replacements);
 }
 
 async function getUserMissions(uid, fetchInstance, onlyStartable = false, onlyStoppable = false) {
@@ -488,9 +280,9 @@ async function getUserMeetings(uid, fetchInstance) {
 }
 
 function parseSaleDate(text) {
-    const lower = text.trim().toLowerCase();
-    if (lower === 'היום' || lower === 'today') return new Date().toISOString();
-    if (lower === 'אתמול' || lower === 'yesterday') {
+    const relDay = relativeDayWord(text);
+    if (relDay === 'today') return new Date().toISOString();
+    if (relDay === 'yesterday') {
         const d = new Date(); d.setDate(d.getDate() - 1); return d.toISOString();
     }
     const match = text.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
@@ -516,72 +308,57 @@ function calcSaleTotal(sale) {
 }
 
 function formatSaleCard(sale, lang) {
-    const fmt = (iso) => new Date(iso).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const fmt = (iso) => new Date(iso).toLocaleDateString(botDateLocale(lang), { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const t = (key) => getText(key, lang);
     const total = calcSaleTotal(sale);
     const isSubscription = sale.kindOf === 'monthly' || sale.kindOf === 'yearly';
 
-    if (lang === 'he') {
-        const kindLabel = sale.kindOf === 'monthly' ? ' (חודשי)' : sale.kindOf === 'yearly' ? ' (שנתי)' : '';
-        let card = `📦 *${sale.productName}*${kindLabel}\n🏢 ${sale.projectName}\n\n`;
-        if (sale.kindOf !== 'total' && sale.kindOf !== 'unlimited') {
-            card += `📊 כמות: *${sale.quantity}*\n`;
-        }
-        card += `💰 מחיר ליחידה: *${sale.each} ₪*\n`;
-        if (isSubscription && sale.startDate) {
-            card += `📅 מ: *${fmt(sale.startDate)}*`;
-            card += sale.finishDate ? ` עד: *${fmt(sale.finishDate)}*\n` : ` (פתוח)\n`;
-        }
-        card += `💵 סה"כ: *${total} ₪*\n`;
-        card += `🗓️ תאריך מכירה: *${fmt(sale.saleDate)}*\n`;
-        card += `👤 מחזיק כסף: *${sale.holderName}*`;
-        if (sale.note) card += `\n📋 הערה: _${sale.note}_`;
-        return card;
-    }
-
-    const kindLabel = sale.kindOf === 'monthly' ? ' (monthly)' : sale.kindOf === 'yearly' ? ' (yearly)' : '';
+    const kindLabel = sale.kindOf === 'monthly' ? ` (${t('saleKindMonthly')})`
+        : sale.kindOf === 'yearly' ? ` (${t('saleKindYearly')})` : '';
     let card = `📦 *${sale.productName}*${kindLabel}\n🏢 ${sale.projectName}\n\n`;
     if (sale.kindOf !== 'total' && sale.kindOf !== 'unlimited') {
-        card += `📊 Qty: *${sale.quantity}*\n`;
+        card += `📊 ${t('saleCardQty')}: *${sale.quantity}*\n`;
     }
-    card += `💰 Per unit: *${sale.each} ₪*\n`;
+    card += `💰 ${t('saleCardPerUnit')}: *${sale.each} ₪*\n`;
     if (isSubscription && sale.startDate) {
-        card += `📅 From: *${fmt(sale.startDate)}*`;
-        card += sale.finishDate ? ` to: *${fmt(sale.finishDate)}*\n` : ` (open)\n`;
+        card += `📅 ${t('saleCardFrom')}: *${fmt(sale.startDate)}*`;
+        card += sale.finishDate ? ` ${t('saleCardTo')}: *${fmt(sale.finishDate)}*\n` : ` (${t('saleCardOpen')})\n`;
     }
-    card += `💵 Total: *${total} ₪*\n`;
-    card += `🗓️ Sale date: *${fmt(sale.saleDate)}*\n`;
-    card += `👤 Money holder: *${sale.holderName}*`;
-    if (sale.note) card += `\n📋 Note: _${sale.note}_`;
+    card += `💵 ${t('saleCardTotal')}: *${total} ₪*\n`;
+    card += `🗓️ ${t('saleCardDate')}: *${fmt(sale.saleDate)}*\n`;
+    card += `👤 ${t('saleCardHolder')}: *${sale.holderName}*`;
+    if (sale.note) card += `\n📋 ${t('saleCardNote')}: _${sale.note}_`;
     return card;
 }
 
 function buildSaleCardKeyboard(sale, uid, lang) {
     const isTotal = sale.kindOf === 'total' || sale.kindOf === 'unlimited';
     const isSubscription = sale.kindOf === 'monthly' || sale.kindOf === 'yearly';
+    const t = (key) => getText(key, lang);
     const buttons = [];
     if (!isTotal) {
         buttons.push([
-            Markup.button.callback(lang === 'he' ? '📊 כמות' : '📊 Qty', `saleFld-quantity-${uid}`),
-            Markup.button.callback(lang === 'he' ? '💰 מחיר' : '💰 Price', `saleFld-each-${uid}`)
+            Markup.button.callback(t('saleQtyBtn'), `saleFld-quantity-${uid}`),
+            Markup.button.callback(t('salePriceBtn'), `saleFld-each-${uid}`)
         ]);
     } else {
-        buttons.push([Markup.button.callback(lang === 'he' ? '💰 מחיר' : '💰 Price', `saleFld-each-${uid}`)]);
+        buttons.push([Markup.button.callback(t('salePriceBtn'), `saleFld-each-${uid}`)]);
     }
     if (isSubscription) {
         buttons.push([
-            Markup.button.callback(lang === 'he' ? '📅 תחילה' : '📅 Start', `saleFld-startDate-${uid}`),
-            Markup.button.callback(lang === 'he' ? '📅 סיום' : '📅 End', `saleFld-finishDate-${uid}`)
+            Markup.button.callback(t('saleStartBtn'), `saleFld-startDate-${uid}`),
+            Markup.button.callback(t('saleEndBtn'), `saleFld-finishDate-${uid}`)
         ]);
     }
     buttons.push([
-        Markup.button.callback(lang === 'he' ? '🗓️ תאריך' : '🗓️ Date', `saleFld-date-${uid}`),
-        Markup.button.callback(lang === 'he' ? '👤 מחזיק' : '👤 Holder', `saleHolder-${uid}`)
+        Markup.button.callback(t('saleDateBtn'), `saleFld-date-${uid}`),
+        Markup.button.callback(t('saleHolderBtn'), `saleHolder-${uid}`)
     ]);
     buttons.push([
-        Markup.button.callback(lang === 'he' ? '📋 הערה' : '📋 Note', `saleFld-note-${uid}`)
+        Markup.button.callback(t('saleNoteBtn'), `saleFld-note-${uid}`)
     ]);
-    buttons.push([Markup.button.callback(lang === 'he' ? '✅ שלח מכירה' : '✅ Send Sale', `saleSend-${uid}`)]);
-    buttons.push([Markup.button.callback(lang === 'he' ? '❌ ביטול' : '❌ Cancel', `saleCancel-${uid}`)]);
+    buttons.push([Markup.button.callback(t('saleSendBtn'), `saleSend-${uid}`)]);
+    buttons.push([Markup.button.callback(t('cancelBtn'), `saleCancel-${uid}`)]);
     return Markup.inlineKeyboard(buttons).resize();
 }
 
@@ -594,37 +371,33 @@ function buildSaleCardKeyboard(sale, uid, lang) {
 const TIMER_NOTE_MAX = 240;
 
 function formatTimerSaveCard(state, lang) {
-    const he = lang === 'he';
     const lines = [];
-    lines.push(he
-        ? `💾 שמירת טיימר — ${state.missionName}`
-        : `💾 Save timer — ${state.missionName}`);
+    lines.push(getText('tsTitle', lang, { missionName: state.missionName }));
     // The hours are the claim the rikma is asked to sign, so the card says how
     // many before the member signs it - not only after.
     const hours = (state.hours ?? 0).toFixed(2);
-    lines.push(he ? `⏱️ שעות לשמירה: ${hours}` : `⏱️ Hours to file: ${hours}`);
+    lines.push(getText('tsHours', lang, { hours }));
     lines.push('');
-    lines.push(he ? `✍️ תיאור: ${state.note || '—'}` : `✍️ Note: ${state.note || '—'}`);
+    lines.push(getText('tsNote', lang, { note: state.note || '—' }));
     if (state.links.length) {
-        lines.push(he ? '🔗 קישורים:' : '🔗 Links:');
+        lines.push(getText('tsLinks', lang));
         for (const link of state.links) lines.push(`• ${saveLinkLabel(link)}`);
     } else {
-        lines.push(he ? '🔗 קישורים: —' : '🔗 Links: —');
+        lines.push(getText('tsLinksNone', lang));
     }
     return lines.join('\n');
 }
 
 function buildTimerSaveKeyboard(state, uid, lang) {
-    const he = lang === 'he';
     const buttons = [
         [
-            Markup.button.callback(he ? '✍️ תיאור' : '✍️ Note', `tsFld-note-${uid}`),
-            Markup.button.callback(he ? '🔗 קישור' : '🔗 Link', `tsFld-link-${uid}`)
+            Markup.button.callback(getText('tsNoteBtn', lang), `tsFld-note-${uid}`),
+            Markup.button.callback(getText('tsLinkBtn', lang), `tsFld-link-${uid}`)
         ]
     ];
     if (state.links.length) {
         buttons.push([
-            Markup.button.callback(he ? '🧹 ניקוי הקישורים' : '🧹 Clear links', `tsLinksClear-${uid}`)
+            Markup.button.callback(getText('tsClearLinksBtn', lang), `tsLinksClear-${uid}`)
         ]);
     }
     buttons.push([
@@ -635,11 +408,11 @@ function buildTimerSaveKeyboard(state, uid, lang) {
     ]);
     buttons.push([
         Markup.button.callback(
-            he ? '💾 שמירה סופית' : '💾 Save now',
+            getText('tsSaveNowBtn', lang),
             `tsGo-${state.missionId}-${uid}-${state.timerId}`
         )
     ]);
-    buttons.push([Markup.button.callback(he ? '❌ ביטול' : '❌ Cancel', `tsCancel-${uid}`)]);
+    buttons.push([Markup.button.callback(getText('cancelBtn', lang), `tsCancel-${uid}`)]);
     return Markup.inlineKeyboard(buttons).resize();
 }
 
@@ -793,8 +566,7 @@ Your Answer (in ${lang}):
         return response.text().trim();
     } catch (error) {
         console.error("Gemini Q&A Error:", error);
-        const errorLang = ['he', 'en'].includes(lang) ? lang : 'he';
-        return getText('aiActionFailed', errorLang);
+        return getText('aiActionFailed', lang);
     }
 }
 
@@ -811,12 +583,8 @@ bot.use(async (ctx, next) => {
 
 bot.use(async (ctx, next) => {
     const chatId = ctx.chat?.id || ctx.callbackQuery?.message?.chat?.id;
-    if (chatId) {
-        ctx.state.userInfo = getUserInfo(chatId);
-        ctx.state.lang = ctx.state.userInfo?.lang || 'he';
-    } else {
-        ctx.state.lang = 'he';
-    }
+    ctx.state.userInfo = chatId ? getUserInfo(chatId) : null;
+    ctx.state.lang = resolveBotLang(ctx.state.userInfo?.lang, ctx.from?.language_code);
     await next();
 });
 
@@ -858,7 +626,7 @@ bot.action('ask_about_platform', async (ctx) => {
     await ctx.answerCbQuery();
     await ctx.reply(getText('askMeAnything', lang));
     // Provide context again upon request for clarity
-    await ctx.reply(getText('infoSent', lang) + "\n\n" + SITE_CONTEXT);
+    await ctx.reply(getText('infoSent', lang) + "\n\n" + getText('siteInfo', lang));
 });
 
 bot.help((ctx) => {
@@ -1227,7 +995,7 @@ bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
         if (!allTasks || allTasks.length === 0) {
             await ctx.editMessageReplyMarkup(undefined).catch(() => { });
             ctx.reply(getText('noTasksToStart', lang));
-            return ctx.answerCbQuery("No tasks found.");
+            return ctx.answerCbQuery(getText('noTasksFound', lang));
         }
 
         const taskButtons = allTasks.map(task => {
@@ -1441,7 +1209,7 @@ bot.action(/^editInterval-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
         ];
 
         await ctx.editMessageReplyMarkup(undefined).catch(() => { });
-        const whatToEdit = lang === 'he' ? 'מה ברצונך לשנות?' : 'What would you like to edit?';
+        const whatToEdit = getText('whatToEdit', lang);
         ctx.reply(`${intervalText}\n\n${whatToEdit}`, Markup.inlineKeyboard(buttons).resize());
     } catch (error) {
         console.error('Error in editInterval:', error);
@@ -1482,7 +1250,7 @@ bot.action(/^editIntervalField-(\d+)-(\d+)-(\d+)-(\d+)-(start|end)$/, async (ctx
         // Show current value for context
         const currentVal = field === 'start' ? interval.start : interval.stop;
         const currentFormatted = currentVal
-            ? new Date(currentVal).toLocaleString(lang === 'he' ? 'he-IL' : 'en-US', {
+            ? new Date(currentVal).toLocaleString(botDateLocale(lang), {
                 day: '2-digit', month: '2-digit', year: 'numeric',
                 hour: '2-digit', minute: '2-digit', hour12: false
             })
@@ -1495,7 +1263,7 @@ bot.action(/^editIntervalField-(\d+)-(\d+)-(\d+)-(\d+)-(start|end)$/, async (ctx
         });
 
         await ctx.editMessageReplyMarkup(undefined).catch(() => { });
-        const currentLabel = lang === 'he' ? 'ערך נוכחי' : 'Current value';
+        const currentLabel = getText('currentValue', lang);
         ctx.reply(
             `${currentLabel}: ${currentFormatted}\n\n${getText('editIntervalPrompt', lang)}`,
             Markup.inlineKeyboard([
@@ -1517,8 +1285,8 @@ bot.action(/^cancelEdit-(\d+)$/, async (ctx) => {
     if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
     pendingEdits.delete(userInfo.uid.toString());
-    await ctx.answerCbQuery(lang === 'he' ? 'העריכה בוטלה' : 'Edit cancelled');
-    await ctx.editMessageText(lang === 'he' ? 'העריכה בוטלה.' : 'Edit cancelled.').catch(() => { });
+    await ctx.answerCbQuery(getText('editCancelledToast', lang));
+    await ctx.editMessageText(getText('editCancelled', lang)).catch(() => { });
 });
 
 // ─── Sale Action Handlers ──────────────────────────────────────────────────
@@ -1698,8 +1466,8 @@ bot.action(/^saleCancelFld-(\d+)$/, async (ctx) => {
 
     const sale = pendingSale.get(userId.toString());
     if (sale) sale.pendingField = null;
-    await ctx.answerCbQuery(lang === 'he' ? 'בוטל' : 'Cancelled');
-    await ctx.editMessageText(lang === 'he' ? 'ההקלדה בוטלה.' : 'Input cancelled.').catch(() => { });
+    await ctx.answerCbQuery(getText('cancelledToast', lang));
+    await ctx.editMessageText(getText('inputCancelled', lang)).catch(() => { });
 });
 
 // Back to sale card (from holder list)
@@ -1790,7 +1558,7 @@ bot.action(/^saleCancel-(\d+)$/, async (ctx) => {
     if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
     pendingSale.delete(userId.toString());
-    await ctx.answerCbQuery(lang === 'he' ? 'בוטל' : 'Cancelled');
+    await ctx.answerCbQuery(getText('cancelledToast', lang));
     await ctx.editMessageText(getText('saleCancelled', lang)).catch(() => { });
 });
 
@@ -2059,7 +1827,7 @@ bot.action(/^taskCancel-(\d+)$/, async (ctx) => {
     if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
     pendingTask.delete(userId.toString());
-    await ctx.answerCbQuery(lang === 'he' ? 'בוטל' : 'Cancelled');
+    await ctx.answerCbQuery(getText('cancelledToast', lang));
     await ctx.editMessageText(getText('taskCancelled', lang)).catch(() => { });
 });
 
@@ -2209,10 +1977,9 @@ bot.on('text', async (ctx) => {
         // Handle pending datetime input for interval editing
         const uid = userInfo.uid.toString();
         if (pendingEdits.has(uid)) {
-            const cancelWords = ['ביטול', 'בטל', 'cancel', 'stop', 'quit'];
-            if (cancelWords.includes(userText.trim().toLowerCase())) {
+            if (isCancelWord(userText)) {
                 pendingEdits.delete(uid);
-                await ctx.reply(lang === 'he' ? 'העריכה בוטלה.' : 'Edit cancelled.');
+                await ctx.reply(getText('editCancelled', lang));
                 return;
             }
 
@@ -2263,10 +2030,9 @@ bot.on('text', async (ctx) => {
         if (pendingTimerSave.has(uid) && pendingTimerSave.get(uid).pendingField) {
             const state = pendingTimerSave.get(uid);
             const field = state.pendingField;
-            const cancelWords = ['ביטול', 'בטל', 'cancel', 'stop', 'quit'];
             const trimmed = userText.trim();
 
-            if (cancelWords.includes(trimmed.toLowerCase())) {
+            if (isCancelWord(trimmed)) {
                 // Only the field is abandoned, not the save: the card comes
                 // back so the member can still file the hours.
                 state.pendingField = null;
@@ -2337,7 +2103,7 @@ bot.on('text', async (ctx) => {
                 sale.startDate = iso;
             } else if (field === 'finishDate') {
                 const trimmed = userText.trim();
-                if (trimmed === '-' || trimmed.toLowerCase() === 'none' || trimmed === 'אין') {
+                if (trimmed === '-' || NONE_WORDS.includes(trimmed.toLowerCase())) {
                     sale.finishDate = null;
                 } else {
                     const iso = parseSaleDate(trimmed);
@@ -2360,8 +2126,7 @@ bot.on('text', async (ctx) => {
 
         // Handle pending task name input → create the task
         if (pendingTask.has(uid) && pendingTask.get(uid).pendingField === 'name') {
-            const cancelWords = ['ביטול', 'בטל', 'cancel', 'stop', 'quit'];
-            if (cancelWords.includes(userText.trim().toLowerCase())) {
+            if (isCancelWord(userText)) {
                 pendingTask.delete(uid);
                 await ctx.reply(getText('taskCancelled', lang));
                 return;

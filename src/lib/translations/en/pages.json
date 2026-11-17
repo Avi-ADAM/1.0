@@ -205,7 +205,17 @@
     },
     "gone": "This mission is no longer available",
     "goneBody": "It may have been assigned, closed or removed. There are plenty of other open missions.",
-    "otherMissions": "See other missions and all your updates"
+    "otherMissions": "See other missions and all your updates",
+    "myCandidacy": {
+      "hint": "You applied for this mission. Until the rikma approves it, you can withdraw.",
+      "withdraw": "Withdraw my candidacy",
+      "confirm": "Withdraw your candidacy? The rikma’s members will be told. You can apply again later.",
+      "confirmYes": "Yes, withdraw",
+      "cancel": "Cancel",
+      "withdrawn": "Your candidacy was withdrawn. You can apply again at any time.",
+      "failed": "We could not withdraw the candidacy right now. Please try again in a moment.",
+      "allMine": "All my requests"
+    }
   },
   "gift": {
     "gift": "Product",

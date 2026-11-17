@@ -57,7 +57,7 @@ import {
 import { listMyMatchesTool } from '../../../mastra/tools/matchTools';
 import { getMyStakeTool } from '../../../mastra/tools/stakeTools';
 import { getDecisionTool } from '../../../mastra/tools/decisionTools';
-import { applyToMissionTool, listMyApplicationsTool, mcpApplyEnabled } from '../../../mastra/tools/joinTools';
+import { applyToMissionTool, listMyApplicationsTool, withdrawCandidacyTool, mcpApplyEnabled } from '../../../mastra/tools/joinTools';
 import { getRikmaLedgerTool } from '../../../mastra/tools/ledgerTools';
 import { findPartnersTool } from '../../../mastra/tools/partnerTools';
 import {
@@ -310,6 +310,9 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   // gap, every customer of that deal - signs. No projectId input: the rikma is read
   // from the opening, and the key scope is checked in the tool. On unless MCP_APPLY_ENABLED=false.
   applyToMissionTool: { tool: applyToMissionTool, title: "Apply to an open mission", tier: 'consentWrite', enabled: mcpApplyEnabled },
+  // Takes that candidacy back: only the caller's own Ask/Askm (the action reads the
+  // owner from the row), the key scope checked in the tool. Same kill switch.
+  withdrawCandidacyTool: { tool: withdrawCandidacyTool, title: "Withdraw my candidacy", tier: 'selfWrite', enabled: mcpApplyEnabled },
 
   // --- sharedWrite (needs MCP_WRITE_SCOPE) ---
   createMissionTool: { tool: createMissionTool, title: "Create an open mission", tier: 'sharedWrite', project: 'member' },

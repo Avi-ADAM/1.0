@@ -61,7 +61,9 @@ describe('MCP tool manifest', () => {
       // The caller's own candidacy, usually in a rikma they are not in yet: the
       // rikma comes from the opening, and the tool checks the key scope itself
       // (joinLoopTools.test.ts "outside the key scope").
-      'applyToMissionTool'
+      'applyToMissionTool',
+      // Taking that candidacy back: the action checks the candidate from the row.
+      'withdrawCandidacyTool'
     ];
     for (const [name, entry] of entries) {
       if (entry.tier === 'read' || entry.tier === 'prepare') continue;

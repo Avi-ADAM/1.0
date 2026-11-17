@@ -46,6 +46,48 @@
   /** The role rules shown with the terms — applying agrees to them (PLAN_SHOP_OPERATIONS §2.3). */
   const acceptedRuleIds = $derived((data.roleRules ?? []).map((r) => r.stepId));
 
+  /**
+   * My candidacy still on the table for this opening (the server read it). A
+   * candidate who is not in the rikma yet cannot open its vote page, so this
+   * page is where they see it and take it back (`withdrawCandidacy` — archived,
+   * never deleted; the rikma's members are told).
+   */
+  let myAskId = $state(/** @type {string | null} */ (null));
+  $effect.pre(() => {
+    myAskId = data.myAskId ?? null;
+  });
+  let confirmingWithdraw = $state(false);
+  let withdrawing = $state(false);
+  let withdrawnNote = $state(false);
+
+  async function withdrawMine() {
+    const pid = data.alld?.attributes?.project?.data?.id;
+    if (withdrawing || !myAskId || !pid) return;
+    withdrawing = true;
+    try {
+      const result = await executeAction('withdrawCandidacy', {
+        side: 'ask',
+        id: String(myAskId),
+        projectId: String(pid)
+      });
+      if (!result.success) {
+        toast.error(result.error?.message ?? $t('pages.availMission.myCandidacy.failed'));
+        return;
+      }
+      myAskId = null;
+      alr = false;
+      success = false;
+      withdrawnNote = true;
+      toast.success($t('pages.availMission.myCandidacy.withdrawn'));
+    } catch (error) {
+      console.error('[availableMission] withdraw failed:', error);
+      toast.error($t('pages.availMission.myCandidacy.failed'));
+    } finally {
+      withdrawing = false;
+      confirmingWithdraw = false;
+    }
+  }
+
   async function ask() {
     alr = true;
     const inD = data.alld;
@@ -96,6 +138,8 @@
         return;
       }
 
+      if (result.data?.askId) myAskId = String(result.data.askId);
+      withdrawnNote = false;
       success = true;
       setTimeout(() => { success = false; }, 15000);
       toast.success(`${$t('pages.availMission.fnnn')}`);
@@ -137,6 +181,8 @@
       }
       closeNego();
       alr = true;
+      if (result.data?.askId) myAskId = String(result.data.askId);
+      withdrawnNote = false;
       success = true;
       setTimeout(() => { success = false; }, 15000);
       toast.success(`${$t('pages.availMission.fnnn')}`);
@@ -749,8 +795,44 @@
                     </div>
                   </fieldset>
                 {/if}
+                {#if withdrawnNote && !myAskId}
+                  <p class="text-barbi text-center mt-5" role="status">{$t('pages.availMission.myCandidacy.withdrawn')}</p>
+                {/if}
                 <div class="flex flex-wrap gap-3 justify-center items-center">
-                  {#if alr == false && !(data.alld.attributes.users?.data ?? [])
+                  {#if myAskId}
+                    <div class="mx-auto mt-7 flex max-w-md flex-col items-center gap-3 rounded-xl border border-gold/60 p-4 text-center text-barbi">
+                      <p>{$t('pages.availMission.myCandidacy.hint')}</p>
+                      {#if confirmingWithdraw}
+                        <p class="font-bold">{$t('pages.availMission.myCandidacy.confirm')}</p>
+                        <div class="flex flex-wrap justify-center gap-2">
+                          <button
+                            type="button"
+                            onclick={() => (confirmingWithdraw = false)}
+                            disabled={withdrawing}
+                            class="rounded-full border border-gold px-4 py-2 text-gold disabled:opacity-60"
+                            >{$t('pages.availMission.myCandidacy.cancel')}</button
+                          >
+                          <button
+                            type="button"
+                            onclick={withdrawMine}
+                            disabled={withdrawing}
+                            class="button-perl rounded-full px-4 py-2 font-bold text-barbi disabled:opacity-60"
+                            >{$t('pages.availMission.myCandidacy.confirmYes')}</button
+                          >
+                        </div>
+                      {:else}
+                        <button
+                          type="button"
+                          onclick={() => (confirmingWithdraw = true)}
+                          class="rounded-full border border-barbi px-4 py-2 font-bold text-barbi hover:bg-barbi hover:text-gold"
+                          >{$t('pages.availMission.myCandidacy.withdraw')}</button
+                        >
+                      {/if}
+                      <a href="/lev?focus=myapp" class="text-sm underline decoration-dotted underline-offset-2"
+                        >{$t('pages.availMission.myCandidacy.allMine')}</a
+                      >
+                    </div>
+                  {:else if alr == false && !(data.alld.attributes.users?.data ?? [])
                       .map((c) => c.id)
                       .includes(data.uid)}
                     <button

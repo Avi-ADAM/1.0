@@ -11,5 +11,14 @@
     "recorded": "Your vote is recorded. The proposal is waiting for the other members.",
     "recordedNo": "Your objection is recorded. The proposal will not pass on these terms — you can offer different terms in a negotiation round.",
     "missing": "This item was not found or has already been archived."
+  },
+  "withdraw": {
+    "hint": "This is your candidacy. Until the rikma approves it, you can withdraw it.",
+    "button": "Withdraw my candidacy",
+    "confirm": "Withdraw your candidacy? The rikma’s members will be told, and the vote on it will close. You can apply again later.",
+    "confirmYes": "Yes, withdraw",
+    "cancel": "Cancel",
+    "done": "Your candidacy was withdrawn. The opening stays open, and you can apply again at any time.",
+    "failed": "We could not withdraw the candidacy right now. Please try again in a moment."
   }
 }

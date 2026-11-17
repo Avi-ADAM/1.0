@@ -481,6 +481,11 @@ export const qidsAccess = {
   'reviveLapsedAsk': { allow: ['user', 'serviceAdmin'] },
   'projectLapsedAsks': { allow: ['user', 'serviceAdmin'] },
   'standingAskByUserAndMission': { allow: ['serviceAdmin'] },
+  // withdrawCandidacy only: the action checks the candidate from the row itself.
+  'askForWithdrawal': { allow: ['serviceAdmin'] },
+  'askmForWithdrawal': { allow: ['serviceAdmin'] },
+  'withdrawAsk': { allow: ['serviceAdmin'] },
+  'withdrawAskm': { allow: ['serviceAdmin'] },
   'getActiveTimegramaForAskm': { allow: ['user', 'serviceAdmin'] },
   'getAskProjectRestime': { allow: ['user', 'serviceAdmin'] },
   'getAskmProjectRestime': { allow: ['user', 'serviceAdmin'] },

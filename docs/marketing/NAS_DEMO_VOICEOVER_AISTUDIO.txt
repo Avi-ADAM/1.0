@@ -1,0 +1,174 @@
+NAS DEMO — קריינות להפקה ב-Google AI Studio (Generate speech)
+מקור הטקסט: docs/marketing/NAS_DEMO_VOICEOVER.txt — הנוסח זהה מילה במילה, רק מוכן ל-TTS.
+
+=====================================================================
+איך עובדים עם הקובץ
+=====================================================================
+1. ב-AI Studio: Generate media ← Speech. מצב Single-speaker.
+2. קול מומלץ: Sadaltager (בטוח, "יודע על מה הוא מדבר", חם).
+   חלופות: Charon (רציני ואינפורמטיבי, טון של מוצר) · Achird (ידידותי, יותר צעיר).
+   מומלץ להפיק את פסקה 1 בשלושתם ולבחור לפני שממשיכים — ואז לא להחליף קול באמצע.
+3. בשדה Style instructions מדביקים פעם אחת את ה"הנחיה הכללית" למטה.
+4. כל פסקה מפיקים בנפרד: מדביקים את הבלוק שלה (שורת ההנחיה + הטקסט) בתיבת הטקסט.
+   כך כל קובץ אודיו תואם סצנה אחת, וקל לחתוך ולסנכרן בעריכה.
+5. אם יצא מהר/איטי מדי — לא לשנות את הטקסט, רק את המילה בהנחיה
+   ("slightly slower" / "a touch faster"). ה-Temperature: להשאיר ברירת מחדל;
+   אם הקול "משחק" יותר מדי, להוריד ל-0.7 בערך.
+6. לייצא WAV, לשמור בשם nas_vo_01.wav … nas_vo_07.wav.
+
+הגייה — כבר כתובה בטקסט כך שהמודל לא יטעה:
+- 1lev1  → "one lev one"  (lev כמו "לב": L-E-V, לא "level")
+- MCP    → "M. C. P." באותיות
+- 1,000 / 400 / 40% → כתובים במילים, כדי שלא יוקראו "one thousand shekels" או "four zero zero"
+- Maya = MY-ah · Dan = כמו באנגלית · Nas = "nahs" (a ארוכה)
+
+=====================================================================
+הנחיה כללית — להדביק ב-Style instructions
+=====================================================================
+You are the narrator of a short product demo video. Speak in clear, natural
+American English. Warm, calm and confident — a founder explaining something
+they believe in to a smart audience, not an advertisement. No hype, no
+announcer voice, no smiling-through-the-words. Medium-low pitch, relaxed
+pace with real pauses between sentences, so the viewer can watch the screen.
+Every sentence ends cleanly downward; never end a sentence on a rising,
+questioning tone. Keep the same voice, energy and microphone distance in every
+take, as if all lines were recorded in one sitting.
+
+=====================================================================
+פסקה 1 · 0:00–0:12 (≈12 שניות) · פתיחה, על המצלמה
+=====================================================================
+מה רואים: אתה בפריים.
+אופי: שקט ורציני. המשפט הראשון הוא בעיה — לתת לו לשקוע. "combine people" — הדגשה
+קלה. אחרי פסיק של "partners" — הפסקה קצרה, ו-"through their agents" כגילוי קטן.
+
+--- להדביק ---
+Read slowly and thoughtfully, like the opening line of a story. Leave a full
+pause after the first sentence. Put gentle weight on "fragile" and on
+"combine people". After "partners", take a short breath, then say "through
+their agents" a little softer, like a reveal:
+
+A one-person business is fragile. Big companies win because they combine people.
+Watch two solo creators become partners, through their agents.
+--- סוף ---
+
+
+=====================================================================
+פסקה 2 · 0:12–0:35 (≈23 שניות) · מאיה מבקשת עורך וידאו
+=====================================================================
+מה רואים: הצ'אט של מאיה, "I need a video editor who'll work for a share", הסוכן מוצא את דן.
+אופי: מספר סיפור, ענייני. יש הרבה זמן בסצנה — קצב איטי והפסקות. ההדגשה על "real people"
+ועל "by skill" (זה ההבדל ממנוע חיפוש).
+
+--- להדביק ---
+Read in a calm storytelling tone, unhurried, with a clear pause between the
+two sentences. Stress "real people", then a tiny pause, and "by skill" as a
+quiet, matter-of-fact point:
+
+Maya teaches coding courses. She tells her agent she needs a video editor who'll
+work for a share. Her agent finds real people, by skill.
+--- סוף ---
+
+
+=====================================================================
+פסקה 3 · 0:35–0:55 (≈20 שניות) · הסוכן מנסח את הרקמה
+=====================================================================
+מה רואים: הטיוטה, מאיה פותחת את הקישור ויוצרת בלחיצה.
+אופי: הרשימה "her mission, the editor's mission, the hours and the rate" — בקצב של
+פריטים, כל אחד נפרד. המשפט האחרון הוא עיקרון — לאט, יציב, מודגש.
+
+--- להדביק ---
+Read clearly. After the colon, list the four items with a light, even rhythm,
+a small pause between each. Then slow down for the last sentence: say "The
+agent never signs for her" firmly and slowly, as a principle, with weight on
+"never":
+
+It drafts the partnership: her mission, the editor's mission, the hours and the rate.
+She confirms with one click. The agent never signs for her.
+--- סוף ---
+
+
+=====================================================================
+פסקה 4 · 0:55–1:20 (≈25 שניות) · הצד של דן
+=====================================================================
+מה רואים: הצ'אט של דן, "Anything that fits me?", התאמה אחת, "Apply".
+אופי: מעבר צד — "On the other side" כמו חיתוך בעריכה. המספרים פשוט ומדויק,
+בלי התלהבות. "He applies." — קצר, סוגר.
+
+--- להדביק ---
+Read with a slight shift of energy, like cutting to a new scene. Pause after
+"On the other side". Say the numbers plainly and precisely, with a short
+pause after "twenty hours". End with "He applies." short and final:
+
+On the other side, Dan's agent has already matched him to Maya's mission,
+on his skill. Twenty hours, a hundred an hour. He applies.
+--- סוף ---
+
+
+=====================================================================
+פסקה 5 · 1:20–1:40 (≈20 שניות) · מאיה מאשרת
+=====================================================================
+מה רואים: "What's waiting for me?", הבקשה של דן, היא פותחת וחותמת.
+אופי: "No bosses, no vetoes" — הלב של הפלטפורמה. שתי מילים, שתי הפסקות.
+"approves, asks, or counters" — שלוש אפשרויות ברורות. סוף המשפט מרגיע.
+(שים לב: בסצנה הזו לא אומרים כלום על שתיקה — זה במכוון, ראה הערות בקובץ המקורי.)
+
+--- להדביק ---
+Read warmly. Pause after "Back to Maya." Say "No bosses, no vetoes" slowly,
+with a clear beat between the two phrases — this is the key idea. Then list
+"approves, asks, or counters" as three distinct choices, and finish the
+sentence in a reassuring, settled tone:
+
+Back to Maya. Dan asked to join. No bosses, no vetoes:
+she approves, asks, or counters, and nothing binds her until she does.
+--- סוף ---
+
+
+=====================================================================
+פסקה 6 · 1:40–2:05 (≈25 שניות) · שלושה שבועות אחר כך
+=====================================================================
+מה רואים: כרטיס "3 weeks later", החלק של דן 40%, מכירה 1,000 / 400 לדן,
+ההצעה החדשה שתאושר בשתיקה בעוד 48 שעות.
+אופי: הפסקה הארוכה והחשובה ביותר — קצב רגיל (לא איטי), כי יש בה הרבה תוכן.
+"Three weeks later." — כמו כותרת, ואז הפסקה. "forty percent" — הדגשה.
+המשפט האחרון "silence is consent" — מאט, זה הרעיון השני הכי חשוב בסרטון.
+
+--- להדביק ---
+Read at a natural, steady pace — a little more momentum than before, but
+never rushed. Say "Three weeks later." like a title card, then a full pause.
+Stress "ownership" and "forty percent". Read the second sentence smoothly
+and confidently. Before the last sentence, take a breath; then slow down
+and give real weight to "silence is consent", ending calmly on "the partners set":
+
+Three weeks later. Every approved hour became ownership: Dan holds forty percent.
+The first sale was split by it, automatically and transparently, and his part is on its way.
+And when Dan proposes new work, silence is consent, on a clock the partners set.
+--- סוף ---
+
+
+=====================================================================
+פסקה 7 · 2:05–2:20 (≈15 שניות) · סגירה
+=====================================================================
+מה רואים: שקופית Nas agent ↔ MCP ↔ 1lev1 · 1lev1.com/mcp
+אופי: המשפט הראשון — החזון, חם ובטוח, הדגשה על "Together" ועל "like a company".
+המשפט האחרון — הזמנה פשוטה וישירה. הכתובת לאט ובבהירות, כאילו מכתיבים אותה.
+
+--- להדביק ---
+Read warmly and with quiet conviction — this is the closing. Stress
+"Together" and "like a company". Pause. Then say the last two sentences as a
+simple, direct invitation. Read the web address slowly and distinctly, as if
+dictating it, with "M. C. P." spelled out letter by letter. End with a
+calm, downward finish and no rising tone:
+
+Nahs helps one person start. Together, we let them build like a company.
+The server is live. Your team can try it today, at one lev one dot com, slash M. C. P.
+--- סוף ---
+
+
+=====================================================================
+בדיקה אחרי ההפקה
+=====================================================================
+- אורך כולל צריך לצאת בסביבות 2:00–2:15 (נשאר מקום לנשימות בעריכה).
+- להאזין במיוחד ל: "one lev one" (לא "one level one"), "M. C. P.", "forty percent".
+- אם "Nahs" נשמע מוזר — לנסות "Nas" כמו שכתוב, או "Nahss".
+- אם פסקה 6 יוצאת ארוכה מ-25 שניות — להפיק שוב עם "a touch faster",
+  לא לקצר טקסט.

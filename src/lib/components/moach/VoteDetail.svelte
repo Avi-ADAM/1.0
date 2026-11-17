@@ -24,6 +24,7 @@
   import { goto } from '$app/navigation';
   import { isRtl, t } from '$lib/translations';
   import { sendToSer } from '$lib/send/sendToSer.js';
+  import { executeAction } from '$lib/client/actionClient';
   import { useRealtime } from '$lib/realtime/bus.svelte';
   import { projects } from '$lib/stores/projectStore.js';
   import {
@@ -111,6 +112,47 @@
   // something different: it blocks these terms until a new round replaces them.
   let votedNo = $state(false);
 
+  // ── The candidate taking back their own candidacy (withdrawCandidacy) ──
+  // Shown only to the person named on the Ask / Askm, while it is still open.
+  // The server checks the same thing from the row; this only hides the button.
+  let liveEntity = $state(null);
+  let withdrawnFor = $state(null);
+  let withdrawn = $derived(withdrawnFor != null && withdrawnFor === entityId);
+  let confirmingWithdraw = $state(false);
+  let withdrawing = $state(false);
+  let withdrawError = $state('');
+  let canWithdraw = $derived.by(() => {
+    if (kind !== 'ask' && kind !== 'askm') return false;
+    const a = (liveEntity ?? entity)?.attributes;
+    if (!a || a.archived === true || a.lapsedAt) return false;
+    if (String(a.users_permissions_user?.data?.id ?? '') !== String(uid)) return false;
+    // An offer the rikma made to this person is answered on the card, not withdrawn.
+    if (kind === 'ask' && a.open_mission?.data?.attributes?.isRishon === true) return false;
+    // An Askm riding a pending resource vote is not an offer on an open resource.
+    if (kind === 'askm' && !a.open_mashaabim?.data) return false;
+    return true;
+  });
+
+  async function withdraw() {
+    withdrawing = true;
+    withdrawError = '';
+    try {
+      const res = await executeAction('withdrawCandidacy', { side: kind, id: entityId, projectId: String(projectId) });
+      if (res?.success) {
+        withdrawnFor = entityId;
+        closedFor = entityId;
+      } else {
+        withdrawError = $t('vots.withdraw.failed');
+      }
+    } catch (e) {
+      console.error('[VoteDetail] withdraw failed', e);
+      withdrawError = $t('vots.withdraw.failed');
+    } finally {
+      withdrawing = false;
+      confirmingWithdraw = false;
+    }
+  }
+
   function upsertById(arr, item) {
     const others = (arr || []).filter((x) => String(x.id) !== String(item.id));
     return item ? [...others, item] : others;
@@ -121,6 +163,7 @@
   // refetch passes a fresh entity here.
   function seedFromEntity(ent) {
     if (!ent) return;
+    liveEntity = ent;
     // A finish approval stays readable after it closes (archived), unlike the
     // proposals the other kinds fetch — a closed one is over, not missing.
     if (kind === 'fini' && ent.attributes?.archived === true) {
@@ -310,7 +353,9 @@
       class="rounded-2xl bg-white dark:bg-gray-800 shadow-lg p-8 text-center space-y-4"
     >
       <div class="text-4xl">✨</div>
-      <p class="text-lg font-bold text-gray-800 dark:text-gray-100">{$t('vots.voteDetail.closed')}</p>
+      <p class="text-lg font-bold text-gray-800 dark:text-gray-100">
+        {withdrawn ? $t('vots.withdraw.done') : $t('vots.voteDetail.closed')}
+      </p>
       <a
         href={backHref}
         class="inline-block px-5 py-2.5 bg-blue-500 text-white font-bold rounded-xl"
@@ -727,6 +772,46 @@
         users={buble.users}
         sqadualed={buble.sqadualed}
       />
+    </div>
+  {/if}
+
+  {#if browser && mounted && !closed && canWithdraw}
+    <div
+      class="mt-4 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+    >
+      {#if confirmingWithdraw}
+        <p class="mb-3">{$t('vots.withdraw.confirm')}</p>
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            class="rounded-lg bg-gray-800 px-4 py-2 font-bold text-white disabled:opacity-60 dark:bg-gray-100 dark:text-gray-900"
+            disabled={withdrawing}
+            onclick={withdraw}
+          >
+            {$t('vots.withdraw.confirmYes')}
+          </button>
+          <button
+            type="button"
+            class="rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-600"
+            disabled={withdrawing}
+            onclick={() => (confirmingWithdraw = false)}
+          >
+            {$t('vots.withdraw.cancel')}
+          </button>
+        </div>
+      {:else}
+        <p class="mb-2">{$t('vots.withdraw.hint')}</p>
+        <button
+          type="button"
+          class="rounded-lg border border-gray-300 px-4 py-2 font-bold dark:border-gray-600"
+          onclick={() => (confirmingWithdraw = true)}
+        >
+          {$t('vots.withdraw.button')}
+        </button>
+      {/if}
+      {#if withdrawError}
+        <p class="mt-2 text-red-700 dark:text-red-300" role="alert">{withdrawError}</p>
+      {/if}
     </div>
   {/if}
 </div>

@@ -206,7 +206,17 @@
     },
     "gone": "Esta misión ya no está disponible",
     "goneBody": "Puede que se haya asignado, cerrado o retirado. Hay muchas otras misiones abiertas.",
-    "otherMissions": "Ver otras misiones y todas tus novedades"
+    "otherMissions": "Ver otras misiones y todas tus novedades",
+    "myCandidacy": {
+      "hint": "Te postulaste a esta misión. Mientras la rikma no la apruebe, puedes retirarte.",
+      "withdraw": "Retirar mi candidatura",
+      "confirm": "¿Retirar tu candidatura? Se avisará a los miembros de la rikma. Puedes volver a postularte más adelante.",
+      "confirmYes": "Sí, retirar",
+      "cancel": "Cancelar",
+      "withdrawn": "Tu candidatura fue retirada. Puedes volver a postularte cuando quieras.",
+      "failed": "No pudimos retirar la candidatura ahora. Inténtalo de nuevo en un momento.",
+      "allMine": "Todas mis solicitudes"
+    }
   },
   "gift": {
     "gift": "Producto",

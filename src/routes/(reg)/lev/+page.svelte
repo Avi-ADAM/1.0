@@ -53,6 +53,7 @@
   import { executeAction } from '$lib/client/actionClient';
   import { shiftWorkStore } from '$lib/utils/levShifts';
   import { fulfillWorkStore, fulfillRuleStore, FULFILL_REALTIME_KEYS } from '$lib/utils/levFulfill';
+  import { myApplicationsStore, MY_APPLICATION_ANI } from '$lib/utils/levMyApplications';
 
   // Dialog components
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -214,6 +215,8 @@
   function clearFocus() {
     focusFilter = null;
     projectFilter.set(null);
+    // My requests are not a to-do: they live only in their focused view.
+    myApplicationsStore.set([]);
   }
 
   // Dialog state
@@ -344,6 +347,20 @@
     }
   }
 
+  // My requests (hub → /lev?focus=myapp): the candidacies I sent that the
+  // rikma has not answered. Most sit in rikmas I am not in yet, so the main
+  // query never sees them; read only for this focused view.
+  async function loadMyApplications() {
+    try {
+      const res = await executeAction('getMyApplications', {});
+      if (res?.success && res.data) myApplicationsStore.set(res.data.applications ?? []);
+      else toast.error($t('lev.myapp.loadFailed'));
+    } catch (e) {
+      console.error('[MyApplications] load failed:', e);
+      toast.error($t('lev.myapp.loadFailed'));
+    }
+  }
+
   function handleCoinLapach(event) {
     // Remove item from display optimistically
     displayItems = displayItems.filter(
@@ -427,7 +444,13 @@
     };
 
     try {
-      if (focusAni && get(dataMode) !== 'full') {
+      if (focusAni && anisForFocus(focusAni).includes(MY_APPLICATION_ANI)) {
+        // My requests come from their own read — show them at once; the rest
+        // of the heart (which rikmas I am in) fills in behind.
+        await loadMyApplications();
+        loading = false;
+        if (get(dataMode) !== 'full') initializeLevData(page.data.uid, '', data.lang).catch(handleBackgroundError);
+      } else if (focusAni && get(dataMode) !== 'full') {
         // Quantum (fast) path: load only the requested slice(s), then kick off
         // the full query 83 in the background so the page becomes complete
         // quietly. Skipped when full data is already in memory (client-side

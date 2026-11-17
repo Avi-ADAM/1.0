@@ -63,7 +63,10 @@ const RENDERABLE = new Set([
   // Order automation (PLAN_SHOP_OPERATIONS §2.2–2.3) — ungated: work, or a
   // rule that would land work on me, addressed to me.
   'fulfill',
-  'fulfillRule'
+  'fulfillRule',
+  // A candidacy I sent, still unanswered — only under ?focus=myapp (the hub's
+  // "my requests"), never in the ordinary deck: the next move is the rikma's.
+  'myapp'
 ]);
 
 /**
@@ -127,7 +130,8 @@ const KIND_META = {
   shiftStarting: { key: 'shiftStarting', glow: 'teal' },
   shiftLog: { key: 'shiftLog', glow: 'teal' },
   fulfill: { key: 'fulfill', glow: 'orange' },
-  fulfillRule: { key: 'fulfillRule', glow: 'orange' }
+  fulfillRule: { key: 'fulfillRule', glow: 'orange' },
+  myapp: { key: 'myapp', glow: 'blue' }
 };
 
 /** Translation key for a kind's label, e.g. `lev.list.kind.pends`. */
@@ -278,7 +282,8 @@ export const WHEN_KINDS = [
   'stipend',
   'promotion',
   'sheirutp',
-  'wishoffer'
+  'wishoffer',
+  'myapp'
 ];
 
 /**
@@ -726,6 +731,15 @@ const ROW_CONTENT = {
       : T(b.proposedByName)
         ? K('lev.list.sub.fulfillRule', { name: T(b.proposedByName)?.text })
         : K('lev.list.sub.fulfillRuleAnon')
+  }),
+
+  // ── a candidacy I sent (the hub's "my requests") ────────────────────────
+  myapp: (b) => ({
+    title: T(b.name),
+    subtitle: K(b.kind === 'resource' ? 'lev.list.sub.myappResource' : 'lev.list.sub.myappMission', {
+      name: T(b.rikmaName)?.text ?? T(b.projectName)?.text ?? ''
+    }),
+    facts: chips(f('hours', n(b.terms?.hours)), f('rate', n(b.terms?.rate)))
   })
 };
 
@@ -810,7 +824,8 @@ const CTA_BY_ANI = {
   shiftStarting: 'answer',
   shiftLog: 'answer',
   fulfill: 'answer',
-  fulfillRule: 'answer'
+  fulfillRule: 'answer',
+  myapp: 'view'
 };
 
 /** Translation key for the row's primary button. */

@@ -1,0 +1,179 @@
+{
+  "id": "nas-demo-site",
+  "title": "Nas demo — site shots (read-only)",
+  "audience": "Nas.com product and engineering team",
+  "language": "en",
+  "$comment": "B-roll for docs/marketing/NAS_DEMO_VOICEOVER.txt. Every scene only reads: no click here writes. The writes (creating the rikma, Dan applying, Maya signing) are filmed live in claude.ai. Rikma 103 = 'Demo · Calm Coding Course' (Rikma B, 3 weeks later); 105 = the rikma created in the dry run. If the claude.ai take creates a new rikma, set vars.rikmaA to its id.",
+  "vars": {
+    "rikmaA": "106",
+    "rikmaB": "103",
+    "dan": "270"
+  },
+  "defaults": {
+    "pace": 1.2,
+    "localStorage": {
+      "lev:view": "list",
+      "moachGuide_${rikmaA}": "done",
+      "moachGuide_${rikmaB}": "done"
+    }
+  },
+  "warmup": [
+    "/user/${dan}",
+    "/project/${rikmaA}",
+    "/moach/${rikmaB}/split",
+    "/moach/${rikmaB}/sales",
+    "/lev"
+  ],
+  "scenes": [
+    {
+      "id": "s1-dan-profile",
+      "title": "Dan's public profile",
+      "session": "maya",
+      "narration": "Her agent finds real people, by skill.",
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/user/${dan}?theme=personal"
+        }
+      ],
+      "lead": 800,
+      "steps": [
+        {
+          "do": "wait",
+          "ms": 2500
+        },
+        {
+          "do": "scroll",
+          "y": 400,
+          "pause": 1800
+        },
+        {
+          "do": "scroll",
+          "y": 0,
+          "pause": 1200
+        }
+      ],
+      "tail": 600
+    },
+    {
+      "id": "s2-rikma-a",
+      "title": "The new rikma, with both partners",
+      "session": "maya",
+      "narration": "It drafts the partnership. She confirms with one click.",
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/project/${rikmaA}?theme=personal"
+        }
+      ],
+      "lead": 800,
+      "steps": [
+        {
+          "do": "wait",
+          "ms": 2500
+        },
+        {
+          "do": "scroll",
+          "y": 500,
+          "pause": 2000
+        },
+        {
+          "do": "scroll",
+          "y": 1000,
+          "pause": 2000
+        }
+      ],
+      "tail": 600
+    },
+    {
+      "id": "s3-stake",
+      "title": "Shares: 60 / 40 from approved hours",
+      "session": "dan",
+      "narration": "Every approved hour became ownership: Dan holds forty percent.",
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaB}/split?theme=business"
+        }
+      ],
+      "lead": 800,
+      "steps": [
+        {
+          "do": "wait",
+          "ms": 1500
+        },
+        {
+          "do": "scroll",
+          "y": 500,
+          "pause": 3500
+        },
+        {
+          "do": "scroll",
+          "y": 850,
+          "pause": 3000
+        }
+      ],
+      "tail": 600
+    },
+    {
+      "id": "s4-sales",
+      "title": "The first sale and Dan's 400",
+      "session": "dan",
+      "narration": "The first sale was split by it, automatically and transparently, and his part is on its way.",
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaB}/sales?theme=business"
+        }
+      ],
+      "lead": 800,
+      "steps": [
+        {
+          "do": "wait",
+          "ms": 1500
+        },
+        {
+          "do": "scroll",
+          "y": 500,
+          "pause": 3000
+        },
+        {
+          "do": "scroll",
+          "y": 1000,
+          "pause": 3000
+        },
+        {
+          "do": "scroll",
+          "y": 1500,
+          "pause": 3000
+        }
+      ],
+      "tail": 600
+    },
+    {
+      "id": "s5-silence-clock",
+      "title": "Dan's new mission, on the rikma's clock",
+      "session": "maya",
+      "narration": "And when Dan proposes new work, silence is consent, on a clock the partners set.",
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/lev?focus=pends&project=${rikmaB}&theme=personal"
+        }
+      ],
+      "lead": 800,
+      "steps": [
+        {
+          "do": "wait",
+          "ms": 3500
+        },
+        {
+          "do": "scroll",
+          "y": 300,
+          "pause": 2200
+        }
+      ],
+      "tail": 800
+    }
+  ]
+}

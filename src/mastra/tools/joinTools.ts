@@ -12,8 +12,13 @@
  * the table (a counter replaces the original), who has signed it, and when
  * silence approves it.
  *
- * Neither tool answers anyone else's proposal. Withdrawing or countering stays
- * on the page each row links to.
+ * `withdrawCandidacyTool` takes one of those candidacies back, on the user's
+ * explicit yes — the `withdrawCandidacy` action, which archives it (never
+ * deletes) and stops its clock. Only the candidate can: the action reads the
+ * owner from the row.
+ *
+ * None of these tools answers anyone else's proposal. Countering stays on the
+ * page each row links to.
  */
 
 import { createTool } from '@mastra/core/tools';
@@ -22,9 +27,9 @@ import { env } from '$env/dynamic/private';
 import { getMcpContext } from '../../lib/server/mcpContext.js';
 import { adminToken } from '../../lib/server/adminToken.js';
 import { voteHref } from '../../lib/notices/links';
+import { shapeApplications as shapeMyApplications } from '../../lib/candidacy/myApplications';
 
 const SITE = 'https://www.1lev1.com';
-const rows = (rel: any): any[] => (Array.isArray(rel?.data) ? rel.data : []);
 const text = (v: unknown): string => (typeof v === 'string' ? v : '');
 const idOf = (rel: any): string | null => (rel?.data?.id != null ? String(rel.data.id) : null);
 const num = (v: unknown): number | null => {
@@ -38,87 +43,19 @@ export function mcpApplyEnabled(): boolean {
 
 // ─── listMyApplications ──────────────────────────────────────────────────────
 
-interface RoundRow {
-  order: number;
-  proposedBy: string | null;
-  status: string | null;
-  hours: number | null;
-  rate: number | null;
-}
-
-/** The round on the table: the last one that was not withdrawn. */
-function standingRound(rounds: RoundRow[]): RoundRow | null {
-  const live = rounds.filter((r) => r.status !== 'withdrawn');
-  return live.length ? live.reduce((a, b) => (b.order >= a.order ? b : a)) : null;
-}
-
-function signers(vots: any[], callerId: string) {
-  const list: any[] = Array.isArray(vots) ? vots.filter(Boolean) : [];
-  const round = list.reduce((m, v) => Math.max(m, Number(v.order) || 0), 0);
-  const ids = new Set<string>();
-  for (const v of list) {
-    if (v.what === true && (Number(v.order) || 0) === round) {
-      const uid = idOf(v.users_permissions_user);
-      if (uid && uid !== String(callerId)) ids.add(uid);
-    }
-  }
-  return ids;
-}
-
-function shapeOne(node: any, kind: 'mission' | 'resource', callerId: string, now: Date) {
-  const a = node?.attributes ?? {};
-  const project = a.project?.data;
-  const members = rows(project?.attributes?.user_1s).map((u) => ({ id: String(u.id), username: text(u.attributes?.username) }));
-  const signedIds = signers(a.vots, callerId);
-
-  const target = kind === 'mission' ? a.open_mission?.data : a.open_mashaabim?.data;
-  const t = target?.attributes ?? {};
-  const rounds: RoundRow[] = rows(kind === 'mission' ? a.negopendmissions : a.nego_mashes).map((r) => {
-    const ra = r.attributes ?? {};
-    return {
-      order: Number(ra.ordern) || 0,
-      proposedBy: ra.proposedBy ?? null,
-      status: ra.status ?? null,
-      hours: num(kind === 'mission' ? ra.noofhours : ra.hm),
-      rate: num(kind === 'mission' ? ra.perhour : ra.price)
-    };
-  });
-  const standing = standingRound(rounds);
-  const original = { hours: num(kind === 'mission' ? t.noofhours : t.hm), rate: num(kind === 'mission' ? t.perhour : t.price) };
-
-  const tg = a.timegrama?.data?.attributes;
-  const deadline = tg?.date && tg.done !== true ? String(tg.date) : null;
-  const projectId = project?.id ? String(project.id) : null;
-  const voteKind = kind === 'mission' ? 'ask' : 'askm';
-
-  return {
-    applicationId: String(node.id),
-    kind,
-    openingId: target?.id ? String(target.id) : null,
-    name: text(t.name),
-    projectId,
-    rikmaName: text(project?.attributes?.projectName),
-    // A counter-proposal replaces the original: the terms on the table are the
-    // last round's, not the opening's.
-    terms: standing ? { hours: standing.hours, rate: standing.rate } : original,
-    countered: !!standing && standing.order > 0,
-    lastProposedBy: standing?.proposedBy ?? 'candidate',
-    rounds: rounds.length,
-    signedBy: members.filter((m) => signedIds.has(m.id)).map((m) => m.username),
-    waitingFor: members.filter((m) => m.id !== String(callerId) && !signedIds.has(m.id)).map((m) => m.username),
-    deadline,
-    silenceApproves: !!deadline && new Date(deadline).getTime() > now.getTime(),
-    createdAt: a.createdAt ? String(a.createdAt) : null,
-    url: projectId ? SITE + voteHref(projectId, voteKind, String(node.id)) : `${SITE}/lev`
-  };
-}
-
-/** Pure: qid mcpMyApplications → the caller's open candidacies, newest first. */
+/**
+ * Pure: qid mcpMyApplications → the caller's open candidacies, newest first.
+ * The shaping is shared with the heart's "my requests" cards
+ * ($lib/candidacy/myApplications); an agent gets absolute links. `url` is the
+ * rikma's vote page (members only); `openingUrl` is the opening's own page,
+ * which a candidate who is not a member yet can open and withdraw from.
+ */
 export function shapeApplications(data: any, callerId: string, now: Date = new Date()) {
-  return [
-    ...rows(data?.asks).map((n) => shapeOne(n, 'mission', callerId, now)),
-    ...rows(data?.askms).map((n) => shapeOne(n, 'resource', callerId, now))
-  ].sort((a, b) => String(b.createdAt ?? '').localeCompare(String(a.createdAt ?? '')));
+  return shapeMyApplications(data, callerId, now).map(({ votePath, openingPath, ...a }) => ({
+    ...a,
+    url: votePath ? SITE + votePath : `${SITE}/lev`,
+    openingUrl: openingPath ? SITE + openingPath : null
+  }));
 }
 
 export const listMyApplicationsTool = createTool({
@@ -126,8 +63,9 @@ export const listMyApplicationsTool = createTool({
   description:
     "The user's own open candidacies: missions they offered to take and resources they offered to bring. For each, " +
     'the terms on the table (after any counter-proposal), who in the rikma has signed and who has not yet, and the ' +
-    'deadline - when it passes with no counter, silence approves the candidacy. Read-only. To withdraw, discuss or ' +
-    'counter, give the user `url`.',
+    'deadline - when it passes with no counter, silence approves the candidacy. Read-only. To withdraw one, use ' +
+    'withdrawCandidacyTool with its applicationId and kind (after the user says yes); to discuss or counter, give ' +
+    'the user `url` if they are a member of that rikma, or `openingUrl` (the public page of the opening, open to anyone) if not.',
   inputSchema: z.object({}),
   execute: async () => {
     const ctx = getMcpContext();
@@ -292,6 +230,94 @@ export const applyToMissionTool = createTool({
     } catch (error) {
       console.error('[applyToMissionTool] failed:', error);
       return { success: false, message: 'Could not send the candidacy right now. Try again shortly.' };
+    }
+  }
+});
+
+// ─── withdrawCandidacy ───────────────────────────────────────────────────────
+
+const WITHDRAW_REFUSALS: Record<string, string> = {
+  'not-found': 'That candidacy was not found.',
+  'not-yours': 'Only the candidate can withdraw a candidacy, and this one is not the user’s.',
+  closed: 'That candidacy is no longer open (accepted, closed or already withdrawn), so there is nothing to withdraw.',
+  'out-of-scope': 'This connection is limited to other rikmas, so it cannot withdraw this candidacy.'
+};
+
+/** Why this candidacy cannot be withdrawn from here, or null when it can. Pure. */
+export function withdrawRefusal(node: any, callerId: string, keyProjects?: string[]): string | null {
+  const a = node?.attributes;
+  if (!a) return 'not-found';
+  if (idOf(a.users_permissions_user) !== String(callerId)) return 'not-yours';
+  if (a.archived === true || a.lapsedAt) return 'closed';
+  const projectId = idOf(a.project);
+  if (keyProjects?.length && (!projectId || !keyProjects.map(String).includes(projectId))) return 'out-of-scope';
+  return null;
+}
+
+export const withdrawCandidacyTool = createTool({
+  id: 'withdrawCandidacy',
+  description:
+    "Withdraw the user's own open candidacy: a mission they offered to take or a resource they offered to bring " +
+    '(a row of listMyApplicationsTool). It is archived, never deleted; its silence clock stops, the rikma\'s members ' +
+    'are told in one line, and the opening stays open so the user can apply again later. Only the candidate can ' +
+    'withdraw - never anyone else\'s proposal. BEFORE calling, name the mission or resource and the rikma to the ' +
+    'user and get their yes - then pass confirmedWithUser: true.',
+  inputSchema: z.object({
+    applicationId: z.string().min(1).describe('applicationId from listMyApplicationsTool.'),
+    kind: z.enum(['mission', 'resource']).describe('kind from listMyApplicationsTool.'),
+    confirmedWithUser: z
+      .literal(true)
+      .describe('true only after the user heard which candidacy and rikma it is and said to withdraw it.')
+  }),
+  execute: async ({ applicationId, kind }) => {
+    const ctx = getMcpContext();
+    if (!ctx?.userId || !ctx.fetchInstance) return { success: false, message: 'Not authenticated.' };
+    const side = kind === 'resource' ? 'askm' : 'ask';
+    try {
+      const { strapiClient, actionService } = await import('../../lib/server/actions/index.js');
+      const res = await strapiClient.execute(
+        side === 'ask' ? 'askForWithdrawal' : 'askmForWithdrawal',
+        { id: String(applicationId) },
+        undefined,
+        ctx.fetchInstance
+      );
+      const node = side === 'ask' ? res?.data?.ask?.data : res?.data?.askm?.data;
+      const refusal = withdrawRefusal(node, String(ctx.userId), ctx.keyProjects);
+      if (refusal) return { success: false, message: WITHDRAW_REFUSALS[refusal] };
+
+      const a = node.attributes;
+      const projectId = idOf(a.project) as string;
+      const opening = side === 'ask' ? a.open_mission?.data : a.open_mashaabim?.data;
+      const name = text(opening?.attributes?.name);
+      const rikmaName = text(a.project?.data?.attributes?.projectName);
+
+      console.log(`[withdrawCandidacyTool] user ${ctx.userId} → ${side} ${applicationId}`);
+      const result = await actionService.executeAction(
+        'withdrawCandidacy',
+        { side, id: String(applicationId), projectId },
+        { userId: String(ctx.userId), jwt: adminToken(), lang: ctx.lang ?? 'en', fetch: ctx.fetchInstance }
+      );
+      if (!result.success) {
+        return {
+          success: false,
+          message: `The candidacy was not withdrawn: ${result.error?.message ?? 'unknown error'}`,
+          url: SITE + voteHref(projectId, side, String(applicationId))
+        };
+      }
+      return {
+        success: true,
+        status: 'withdrawn',
+        applicationId: String(applicationId),
+        kind,
+        name,
+        rikmaName,
+        message:
+          'The candidacy was withdrawn. The rikma\'s members were told, its clock stopped, and the opening stays ' +
+          'open - the user can apply again later.'
+      };
+    } catch (error) {
+      console.error('[withdrawCandidacyTool] failed:', error);
+      return { success: false, message: 'Could not withdraw the candidacy right now. Try again shortly.' };
     }
   }
 });

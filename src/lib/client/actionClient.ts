@@ -404,6 +404,8 @@ export type ActionKey =
   | 'acceptCounterOnAskm'
   | 'acceptCounterOnAsk'
   | 'reviveLapsedAsk'
+  | 'withdrawCandidacy'
+  | 'getMyApplications'
   | 'candidateCounterOnAskm'
   | 'candidateCounterOnAsk'
   | 'customizeOpenMashaabim'
