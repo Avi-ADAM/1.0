@@ -73,7 +73,8 @@
     "resourceChain": "عملية مورد",
     "saleChain": "عملية بيع",
     "loading": "جارٍ التحميل…",
-    "error": "فشل تحميل البيانات"
+    "error": "فشل تحميل البيانات",
+    "nameRequired": "اسم العملية مطلوب."
   },
   "splitDetail": {
     "participants": "شركاء",
@@ -104,7 +105,12 @@
     "date": "التاريخ",
     "buyer": "المشتري",
     "note": "ملاحظة",
-    "status": "الحالة"
+    "status": "الحالة",
+    "holderSelf": "موثّق (ذاتي)",
+    "holderOpen": "بانتظار موافقة {{name}}",
+    "holderAutoApproved": "موافقة تلقائية",
+    "holderConfirmed": "مؤكّد",
+    "holderLegacy": "غير موثّق (قديم)"
   },
   "acts": {
     "assignee": "المكلف",
@@ -133,7 +139,8 @@
     "processPage": "صفحة العملية",
     "id": "معرف",
     "chatSoon": "مناقشة العملية - قريبًا",
-    "chatDesc": "ستظهر هنا سلاسل النقاش وتكامل الدردشة."
+    "chatDesc": "ستظهر هنا سلاسل النقاش وتكامل الدردشة.",
+    "loadMissionError": "تعذّر تحميل المهمة المكتملة"
   },
   "layout": {
     "back": "العودة إلى القائمة",
@@ -168,7 +175,9 @@
     "code": "الكود",
     "stipend": "منح المعيشة",
     "docs": "معلومات مشتركة",
-    "events": "الفعاليات"
+    "events": "الفعاليات",
+    "services": "الخدمات",
+    "vote": "تصويت"
   },
   "create": {
     "mission": "إنشاء مهمة",
@@ -439,5 +448,55 @@
     "viewing": "يتصفح الريكما الآن",
     "viewersOne": "عضو واحد يتصفح الريكما الآن",
     "viewersMany": "{{count}} أعضاء يتصفحون الريكما الآن"
+  },
+  "tables": {
+    "pendingAction": "مهمة قيد الموافقة",
+    "pendingActions": "مهام قيد الموافقة",
+    "openAction": "مهمة مفتوحة",
+    "openActions": "مهام مفتوحة",
+    "inProgressAction": "مهمة قيد التنفيذ",
+    "inProgressActions": "مهام قيد التنفيذ",
+    "publishedResources": "الموارد المطلوبة المنشورة",
+    "options": "خيارات",
+    "mission": "مهمة",
+    "name": "الاسم",
+    "description": "الوصف",
+    "requiredSkills": "المهارات المطلوبة",
+    "roleDefinition": "تعريف الدور",
+    "missionType": "نوع المهمة",
+    "executionDate": "تاريخ التنفيذ",
+    "publicLinks": "روابط عامة",
+    "link": "رابط",
+    "rikmaNotes": "ملاحظات خاصة بالريكما",
+    "rikmaLinks": "روابط خاصة بالريكما",
+    "privateLink": "رابط خاص",
+    "estimatedHours": "كم ساعة يُتوقع أن تستغرق؟",
+    "hourlyRate": "قيمة الساعة",
+    "totalMissionValue": "إجمالي قيمة المهمة",
+    "alreadyCompleted": "أُنجز حتى الآن",
+    "performedBy": "ينفّذها",
+    "edit": "تعديل",
+    "inFavor": "مؤيد",
+    "waiting": "بانتظار",
+    "against": "معترض",
+    "kind": "النوع",
+    "quantity": "الكمية",
+    "startDate": "تاريخ البدء",
+    "endDate": "تاريخ الانتهاء",
+    "specialNotes": "ملاحظات خاصة",
+    "cost": "التكلفة",
+    "monetaryValue": "القيمة المالية",
+    "perMonth": "لكل شهر",
+    "perYear": "لكل سنة",
+    "forWholePeriod": "لكامل الفترة",
+    "perUnit": "للوحدة",
+    "maxRikmaValue": "أقصى قيمة تُحتسب في الريكما",
+    "totalCost": "التكلفة الإجمالية",
+    "totalMaxValue": "إجمالي القيمة القصوى",
+    "resourceLink": "رابط تفاصيل المنتج / السعر / الشراء"
+  },
+  "gantt": {
+    "setup": "تأسيس",
+    "operation": "تشغيل"
   }
 }

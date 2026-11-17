@@ -147,7 +147,7 @@
 
       return {
         id: a.id,
-        name: attr.shem ?? '׳’ג‚¬ג€',
+        name: attr.shem ?? '—',
         clickId: click.id,
         clickKind: click.kind,
         kind: colKindMap[colId],

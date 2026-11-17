@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
-  import { locale } from '$lib/translations';
+  import { locale, t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import {
     fetchTimers,
@@ -310,7 +310,7 @@
 </script>
 
 <svelte:head>
-  <title>{$lang === 'he' ? 'טיימרים' : $lang === 'ar' ? 'المؤقتات' : 'Timers'} · 1lev1</title>
+  <title>{$t('timers.proTitle')} · 1lev1</title>
 </svelte:head>
 
 {#if $isBusiness}

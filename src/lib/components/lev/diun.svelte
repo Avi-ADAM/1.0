@@ -1,4 +1,4 @@
-﻿<script>
+<script>
   import Spinner from '$lib/celim/Spinner.svelte';
   import ChatMessage from '../../celim/messeges.svelte';
   import TodayDivider from '../../celim/todaydevider.svelte';
@@ -56,7 +56,7 @@
     nameMe = 'Me',
     profilePicMe = 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png',
     smalldes = 'small description',
-    nameChatPartner = 'הצבעה',
+    nameChatPartner,
     profilePicChatPartner = '/favicon.ico',
     money = false,
     messages = [],
@@ -97,6 +97,7 @@
   };
   let dow = $state();
 
+  let partnerTitle = $derived(nameChatPartner || $t('lev.diun.vote'));
   let labelText = $derived(
     money
       ? $t('lev.diun.labelMoney')
@@ -114,7 +115,7 @@
         if (why.length > 27) {
           onNo?.({ why: why });
         } else {
-          alert('מינימום 27 תווים'); //todo lang
+          alert($t('lev.diun.minChars', { count: 27 }));
         }
       } else if (rect == true) {
         onRect?.({ why: why });
@@ -185,13 +186,13 @@
       <div class="relative flex-shrink-0">
         <img
           src={profilePicChatPartner}
-          alt={nameChatPartner}
+          alt={partnerTitle}
           class="{compact ? 'w-9 h-9' : 'w-11 h-11 sm:w-14 sm:h-14'} rounded-full ring-2 ring-gray-700/50 hover:ring-fuchsia-500/50 object-cover transition-all duration-200"
         />
         <span
-          class="absolute -bottom-0.5 {$lang === 'en'
-            ? '-right-0.5'
-            : '-left-0.5'} w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border-2 border-gray-800 {mypos ===
+          class="absolute -bottom-0.5 {$isRtl
+            ? '-left-0.5'
+            : '-right-0.5'} w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border-2 border-gray-800 {mypos ===
           true
             ? 'bg-green-500 shadow-lg shadow-green-500/50'
             : 'bg-red-500 shadow-lg shadow-red-500/50'} transition-all duration-200"
@@ -199,7 +200,7 @@
       </div>
       <div class="flex flex-col min-w-0 flex-1 gap-0.5">
         <h3 class="{compact ? 'text-sm' : 'text-base sm:text-xl'} font-semibold text-white truncate">
-          {nameChatPartner}
+          {partnerTitle}
         </h3>
         {#if rikmaName}
           <p class="{compact ? 'text-xs' : 'text-xs sm:text-sm'} text-barbi truncate font-medium">
@@ -224,7 +225,7 @@
       <ChatMessage
         {nameMe}
         {profilePicMe}
-        {nameChatPartner}
+        nameChatPartner={partnerTitle}
         profilePicChatPartner={message.pic}
         message={message.message}
         timestamp={message.timestamp}
@@ -283,9 +284,9 @@
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
                 fill="currentColor"
-                class="w-5 h-5 transform {$lang === 'en'
-                  ? 'rotate-90'
-                  : '-rotate-90'}"
+                class="w-5 h-5 transform {$isRtl
+                  ? '-rotate-90'
+                  : 'rotate-90'}"
               >
                 <path
                   d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"

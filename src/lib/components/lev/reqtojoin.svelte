@@ -460,21 +460,13 @@
     }
   }
 
-  let u = ' הצבעה על בקשה לביצוע משימה והצטרפות לרקמה';
+  let u = '';
   function hover(id) {
-    if (id == '0') {
-      u = ' הצבעה על בקשה לביצוע משימה והצטרפות לרקמה';
-    } else {
-      u = id;
-    }
+    u = id == '0' ? $t('lev.hoverDefault.joinMission') : id;
     onHover?.({ id: u });
   }
   function hoverc(event) {
-    if (event == '0') {
-      u = ' הצבעה על בקשה לביצוע משימה והצטרפות לרקמה';
-    } else {
-      u = event;
-    }
+    u = event == '0' ? $t('lev.hoverDefault.joinMission') : event;
     onHover?.({ id: u });
   }
   let clicked = $state(false);

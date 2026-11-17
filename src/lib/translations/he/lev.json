@@ -17,7 +17,14 @@
     "oneMonent": "שניה בבקשה",
     "editTimer": "עריכת הטיימר",
     "timerRunning": "הטיימר עדיין רץ. יש לעצור ולשמור אותו לפני הגשת המשימה.",
-    "noHours": "עוד לא נשמרו שעות למשימה הזו. יש להפעיל את הטיימר (או לערוך אותו) ולשמור, ואז להגיש."
+    "noHours": "עוד לא נשמרו שעות למשימה הזו. יש להפעיל את הטיימר (או לערוך אותו) ולשמור, ואז להגיש.",
+    "timerStoppedTitle": "1💗1 טיימר נעצר",
+    "timerQuotaReached": "שלום {{name}}, הטיימר של {{mission}} נעצר מפני שמכסת השעות שסוכמה הסתיימה. יש ליצור משימה חדשה.",
+    "timerNearEndTitle": "1💗1 טיימר קרוב לסיום",
+    "timerWarn10Pct": "שלום {{name}}, נשארו רק 10% לטיימר של {{mission}} — כדאי להתכונן וליצור משימה חדשה.",
+    "timerWarn5Pct": "שלום {{name}}, נשארו רק 5% לטיימר של {{mission}} — כדאי להתכונן וליצור משימה חדשה.",
+    "timerWarn5Min": "שלום {{name}}, נשארו רק 5 דקות לטיימר של {{mission}} — כדאי להתכונן וליצור משימה חדשה.",
+    "timerWarn1Min": "שלום {{name}}, נשארה רק דקה לטיימר של {{mission}} — כדאי להתכונן וליצור משימה חדשה."
   },
   "cards": {
     "approve": "אני רוצה",
@@ -61,13 +68,16 @@
       "addReceiverHint": "כדי שהלקוח יוכל להעביר לכם כסף, הגש.י את עצמך כמקבל.ת",
       "addMeReceiver": "הוסף אותי כמקבל כסף",
       "removeMeReceiver": "הסר אותי מהרשימה",
-      "activeSale": "מכירה פעילה"
+      "activeSale": "מכירה פעילה",
+      "you": "את/ה",
+      "pendingShort": "ממתין..."
     },
     "voteStatus": {
       "approved": "אישרו",
       "oldVersion": "גרסה קודמת",
       "waiting": "טרם הצביעו",
-      "rejected": "התנגדו"
+      "rejected": "התנגדו",
+      "showAll": "הצג את כולם"
     },
     "filter": {
       "heartTitle": "לב המערכת",
@@ -140,7 +150,9 @@
       "hintEditTimer": "לחיצה לעריכת הטיימר",
       "hintComplete": "לחיצה לסיום המשימה",
       "hintStartTimer": "הפעלת טיימר",
-      "hintStopTimer": "עצירת הטיימר"
+      "hintStopTimer": "עצירת הטיימר",
+      "start": "התחלה",
+      "pause": "הפסקה"
     },
     "openChat": "פתיחת צ'אט",
     "withdraw": "משיכת ההצעה",
@@ -198,7 +210,8 @@
       "confirmTo": "להעביר ל{{name}}:",
       "confirmHint": "הכסף עצמו עובר ביניכם, מחוץ לאתר. כאן נרשם למי הועבר, והמקבל/ת יאשר/תאשר כשהגיע.",
       "confirmYes": "כן, להעביר",
-      "confirmBack": "חזרה"
+      "confirmBack": "חזרה",
+      "chatTitle": "אישור מכירה"
     },
     "dowegeot": {
       "head": "אישור קבלת משאב בהצלחה",
@@ -287,7 +300,8 @@
       "openingChat": "פותח צ'אט...",
       "error": "שגיאה",
       "transferStatus": "העברת כסף",
-      "complete": "הושלם"
+      "complete": "הושלם",
+      "chatTitle": "סיכום העברת כספים"
     },
     "wishOffer": {
       "cardType": "הצעה לביצוע משאלה",
@@ -389,7 +403,26 @@
     },
     "wishApplied": "ההצעה נשלחה בהצלחה",
     "toProfile": " לעמוד הפרופיל",
-    "awaitingClient": "ההצבעה נרשמה. החלק הזה שייך לעסקה של לקוחה, ולכן הוא ייכנס רק אחרי שגם היא תאשר."
+    "awaitingClient": "ההצבעה נרשמה. החלק הזה שייך לעסקה של לקוחה, ולכן הוא ייכנס רק אחרי שגם היא תאשר.",
+    "pma": {
+      "updatedOffer": "הצעה מתוקנת",
+      "recurringHead": "🔁 משאב חוזר · אישרור חודשי",
+      "approveHead": "אישור משאב",
+      "autoApproveIn": "אישור אוטומטי בעוד:",
+      "price": "מחיר",
+      "offeredValue": "שווי מוצע",
+      "billingType": "סוג חיוב",
+      "frequency": "תדירות",
+      "everyMonth": "כל חודש",
+      "everyYear": "כל שנה",
+      "everyMonths": "כל {{count}} חודשים",
+      "everyYears": "כל {{count}} שנים",
+      "estMonthlyCost": "עלות חודשית משוערת",
+      "monthlyChargeHint": "בכל חודש ייפתח חיוב לאישור ההוצאה בפועל",
+      "activeUpdatedOffer": "הצעה מתוקנת פעילה",
+      "changesMade": "השיפורים שבוצעו:",
+      "pleaseReview": "הוגשה הצעה מתוקנת למשאב, אנא עברו עליה."
+    }
   },
   "taskApproval": {
     "approve": "אישור",
@@ -466,7 +499,10 @@
     "labelDiscussion": "הודעה - נא להתייחס להודעות קודמות",
     "labelForum": "כתוב הודעה...",
     "typing": "{{names}} באמצע הקלדה…",
-    "typingSomeone": "מישהו באמצע הקלדה…"
+    "typingSomeone": "מישהו באמצע הקלדה…",
+    "minChars": "מינימום {{count}} תווים",
+    "vote": "הצבעה",
+    "voteOn": "הצבעה על {{name}}"
   },
   "productRequest": {
     "request": "בקשה"
@@ -1281,5 +1317,43 @@
     "withdrawn": "המועמדות נמשכה.",
     "failed": "לא הצלחנו למשוך את המועמדות כרגע. כדאי לנסות שוב בעוד רגע.",
     "loadFailed": "לא הצלחנו לטעון את הבקשות שלך כרגע."
+  },
+  "feed": {
+    "someone": "משתמש/ת",
+    "unnamedMission": "משימה",
+    "voteFavor": "{{name}} בעד",
+    "voteAgainst": "{{name}} נגד",
+    "oldVersion": "גרסה ישנה",
+    "oldVersionParen": "(גרסה ישנה)",
+    "reason": "בנימוק: {{reason}}",
+    "askedToJoin": "{{name}} ביקש/ה להצטרף אל {{mission}}",
+    "didNego": "{{name}} ביצע/ה משא ומתן",
+    "diffHours": "משימה זו: {{current}} שעות במקום {{previous}} שעות",
+    "diffPerHour": "לפי שעה: {{current}} במקום {{previous}}",
+    "diffTotal": "סה״כ: {{current}} במקום {{previous}}",
+    "diffName": "שם: \"{{current}}\" במקום \"{{previous}}\"",
+    "diffDescription": "תיאור: \"{{current}}\" במקום \"{{previous}}\"",
+    "diffNotes": "הערות: \"{{current}}\" במקום \"{{previous}}\"",
+    "diffValue": "\"{{current}}\" במקום \"{{previous}}\"",
+    "diffResQty": "כמות המשאב: {{current}} במקום {{previous}}",
+    "diffResPrice": "מחיר המשאב: {{current}} במקום {{previous}}",
+    "diffResOffered": "שווי מוצע למשאב: {{current}} במקום {{previous}}",
+    "diffResTotal": "סה״כ למשאב: {{current}} במקום {{previous}}",
+    "diffResKind": "סוג המשאב: \"{{current}}\" במקום \"{{previous}}\"",
+    "monthly": "חודשי",
+    "oneTime": "חד פעמי",
+    "maagad": "מאגד ביקוש",
+    "maagadNamed": "מאגד · {{name}}",
+    "concierge": "קונסירג׳",
+    "conciergeNamed": "קונסירג׳ · {{name}}"
+  },
+  "hoverDefault": {
+    "pendingMission": "הצבעה על פרסום הצעת משימה לרקמה",
+    "pendingResource": "הצבעה על בקשת משאב לרקמה",
+    "finishApproval": "בקשה לאישור ביצוע משימה בהצלחה",
+    "resourceSuggest": "הצעה לשיתוף משאב והצטרפות לרקמה",
+    "joinMission": "הצבעה על בקשה לביצוע משימה והצטרפות לרקמה",
+    "resourceReceived": "בקשה לאישור קבלת משאב בהצלחה",
+    "negoSoonHint": "משא ומתן כאן בפיתוח — בינתיים ניתן להשיב עם נימוק וליצור משאב חדש עם המאפיינים הרצויים."
   }
 }

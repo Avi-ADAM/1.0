@@ -239,8 +239,12 @@
     let sourceName = $derived(
         data.alld?.project?.data?.attributes?.projectName ??
             (isMaagadSrc
-                ? `${$lang === 'he' ? 'מאגד ביקוש' : 'demand pool'}${maagadInfo?.name ? ` · ${maagadInfo.name}` : ''}`
-                : `${$lang === 'he' ? "קונסיירז'" : 'concierge'}${ratsonName ? ` · ${ratsonName}` : ''}`)
+                ? maagadInfo?.name
+                    ? $t('lev.feed.maagadNamed', { name: maagadInfo.name })
+                    : $t('lev.feed.maagad')
+                : ratsonName
+                    ? $t('lev.feed.conciergeNamed', { name: ratsonName })
+                    : $t('lev.feed.concierge'))
     );
 
     // ── UGC translation (PLAN_UGC_TRANSLATION §4, §7.1) ──────────────────

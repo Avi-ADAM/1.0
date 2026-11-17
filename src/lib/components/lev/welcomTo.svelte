@@ -1,4 +1,4 @@
-שי<script>
+<script>
     import { fly } from 'svelte/transition';
 import { Confetti } from "svelte-confetti"
 import { lang } from '$lib/stores/lang.js';

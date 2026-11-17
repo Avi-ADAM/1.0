@@ -1,6 +1,6 @@
 <script>
   import { page } from '$app/state';
-  import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import VoteDetail from '$lib/components/moach/VoteDetail.svelte';
 
   // `data` merges the moach [projectId] layout load (projectBase, uid,
@@ -21,11 +21,7 @@
   <title
     >{data.projectBase?.projectName
       ? `${data.projectBase.projectName} · `
-      : ''}{entityTitle ? `${entityTitle} · ` : ''}{$lang === 'he'
-      ? 'הצבעה'
-      : $lang === 'ar'
-        ? 'تصويت'
-        : 'Vote'} · 1lev1</title
+      : ''}{entityTitle ? `${entityTitle} · ` : ''}{$t('moach.layout.vote')} · 1lev1</title
   >
 </svelte:head>
 

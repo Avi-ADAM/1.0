@@ -8,7 +8,7 @@
   import { untrack } from 'svelte';
   import { page } from '$app/state';
   import { timers, updateTimers, lockTimerForEdit } from '$lib/stores/timers';
-  import { lang } from '$lib/stores/lang';
+  import { t } from '$lib/translations';
   import TimerDialogs from './TimerDialogs.svelte';
 
   let {
@@ -588,7 +588,7 @@
         style="cursor: pointer;"
         role="button"
         tabindex="0"
-        aria-label={isRunning ? 'עצור טיימר' : 'הפעל טיימר'}
+        aria-label={isRunning ? $t('timers.proStop') : $t('timers.proStart')}
       >
         <!-- Hit area expander -->
         <circle cx="0" cy="0" r="75" fill="transparent" stroke="transparent" />
@@ -616,7 +616,7 @@
         style="cursor: pointer;"
         role="button"
         tabindex="0"
-        aria-label="ערוך טיימר"
+        aria-label={$t('timers.editTimer')}
       >
         <!-- Hit area expander -->
         <circle cx="0" cy="0" r="75" fill="transparent" stroke="transparent" />
@@ -885,11 +885,7 @@
         text-anchor="middle"
       >
         <tspan fill="#FFFFFF" font-weight="900">
-          {#if $lang === 'he'}
-            {Math.floor(totalHoursDone)} / {hoursAssigned} שעות
-          {:else}
-            Hours: {hoursAssigned} / {Math.floor(totalHoursDone)}
-          {/if}
+          {$t('timers.proHoursOf', { done: Math.floor(totalHoursDone), target: hoursAssigned })}
         </tspan>
       </textPath>
     </text>

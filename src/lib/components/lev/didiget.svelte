@@ -305,7 +305,7 @@ id: ${pendId}
             halukId: Number(pendId),
             projectName: projectName,
             projectPic: src,
-            transferDetails: `${kind === 'send' ? 'העברת' : 'קבלת'} ${amount}`,
+            transferDetails: `${kind === 'send' ? $t('lev.cards.didiget.transferring') : $t('lev.cards.didiget.receiving')} ${amount}`,
             senderId: send,
             receiverId: recive,
             participants: [send, recive] // גם לפורום קיים
@@ -341,7 +341,7 @@ id: ${pendId}
           halukId: Number(pendId),
           projectName: projectName,
           projectPic: src,
-          transferDetails: `${kind === 'send' ? 'העברת' : 'קבלת'} ${amount}`,
+          transferDetails: `${kind === 'send' ? $t('lev.cards.didiget.transferring') : $t('lev.cards.didiget.receiving')} ${amount}`,
           senderId: send,
           receiverId: recive,
           participants: [send, recive]
@@ -429,15 +429,14 @@ id: ${pendId}
             {no}
             rect={true}
             smalldes={projectName}
-            nameChatPartner={`צ'אט על העברת כסף`}
+            nameChatPartner={$t('common.chat.moneyTransfer')}
             mypos={true}
             profilePicChatPartner={src}
             messages={messege}
           />
         {:else if masa === true}
           <h2 class="bg-gold text-barbi text-center">
-            .יבנה במהרה בימינו אמן בנתיים יש להגיב לא ולנמק ואז ליצור משאב חדש
-            עם המאפיינים הרצויים
+            {$t('lev.hoverDefault.negoSoonHint')}
           </h2>
           <!--
 <Nego

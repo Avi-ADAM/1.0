@@ -1,4 +1,4 @@
-﻿<script>
+<script>
   import { t, locale, isRtl } from '$lib/translations';
 
   /**
@@ -140,7 +140,7 @@
             onclick={onClose}
             class="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100
                    dark:hover:text-zinc-200 dark:hover:bg-zinc-800 transition"
-            aria-label="סגור"
+            aria-label={$t('common.close')}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

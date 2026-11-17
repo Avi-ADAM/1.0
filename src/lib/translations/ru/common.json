@@ -72,7 +72,17 @@
     "system": "Система 1💗1",
     "loading": "Загрузка…",
     "onlineStatus": "Статус доступности",
-    "meetingFallback": "Встреча"
+    "meetingFallback": "Встреча",
+    "now": "сейчас",
+    "minsAgo": "{{count}} мин назад",
+    "hoursAgo": "{{count}} ч назад",
+    "yesterday": "Вчера",
+    "receivingFrom": "Получение {{amount}} от {{name}}",
+    "sendingTo": "Перевод {{amount}} для {{name}}",
+    "saleLabel": "Продажа: {{name}}",
+    "saleReport": "Отчёт о продаже",
+    "saleReportNamed": "Отчёт о продаже: {{name}}",
+    "meetingCreated": "Встреча создана"
   },
   "footer": {
     "brain": "«Мозг» рикм",
@@ -247,5 +257,7 @@
   "someoneInitials": "Уч",
   "wishNotFound": "Желание не найдено",
   "wishNotPublic": "Это желание закрыто для публики",
-  "untitled": "(без названия)"
+  "untitled": "(без названия)",
+  "error": "Ошибка",
+  "proposals": "Предложения"
 }

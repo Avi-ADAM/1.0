@@ -341,7 +341,7 @@
       type="button"
       class="flex items-center flex-wrap gap-x-3 gap-y-1.5 cursor-pointer"
       aria-expanded={expanded}
-      title={$lang === 'he' ? 'הצג את כולם' : 'Show all'}
+      title={$t('lev.cards.voteStatus.showAll')}
       onclick={(e) => {
         e.stopPropagation();
         pinned = !pinned;

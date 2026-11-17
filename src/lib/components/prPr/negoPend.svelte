@@ -1,4 +1,4 @@
-﻿<script>
+<script>
   import { isRtl, t } from '$lib/translations';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import Text from '../conf/text.svelte';
@@ -190,13 +190,13 @@
       title: name1,
       projectName,
       fields: [
-        { key: 'name', label: 'שם', kind: 'text', original: name1 ?? null, proposed: name2 ?? null },
-        { key: 'descrip', label: 'תיאור', kind: 'text', original: descrip ?? null, proposed: descrip2 ?? null },
-        { key: 'price', label: 'שווי', kind: 'number', original: Number(price) || 0, proposed: Number(price2) || 0 },
-        { key: 'easy', label: 'שווי לב', kind: 'number', original: Number(easy) || 0, proposed: Number(easy2) || 0 },
-        { key: 'hm', label: 'כמות', kind: 'number', original: Number(hm) || 0, proposed: Number(hm2) || 0 },
-        { key: 'sqadualed', label: 'תאריך התחלה', kind: 'date', original: toIsoDateString(sqadualed) ?? null, proposed: toIsoDateString(sqadualed2) ?? null },
-        { key: 'sqadualedf', label: 'תאריך סיום', kind: 'date', original: toIsoDateString(sqadualedf) ?? null, proposed: toIsoDateString(sqadualedf2) ?? null }
+        { key: 'name', label: $t('moach.tables.name'), kind: 'text', original: name1 ?? null, proposed: name2 ?? null },
+        { key: 'descrip', label: $t('moach.tables.description'), kind: 'text', original: descrip ?? null, proposed: descrip2 ?? null },
+        { key: 'price', label: $t('lev.cards.pma.price'), kind: 'number', original: Number(price) || 0, proposed: Number(price2) || 0 },
+        { key: 'easy', label: $t('lev.cards.pma.offeredValue'), kind: 'number', original: Number(easy) || 0, proposed: Number(easy2) || 0 },
+        { key: 'hm', label: $t('moach.tables.quantity'), kind: 'number', original: Number(hm) || 0, proposed: Number(hm2) || 0 },
+        { key: 'sqadualed', label: $t('moach.tables.startDate'), kind: 'date', original: toIsoDateString(sqadualed) ?? null, proposed: toIsoDateString(sqadualed2) ?? null },
+        { key: 'sqadualedf', label: $t('moach.tables.endDate'), kind: 'date', original: toIsoDateString(sqadualedf) ?? null, proposed: toIsoDateString(sqadualedf2) ?? null }
       ]
     });
   }

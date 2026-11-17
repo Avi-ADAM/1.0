@@ -17,7 +17,14 @@
     "oneMonent": "لحظة من فضلك",
     "editTimer": "تعديل المؤقت",
     "timerRunning": "المؤقّت لا يزال يعمل. أوقفه واحفظه قبل تقديم المهمة.",
-    "noHours": "لم تُحفظ أي ساعات لهذه المهمة بعد. شغّل المؤقّت (أو عدّله) واحفظ، ثم قدّم المهمة."
+    "noHours": "لم تُحفظ أي ساعات لهذه المهمة بعد. شغّل المؤقّت (أو عدّله) واحفظ، ثم قدّم المهمة.",
+    "timerStoppedTitle": "1💗1 توقّف المؤقت",
+    "timerQuotaReached": "مرحبًا {{name}}، توقّف مؤقت {{mission}} لانتهاء حصة الساعات المتفق عليها. يُرجى إنشاء مهمة جديدة.",
+    "timerNearEndTitle": "1💗1 المؤقت على وشك الانتهاء",
+    "timerWarn10Pct": "مرحبًا {{name}}، لم يتبقَّ سوى 10% في مؤقت {{mission}} — يُستحسن التحضير وإنشاء مهمة جديدة.",
+    "timerWarn5Pct": "مرحبًا {{name}}، لم يتبقَّ سوى 5% في مؤقت {{mission}} — يُستحسن التحضير وإنشاء مهمة جديدة.",
+    "timerWarn5Min": "مرحبًا {{name}}، لم يتبقَّ سوى 5 دقائق في مؤقت {{mission}} — يُستحسن التحضير وإنشاء مهمة جديدة.",
+    "timerWarn1Min": "مرحبًا {{name}}، لم تتبقَّ سوى دقيقة واحدة في مؤقت {{mission}} — يُستحسن التحضير وإنشاء مهمة جديدة."
   },
   "cards": {
     "approve": "أريد",
@@ -61,13 +68,16 @@
       "addReceiverHint": "حتى يتمكن العميل من تحويل الأموال إليك، أضف نفسك كمستلم",
       "addMeReceiver": "أضفني كمستلم",
       "removeMeReceiver": "أزلني من القائمة",
-      "activeSale": "بيع نشط"
+      "activeSale": "بيع نشط",
+      "you": "أنت",
+      "pendingShort": "قيد الانتظار..."
     },
     "voteStatus": {
       "approved": "وافقوا",
       "oldVersion": "نسخة قديمة",
       "waiting": "لم يصوتوا بعد",
-      "rejected": "رفضوا"
+      "rejected": "رفضوا",
+      "showAll": "عرض الجميع"
     },
     "filter": {
       "heartTitle": "قلب النظام",
@@ -140,7 +150,9 @@
       "hintEditTimer": "انقر لتعديل المؤقّت",
       "hintComplete": "انقر لإنهاء المهمة",
       "hintStartTimer": "تشغيل المؤقّت",
-      "hintStopTimer": "إيقاف المؤقّت"
+      "hintStopTimer": "إيقاف المؤقّت",
+      "start": "بدء",
+      "pause": "إيقاف"
     },
     "openChat": "فتح الدردشة",
     "withdraw": "سحب العرض",
@@ -198,7 +210,8 @@
       "confirmTo": "التحويل إلى {{name}}:",
       "confirmHint": "المال نفسه ينتقل بينكم خارج الموقع. هنا يُسجَّل لمن دُفع، ويؤكّد المستلم عند وصوله.",
       "confirmYes": "نعم، حوِّل",
-      "confirmBack": "رجوع"
+      "confirmBack": "رجوع",
+      "chatTitle": "تأكيد البيع"
     },
     "dowegeot": {
       "head": "تأكيد استلام المورد بنجاح",
@@ -287,7 +300,8 @@
       "openingChat": "جاري فتح الدردشة...",
       "error": "خطأ",
       "transferStatus": "تحويل الأموال",
-      "complete": "اكتمل"
+      "complete": "اكتمل",
+      "chatTitle": "ملخص تحويل الأموال"
     },
     "wishOffer": {
       "cardType": "عرض لتنفيذ أمنيتك",
@@ -389,7 +403,26 @@
     },
     "wishApplied": "تم إرسال عرضك بنجاح",
     "toProfile": "إلى صفحة الملف الشخصي",
-    "awaitingClient": "تم تسجيل تصويتك. هذا الجزء من صفقة زبونة، لذا لا يُعتمد إلا بعد موافقتها أيضًا."
+    "awaitingClient": "تم تسجيل تصويتك. هذا الجزء من صفقة زبونة، لذا لا يُعتمد إلا بعد موافقتها أيضًا.",
+    "pma": {
+      "updatedOffer": "عرض معدّل",
+      "recurringHead": "🔁 مورد متكرر · تأكيد شهري",
+      "approveHead": "الموافقة على مورد",
+      "autoApproveIn": "موافقة تلقائية خلال:",
+      "price": "السعر",
+      "offeredValue": "القيمة المقترحة",
+      "billingType": "نوع الفوترة",
+      "frequency": "التكرار",
+      "everyMonth": "كل شهر",
+      "everyYear": "كل سنة",
+      "everyMonths": "كل {{count}} أشهر",
+      "everyYears": "كل {{count}} سنوات",
+      "estMonthlyCost": "التكلفة الشهرية التقديرية",
+      "monthlyChargeHint": "في كل شهر يُفتح استحقاق لتأكيد المصروف الفعلي",
+      "activeUpdatedOffer": "عرض معدّل نشط",
+      "changesMade": "التعديلات التي أُجريت:",
+      "pleaseReview": "تم تقديم عرض معدّل لهذا المورد، يُرجى مراجعته."
+    }
   },
   "taskApproval": {
     "approve": "موافقة",
@@ -466,7 +499,10 @@
     "labelDiscussion": "رسالة - يرجى الرجوع إلى الرسائل السابقة",
     "labelForum": "اكتب رسالة...",
     "typing": "{{names}} يكتب الآن…",
-    "typingSomeone": "أحدهم يكتب الآن…"
+    "typingSomeone": "أحدهم يكتب الآن…",
+    "minChars": "الحد الأدنى {{count}} حرفًا",
+    "vote": "تصويت",
+    "voteOn": "تصويت على {{name}}"
   },
   "productRequest": {
     "request": "طلب"
@@ -1281,5 +1317,43 @@
     "withdrawn": "تم سحب ترشّحك.",
     "failed": "تعذّر سحب الترشّح الآن. يُرجى المحاولة مرة أخرى بعد قليل.",
     "loadFailed": "تعذّر تحميل طلباتك الآن."
+  },
+  "feed": {
+    "someone": "عضو",
+    "unnamedMission": "مهمة",
+    "voteFavor": "{{name}} مؤيد",
+    "voteAgainst": "{{name}} معترض",
+    "oldVersion": "نسخة قديمة",
+    "oldVersionParen": "(نسخة قديمة)",
+    "reason": "السبب: {{reason}}",
+    "askedToJoin": "طلب/ت {{name}} الانضمام إلى {{mission}}",
+    "didNego": "أجرى/ت {{name}} تفاوضًا",
+    "diffHours": "الساعات: {{current}} ساعات بدلاً من {{previous}} ساعات",
+    "diffPerHour": "لكل ساعة: {{current}} بدلاً من {{previous}}",
+    "diffTotal": "الإجمالي: {{current}} بدلاً من {{previous}}",
+    "diffName": "الاسم: \"{{current}}\" بدلاً من \"{{previous}}\"",
+    "diffDescription": "الوصف: \"{{current}}\" بدلاً من \"{{previous}}\"",
+    "diffNotes": "ملاحظات: \"{{current}}\" بدلاً من \"{{previous}}\"",
+    "diffValue": "\"{{current}}\" بدلاً من \"{{previous}}\"",
+    "diffResQty": "كمية المورد: {{current}} بدلاً من {{previous}}",
+    "diffResPrice": "سعر المورد: {{current}} بدلاً من {{previous}}",
+    "diffResOffered": "القيمة المقترحة للمورد: {{current}} بدلاً من {{previous}}",
+    "diffResTotal": "إجمالي المورد: {{current}} بدلاً من {{previous}}",
+    "diffResKind": "نوع المورد: \"{{current}}\" بدلاً من \"{{previous}}\"",
+    "monthly": "شهري",
+    "oneTime": "لمرة واحدة",
+    "maagad": "تجمع طلب",
+    "maagadNamed": "تجمع · {{name}}",
+    "concierge": "كونسيرج",
+    "conciergeNamed": "الكونسيرج · {{name}}"
+  },
+  "hoverDefault": {
+    "pendingMission": "تصويت على نشر مقترح مهمة في الريكما",
+    "pendingResource": "تصويت على طلب مورد للريكما",
+    "finishApproval": "طلب الموافقة على إتمام المهمة بنجاح",
+    "resourceSuggest": "عرض لمشاركة مورد والانضمام إلى الريكما",
+    "joinMission": "تصويت على طلب تنفيذ مهمة والانضمام إلى الريكما",
+    "resourceReceived": "طلب تأكيد استلام المورد بنجاح",
+    "negoSoonHint": "التفاوض هنا قيد التطوير — في الوقت الحالي يُرجى توضيح السبب وإنشاء مورد جديد بالمواصفات المطلوبة."
   }
 }

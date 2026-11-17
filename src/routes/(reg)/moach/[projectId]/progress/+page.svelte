@@ -106,7 +106,7 @@
 </script>
 
 <svelte:head>
-  <title>{data.projectBase?.projectName ? `${data.projectBase.projectName} · ` : ''}{$lang === 'he' ? 'בתהליך' : $lang === 'ar' ? 'قيد التنفيذ' : 'Progress'} · 1lev1</title>
+  <title>{data.projectBase?.projectName ? `${data.projectBase.projectName} · ` : ''}{$t('moach.layout.progress')} · 1lev1</title>
 </svelte:head>
 
 {#if openCount > 0}

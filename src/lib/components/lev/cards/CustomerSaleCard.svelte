@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   import { isRtl, t } from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import RichText from '$lib/celim/ui/richText.svelte';
@@ -33,7 +33,7 @@
       if (buble.forumId && buble.forumId !== -1) {
         const md = {
           pid: Number(buble.projectId),
-          title: { he: 'אישור מכירה', en: 'Sale Approval' },
+          title: $t('lev.cards.customerSale.chatTitle'),
           transferDetails: buble.name
         };
         const tempF = $forum;
@@ -73,7 +73,7 @@
           buble.forumId = newForumId;
           const md = {
             pid: Number(buble.projectId),
-            title: { he: 'אישור מכירה', en: 'Sale Approval' },
+            title: $t('lev.cards.customerSale.chatTitle'),
             transferDetails: buble.name
           };
           const tempF = $forum;

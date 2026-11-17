@@ -2,6 +2,7 @@ import { sendToSer } from '$lib/send/sendToSer.js';
 import { get, writable } from 'svelte/store';
 import { realtimeBus } from '$lib/realtime/bus.svelte';
 import { uPic } from '$lib/stores/uPic.js';
+import { t as translateStore } from '$lib/translations';
   const baseUrl = import.meta.env.VITE_URL
 
 const inFlightForumFetches = new Set();
@@ -196,7 +197,10 @@ export async function initialForum (all = false,ids = [],myId = 0){
                               ? project.attributes.profilePic.data.attributes.formats.thumbnail.url
                               : project.attributes.profilePic.data?.attributes?.url,
                             halukId: haluka.id,
-                            transferDetails: `קבלת ${haluka.attributes.amount} מ-${haluka.attributes.usersend.data.attributes.username}`,
+                            transferDetails: get(translateStore)('common.chat.receivingFrom', {
+                              amount: haluka.attributes.amount,
+                              name: haluka.attributes.usersend.data.attributes.username
+                            }),
                             senderId: senderId,
                             receiverId: receiverId,
                             participants: [String(senderId), String(receiverId)]
@@ -211,7 +215,10 @@ export async function initialForum (all = false,ids = [],myId = 0){
                                 ? project.attributes.profilePic.data.attributes.formats.thumbnail.url
                                 : project.attributes.profilePic.data?.attributes?.url,
                               halukId: haluka.id,
-                              transferDetails: `קבלת ${haluka.attributes.amount} מ-${haluka.attributes.usersend.data.attributes.username}`,
+                              transferDetails: get(translateStore)('common.chat.receivingFrom', {
+                                amount: haluka.attributes.amount,
+                                name: haluka.attributes.usersend.data.attributes.username
+                              }),
                               senderId: senderId,
                               receiverId: receiverId,
                               participants: [String(senderId), String(receiverId)]
@@ -243,7 +250,10 @@ export async function initialForum (all = false,ids = [],myId = 0){
                               ? project.attributes.profilePic.data.attributes.formats.thumbnail.url
                               : project.attributes.profilePic.data?.attributes?.url,
                             halukId: haluka.id,
-                            transferDetails: `העברת ${haluka.attributes.amount} ל-${haluka.attributes.userrecive.data.attributes.username}`,
+                            transferDetails: get(translateStore)('common.chat.sendingTo', {
+                              amount: haluka.attributes.amount,
+                              name: haluka.attributes.userrecive.data.attributes.username
+                            }),
                             senderId: senderId,
                             receiverId: receiverId,
                             participants: [String(senderId), String(receiverId)]
@@ -258,7 +268,10 @@ export async function initialForum (all = false,ids = [],myId = 0){
                                 ? project.attributes.profilePic.data.attributes.formats.thumbnail.url
                                 : project.attributes.profilePic.data?.attributes?.url,
                               halukId: haluka.id,
-                              transferDetails: `העברת ${haluka.attributes.amount} ל-${haluka.attributes.userrecive.data.attributes.username}`,
+                              transferDetails: get(translateStore)('common.chat.sendingTo', {
+                                amount: haluka.attributes.amount,
+                                name: haluka.attributes.userrecive.data.attributes.username
+                              }),
                               senderId: senderId,
                               receiverId: receiverId,
                               participants: [String(senderId), String(receiverId)]
@@ -311,6 +324,7 @@ export async function initialForum (all = false,ids = [],myId = 0){
 export function forums(dat, myId, all = false) {
   const currentForums = get(forum);
   const forumsList = dat?.forums?.data || [];
+  const tr = get(translateStore);
 
   for (let t = 0; t < forumsList.length; t++) {
     const forumData = forumsList[t];
@@ -338,7 +352,7 @@ export function forums(dat, myId, all = false) {
       if (project?.attributes?.projectName) md.projectName = project.attributes.projectName;
       if (projectPic) md.projectPic = projectPic;
       if (mesimaName) md.mesimaName = mesimaName;
-      if (sheirutName) md.transferDetails = `מכירה: ${sheirutName}`;
+      if (sheirutName) md.transferDetails = tr('common.chat.saleLabel', { name: sheirutName });
 
       // A bilateral sale-holder-consent chat: title it after the reported sale
       // (the linked saleClaim Decision's name, e.g. "product · 100₪") instead of
@@ -348,10 +362,9 @@ export function forums(dat, myId, all = false) {
       );
       if (saleClaimDec) {
         const dn = saleClaimDec.attributes?.decisionName || attrs.subject || '';
-        md.title = {
-          he: dn ? `דיווח מכירה: ${dn}` : 'דיווח מכירה',
-          en: dn ? `Sale report: ${dn}` : 'Sale report'
-        };
+        md.title = dn
+          ? tr('common.chat.saleReportNamed', { name: dn })
+          : tr('common.chat.saleReport');
       }
 
       // 3. Process Messages locally to avoid triggering store reactivity mid-loop

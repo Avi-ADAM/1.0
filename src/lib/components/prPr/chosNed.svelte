@@ -4,7 +4,7 @@
   import Addnewnee from '../addnew/addNewNeed.svelte';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { lang } from '$lib/stores/lang';
-  import { t } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
 
   let addnee = $state(false);
   let isLow = $state(true);
@@ -34,7 +34,7 @@
      };
 
   let { needss = $bindable([]), selctedi = [], selected = $bindable([]) , onStr, onAddm, onAdd } = $props();
-    const placeholder = `הוספת משאבים נדרשים `;
+  let placeholder = $derived($t('project.chosNed.addResources'));
 
 function newn(event) {
   addnee = false;
@@ -55,7 +55,7 @@ function incremen() {
     })
 	};
   </script>
-  <div dir="rtl" style="max-width: 100%" >
+  <div dir={$isRtl ? 'rtl' : 'ltr'} style="max-width: 100%" >
     <h1>{$t('project.chosNed.addResources')}</h1>
     <div class="items-center">
       <div class="gg w-min	pb-1">

@@ -73,7 +73,8 @@
     "resourceChain": "Proceso de recurso",
     "saleChain": "Proceso de venta",
     "loading": "Cargando el proceso…",
-    "error": "No se pudieron cargar los datos"
+    "error": "No se pudieron cargar los datos",
+    "nameRequired": "El nombre del proceso es obligatorio."
   },
   "splitDetail": {
     "participants": "Socios",
@@ -104,7 +105,12 @@
     "date": "Fecha",
     "buyer": "Comprador",
     "note": "Nota",
-    "status": "Estado"
+    "status": "Estado",
+    "holderSelf": "verificado (propio)",
+    "holderOpen": "esperando el consentimiento de {{name}}",
+    "holderAutoApproved": "aprobado automáticamente",
+    "holderConfirmed": "confirmado",
+    "holderLegacy": "sin verificar (anterior)"
   },
   "acts": {
     "assignee": "Responsable",
@@ -133,7 +139,8 @@
     "processPage": "Página del proceso",
     "id": "ID",
     "chatSoon": "Debate del proceso: próximamente",
-    "chatDesc": "Aquí aparecerán los hilos de debate y el chat."
+    "chatDesc": "Aquí aparecerán los hilos de debate y el chat.",
+    "loadMissionError": "No se pudo cargar la misión completada"
   },
   "layout": {
     "back": "Volver a la lista",
@@ -168,7 +175,9 @@
     "code": "Código",
     "stipend": "Becas",
     "docs": "Info compartida",
-    "events": "Eventos"
+    "events": "Eventos",
+    "services": "Servicios",
+    "vote": "Votación"
   },
   "create": {
     "mission": "Crear una misión",
@@ -439,5 +448,55 @@
     "viewing": "viendo la rikma ahora",
     "viewersOne": "Un miembro está viendo la rikma ahora",
     "viewersMany": "{{count}} miembros están viendo la rikma ahora"
+  },
+  "tables": {
+    "pendingAction": "Acción en proceso de aprobación",
+    "pendingActions": "Acciones en proceso de aprobación",
+    "openAction": "Acción abierta",
+    "openActions": "Acciones abiertas",
+    "inProgressAction": "Acción en curso",
+    "inProgressActions": "Acciones en curso",
+    "publishedResources": "Recursos necesarios publicados",
+    "options": "Opciones",
+    "mission": "Misión",
+    "name": "Nombre",
+    "description": "Descripción",
+    "requiredSkills": "Habilidades requeridas",
+    "roleDefinition": "Definición del rol",
+    "missionType": "Tipo de misión",
+    "executionDate": "Fecha de ejecución",
+    "publicLinks": "Enlaces públicos",
+    "link": "Enlace",
+    "rikmaNotes": "Notas especiales para mi rikma",
+    "rikmaLinks": "Enlaces privados para mi rikma",
+    "privateLink": "Enlace privado",
+    "estimatedHours": "¿Cuántas horas debería llevar?",
+    "hourlyRate": "Valor por hora",
+    "totalMissionValue": "Valor total de la misión",
+    "alreadyCompleted": "Ya completado",
+    "performedBy": "Realizada por",
+    "edit": "Editar",
+    "inFavor": "A favor",
+    "waiting": "En espera",
+    "against": "En contra",
+    "kind": "Tipo",
+    "quantity": "Cantidad",
+    "startDate": "Fecha de inicio",
+    "endDate": "Fecha de fin",
+    "specialNotes": "Notas especiales",
+    "cost": "Costo",
+    "monetaryValue": "Valor monetario",
+    "perMonth": "por mes",
+    "perYear": "por año",
+    "forWholePeriod": "por todo el período",
+    "perUnit": "por unidad",
+    "maxRikmaValue": "Valor máximo computable en la rikma",
+    "totalCost": "Costo total",
+    "totalMaxValue": "Valor máximo total",
+    "resourceLink": "Enlace de detalles / precio / compra"
+  },
+  "gantt": {
+    "setup": "Puesta en marcha",
+    "operation": "Operación"
   }
 }
