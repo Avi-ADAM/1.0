@@ -8,7 +8,7 @@ import {
     saveLinkLabel,
     SAVE_LINKS_MAX
 } from '$lib/timers/saveLinks';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { createGeminiClient } from '$lib/bot/context.js';
 import { actionService } from '$lib/server/actions/index.js';
 import { normalizeAdminToken } from '$lib/server/adminToken.js';
 import { checkTelegramWebhook } from '$lib/server/telegramWebhookAuth.js';
@@ -47,8 +47,7 @@ if (!Token) throw new Error("Telegram Bot Token not found!");
 if (!geminiApiKey) throw new Error("Gemini API Key not found!");
 
 const bot = new Telegraf(Token);
-const genAI = new GoogleGenerativeAI(geminiApiKey);
-const geminiModel = genAI.getGenerativeModel({ model: "gemini-3-flash-preview-preview" });
+const geminiModel = createGeminiClient(geminiApiKey);
 
 let allD = [];
 let appIds = [];
