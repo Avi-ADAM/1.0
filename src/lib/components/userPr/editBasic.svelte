@@ -108,20 +108,10 @@
 
   // Functions
   onMount(async () => {
-    if ('Notification' in window && 'serviceWorker' in navigator) {
-      nutiPermission = Notification.permission;
-      const reg = await navigator.serviceWorker.ready;
-      const existing = await reg.pushManager.getSubscription();
-      // Re-send it: a device subscribed while the save was missing (Aug 2025 –
-      // Oct 2026) has a browser subscription and no machshir. Idempotent.
-      if (existing && nutiPermission === 'granted') {
-        sub = existing;
-        saveDevice(existing).catch((e) => console.warn('[push] re-register failed', e));
-      }
-    } else {
-      nutiPermission = 'unsupported';
-    }
-    // Set initialValues at the end of onMount
+    // Snapshot first. `serviceWorker.ready` never resolves on a device with no
+    // registered worker, and anything after that await never ran — so
+    // initialValues stayed null, `chan` stayed false and the save bar never
+    // appeared (a language change looked unsaveable).
     initialValues = {
       un,
       bi,
@@ -136,6 +126,19 @@
       location: JSON.stringify(location)
     };
     fetchKeys();
+    if ('Notification' in window && 'serviceWorker' in navigator) {
+      nutiPermission = Notification.permission;
+      const reg = await navigator.serviceWorker.ready;
+      const existing = await reg.pushManager.getSubscription();
+      // Re-send it: a device subscribed while the save was missing (Aug 2025 –
+      // Oct 2026) has a browser subscription and no machshir. Idempotent.
+      if (existing && nutiPermission === 'granted') {
+        sub = existing;
+        saveDevice(existing).catch((e) => console.warn('[push] re-register failed', e));
+      }
+    } else {
+      nutiPermission = 'unsupported';
+    }
   });
 
   // API Keys state
@@ -236,6 +239,19 @@
       cards: checked,
       location
     });
+    initialValues = {
+      un,
+      bi,
+      githublink,
+      twiterlink,
+      discordlink,
+      fblink,
+      frd,
+      lango,
+      checked,
+      noMail,
+      location: JSON.stringify(location)
+    };
     chan = false;
     toast.success($t('pages.editBasic.saved'));
   }
