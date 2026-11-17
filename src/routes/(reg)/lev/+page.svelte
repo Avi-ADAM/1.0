@@ -53,7 +53,7 @@
   import { executeAction } from '$lib/client/actionClient';
   import { shiftWorkStore } from '$lib/utils/levShifts';
   import { fulfillWorkStore, fulfillRuleStore, FULFILL_REALTIME_KEYS } from '$lib/utils/levFulfill';
-  import { myApplicationsStore, MY_APPLICATION_ANI } from '$lib/utils/levMyApplications';
+  import { myApplicationsStore, MY_REQUESTS_FOCUS, isMyCandidacyItem } from '$lib/utils/levMyApplications';
 
   // Dialog components
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -93,15 +93,17 @@
   /** @type {import('$lib/notices').NoticeDismissal[]} */
   let noticeDismissals = $state([]);
 
-  // Focused view (?focus= deep-link from hub): show only these ani values.
-  // Kept as a view-level filter so the background full load can complete the
-  // stores without flooding the screen with every card type.
+  // Focused view (?focus= deep-link from hub): show only the matching cards —
+  // by ani, or for "my requests" (?focus=myapp) the opening cards that are my
+  // own candidacies. Kept as a view-level predicate so the background full load
+  // can complete the stores without flooding the screen with every card type.
+  /** @type {((item: any) => boolean) | null} */
   let focusFilter = $state(null);
 
   // Reactive subscriptions
   $effect(() => {
     displayItems = focusFilter
-      ? $finalSwiperArray.filter((i) => focusFilter.has(i.ani))
+      ? $finalSwiperArray.filter((i) => focusFilter(i))
       : $finalSwiperArray;
     cards = $isCardsView;
   });
@@ -117,7 +119,7 @@
    * from one kind to another. Same for projects: after picking one, one chip.
    */
   let filterSource = $derived(
-    focusFilter ? $mergedFeed.filter((i) => focusFilter.has(i.ani)) : $mergedFeed
+    focusFilter ? $mergedFeed.filter((i) => focusFilter(i)) : $mergedFeed
   );
 
   // One pass over the feed instead of the thirty separate `displayItems.filter`
@@ -215,8 +217,6 @@
   function clearFocus() {
     focusFilter = null;
     projectFilter.set(null);
-    // My requests are not a to-do: they live only in their focused view.
-    myApplicationsStore.set([]);
   }
 
   // Dialog state
@@ -347,17 +347,19 @@
     }
   }
 
-  // My requests (hub → /lev?focus=myapp): the candidacies I sent that the
-  // rikma has not answered. Most sit in rikmas I am not in yet, so the main
-  // query never sees them; read only for this focused view.
-  async function loadMyApplications() {
+  // Where my candidacies stand (who signed, who has not answered, when silence
+  // approves) — shown on the opening's own card in its "already applied" state.
+  // Read by candidate: most sit in rikmas I am not in yet. Quiet on failure in
+  // the ordinary deck (the cards still work without it); said aloud in the
+  // hub's "my requests" view, which is about exactly this.
+  async function loadMyApplications(loud = false) {
     try {
       const res = await executeAction('getMyApplications', {});
       if (res?.success && res.data) myApplicationsStore.set(res.data.applications ?? []);
-      else toast.error($t('lev.myapp.loadFailed'));
+      else if (loud) toast.error($t('lev.myapp.loadFailed'));
     } catch (e) {
       console.error('[MyApplications] load failed:', e);
-      toast.error($t('lev.myapp.loadFailed'));
+      if (loud) toast.error($t('lev.myapp.loadFailed'));
     }
   }
 
@@ -398,10 +400,13 @@
 
     // Apply the focused view regardless of how the data gets loaded — the
     // whole point of the deep-link is seeing only the requested cards.
-    if (focusAni) {
+    if (focusAni === MY_REQUESTS_FOCUS) {
+      focusFilter = isMyCandidacyItem;
+    } else if (focusAni) {
       const anis = anisForFocus(focusAni);
       if (anis.length > 0) {
-        focusFilter = new Set(anis);
+        const set = new Set(anis);
+        focusFilter = (i) => set.has(i.ani);
       }
       if (focusProject) {
         projectFilter.set(focusProject);
@@ -432,6 +437,7 @@
     loadStipendWork();
     loadShiftWork();
     loadFulfillWork();
+    loadMyApplications(focusAni === MY_REQUESTS_FOCUS);
 
     // Errors of a background refresh must not blank an already-rendered page —
     // only an expired session needs action.
@@ -444,12 +450,15 @@
     };
 
     try {
-      if (focusAni && anisForFocus(focusAni).includes(MY_APPLICATION_ANI)) {
-        // My requests come from their own read — show them at once; the rest
-        // of the heart (which rikmas I am in) fills in behind.
-        await loadMyApplications();
+      if (focusAni === MY_REQUESTS_FOCUS) {
+        // My candidacies are the opening cards of query 83 (asks / askms) —
+        // no slice serves them, so this view waits for the main load.
+        if (get(dataMode) === 'full') {
+          initializeLevData(page.data.uid, '', data.lang).catch(handleBackgroundError);
+        } else {
+          await initializeLevData(page.data.uid, '', data.lang);
+        }
         loading = false;
-        if (get(dataMode) !== 'full') initializeLevData(page.data.uid, '', data.lang).catch(handleBackgroundError);
       } else if (focusAni && get(dataMode) !== 'full') {
         // Quantum (fast) path: load only the requested slice(s), then kick off
         // the full query 83 in the background so the page becomes complete

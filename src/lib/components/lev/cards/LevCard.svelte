@@ -47,7 +47,7 @@
   import ShiftHoursCard from './ShiftHoursCard.svelte';
   import FulfillCard from './FulfillCard.svelte';
   import FulfillRuleCard from './FulfillRuleCard.svelte';
-  import MyApplicationCard from './MyApplicationCard.svelte';
+  import { myApplicationsByKey, candidacyFor } from '$lib/utils/levMyApplications';
   import { setLevItem } from '../levItemContext.js';
 
   /**
@@ -210,8 +210,6 @@
   <FulfillCard {buble} isFirst={isVisible} onProj={proj} onDone={delo} />
 {:else if buble.ani === 'fulfillRule'}
   <FulfillRuleCard {buble} isFirst={isVisible} onProj={proj} onDone={delo} />
-{:else if buble.ani === 'myapp'}
-  <MyApplicationCard {buble} isFirst={isVisible} onProj={proj} onDone={delo} />
 {:else if buble.ani === 'sitesharedecide'}
   <SiteShareAutoApprovedCard
       {buble}
@@ -664,6 +662,7 @@
       myAskUsers={buble.myAskUsers ?? []}
       myRound={buble.myRound ?? null}
       alreadyi={buble.alreadyi}
+      candidacy={candidacyFor($myApplicationsByKey, buble)}
       {askedarr}
       {declineddarr}
       deadLine={buble.sqadualed}
@@ -716,6 +715,8 @@
       oid={buble.oid}
       id={buble.id}
       askId={buble.myAskId ?? buble.askId ?? 1}
+      myAskId={buble.myAskId ?? null}
+      candidacy={candidacyFor($myApplicationsByKey, buble)}
       myRoundProposedBy={buble.myRoundProposedBy ?? null}
       myOrdern={buble.myOrdern ?? 0}
       myAskUsers={buble.myAskUsers ?? []}

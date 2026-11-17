@@ -156,7 +156,9 @@
   }
   import Cards from './cards/sugestma.svelte';
   import Nego from '../prPr/negoPend.svelte';
-  import { executeAction } from '$lib/client/actionClient';
+  import { executeAction, actionErrorText } from '$lib/client/actionClient';
+  import { toast } from 'svelte-sonner';
+  import { forgetMyApplication } from '$lib/utils/levMyApplications';
   import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
   import Spinner from '$lib/celim/Spinner.svelte';
   import Diun from './diun.svelte';
@@ -208,6 +210,8 @@
    * @property {any} [chat]
    * @property {number} [order]
    * @property {number} [askId]
+   * @property {string|null} [myAskId] - my own pending Askm here, or null
+   * @property {import('$lib/candidacy/myApplications').MyApplication | null} [candidacy] - where my candidacy stands
    * @property {string|null} [myRoundProposedBy]
    * @property {number} [myOrdern]
    * @property {any[]} [myAskUsers]
@@ -252,6 +256,10 @@
     chat = $bindable([]),
     order = $bindable(0),
     askId = 1,
+    /** my own pending Askm on this resource, or null — only then can I withdraw it */
+    myAskId = null,
+    /** where my candidacy stands (getMyApplications), or null */
+    candidacy = null,
     // Path B2 — the rikma's latest response on the candidate's own application.
     myRoundProposedBy = null, // 'project' → rikma countered, awaiting candidate
     myOrdern = 0,
@@ -288,6 +296,30 @@
       else error1 = result.error;
     } catch (e) {
       error1 = e;
+    } finally {
+      withdrawing = false;
+    }
+  }
+  // Withdraw my ordinary candidacy (not a self-nomination): archives only my
+  // Askm, stops its clock and tells the members (withdrawCandidacy).
+  async function withdrawMyAskm() {
+    if (withdrawing || !myAskId || !projectId) return;
+    withdrawing = true;
+    try {
+      const result = await executeAction('withdrawCandidacy', {
+        side: 'askm',
+        id: String(myAskId),
+        projectId: String(projectId)
+      });
+      if (result.success) {
+        toast.success($t('lev.myapp.withdrawn'));
+        forgetMyApplication('resource', String(myAskId));
+        less();
+      } else {
+        toast.error(actionErrorText(result, $t('lev.myapp.failed')));
+      }
+    } catch (e) {
+      toast.error($t('lev.myapp.failed'));
     } finally {
       withdrawing = false;
     }
@@ -408,7 +440,8 @@
   {selfNomination}
   {dateMatch}
   onNegoDates={() => nego(oid)}
-  onWithdraw={withdrawSelfNom}
+  {candidacy}
+  onWithdraw={selfNomination ? withdrawSelfNom : myAskId && projectId ? withdrawMyAskm : null}
   {offerHref}
   onProj={projectNav}
 />

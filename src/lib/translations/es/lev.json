@@ -903,8 +903,7 @@
       "shiftLog": "Horas del turno",
       "fulfill": "Tarea de pedido",
       "fulfillRule": "Regla de automatización",
-      "promotion": "Promoción de la tienda",
-      "myapp": "Mi solicitud"
+      "promotion": "Promoción de la tienda"
     },
     "fact": {
       "hours": "{{value}} horas",
@@ -977,9 +976,7 @@
       "fulfillStock": "Poco stock: {{name}}",
       "fulfillRule": "Propuesta de {{name}} — espera tu respuesta",
       "fulfillRuleAnon": "Una regla que recae en ti — espera tu respuesta",
-      "fulfillRuleCounter": "{{name}} propuso un cambio — espera tu respuesta",
-      "myappMission": "Misión en {{name}}",
-      "myappResource": "Recurso para {{name}}"
+      "fulfillRuleCounter": "{{name}} propuso un cambio — espera tu respuesta"
     },
     "title": {
       "transfer": "{{from}} → {{to}}",
@@ -1031,8 +1028,7 @@
     "stipend": "Abierta {{time}}",
     "sheirutp": "Enviada {{time}}",
     "wishoffer": "Presentada {{time}}",
-    "promotion": "Propuesta {{time}}",
-    "myapp": "Enviada {{time}}"
+    "promotion": "Propuesta {{time}}"
   },
   "fulfill": {
     "type": "Tarea de un pedido de tu sitio",
@@ -1273,12 +1269,6 @@
     "counter": "Contrapropuesta"
   },
   "myapp": {
-    "cardType": "Mi solicitud",
-    "mission": "Te ofreciste a tomar esta misión en la rikma {{name}}.",
-    "resource": "Te ofreciste a aportar este recurso a la rikma {{name}}.",
-    "missionTerms": "{{hours}} horas · {{rate}} por hora",
-    "resourceTerms": "Por {{rate}}",
-    "countered": "Se propusieron otros términos; estos son los que están sobre la mesa ahora.",
     "signed": "Ya aprobaron: {{names}}",
     "waiting": "Aún no respondieron: {{names}}",
     "silence": "Si nadie propone otros términos hasta {{time}}, el silencio aprueba tu candidatura.",

@@ -902,8 +902,7 @@
       "shiftLog": "שעות משמרת",
       "fulfill": "מטלה להזמנה",
       "fulfillRule": "כלל אוטומציה",
-      "promotion": "מבצע בחנות",
-      "myapp": "הבקשה שלי"
+      "promotion": "מבצע בחנות"
     },
     "fact": {
       "hours": "{{value}} שעות",
@@ -976,9 +975,7 @@
       "fulfillStock": "מלאי נמוך: {{name}}",
       "fulfillRule": "הצעה של {{name}} — מחכה לתשובתך",
       "fulfillRuleAnon": "כלל שנוחת עליך — מחכה לתשובתך",
-      "fulfillRuleCounter": "{{name}} הציע/ה שינוי — מחכה לתשובתך",
-      "myappMission": "משימה ברקמה {{name}}",
-      "myappResource": "משאב לרקמה {{name}}"
+      "fulfillRuleCounter": "{{name}} הציע/ה שינוי — מחכה לתשובתך"
     },
     "title": {
       "transfer": "{{from}} ← {{to}}",
@@ -1030,8 +1027,7 @@
     "stipend": "נפתחה {{time}}",
     "sheirutp": "נשלחה {{time}}",
     "wishoffer": "הוגשה {{time}}",
-    "promotion": "הוצע {{time}}",
-    "myapp": "נשלחה {{time}}"
+    "promotion": "הוצע {{time}}"
   },
   "fulfill": {
     "type": "מטלה להזמנה מהאתר",
@@ -1272,12 +1268,6 @@
     "counter": "הצעה נגדית"
   },
   "myapp": {
-    "cardType": "הבקשה שלי",
-    "mission": "הצעת לקחת את המשימה הזו ברקמה {{name}}.",
-    "resource": "הצעת להביא את המשאב הזה לרקמה {{name}}.",
-    "missionTerms": "{{hours}} שעות · {{rate}} לשעה",
-    "resourceTerms": "במחיר {{rate}}",
-    "countered": "הוצעו תנאים אחרים, ואלה התנאים שעל השולחן עכשיו.",
     "signed": "כבר אישרו: {{names}}",
     "waiting": "עוד לא ענו: {{names}}",
     "silence": "אם אף אחד לא יציע תנאים אחרים עד {{time}}, השתיקה תאשר את המועמדות.",

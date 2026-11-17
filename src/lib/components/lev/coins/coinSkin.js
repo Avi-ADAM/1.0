@@ -84,8 +84,7 @@ const FACE_BY_ANI = {
   sitesharedecide: FACES.coinnn,
   stipendpay: FACES.newcoin,
   stipendconfirm: FACES.coin,
-  stipendaccrued: FACES.coin,
-  myapp: FACES.coin // a candidacy I sent: the join request's own face
+  stipendaccrued: FACES.coin
 };
 
 /** The face for a kind. Every kind has one — an unknown one gets the decision coin. */

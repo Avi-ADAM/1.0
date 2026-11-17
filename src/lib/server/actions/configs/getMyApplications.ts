@@ -1,8 +1,9 @@
 /**
  * Action: getMyApplications — read-only.
  *
- * The caller's own open candidacies (Ask / Askm), for the heart's "my requests"
- * cards (`/lev?focus=myapp`, linked from the hub). Most of them sit in rikmas
+ * The caller's own open candidacies (Ask / Askm): who signed, who has not
+ * answered, when silence approves — shown on the opening's own heart card
+ * (and under `/lev?focus=myapp`, the hub's "my requests"). Most sit in rikmas
  * the caller is not a member of yet, so the main heart query — which walks the
  * caller's rikmas — never sees them; this reads them by candidate instead.
  *

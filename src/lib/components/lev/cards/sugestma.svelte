@@ -11,6 +11,7 @@
 
   // רכיבים מודרניים חדשים
   import CardHeader from './CardHeader.svelte';
+  import CandidacyStatus from './CandidacyStatus.svelte';
   import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
   import DateOverlap from '$lib/components/resource/DateOverlap.svelte';
 
@@ -51,7 +52,8 @@
    * @property {any} [myRound]
    * @property {() => void} [onTochat]
    * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
-   * @property {(() => void) | null} [onWithdraw] - withdraw my self-nomination entirely
+   * @property {(() => void) | null} [onWithdraw] - withdraw my application (self-nomination or candidacy)
+   * @property {import('$lib/candidacy/myApplications').MyApplication | null} [candidacy] - where my candidacy stands
    * @property {import('$lib/resources/dateMatchView.js').DateMatch | null} [dateMatch] - date-overlap line (PLAN_RESOURCE_CALENDAR §6.4)
    * @property {(() => void)} [onNegoDates] - open the date counter-proposal
    * @property {string|null} [offerHref] - wish/maagad-sourced need: offer on the source page instead
@@ -98,6 +100,8 @@
     // authored resource offer — they may withdraw it entirely.
     selfNomination = false,
     onWithdraw = null,
+    /** where my candidacy stands (getMyApplications), or null */
+    candidacy = null,
     // Date-overlap line (PLAN_RESOURCE_CALENDAR §6.4). Null when the holder's
     // window already covers the request, so the card stays quiet.
     /** @type {import('$lib/resources/dateMatchView.js').DateMatch | null} */
@@ -105,6 +109,13 @@
     /** @type {(() => void) | undefined} opens the date counter-proposal */
     onNegoDates = undefined
   } = $props();
+
+  // An ordinary candidacy asks once before withdrawing; the members are told.
+  let confirmingWithdraw = $state(false);
+  function askWithdraw() {
+    if (selfNomination) onWithdraw?.();
+    else confirmingWithdraw = true;
+  }
 
 
   function hover(x) {
@@ -225,6 +236,10 @@
   <div
     class="d bg-white dark:bg-slate-800 transition-all-300 p-4 flex-1 overflow-y-auto space-y-5"
   >
+    <!-- איפה המועמדות שלי עומדת: מי אישר, מי עוד לא ענה, מתי השתיקה תאשר -->
+    {#if candidacy}
+      <CandidacyStatus {candidacy} />
+    {/if}
     <!-- ההצעה שלי — מוצגת כשהגשתי התאמה אישית (סבב מו"מ על המועמדות שלי) -->
     {#if myRound}
       {@const byCandidate = myRound.proposedBy !== 'project'}
@@ -586,8 +601,32 @@
           <div class="w-8 h-8 text-white"><Lev /></div>
           <span class="whitespace-nowrap">{$t('lev.cards.approve')}</span>
         </button>
+      {:else if confirmingWithdraw}
+        <div class="w-full flex flex-col gap-2">
+          <p class="text-sm font-bold text-gray-800 dark:text-gray-100">{$t('lev.myapp.confirm')}</p>
+          <div class="flex gap-2">
+            <button
+              type="button"
+              class="flex-1 py-2 rounded-xl border border-gray-300 dark:border-slate-600 text-sm text-gray-800 dark:text-gray-100"
+              onclick={() => (confirmingWithdraw = false)}
+            >
+              {$t('lev.myapp.cancel')}
+            </button>
+            <button
+              type="button"
+              class="flex-2 py-2 rounded-xl bg-barbi text-gold text-sm font-bold"
+              style="flex: 2;"
+              onclick={() => {
+                confirmingWithdraw = false;
+                onWithdraw?.();
+              }}
+            >
+              {$t('lev.myapp.confirmYes')}
+            </button>
+          </div>
+        </div>
       {:else}
-        <!-- ההצעה שלי ממתינה לרקמה — תקשורת זמינה תמיד, ומשיכה על הצעה עצמית -->
+        <!-- ההצעה שלי ממתינה לרקמה — תקשורת זמינה תמיד, ומשיכה (הצעה עצמית או מועמדות) -->
         {#if onTochat}
           <button
             onmouseenter={() => hover($t('lev.rektom.chat'))}
@@ -601,18 +640,22 @@
             >
           </button>
         {/if}
-        {#if selfNomination && onWithdraw}
-          <!-- משיכת הצעה עצמית (PLAN_SELF_NOMINATION §3.3) — המשאב כולו שלי,
-               ולכן המשיכה מארכבת אותו יחד עם הבקשה. -->
+        {#if onWithdraw}
+          <!-- משיכה: הצעה עצמית (PLAN_SELF_NOMINATION §3.3) מארכבת את המשאב
+               כולו יחד עם הבקשה; מועמדות רגילה מארכבת רק את הבקשה שלי. -->
           <button
             onmouseenter={() =>
-              hover($t('lev.cards.sugestma.withdrawSelfNomination'))}
+              hover(
+                selfNomination
+                  ? $t('lev.cards.sugestma.withdrawSelfNomination')
+                  : $t('lev.myapp.withdraw')
+              )}
             onmouseleave={() => hover('0')}
             class="flex-1 py-2 flex justify-center items-center gap-2 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-gray-400 hover:text-gray-600 font-bold rounded-xl transition-all"
-            onclick={() => onWithdraw?.()}
+            onclick={askWithdraw}
           >
             <span class="whitespace-nowrap"
-              >🌱 {$t('lev.cards.withdraw')}</span
+              >{selfNomination ? `🌱 ${$t('lev.cards.withdraw')}` : $t('lev.myapp.withdraw')}</span
             >
           </button>
         {/if}

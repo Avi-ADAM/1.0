@@ -11,6 +11,7 @@
 
   // ייבוא רכיבים מודרניים חדשים
   import CardHeader from './CardHeader.svelte';
+  import CandidacyStatus from './CandidacyStatus.svelte';
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
   import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
   import MissionStipendOffer from '$lib/components/stipend/MissionStipendOffer.svelte';
@@ -77,8 +78,19 @@
     // Self-nomination (PLAN_SELF_NOMINATION §4.2): this is the candidate's own
     // authored proposal — they may withdraw it entirely.
     selfNomination = false,
-    onWithdraw = null
+    // Withdraw my application: the whole self-nomination, or — for an
+    // ordinary candidacy — only my Ask (withdrawCandidacy). Null hides it.
+    onWithdraw = null,
+    /** where my candidacy stands (getMyApplications), or null */
+    candidacy = null
   } = $props();
+
+  // An ordinary candidacy asks once before withdrawing; the members are told.
+  let confirmingWithdraw = $state(false);
+  function askWithdraw() {
+    if (selfNomination) onWithdraw?.();
+    else confirmingWithdraw = true;
+  }
 
 
   function hover(x) {
@@ -138,6 +150,10 @@
     class="d bg-white dark:bg-slate-800 
     transition-all duration-300 p-5 flex-1 overflow-y-auto space-y-6 text-gray-800 dark:text-gray-100"
   >
+    <!-- איפה המועמדות שלי עומדת: מי אישר, מי עוד לא ענה, מתי השתיקה תאשר -->
+    {#if candidacy}
+      <CandidacyStatus {candidacy} />
+    {/if}
     <!-- ההצעה שלי — מוצגת כשהגשתי התאמה אישית (סבב מו"מ על המועמדות שלי) -->
     {#if myRound}
       {@const byCandidate = myRound.proposedBy !== 'project'}
@@ -580,13 +596,37 @@
           <div class="w-8 h-8 text-white"><Lev /></div>
           <span class="whitespace-nowrap">{$t('lev.cards.approve')}</span>
         </button>
+      {:else if alreadyi == true && confirmingWithdraw}
+        <div class="w-full flex flex-col gap-2">
+          <p class="text-sm font-bold text-gray-800 dark:text-gray-100">{$t('lev.myapp.confirm')}</p>
+          <div class="flex gap-2">
+            <button
+              type="button"
+              class="flex-1 py-3 rounded-xl border border-gray-300 dark:border-slate-600 text-sm text-gray-800 dark:text-gray-100"
+              onclick={() => (confirmingWithdraw = false)}
+            >
+              {$t('lev.myapp.cancel')}
+            </button>
+            <button
+              type="button"
+              class="flex-2 py-3 rounded-xl bg-barbi text-gold text-sm font-bold"
+              style="flex: 2;"
+              onclick={() => {
+                confirmingWithdraw = false;
+                onWithdraw?.();
+              }}
+            >
+              {$t('lev.myapp.confirmYes')}
+            </button>
+          </div>
+        </div>
       {:else if alreadyi == true}
         <!-- מצב צ'אט -->
         <button
-          class="{selfNomination && onWithdraw
+          class="{onWithdraw
             ? 'flex-2'
             : 'w-full'} py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold rounded-xl shadow-md flex justify-center items-center gap-2 hover:opacity-90 transition-all"
-          style={selfNomination && onWithdraw ? 'flex: 2;' : ''}
+          style={onWithdraw ? 'flex: 2;' : ''}
           onmouseenter={() => hover($t('lev.rektom.chat'))}
           onmouseleave={() => hover('0')}
           onclick={() => tochat()}
@@ -594,18 +634,22 @@
           <span>{$t('lev.cards.openChat')}</span>
           <div class="w-6 h-6"><Chaticon /></div>
         </button>
-        {#if selfNomination && onWithdraw}
-          <!-- משיכת הצעה עצמית (PLAN_SELF_NOMINATION §3.3) — המשימה כולה שלי,
-               ולכן המשיכה מארכבת אותה יחד עם הבקשה. -->
+        {#if onWithdraw}
+          <!-- משיכה: הצעה עצמית (PLAN_SELF_NOMINATION §3.3) מארכבת את המשימה
+               כולה יחד עם הבקשה; מועמדות רגילה מארכבת רק את הבקשה שלי. -->
           <button
             class="flex-1 py-3 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-gray-400 hover:text-gray-600 font-bold rounded-xl flex justify-center items-center gap-2 transition-all"
             onmouseenter={() =>
-              hover($t('lev.cards.sugestmi.withdrawSelfNomination'))}
+              hover(
+                selfNomination
+                  ? $t('lev.cards.sugestmi.withdrawSelfNomination')
+                  : $t('lev.myapp.withdraw')
+              )}
             onmouseleave={() => hover('0')}
-            onclick={() => onWithdraw?.()}
+            onclick={askWithdraw}
           >
             <span class="whitespace-nowrap"
-              >🌱 {$t('lev.cards.withdraw')}</span
+              >{selfNomination ? `🌱 ${$t('lev.cards.withdraw')}` : $t('lev.myapp.withdraw')}</span
             >
           </button>
         {/if}

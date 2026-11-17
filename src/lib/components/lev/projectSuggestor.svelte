@@ -1,7 +1,9 @@
 <script>
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
-  import { executeAction } from '$lib/client/actionClient';
+  import { executeAction, actionErrorText } from '$lib/client/actionClient';
+  import { toast } from 'svelte-sonner';
+  import { forgetMyApplication } from '$lib/utils/levMyApplications';
   import { fly } from 'svelte/transition';
   import { onMount } from 'svelte';
   import { t } from '$lib/translations';
@@ -49,6 +51,7 @@
    * @property {boolean} [cards] - Cards flag
    * @property {any} [chat] - Chat data
    * @property {any} askId - Ask ID
+   * @property {import('$lib/candidacy/myApplications').MyApplication | null} [candidacy] - where my candidacy stands
    * @property {string|null} [myRoundProposedBy] - latest round author on my application ('project' = rikma countered)
    * @property {number} [myOrdern] - latest round order on my application
    * @property {any[]} [myAskUsers] - my application's vots (for accept/counter)
@@ -104,6 +107,8 @@
     chat = [],
     askId,
     forumId, // Add forumId to props
+    /** where my candidacy stands (getMyApplications), or null */
+    candidacy = null,
     // Path B2 — the rikma's latest response on the candidate's own application.
     myRoundProposedBy = null, // 'project' → rikma countered, awaiting candidate
     myOrdern = 0,
@@ -147,6 +152,31 @@
       else error1 = result.error;
     } catch (e) {
       error1 = e;
+    } finally {
+      withdrawing = false;
+    }
+  }
+
+  // Withdraw my ordinary candidacy (not a self-nomination): archives only my
+  // Ask, stops its clock and tells the members (withdrawCandidacy).
+  async function withdrawMyAsk() {
+    if (withdrawing || !askId || !projectId) return;
+    withdrawing = true;
+    try {
+      const result = await executeAction('withdrawCandidacy', {
+        side: 'ask',
+        id: String(askId),
+        projectId: String(projectId)
+      });
+      if (result.success) {
+        toast.success($t('lev.myapp.withdrawn'));
+        forgetMyApplication('mission', String(askId));
+        less(oid);
+      } else {
+        toast.error(actionErrorText(result, $t('lev.myapp.failed')));
+      }
+    } catch (e) {
+      toast.error($t('lev.myapp.failed'));
     } finally {
       withdrawing = false;
     }
@@ -513,7 +543,8 @@
   {wishName}
   {projectId}
   {selfNomination}
-  onWithdraw={withdrawSelfNom}
+  {candidacy}
+  onWithdraw={selfNomination ? withdrawSelfNom : alreadyi && askId && projectId ? withdrawMyAsk : null}
   {offerHref}
 />
 

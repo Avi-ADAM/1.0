@@ -902,8 +902,7 @@
       "shiftLog": "Shift hours",
       "fulfill": "Order task",
       "fulfillRule": "Automation rule",
-      "promotion": "Shop promotion",
-      "myapp": "My request"
+      "promotion": "Shop promotion"
     },
     "fact": {
       "hours": "{{value}} hours",
@@ -976,9 +975,7 @@
       "fulfillStock": "Low stock: {{name}}",
       "fulfillRule": "Proposed by {{name}} — waiting for your answer",
       "fulfillRuleAnon": "A rule that lands on you — waiting for your answer",
-      "fulfillRuleCounter": "{{name}} proposed a change — waiting for your answer",
-      "myappMission": "Mission in {{name}}",
-      "myappResource": "Resource for {{name}}"
+      "fulfillRuleCounter": "{{name}} proposed a change — waiting for your answer"
     },
     "title": {
       "transfer": "{{from}} → {{to}}",
@@ -1030,8 +1027,7 @@
     "stipend": "Opened {{time}}",
     "sheirutp": "Sent {{time}}",
     "wishoffer": "Submitted {{time}}",
-    "promotion": "Proposed {{time}}",
-    "myapp": "Sent {{time}}"
+    "promotion": "Proposed {{time}}"
   },
   "fulfill": {
     "type": "Task for an order from your site",
@@ -1272,12 +1268,6 @@
     "counter": "Counter-offer"
   },
   "myapp": {
-    "cardType": "My request",
-    "mission": "You offered to take this mission in the rikma {{name}}.",
-    "resource": "You offered to bring this resource to the rikma {{name}}.",
-    "missionTerms": "{{hours}} hours · {{rate}} per hour",
-    "resourceTerms": "At {{rate}}",
-    "countered": "Other terms were proposed; these are the terms on the table now.",
     "signed": "Already approved: {{names}}",
     "waiting": "Not answered yet: {{names}}",
     "silence": "If nobody proposes other terms by {{time}}, silence approves your candidacy.",

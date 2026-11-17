@@ -1,13 +1,6 @@
-import { describe, expect, it, vi } from 'vitest';
-
-vi.mock('$lib/stores/levStores', async () => {
-  const { writable } = await import('svelte/store');
-  return { projectsStore: writable([]) };
-});
-vi.mock('$lib/utils/projectHelpers.js', () => ({ createProjectInfo: () => ({}) }));
-
-const { shapeApplications } = await import('./myApplications');
-const { processMyApplications } = await import('$lib/utils/levMyApplications');
+import { describe, expect, it } from 'vitest';
+import { shapeApplications } from './myApplications';
+import { candidacyFor, isMyCandidacyItem } from '$lib/utils/levMyApplications';
 
 const project = { data: { id: '5', attributes: { projectName: 'Bakery', user_1s: { data: [{ id: '1', attributes: { username: 'dan' } }] } } } };
 
@@ -35,18 +28,25 @@ describe('shapeApplications', () => {
   });
 });
 
-describe('processMyApplications', () => {
-  it('makes one myapp card per candidacy, named after the rikma when I am not in it', () => {
-    const items = processMyApplications(shapeApplications(data, '7'));
-    expect(items).toHaveLength(2);
-    expect(items[0].ani).toBe('myapp');
-    expect(items[0].projectName).toBe('Bakery');
-    expect(items[0].coinlapach).toBe('myapp-mission-11');
-    expect(items[1].coinlapach).toBe('myapp-resource-20');
-    expect(items[0].when?.at).toBe('2026-11-10T10:00:00.000Z');
+describe('my candidacies on the heart’s own cards', () => {
+  const missionCard = { ani: 'meData', alreadyi: true, askId: '11' };
+  const resourceCard = { ani: 'huca', myAskId: '20' };
+
+  it('?focus=myapp keeps only the opening cards I applied to', () => {
+    expect(isMyCandidacyItem(missionCard)).toBe(true);
+    expect(isMyCandidacyItem(resourceCard)).toBe(true);
+    // A suggestion I have not applied to, and a resource card with no Askm of mine.
+    expect(isMyCandidacyItem({ ani: 'meData', alreadyi: false, askId: '11' })).toBe(false);
+    expect(isMyCandidacyItem({ ani: 'huca', askId: '20' })).toBe(false);
+    expect(isMyCandidacyItem({ ani: 'pend', alreadyi: true, askId: '11' })).toBe(false);
+    expect(isMyCandidacyItem(null)).toBe(false);
   });
 
-  it('never throws on missing data', () => {
-    expect(processMyApplications(null)).toEqual([]);
+  it('finds where the card’s candidacy stands, by kind and id', () => {
+    const map = new Map(shapeApplications(data, '7').map((a) => [`${a.kind}:${a.applicationId}`, a]));
+    expect(candidacyFor(map, missionCard)?.name).toBe('Bake bread');
+    expect(candidacyFor(map, resourceCard)?.name).toBe('Oven');
+    // Ask 20 is not a mission candidacy: ids never cross kinds.
+    expect(candidacyFor(map, { ani: 'meData', alreadyi: true, askId: '20' })).toBeNull();
   });
 });
