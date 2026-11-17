@@ -33,7 +33,7 @@
 
   const sale = $derived(data.sale);
   const kind = $derived(data.kind);
-  const deal = $derived(sale && kind ? saleToDealDetail(sale, kind) : null);
+  const deal = $derived(sale && kind ? saleToDealDetail(sale, kind, $t) : null);
   // A wish deal is billed by the hours its rikma approved, capped per part (C-14), and is
   // paid part by part as each provider confirms theirs (C-19) — every number on the page
   // reads `due` (`computeDealDue`), the same fact the status and the parts panel show.
@@ -63,10 +63,10 @@
   );
 
   const STATUS_LABEL: Record<string, string> = {
-    active: 'בביצוע',
-    pending: 'בתיאום',
-    approval: 'ממתין לאישור',
-    done: 'הושלם ✓'
+    active: 'deals.statusInProgress',
+    pending: 'deals.statusCoordination',
+    approval: 'deals.pendingApproval',
+    done: 'deals.statusDone'
   };
 
   let isProcessing = $state(false);
@@ -100,11 +100,11 @@
       const result = await res.json();
       if (!result.success) throw new Error(result.error?.message || 'Failed');
 
-      toast.success('הפעולה בוצעה בהצלחה');
+      toast.success($t('deals.dealPage.actionDone'));
       await invalidateAll();
     } catch (err) {
       console.error(err);
-      toast.error('שגיאה בביצוע הפעולה');
+      toast.error($t('deals.dealPage.actionError'));
     } finally {
       isProcessing = false;
     }
@@ -324,19 +324,19 @@
 </script>
 
 <svelte:head>
-  <title>{deal ? `${deal.product} · עסקאות` : 'עסקה'}</title>
+  <title>{deal ? `${deal.product} · ${$t('deals.dealPage.title')}` : $t('deals.dealPage.title')}</title>
 </svelte:head>
 
 <main class="page-wrap">
   <button class="back-btn anim" onclick={() => goto('/deals')}>
-    ← חזרה לכל העסקאות
+    ← {$t('deals.request.allDeals')}
   </button>
 
   {#if !deal}
     <div class="state">
       <div class="missing">
-        <div class="missing-title">העסקה לא נמצאה</div>
-        <div class="missing-sub">ייתכן שהיא הושלמה או שאינה בהרשאתך.</div>
+        <div class="missing-title">{$t('deals.dealPage.notFound')}</div>
+        <div class="missing-sub">{$t('deals.dealPage.notFoundSub')}</div>
       </div>
     </div>
   {:else}
@@ -355,34 +355,36 @@
           </p>
         {/if}
         <div class="hero-badges">
-          <span class="status-badge {deal.status}">{STATUS_LABEL[deal.status]}</span>
-          <span class="chip">{kind === 'purchase' ? 'אתה הקונה' : 'אתה במכירה'}</span>
+          <span class="status-badge {deal.status}">{$t(STATUS_LABEL[deal.status])}</span>
+          <span class="chip"
+            >{kind === 'purchase' ? $t('deals.dealPage.youBuyer') : $t('deals.dealPage.youSeller')}</span
+          >
           {#if offsite}<span class="chip">{$t('deals.offsite.chip')}</span>{/if}
           {#if deal.startDate !== '—'}
-            <span class="chip">התחיל {deal.startDate}</span>
+            <span class="chip">{$t('deals.dealPage.started', { date: deal.startDate })}</span>
           {/if}
           {#if deal.endDate !== '—'}
-            <span class="chip">סיום: {deal.endDate}</span>
+            <span class="chip">{$t('deals.dealPage.ends', { date: deal.endDate })}</span>
           {/if}
         </div>
       </div>
       <div class="hero-stats">
         <div class="hs">
           <div class="hs-v gold"><Money amount={totalCost} /></div>
-          <div class="hs-l">{due ? (due.track === 'fixed' ? $t('deals.due.heroLabelFixed') : $t('deals.due.heroLabel')) : 'עלות כוללת'}</div>
+          <div class="hs-l">{due ? (due.track === 'fixed' ? $t('deals.due.heroLabelFixed') : $t('deals.due.heroLabel')) : $t('deals.totalCost')}</div>
         </div>
         <div class="hs">
           <div class="hs-v" style="color:#4ade80"><Money amount={paid} /></div>
-          <div class="hs-l">שולם</div>
+          <div class="hs-l">{$t('deals.paid')}</div>
         </div>
         <div class="hs">
           <div class="hs-v">{progressPct}%</div>
-          <div class="hs-l">התקדמות</div>
+          <div class="hs-l">{$t('deals.dealPage.progress')}</div>
         </div>
         {#if deal.pendingApprovals.length > 0}
           <div class="hs">
             <div class="hs-v pink">{deal.pendingApprovals.length}</div>
-            <div class="hs-l">לאישורך</div>
+            <div class="hs-l">{$t('deals.pendingYourApproval')}</div>
           </div>
         {/if}
       </div>

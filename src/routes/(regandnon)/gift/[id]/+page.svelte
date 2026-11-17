@@ -451,11 +451,7 @@
                   class="flex items-center gap-3 mb-4 px-4 py-3 rounded-lg border border-gold/40 bg-gold/10 text-sm font-semibold text-gold hover:bg-gold/20 transition-colors"
                 >
                   <EntityIcon kind="waiting" size={17} />
-                  <span>
-                    {$lang === 'he'
-                      ? 'כבר שלחת בקשת רכישה - לצפייה בבקשה'
-                      : 'You already submitted a purchase request - view it'}
-                  </span>
+                  <span>{$t('offerings.page.pendingRequest')}</span>
                   <span class="mr-auto rtl:ml-auto rtl:mr-0">←</span>
                 </a>
               {/if}
@@ -495,9 +491,7 @@
                     href={`/gift/${data.mId}/edit`}
                     class="text-sm font-semibold text-barbi underline mb-3 inline-block"
                   >
-                    {$lang === 'he'
-                      ? 'עריכת BOM / מוצר'
-                      : 'Edit BOM / product'}
+                    {$t('offerings.page.editBom')}
                   </a>
                   <button
                     class="text-sm font-semibold text-gray-500 hover:text-barbi flex items-center gap-2 transition-colors"

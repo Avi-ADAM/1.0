@@ -76,5 +76,20 @@
   "discussion_not_found": "דיון לא נמצא",
   "loading": "טוען...",
   "anonymous": "אנונימי/ת",
-  "discussion_created_by": "הדיון נפתח על ידי"
+  "discussion_created_by": "הדיון נפתח על ידי",
+  "layout": {
+    "docOpen": "דיון: {{topic}} - מערכת יישוב מחלוקות",
+    "docNew": "דיון חדש - מערכת יישוב מחלוקות",
+    "docDefault": "מערכת יישוב מחלוקות",
+    "joinDesc": "הצטרף לדיון פתוח ויישוב מחלוקות",
+    "newDesc": "פתח דיון חדש וזמן אחרים להשתתף",
+    "srTopic": "דיון פתוח בנושא: {{topic}}",
+    "srNew": "יצירת דיון חדש"
+  },
+  "view": {
+    "addMinLine1": "הוסף לפחות 2 עמדות",
+    "addMinLine2": "כדי לראות ניתוח ממדים",
+    "refreshAi": "עדכן ניתוח AI"
+  },
+  "unitsShort": "יח׳"
 }

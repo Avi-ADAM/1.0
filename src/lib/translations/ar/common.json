@@ -72,7 +72,17 @@
     "system": "نظام 1💗1",
     "loading": "جارٍ التحميل…",
     "onlineStatus": "حالة التوفر",
-    "meetingFallback": "اجتماع"
+    "meetingFallback": "اجتماع",
+    "now": "الآن",
+    "minsAgo": "منذ {{count}} د",
+    "hoursAgo": "منذ {{count}} س",
+    "yesterday": "أمس",
+    "receivingFrom": "استلام {{amount}} من {{name}}",
+    "sendingTo": "تحويل {{amount}} إلى {{name}}",
+    "saleLabel": "بيع: {{name}}",
+    "saleReport": "تقرير بيع",
+    "saleReportNamed": "تقرير بيع: {{name}}",
+    "meetingCreated": "تم إنشاء الاجتماع"
   },
   "footer": {
     "brain": "عقل الريكمات",
@@ -247,5 +257,7 @@
   "someoneInitials": "عض",
   "wishNotFound": "لم يتم العثور على الأمنية",
   "wishNotPublic": "هذه الأمنية غير مفتوحة للعامة",
-  "untitled": "(بلا اسم)"
+  "untitled": "(بلا اسم)",
+  "error": "خطأ",
+  "proposals": "مقترحات"
 }

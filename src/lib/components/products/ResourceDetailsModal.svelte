@@ -1,6 +1,5 @@
 ﻿<script lang="ts">
-  import { isRtl } from '$lib/translations';
-  import { lang } from '$lib/stores/lang.js';
+  import { isRtl, t } from '$lib/translations';
   import { fade, fly } from 'svelte/transition';
   import type { ResourceExtraDetails } from './types';
 
@@ -31,36 +30,6 @@
     }
   });
 
-  const t = $derived(
-    $lang === 'he'
-      ? {
-          title: 'פרטים מלאים למשאב',
-          subtitle:
-            'הנתונים האלה נשמרים עם המוצר ויועברו לדרישת המשאב בעת המכירה',
-          desc: 'תיאור מפורט',
-          spnot: 'הערות מיוחדות / מפרט',
-          linkto: 'קישור / לינק חיצוני',
-          easy: 'מחיר מינימום / Easy',
-          startDate: 'תחילת ביצוע מתוכננת',
-          endDate: 'סיום ביצוע מתוכנן',
-          save: 'שמור פרטים',
-          cancel: 'ביטול'
-        }
-      : {
-          title: 'Full resource details',
-          subtitle:
-            'These details are stored with the product and applied to the resource request when the product is sold',
-          desc: 'Description',
-          spnot: 'Special notes / spec',
-          linkto: 'External link',
-          easy: 'Minimum / Easy price',
-          startDate: 'Planned start',
-          endDate: 'Planned end',
-          save: 'Save details',
-          cancel: 'Cancel'
-        }
-  );
-
   function save() {
     onSave({ ...draft });
   }
@@ -79,22 +48,22 @@
       onclick={(e) => e.stopPropagation()}
       role="dialog"
       aria-modal="true"
-      aria-label={t.title}
+      aria-label={$t('products.resourceDetails.title')}
     >
       <header>
         <div>
-          <h2>{t.title}</h2>
+          <h2>{$t('products.resourceDetails.title')}</h2>
           {#if resourceName}
             <p class="res-name">📦 {resourceName}</p>
           {/if}
-          <p class="sub">{t.subtitle}</p>
+          <p class="sub">{$t('products.resourceDetails.subtitle')}</p>
         </div>
         <button class="x" type="button" aria-label="close" onclick={onClose}>×</button>
       </header>
 
       <div class="body" dir={$isRtl ? 'rtl' : 'ltr'}>
         <label class="field">
-          <span>{t.desc}</span>
+          <span>{$t('products.resourceDetails.desc')}</span>
           <textarea
             class="input textarea"
             rows="4"
@@ -103,7 +72,7 @@
         </label>
 
         <label class="field">
-          <span>{t.spnot}</span>
+          <span>{$t('products.resourceDetails.spnot')}</span>
           <textarea
             class="input textarea"
             rows="2"
@@ -112,12 +81,12 @@
         </label>
 
         <label class="field">
-          <span>{t.linkto}</span>
+          <span>{$t('products.resourceDetails.linkto')}</span>
           <input class="input" type="url" bind:value={draft.linkto} />
         </label>
 
         <label class="field">
-          <span>{t.easy}</span>
+          <span>{$t('products.resourceDetails.easy')}</span>
           <input
             class="input"
             type="number"
@@ -129,7 +98,7 @@
 
         <div class="grid">
           <label class="field">
-            <span>{t.startDate}</span>
+            <span>{$t('products.resourceDetails.startDate')}</span>
             <input
               class="input"
               type="datetime-local"
@@ -137,7 +106,7 @@
             />
           </label>
           <label class="field">
-            <span>{t.endDate}</span>
+            <span>{$t('products.resourceDetails.endDate')}</span>
             <input
               class="input"
               type="datetime-local"
@@ -149,8 +118,8 @@
       </div>
 
       <footer>
-        <button class="secondary" type="button" onclick={onClose}>{t.cancel}</button>
-        <button class="primary" type="button" onclick={save}>{t.save}</button>
+        <button class="secondary" type="button" onclick={onClose}>{$t('products.resourceDetails.cancel')}</button>
+        <button class="primary" type="button" onclick={save}>{$t('products.resourceDetails.save')}</button>
       </footer>
     </div>
   </div>

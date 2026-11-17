@@ -390,22 +390,14 @@
     nego = false;
   }
 
-  let u = 'בקשה לאישור קבלת משאב בהצלחה';
+  let u = '';
   function hover(id) {
-    if (id == '0') {
-      u = 'בקשה לאישור קבלת משאב בהצלחה';
-    } else {
-      u = id;
-    }
+    u = id == '0' ? $t('lev.hoverDefault.resourceReceived') : id;
     onHover?.({ id: u });
   }
 
   function hoverc(event) {
-    if (event.x == '0') {
-      u = 'בקשה לאישור ביצוע משימה בהצלחה';
-    } else {
-      u = event.x;
-    }
+    u = event.x == '0' ? $t('lev.hoverDefault.resourceReceived') : event.x;
     onHover?.({ id: u });
   }
   import Cards from './cards/dowegeot.svelte';

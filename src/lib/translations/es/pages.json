@@ -177,7 +177,10 @@
       "maagad": "1💗1 | Recurso del agregador de demanda: \"{{name}}\"",
       "wish": "1💗1 | Recurso de un deseo: \"{{name}}\"",
       "project": "1💗1 | Propuesta para compartir el recurso \"{{name}}\" en la rikma {{projectName}}"
-    }
+    },
+    "error": "Error",
+    "sendOfferError": "No se pudo enviar la propuesta",
+    "genericError": "Se produjo un error"
   },
   "availMission": {
     "fnnn": "La solicitud se envió con éxito",
@@ -216,7 +219,13 @@
       "withdrawn": "Tu candidatura fue retirada. Puedes volver a postularte cuando quieras.",
       "failed": "No pudimos retirar la candidatura ahora. Inténtalo de nuevo en un momento.",
       "allMine": "Todas mis solicitudes"
-    }
+    },
+    "seeWish": "Ver el deseo",
+    "negoUnavailable": "La negociación no está disponible para misiones del conserje",
+    "sendOfferError": "No se pudo enviar la propuesta",
+    "sendRequestError": "No se pudo enviar la solicitud",
+    "genericError": "Se produjo un error",
+    "projectLoadError": "No se pudieron cargar los datos del proyecto"
   },
   "gift": {
     "gift": "Producto",
@@ -476,7 +485,19 @@
     "type": "Tipo",
     "unlimited": "Sin límite",
     "outOfStock": "Agotado",
-    "tryAgain": "Intentar de nuevo"
+    "tryAgain": "Intentar de nuevo",
+    "saleDoneUnits": "¡Venta de {{units}} unidades de «{{name}}» realizada con éxito!",
+    "saleDone": "¡Venta realizada con éxito!",
+    "saleFailed": "No se pudo completar la venta",
+    "shareText": "Mira este producto: {{name}}",
+    "linkCopied": "Enlace copiado",
+    "linkCopyFailed": "No se pudo copiar el enlace",
+    "refreshed": "Datos de productos actualizados",
+    "unknownProject": "Proyecto desconocido",
+    "claimsMineOne": "Tienes 1 informe de venta esperando tu respuesta en la página del corazón",
+    "claimsMineMany": "Tienes {{count}} informes de venta esperando tu respuesta en la página del corazón",
+    "claimsWaitingOne": "1 informe de venta esperando el consentimiento de quien tiene el dinero",
+    "claimsWaitingMany": "{{count}} informes de venta esperando el consentimiento de quien tiene el dinero"
   },
   "meetings": {
     "title": "Reuniones mágicas",

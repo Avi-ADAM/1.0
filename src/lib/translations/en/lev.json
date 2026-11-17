@@ -17,7 +17,14 @@
     "oneMonent": "one moment please",
     "editTimer": "edit Timer",
     "timerRunning": "The timer is still running. Stop and save it before submitting the mission.",
-    "noHours": "No hours have been saved for this mission yet. Run the timer (or edit it) and save, then submit."
+    "noHours": "No hours have been saved for this mission yet. Run the timer (or edit it) and save, then submit.",
+    "timerStoppedTitle": "1💗1 Timer stopped",
+    "timerQuotaReached": "Hi {{name}}, the timer for {{mission}} stopped because the agreed hours have run out. Please create a new mission.",
+    "timerNearEndTitle": "1💗1 Timer almost finished",
+    "timerWarn10Pct": "Hi {{name}}, only 10% of the allotted time remains on {{mission}} — consider creating a new mission.",
+    "timerWarn5Pct": "Hi {{name}}, only 5% of the allotted time remains on {{mission}} — consider creating a new mission.",
+    "timerWarn5Min": "Hi {{name}}, only 5 minutes remain on {{mission}} — consider creating a new mission.",
+    "timerWarn1Min": "Hi {{name}}, only 1 minute remains on {{mission}} — consider creating a new mission."
   },
   "cards": {
     "approve": "I want",
@@ -61,13 +68,16 @@
       "addReceiverHint": "So the customer can transfer money to you, add yourself as a recipient",
       "addMeReceiver": "Add me as money recipient",
       "removeMeReceiver": "Remove me from list",
-      "activeSale": "ACTIVE SALE"
+      "activeSale": "ACTIVE SALE",
+      "you": "You",
+      "pendingShort": "Pending..."
     },
     "voteStatus": {
       "approved": "Approved",
       "oldVersion": "Old Version",
       "waiting": "Waiting",
-      "rejected": "Rejected"
+      "rejected": "Rejected",
+      "showAll": "Show all"
     },
     "filter": {
       "heartTitle": "Heart of the system",
@@ -140,7 +150,9 @@
       "hintEditTimer": "Click to edit the timer",
       "hintComplete": "Click to finish the mission",
       "hintStartTimer": "Start the timer",
-      "hintStopTimer": "Stop the timer"
+      "hintStopTimer": "Stop the timer",
+      "start": "Start",
+      "pause": "Pause"
     },
     "openChat": "Open Chat",
     "withdraw": "Withdraw",
@@ -198,7 +210,8 @@
       "confirmTo": "Transfer to {{name}}:",
       "confirmHint": "The money itself moves between you, outside the site. Here you record who you paid, and {{name}} confirms when it arrives.",
       "confirmYes": "Yes, I'm transferring",
-      "confirmBack": "Back"
+      "confirmBack": "Back",
+      "chatTitle": "Sale Approval"
     },
     "dowegeot": {
       "head": "Approval of receiving a resource successfully",
@@ -287,7 +300,8 @@
       "openingChat": "Opening chat...",
       "error": "Error",
       "transferStatus": "Money transfer",
-      "complete": "Complete"
+      "complete": "Complete",
+      "chatTitle": "Money Transfer Summary"
     },
     "wishOffer": {
       "cardType": "Offer to fulfill your wish",
@@ -389,7 +403,26 @@
     },
     "wishApplied": "Your offer was sent successfully",
     "toProfile": "to the profile page",
-    "awaitingClient": "Your vote is recorded. This part belongs to a customer's deal, so it goes through only once she approves too."
+    "awaitingClient": "Your vote is recorded. This part belongs to a customer's deal, so it goes through only once she approves too.",
+    "pma": {
+      "updatedOffer": "Revised proposal",
+      "recurringHead": "🔁 Recurring resource · monthly confirmation",
+      "approveHead": "Resource approval",
+      "autoApproveIn": "Auto-approves in:",
+      "price": "Price",
+      "offeredValue": "Offered value",
+      "billingType": "Billing type",
+      "frequency": "Frequency",
+      "everyMonth": "Every month",
+      "everyYear": "Every year",
+      "everyMonths": "Every {{count}} months",
+      "everyYears": "Every {{count}} years",
+      "estMonthlyCost": "Estimated monthly cost",
+      "monthlyChargeHint": "Each month a charge opens to confirm the actual expense",
+      "activeUpdatedOffer": "Active revised proposal",
+      "changesMade": "Changes made:",
+      "pleaseReview": "A revised proposal was submitted for this resource — please review it."
+    }
   },
   "taskApproval": {
     "approve": "Approve",
@@ -466,7 +499,10 @@
     "labelDiscussion": "Message - please refer to previous messages",
     "labelForum": "Write a message...",
     "typing": "{{names}} typing…",
-    "typingSomeone": "Someone is typing…"
+    "typingSomeone": "Someone is typing…",
+    "minChars": "Minimum {{count}} characters",
+    "vote": "Vote",
+    "voteOn": "Vote on {{name}}"
   },
   "productRequest": {
     "request": "Request"
@@ -1281,5 +1317,43 @@
     "withdrawn": "Your candidacy was withdrawn.",
     "failed": "We could not withdraw the candidacy right now. Please try again in a moment.",
     "loadFailed": "We could not load your requests right now."
+  },
+  "feed": {
+    "someone": "Member",
+    "unnamedMission": "mission",
+    "voteFavor": "{{name}} in favor",
+    "voteAgainst": "{{name}} objected",
+    "oldVersion": "older version",
+    "oldVersionParen": "(older version)",
+    "reason": "Reason: {{reason}}",
+    "askedToJoin": "{{name}} asked to join {{mission}}",
+    "didNego": "{{name}} negotiated changes",
+    "diffHours": "Hours: {{current}} hours instead of {{previous}} hours",
+    "diffPerHour": "Hourly rate: {{current}} instead of {{previous}}",
+    "diffTotal": "Total: {{current}} instead of {{previous}}",
+    "diffName": "Name: \"{{current}}\" instead of \"{{previous}}\"",
+    "diffDescription": "Description: \"{{current}}\" instead of \"{{previous}}\"",
+    "diffNotes": "Notes: \"{{current}}\" instead of \"{{previous}}\"",
+    "diffValue": "\"{{current}}\" instead of \"{{previous}}\"",
+    "diffResQty": "Resource quantity: {{current}} instead of {{previous}}",
+    "diffResPrice": "Resource price: {{current}} instead of {{previous}}",
+    "diffResOffered": "Offered value: {{current}} instead of {{previous}}",
+    "diffResTotal": "Resource total: {{current}} instead of {{previous}}",
+    "diffResKind": "Resource type: \"{{current}}\" instead of \"{{previous}}\"",
+    "monthly": "Monthly",
+    "oneTime": "One-time",
+    "maagad": "Demand pool",
+    "maagadNamed": "Pool · {{name}}",
+    "concierge": "Concierge",
+    "conciergeNamed": "Concierge · {{name}}"
+  },
+  "hoverDefault": {
+    "pendingMission": "Vote on publishing a mission proposal to the rikma",
+    "pendingResource": "Vote on a resource request for the rikma",
+    "finishApproval": "Request to approve mission completion",
+    "resourceSuggest": "Offer to share a resource and join the rikma",
+    "joinMission": "Vote on a request to take a mission and join the rikma",
+    "resourceReceived": "Request to confirm resource receipt",
+    "negoSoonHint": "Negotiation here is coming soon — for now, please share your reason and create a new resource with the desired terms."
   }
 }

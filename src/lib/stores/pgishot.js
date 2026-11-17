@@ -2,6 +2,7 @@ import { sendToSer } from "$lib/send/sendToSer.js";
 import { writable, get } from "svelte/store";
 import { socketClient } from './socketClient';
 import { browser } from '$app/environment';
+import { t as translateStore } from '$lib/translations';
 
 // Stores
 export const whoToFollow = writable({});
@@ -355,7 +356,7 @@ export async function initiatePgishot(idL) {
           
           meetings[meeting.id].messages.push({
             timestamp: meeting.attributes.publishedAt,
-            message: "הפגישה נוצרה"
+            message: get(translateStore)('common.chat.meetingCreated')
           });
           
           // Track participants

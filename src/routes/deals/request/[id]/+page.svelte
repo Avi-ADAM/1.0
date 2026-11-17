@@ -10,7 +10,8 @@
   import { addVote, rejectSheirutpend } from '$lib/client/actionClient';
   import QuotePanel from '$lib/components/deals/QuotePanel.svelte';
   import DealStages from '$lib/components/deals/DealStages.svelte';
-  import { t } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
+  import { lang } from '$lib/stores/lang.js';
   import { providerCanApprove } from '$lib/sheirut/quoteState';
 
   let { data } = $props();
@@ -19,15 +20,15 @@
     monthly: 'calendar', yearly: 'date', total: 'star', unlimited: 'endless', daily: 'sunrise'
   };
   const KIND_LABEL: Record<string, string> = {
-    monthly: 'מינוי חודשי', yearly: 'מינוי שנתי', total: 'תשלום חד פעמי',
-    unlimited: 'ליחידה - ללא הגבלה', daily: 'יומי'
+    monthly: 'deals.kindMonthly', yearly: 'deals.kindYearly', total: 'deals.kindTotal',
+    unlimited: 'deals.kindUnlimited', daily: 'deals.kindDaily'
   };
 
   function fmt(iso?: string | null) {
     if (!iso) return '—';
     const d = new Date(iso);
     if (isNaN(d.getTime())) return '—';
-    return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()}`;
+    return d.toLocaleDateString($lang);
   }
 
   const isComplexProduct = $derived(data.pricingMode && data.pricingMode !== 'fixed');
@@ -81,14 +82,14 @@
       localVoteCount += 1;
 
       if (data.memberCount === 1 || result.data?._deleted) {
-        toast.success('הבקשה אושרה - נוצר שירות חדש!');
+        toast.success($t('deals.request.createdToast'));
         await goto('/deals');
       } else {
-        toast.success(`הצבעתך נרשמה (${localVoteCount}/${data.memberCount})`);
+        toast.success($t('deals.request.voteToast', { done: localVoteCount, total: data.memberCount }));
       }
     } catch (err: any) {
       console.error(err);
-      toast.error('שגיאה באישור הבקשה');
+      toast.error($t('deals.request.approveError'));
     } finally {
       isProcessing = false;
     }
@@ -103,11 +104,11 @@
         projectId: String(data.projectId)
       });
       if (!result.success) throw new Error(result.error?.message || 'Failed');
-      toast.success('הבקשה נדחתה');
+      toast.success($t('deals.request.rejectedToast'));
       await goto('/deals');
     } catch (err: any) {
       console.error(err);
-      toast.error('שגיאה בדחיית הבקשה');
+      toast.error($t('deals.request.rejectError'));
     } finally {
       isProcessing = false;
     }
@@ -138,7 +139,7 @@
         if (!localForumId) throw new Error('No forum ID returned');
       } catch (err: any) {
         console.error(err);
-        toast.error('שגיאה בפתיחת הצ׳אט');
+        toast.error($t('deals.request.chatError'));
         return;
       } finally {
         isCreatingChat = false;
@@ -167,11 +168,11 @@
 </script>
 
 <svelte:head>
-  <title>{data.productName} · בקשת הזמנה</title>
+  <title>{data.productName} · {$t('deals.request.pageTitle')}</title>
 </svelte:head>
 
-<main class="page-wrap" dir="rtl">
-  <button class="back-btn" onclick={() => goto('/deals')}>← חזרה לעסקאות</button>
+<main class="page-wrap" dir={$isRtl ? 'rtl' : 'ltr'}>
+  <button class="back-btn" onclick={() => goto('/deals')}>← {$t('deals.request.back')}</button>
 
   <DealStages stages={data.stages ?? []} />
 
@@ -184,13 +185,13 @@
         {#if data.dealId}
           ✓ {$t('deals.requestSettled.badge')}
         {:else if data.kind === 'buy'}
-          <EntityIcon kind="waiting" size={14} /> ממתינה לאישור המוכר
+          <EntityIcon kind="waiting" size={14} /> {$t('deals.request.waitingSeller')}
         {:else if localAlreadyVoted && data.memberCount === 1}
-          ✓ אושרה
+          ✓ {$t('deals.request.approved')}
         {:else if localAlreadyVoted}
-          ✓ הצבעתך נרשמה
+          ✓ {$t('deals.request.voteRecorded')}
         {:else}
-          <EntityIcon kind="waiting" size={14} /> ממתינה לאישורך
+          <EntityIcon kind="waiting" size={14} /> {$t('deals.request.waitingYou')}
         {/if}
       </div>
       <h1 class="product-name">{data.productName}</h1>
@@ -210,21 +211,21 @@
   <div class="cards-row">
     <!-- Details card -->
     <div class="info-card">
-      <div class="card-title">פרטי הבקשה</div>
+      <div class="card-title">{$t('deals.request.detailsTitle')}</div>
       <div class="rows">
         <div class="row">
-          <span class="rl">סוג</span>
+          <span class="rl">{$t('deals.request.type')}</span>
           <span class="rv">
               <EntityIcon kind={KIND_ICON[data.productKindOf] ?? 'product'} size={14} />
-              {KIND_LABEL[data.productKindOf] ?? '—'}
+              {KIND_LABEL[data.productKindOf] ? $t(KIND_LABEL[data.productKindOf]) : '—'}
             </span>
         </div>
         <div class="row">
-          <span class="rl">כמות</span>
+          <span class="rl">{$t('deals.metaQuantity')}</span>
           <span class="rv">{quote?.state.quant ?? data.quant}</span>
         </div>
         <div class="row">
-          <span class="rl">מחיר ליחידה</span>
+          <span class="rl">{$t('deals.quote.unitPrice')}</span>
           <span class="rv"
             >{#if quote?.state.openPrice}{$t('deals.quote.byQuote')}{:else}<Money
                 amount={quote?.state.price ?? data.price}
@@ -232,7 +233,7 @@
           >
         </div>
         <div class="row total-row">
-          <span class="rl">סה"כ</span>
+          <span class="rl">{$t('deals.metaTotal')}</span>
           <span class="rv gold"
             >{#if quote?.state.openPrice}{$t('deals.quote.byQuote')}{:else}<Money
                 amount={quote?.state.total ?? data.total}
@@ -241,18 +242,18 @@
         </div>
         {#if data.startDate}
           <div class="row">
-            <span class="rl">תאריך התחלה</span>
+            <span class="rl">{$t('deals.request.startDate')}</span>
             <span class="rv">{fmt(data.startDate)}</span>
           </div>
         {/if}
         {#if data.finnishDate}
           <div class="row">
-            <span class="rl">תאריך סיום</span>
+            <span class="rl">{$t('deals.request.endDate')}</span>
             <span class="rv">{fmt(data.finnishDate)}</span>
           </div>
         {/if}
         <div class="row">
-          <span class="rl">הוגשה</span>
+          <span class="rl">{$t('deals.request.submitted')}</span>
           <span class="rv">{fmt(data.createdAt)}</span>
         </div>
       </div>
@@ -260,7 +261,7 @@
 
     <!-- Requester / status card -->
     <div class="info-card">
-      <div class="card-title">{data.kind === 'buy' ? 'הרוכש' : 'פרטי הבקשה'}</div>
+      <div class="card-title">{data.kind === 'buy' ? $t('deals.request.buyer') : $t('deals.request.requester')}</div>
       <div class="rows">
         {#if data.requesterPic}
           <img src={data.requesterPic} alt={data.requesterName} class="avatar" />
@@ -268,7 +269,7 @@
           <div class="avatar-placeholder">{(data.requesterName || '?').charAt(0)}</div>
         {/if}
         <div class="row">
-          <span class="rl">שם</span>
+          <span class="rl">{$t('common.name')}</span>
           <a href="/user/{data.requesterId}" class="rv user-link">{data.requesterName || '—'}</a>
         </div>
       </div>
@@ -285,10 +286,7 @@
       {:else if data.kind === 'buy'}
         <div class="status-box">
           <div class="status-icon"><EntityIcon kind="waiting" size={20} /></div>
-          <div class="status-text">
-            הבקשה שלך התקבלה ומועברת לאישור הפרויקט.
-            תקבל/י עדכון כשהפרויקט יאשר.
-          </div>
+          <div class="status-text">{$t('deals.request.buyReceived')}</div>
         </div>
       {:else}
         <div class="seller-actions">
@@ -297,7 +295,9 @@
               <div class="vote-bar-wrap">
                 <div class="vote-bar" style="width: {Math.round((localVoteCount / data.memberCount) * 100)}%"></div>
               </div>
-              <span class="vote-label">{localVoteCount} / {data.memberCount} אישורים</span>
+              <span class="vote-label"
+                >{$t('deals.request.votes', { done: localVoteCount, total: data.memberCount })}</span
+              >
             </div>
           {/if}
           {#if approveBlocked}
@@ -309,7 +309,7 @@
               onclick={handleReject}
               disabled={isProcessing}
             >
-              דחייה
+              {$t('deals.request.reject')}
             </button>
             <button
               class="btn-approve"
@@ -318,13 +318,13 @@
               title={approveBlocked ? approveBlockedWhy : undefined}
             >
               {#if isProcessing}
-                מעבד...
+                {$t('deals.request.processing')}
               {:else if localAlreadyVoted}
-                אישרת ✓
+                {$t('deals.request.approvedByYou')}
               {:else if data.memberCount === 1}
-                אישור ויצירת עסקה
+                {$t('deals.request.approveAndCreate')}
               {:else}
-                אישור
+                {$t('common.approve')}
               {/if}
             </button>
           </div>
@@ -347,10 +347,10 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
           d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
       </svg>
-      {isCreatingChat ? 'פותח צ׳אט...' : 'צ׳אט'}
+      {isCreatingChat ? $t('deals.request.openingChat') : $t('deals.request.chat')}
     </button>
-    <button class="btn-primary" onclick={() => goto('/deals')}>לכל העסקאות</button>
-    <a href="/gift/{data.productId ?? ''}" class="btn-secondary">לדף המוצר</a>
+    <button class="btn-primary" onclick={() => goto('/deals')}>{$t('deals.request.allDeals')}</button>
+    <a href="/gift/{data.productId ?? ''}" class="btn-secondary">{$t('deals.request.toProduct')}</a>
   </div>
 </main>
 

@@ -33,6 +33,42 @@ import { readSaveFiles } from '$lib/timers/saveFiles';
 import { counterHistory, standingOrder, standingVotes, voterId } from '$lib/finiapruval/rounds';
 import { claimSessions } from '$lib/finiapruval/sessions';
 
+/** Translator callback (`$t` from `$lib/translations`), passed in by reactive stores so processors stay pure. */
+export type TranslateFn = (key: string, payload?: Record<string, any>) => string;
+
+const identityT: TranslateFn = (key, payload) => {
+  if (!payload) return key;
+  const args = Object.entries(payload)
+    .map(([k, v]) => `${k}=${v}`)
+    .join(',');
+  return args ? `${key}(${args})` : key;
+};
+
+function escHtml(value: unknown): string {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function resourceKindLabel(kind: unknown, t: TranslateFn): string {
+  switch (kind) {
+    case 'total':
+      return t('mash.total');
+    case 'perUnit':
+      return t('mash.perUnit');
+    case 'monthly':
+      return t('mash.monthly');
+    case 'yearly':
+      return t('mash.yearly');
+    case 'rent':
+      return t('mash.rent');
+    default:
+      return String(kind ?? '');
+  }
+}
+
 
 /**
  * Common interface for all display items.
@@ -149,7 +185,8 @@ function getProjectMemberCount(projects: ProjectData[], projectId: string): numb
  */
 export function processPends(
   pends: PendMissionData[],
-  projects: ProjectData[]
+  projects: ProjectData[],
+  t: TranslateFn = identityT
 ): DisplayItem[] {
   if (!pends || !Array.isArray(pends)) {
     return [];
@@ -243,7 +280,7 @@ export function processPends(
       const latestVote = sortedUserVotes[0];
 
       const voterInfo = createUserInfo(pend.projectId, uid);
-      const voterName = voterInfo.username || 'User';
+      const voterName = voterInfo.username || t('lev.feed.someone');
       const voterPic = voterInfo.src || projectInfo.src2;
       const uOrder = latestVote.order || 0;
 
@@ -251,9 +288,11 @@ export function processPends(
       const isCurrentVersion = uOrder == orderon;
       const isFavor = isCurrentVersion ? latestVote.what === true : false;
 
-      let msgText = `${voterName} ${isFavor ? 'בעד' : 'נגד'}`;
+      let msgText = isFavor
+        ? t('lev.feed.voteFavor', { name: escHtml(voterName) })
+        : t('lev.feed.voteAgainst', { name: escHtml(voterName) });
       if (!isCurrentVersion) {
-        msgText += ' גרסה ישנה';
+        msgText += ` ${t('lev.feed.oldVersion')}`;
       }
 
       messege.push({
@@ -318,41 +357,36 @@ export function processPends(
       const attr = n.attributes;
       const uid = attr.users_permissions_user?.data?.id;
       const negoInfo = createUserInfo(pend.projectId, uid);
-      const negoName = negoInfo.username || 'User';
+      const negoName = negoInfo.username || t('lev.feed.someone');
       const negoPic = negoInfo.src || projectInfo.src2;
 
-      let msgText = `<span class="underline">${negoName} ביצע משא ומתן</span>`; // Hebrew: Did Nego
+      let msgText = `<span class="underline">${escHtml(t('lev.feed.didNego', { name: negoName }))}</span>`;
 
-      // Detailed Diff Logic (matching old code)
-      // Note: Comparing 'pend' (current values) with 'nego' (historical proposal attributes)
-      // The old code compared pend vs nego. 
-      // Assuming 'pend' holds the *current* state of the mission in the new architecture as well.
-
+      // Detailed Diff Logic (comparing current state of the mission against the historical round)
       if (attr.noofhours && attr.noofhours !== pend.noofhours) {
-        msgText += `<br>⚙️ משימה זו ${pend.noofhours} שעות במקום ${attr.noofhours} שעות`;
+        msgText += `<br>⚙️ ${escHtml(t('lev.feed.diffHours', { current: pend.noofhours, previous: attr.noofhours }))}`;
       }
       if (attr.perhour && attr.perhour !== pend.perhour) {
-        msgText += `<br> ⚙️ לפי שעה ${pend.perhour} במקום ${attr.perhour}`;
+        msgText += `<br>⚙️ ${escHtml(t('lev.feed.diffPerHour', { current: pend.perhour, previous: attr.perhour }))}`;
       }
       if ((attr.perhour && attr.perhour !== pend.perhour) || (attr.noofhours && attr.noofhours !== pend.noofhours)) {
         const currentTotal = (pend.perhour || 0) * (pend.noofhours || 0);
         const negoTotal = (attr.perhour || 0) * (attr.noofhours || 0);
-        msgText += `<br>⚙️ סה"כ ${currentTotal} במקום ${negoTotal}`;
+        msgText += `<br>⚙️ ${escHtml(t('lev.feed.diffTotal', { current: currentTotal, previous: negoTotal }))}`;
       }
       if (attr.name && attr.name !== pend.name) {
-        msgText += `<br>⚙️ שם "${pend.name}" במקום: "${attr.name}"`;
+        msgText += `<br>⚙️ ${escHtml(t('lev.feed.diffName', { current: pend.name, previous: attr.name }))}`;
       }
       if (attr.descrip && attr.descrip !== pend.descrip) {
-        msgText += `<br>⚙️ תיאור "${pend.descrip}" במקום: "${attr.descrip}"`;
+        msgText += `<br>⚙️ ${escHtml(t('lev.feed.diffDescription', { current: pend.descrip, previous: attr.descrip }))}`;
       }
       if (attr.hearotMeyuchadot && attr.hearotMeyuchadot !== pend.hearotMeyuchadot) {
-        msgText += `<br>⚙️ הערות "${pend.hearotMeyuchadot}" במקום: "${attr.hearotMeyuchadot}"`;
+        msgText += `<br>⚙️ ${escHtml(t('lev.feed.diffNotes', { current: pend.hearotMeyuchadot, previous: attr.hearotMeyuchadot }))}`;
       }
       if (attr.isMonth !== undefined && attr.isMonth !== pend.iskvua) {
-        // Basic boolean text fallback
-        const currentVal = pend.iskvua ? 'חודשי' : 'חד פעמי';
-        const negoVal = attr.isMonth ? 'חודשי' : 'חד פעמי';
-        msgText += `<br>⚙️ "${currentVal}" במקום: "${negoVal}"`;
+        const currentVal = pend.iskvua ? t('lev.feed.monthly') : t('lev.feed.oneTime');
+        const negoVal = attr.isMonth ? t('lev.feed.monthly') : t('lev.feed.oneTime');
+        msgText += `<br>⚙️ ${escHtml(t('lev.feed.diffValue', { current: currentVal, previous: negoVal }))}`;
       }
 
       messege.push({
@@ -708,7 +742,8 @@ export function processFiapp(
  */
 export function processAsked(
   asked: AskData[],
-  projects: ProjectData[]
+  projects: ProjectData[],
+  t: TranslateFn = identityT
 ): DisplayItem[] {
   if (!asked || !Array.isArray(asked)) {
     return [];
@@ -797,7 +832,12 @@ export function processAsked(
 
     // 5.1 Initial "Asked to join" message
     messages.push({
-      message: `${userAttrs.username || 'User'} ביקש להצטרף ל ${omData.name || 'Mission'}`,
+      message: escHtml(
+        t('lev.feed.askedToJoin', {
+          name: userAttrs.username || t('lev.feed.someone'),
+          mission: omData.name || t('lev.feed.unnamedMission')
+        })
+      ),
       what: true,
       pic: userPic,
       timestamp: new Date(ask.createdAt),
@@ -811,15 +851,18 @@ export function processAsked(
       const latestVote = sortedUserVotes[0];
 
       const voterInfo = createUserInfo(ask.projectId, uid);
-      const voterName = voterInfo.username || 'Member';
+      const voterName = voterInfo.username || t('lev.feed.someone');
       const voterPic = voterInfo.src || projectInfo.src2;
       const uOrder = latestVote.order || 0;
 
       const isCurrentVersion = uOrder == orderon;
       const isFavor = isCurrentVersion ? latestVote.what === true : false;
+      const voteBase = isFavor
+        ? t('lev.feed.voteFavor', { name: voterName })
+        : t('lev.feed.voteAgainst', { name: voterName });
 
       messages.push({
-        message: `${voterName} ${isFavor ? 'בעד' : 'נגד'}${!isCurrentVersion ? ' גרסה ישנה' : ''}`,
+        message: escHtml(`${voteBase}${!isCurrentVersion ? ` ${t('lev.feed.oldVersion')}` : ''}`),
         what: isCurrentVersion ? latestVote.what : false,
         pic: voterPic,
         timestamp: new Date(latestVote.zman || latestVote.createdAt || new Date()),
@@ -891,41 +934,41 @@ export function processAsked(
 
         // Use helper to get up-to-date member info
         const negoUserInfo = createUserInfo(ask.projectId, negoUserId);
-        const negoUser = negoUserInfo.username || negoAttrs.users_permissions_user?.data?.attributes?.username || 'User';
+        const negoUser =
+          negoUserInfo.username ||
+          negoAttrs.users_permissions_user?.data?.attributes?.username ||
+          t('lev.feed.someone');
         const negoUserPic = negoUserInfo.src || projectInfo.src2;
 
-        let negoMsg = `<span class="underline">${negoUser} עשה משא ומתן</span>`; // Hebrew: Negotiated
+        let negoMsg = `<span class="underline">${escHtml(t('lev.feed.didNego', { name: negoUser }))}</span>`;
 
-        // Logic to compare fields
-        // Note: omData has the current mission values. dictasked[t] in old code had them too.
-        // We compare the negotiation proposal (negoAttrs) with the current values (omData).
-
+        // Compare the negotiation proposal (negoAttrs) with the current values (omData).
         const currentHours = omData.noofhours || 0;
         const currentPerhour = omData.perhour || 0;
         const currentName = omData.name;
         const currentDesc = omData.descrip;
-        const currentNotes = omData.hearotMeyuchadot;
-        const currentIsKvua = omData.iskvua;
 
         if (negoAttrs.noofhours && negoAttrs.noofhours !== currentHours) {
-          negoMsg += `<br>⚙️ משימה ${currentHours} שעות במקום ${negoAttrs.noofhours} שעות`;
+          negoMsg += `<br>⚙️ ${escHtml(t('lev.feed.diffHours', { current: currentHours, previous: negoAttrs.noofhours }))}`;
         }
         if (negoAttrs.perhour && negoAttrs.perhour !== currentPerhour) {
-          negoMsg += `<br>⚙️ לפי שעה ${currentPerhour} במקום ${negoAttrs.perhour}`;
+          negoMsg += `<br>⚙️ ${escHtml(t('lev.feed.diffPerHour', { current: currentPerhour, previous: negoAttrs.perhour }))}`;
         }
         // Total calculation
-        if ((negoAttrs.perhour && negoAttrs.perhour !== currentPerhour) ||
-          (negoAttrs.noofhours && negoAttrs.noofhours !== currentHours)) {
+        if (
+          (negoAttrs.perhour && negoAttrs.perhour !== currentPerhour) ||
+          (negoAttrs.noofhours && negoAttrs.noofhours !== currentHours)
+        ) {
           const originalTotal = currentPerhour * currentHours;
           const negoTotal = (negoAttrs.perhour || 0) * (negoAttrs.noofhours || 0);
-          negoMsg += `<br>⚙️ סה"כ ${originalTotal} במקום ${negoTotal}`;
+          negoMsg += `<br>⚙️ ${escHtml(t('lev.feed.diffTotal', { current: originalTotal, previous: negoTotal }))}`;
         }
 
         if (negoAttrs.name && negoAttrs.name !== currentName) {
-          negoMsg += `<br>⚙️ שם "${currentName}" במקום: "${negoAttrs.name}"`;
+          negoMsg += `<br>⚙️ ${escHtml(t('lev.feed.diffName', { current: currentName, previous: negoAttrs.name }))}`;
         }
         if (negoAttrs.descrip && negoAttrs.descrip !== currentDesc) {
-          negoMsg += `<br>⚙️ תיאור "${currentDesc}" במקום: "${negoAttrs.descrip}"`;
+          negoMsg += `<br>⚙️ ${escHtml(t('lev.feed.diffDescription', { current: currentDesc, previous: negoAttrs.descrip }))}`;
         }
 
         messages.push({
@@ -1156,7 +1199,8 @@ export function processAskedResources(
  */
 export function processSuggestions(
   suggestions: SuggestionData[],
-  projects: ProjectData[]
+  projects: ProjectData[],
+  t: TranslateFn = identityT
 ): DisplayItem[] {
   if (!suggestions || !Array.isArray(suggestions)) {
     return [];
@@ -1172,16 +1216,18 @@ export function processSuggestions(
 
     // Use stored project data if available (member), otherwise use embedded details (non-member)
     const projectInfo = createProjectInfo(suggestion.projectId);
-    // Project-less suggestions belong to no weave — they carry a `maagad`
-    // (demand pool) or a `ratson` (wish → "קונסירג'", PLAN_CONCIERGE §5.2)
+    // Project-less suggestions belong to no rikma — they carry a `maagad`
+    // (demand pool) or a `ratson` (wish → concierge, PLAN_CONCIERGE §5.2)
     // link. Brand them accordingly (PLAN_HUB_LEV_DEMAND_SYNC r2).
     const isMaagad = !!(suggestion.maagadId || suggestion.maagadName || suggestion.source === 'maagad');
     const isConcierge =
       !isMaagad && !!(suggestion.ratsonName || suggestion.ratsonId || suggestion.source === 'concierge');
     const projectName = isMaagad
-      ? (suggestion.maagadName ? `מאגד · ${suggestion.maagadName}` : 'מאגד ביקוש')
+      ? suggestion.maagadName
+        ? t('lev.feed.maagadNamed', { name: suggestion.maagadName })
+        : t('lev.feed.maagad')
       : isConcierge
-        ? 'קונסירג׳'
+        ? t('lev.feed.concierge')
         : (project?.attributes.projectName || suggestion.projectDetails?.name || '');
     const projectImageUrl = isConcierge
       ? '/logo-concierge.png'
@@ -1282,7 +1328,8 @@ export function processSuggestions(
  */
 export function processResourceSuggestions(
   resourceSuggestions: ResourceSuggestionData[],
-  projects: ProjectData[]
+  projects: ProjectData[],
+  t: TranslateFn = identityT
 ): DisplayItem[] {
   if (!resourceSuggestions || !Array.isArray(resourceSuggestions)) {
     return [];
@@ -1305,9 +1352,11 @@ export function processResourceSuggestions(
     const isConcierge =
       !isMaagad && !projectId && !!(huca.ratsonId || huca.ratsonName || huca.source === 'concierge');
     const finalProjectName = isMaagad
-      ? (huca.maagadName ? `מאגד · ${huca.maagadName}` : 'מאגד ביקוש')
+      ? huca.maagadName
+        ? t('lev.feed.maagadNamed', { name: huca.maagadName })
+        : t('lev.feed.maagad')
       : isConcierge
-        ? 'קונסירג׳'
+        ? t('lev.feed.concierge')
         : (huca.projectName || projectInfo.projectName);
     const finalSrc = isConcierge
       ? '/logo-concierge.png'
@@ -1385,7 +1434,8 @@ export function processResourceSuggestions(
  */
 export function processPmashes(
   pmashes: PendResourceData[],
-  projects: ProjectData[]
+  projects: ProjectData[],
+  t: TranslateFn = identityT
 ): DisplayItem[] {
   if (!pmashes || !Array.isArray(pmashes)) {
     return [];
@@ -1486,9 +1536,14 @@ export function processPmashes(
       for (const vote of users) {
         const voterId = vote.users_permissions_user?.data?.id;
         const voterInfo = createUserInfo(pmash.projectId, voterId);
+        const voterName = voterInfo.username || t('lev.feed.someone');
+        const voteBase =
+          vote.what === false
+            ? t('lev.feed.voteAgainst', { name: voterName })
+            : t('lev.feed.voteFavor', { name: voterName });
 
         messege.push({
-          message: `${voterInfo.username} בעד${vote.order != orderon ? ' (גרסה ישנה)' : ''}`,
+          message: escHtml(`${voteBase}${vote.order != orderon ? ` ${t('lev.feed.oldVersionParen')}` : ''}`),
           what: vote.what,
           pic: voterInfo.src,
           sentByMe: voterId === myid,
@@ -1520,56 +1575,61 @@ export function processPmashes(
         const negoUserInfo = createUserInfo(pmash.projectId, negoUserId);
 
         // Build negotiation message with field-by-field comparison
-        let negoMsg = `<span class="underline">${negoUserInfo.username} עשה משא ומתן</span>`;
-
+        const negoName = negoUserInfo.username || t('lev.feed.someone');
+        let negoMsg = `<span class="underline">${escHtml(t('lev.feed.didNego', { name: negoName }))}</span>`;
 
         // Compare hm (quantity)
         if (negoAttrs.hm && negoAttrs.hm !== pmash.hm) {
-          negoMsg += `<br>⚙️ שהמשאב כמות ${pmash.hm ?? 0} במקום ${negoAttrs.hm ?? 0}`;
+          negoMsg += `<br>⚙️ ${escHtml(t('lev.feed.diffResQty', { current: pmash.hm ?? 0, previous: negoAttrs.hm ?? 0 }))}`;
         }
 
         // Compare price
         if (negoAttrs.price && negoAttrs.price !== pmash.price) {
-          negoMsg += `<br>⚙️ שהמשאב מחיר ${pmash.price ?? 0} במקום ${negoAttrs.price ?? 0}`;
+          negoMsg += `<br>⚙️ ${escHtml(t('lev.feed.diffResPrice', { current: pmash.price ?? 0, previous: negoAttrs.price ?? 0 }))}`;
         }
 
-        // Compare easy
+        // Compare easy (offered value)
         if (negoAttrs.easy && negoAttrs.easy !== pmash.easy) {
-          negoMsg += `<br>⚙️ שהמשאב קלות ${pmash.easy ?? 0} במקום ${negoAttrs.easy ?? 0}`;
+          negoMsg += `<br>⚙️ ${escHtml(t('lev.feed.diffResOffered', { current: pmash.easy ?? 0, previous: negoAttrs.easy ?? 0 }))}`;
         }
 
         // Total price calculation
         if (negoAttrs.price !== pmash.price || negoAttrs.hm !== pmash.hm) {
           const currentTotal = (pmash.price || 0) * 1 * (pmash.hm || 0);
           const negoTotal = (negoAttrs.price || pmash.price || 0) * 1 * (negoAttrs.hm || pmash.hm || 0);
-          negoMsg += `<br>⚙️ סה"כ למשאב ${currentTotal} במקום ${negoTotal}`;
+          negoMsg += `<br>⚙️ ${escHtml(t('lev.feed.diffResTotal', { current: currentTotal, previous: negoTotal }))}`;
         }
 
         // Total easy calculation
         if (negoAttrs.easy !== pmash.easy || negoAttrs.hm !== pmash.hm) {
           const currentEasyTotal = (pmash.easy || 0) * 1 * (negoAttrs.hm || pmash.hm || 0);
           const negoEasyTotal = (negoAttrs.easy || pmash.easy || 0) * 1 * (negoAttrs.hm || pmash.hm || 0);
-          negoMsg += `<br>⚙️ סה"כ ${currentEasyTotal} במקום ${negoEasyTotal}`;
+          negoMsg += `<br>⚙️ ${escHtml(t('lev.feed.diffTotal', { current: currentEasyTotal, previous: negoEasyTotal }))}`;
         }
 
         // Compare name
         if (negoAttrs.name && negoAttrs.name !== pmash.name) {
-          negoMsg += `<br>⚙️ שם משאב משא ומתן "${pmash.name}" במקום: "${negoAttrs.name}"`;
+          negoMsg += `<br>⚙️ ${escHtml(t('lev.feed.diffName', { current: pmash.name, previous: negoAttrs.name }))}`;
         }
 
         // Compare description
         if (negoAttrs.descrip && negoAttrs.descrip !== pmash.descrip) {
-          negoMsg += `<br>⚙️ תיאור משאב משא ומתן "${pmash.descrip}" במקום: "${negoAttrs.descrip}"`;
+          negoMsg += `<br>⚙️ ${escHtml(t('lev.feed.diffDescription', { current: pmash.descrip, previous: negoAttrs.descrip }))}`;
         }
 
         // Compare special notes (spnot/hearotMeyuchadot)
         if (negoAttrs.spnot && negoAttrs.spnot !== pmash.spnot) {
-          negoMsg += `<br>⚙️ הערות מיוחדות משאב משא ומתן "${pmash.spnot}" במקום: "${negoAttrs.spnot}"`;
+          negoMsg += `<br>⚙️ ${escHtml(t('lev.feed.diffNotes', { current: pmash.spnot, previous: negoAttrs.spnot }))}`;
         }
 
         // Compare kindOf (resource type)
         if (negoAttrs.kindOf && negoAttrs.kindOf !== pmash.resourceType) {
-          negoMsg += `<br>⚙️ סוג ${pmash.resourceType} במקום: "${negoAttrs.kindOf}"`;
+          negoMsg += `<br>⚙️ ${escHtml(
+            t('lev.feed.diffResKind', {
+              current: resourceKindLabel(pmash.resourceType, t),
+              previous: resourceKindLabel(negoAttrs.kindOf, t)
+            })
+          )}`;
         }
 
         messege.push({
@@ -2047,7 +2107,8 @@ export function processTransfers(
  */
 export function processDecisions(
   decisions: DecisionData[],
-  projects: ProjectData[]
+  projects: ProjectData[],
+  t: TranslateFn = identityT
 ): DisplayItem[] {
   if (!decisions || !Array.isArray(decisions)) {
     return [];
@@ -2109,15 +2170,17 @@ export function processDecisions(
     for (const u of users) {
       const uid = u.users_permissions_user?.data?.id;
       const voterInfo = createUserInfo(decision.projectId, uid);
-      const voterName = voterInfo.username || 'User';
+      const voterName = voterInfo.username || t('lev.feed.someone');
 
       const isFavor = u.what === true;
-      // Hebrew from hachla:
-      // message: `${username} ${what==true ? 'בעד' : ' נגד \n ${why!==null ? `בנימוק: ${why}` : ''}`}`
 
-      let msgText = `${voterName} ${isFavor ? 'בעד' : 'נגד'}`;
+      let msgText = escHtml(
+        isFavor
+          ? t('lev.feed.voteFavor', { name: voterName })
+          : t('lev.feed.voteAgainst', { name: voterName })
+      );
       if (u.why) {
-        msgText += `\nבנימוק: ${u.why}`;
+        msgText += `<br>${escHtml(t('lev.feed.reason', { reason: u.why }))}`;
       }
 
       messege.push({
@@ -2295,7 +2358,8 @@ export function processDecisions(
  */
 export function processProductRequests(
   sheirutpends: ProductRequestData[],
-  projects: ProjectData[]
+  projects: ProjectData[],
+  t: TranslateFn = identityT
 ): DisplayItem[] {
   if (!sheirutpends || !Array.isArray(sheirutpends)) {
     return [];
@@ -2355,9 +2419,13 @@ export function processProductRequests(
       const uid = v.users_permissions_user?.data?.id;
       const info = createUserInfo(request.projectId, uid);
       const isCurrent = (v.order || 0) === orderon;
+      const voterName = info.username || t('lev.feed.someone');
+      const voteBase = v.what
+        ? t('lev.feed.voteFavor', { name: voterName })
+        : t('lev.feed.voteAgainst', { name: voterName });
 
       messege.push({
-        message: `${info.username} ${v.what ? 'בעד' : 'נגד'}${!isCurrent ? ' (גרסה ישנה)' : ''}`,
+        message: escHtml(`${voteBase}${!isCurrent ? ` ${t('lev.feed.oldVersionParen')}` : ''}`),
         what: v.what,
         pic: info.src,
         timestamp: new Date() // Date not always available in extracted vots, could add to extractor

@@ -6,22 +6,18 @@
    * counter-proposal ping-pong until both sides sign the same version.
    */
   import { groupVotesByRound, mediaUrl } from '$lib/utils/processLifecycle';
+  import { t } from '$lib/translations';
+  import { lang as uiLang } from '$lib/stores/lang.js';
 
   let { vots = [], lang = 'en' } = $props();
 
-  const i18n = {
-    he: { round: 'סבב', approved: 'אישר/ה', countered: 'הגיב/ה בהצעה נגדית', pending: 'טרם הגיב/ה', empty: 'אין הצבעות עדיין' },
-    en: { round: 'Round', approved: 'Approved', countered: 'Countered', pending: 'No answer yet', empty: 'No votes yet' },
-    ar: { round: 'جولة', approved: 'وافق/ت', countered: 'رد/ت باقتراح مضاد', pending: 'لم يرد بعد', empty: 'لا توجد أصوات بعد' }
-  };
-  let t = $derived(i18n[lang] ?? i18n.en);
 
   let rounds = $derived(groupVotesByRound(vots));
 
   function formatDate(value) {
     if (!value) return '';
     try {
-      return new Date(value).toLocaleDateString(lang === 'he' ? 'he-IL' : lang === 'ar' ? 'ar' : 'en-GB', {
+      return new Date(value).toLocaleDateString($uiLang, {
         day: 'numeric', month: 'short', year: 'numeric'
       });
     } catch {
@@ -31,13 +27,13 @@
 </script>
 
 {#if rounds.length === 0}
-  <p class="vr-empty">{t.empty}</p>
+  <p class="vr-empty">{$t('moach.voteRounds.empty')}</p>
 {:else}
   <div class="vr">
     {#each rounds as round (round.order)}
       <div class="vr-round">
         {#if rounds.length > 1}
-          <span class="vr-round-label">{t.round} {round.order + 1}</span>
+          <span class="vr-round-label">{$t('moach.voteRounds.round')} {round.order + 1}</span>
         {/if}
         <ul class="vr-list">
           {#each round.votes as vote (vote.id)}
@@ -49,11 +45,11 @@
               {/if}
               <span class="vr-name">{vote.username || `#${vote.userId}`}</span>
               {#if vote.what === true}
-                <span class="vr-what vr-what--yes">✓ {t.approved}</span>
+                <span class="vr-what vr-what--yes">✓ {$t('moach.voteRounds.approved')}</span>
               {:else if vote.what === false}
-                <span class="vr-what vr-what--no">↺ {t.countered}</span>
+                <span class="vr-what vr-what--no">↺ {$t('moach.voteRounds.countered')}</span>
               {:else}
-                <span class="vr-what vr-what--pending">{t.pending}</span>
+                <span class="vr-what vr-what--pending">{$t('moach.voteRounds.pending')}</span>
               {/if}
               {#if vote.zman}
                 <span class="vr-date">{formatDate(vote.zman)}</span>

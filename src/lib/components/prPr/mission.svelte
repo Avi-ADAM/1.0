@@ -1,4 +1,4 @@
-﻿<script>
+<script>
   import { isRtl } from '$lib/translations';
   import Daterange from './../../celim/ui/daterange.svelte';
   import Crtask from '$lib/components/prPr/tasks/crtask.svelte';
@@ -17,6 +17,8 @@
   import heMission from '$lib/translations/he/mission.json';
   import enMission from '$lib/translations/en/mission.json';
   import arMission from '$lib/translations/ar/mission.json';
+  import ruMission from '$lib/translations/ru/mission.json';
+  import esMission from '$lib/translations/es/mission.json';
   import SkillSelector from '../ui/SkillSelector.svelte';
   import RoleSelector from '../ui/RoleSelector.svelte';
   import { t as trans } from '$lib/translations';
@@ -364,7 +366,7 @@
   const inRikma = (/** @type {number} */ n) =>
     entryCurrency === rikmaCur ? n : (convert(n, entryCurrency, rikmaCur, money.fx) ?? n);
 
-  const missionByLang = { he: heMission, en: enMission, ar: arMission };
+  const missionByLang = { he: heMission, en: enMission, ar: arMission, ru: ruMission, es: esMission };
   const mf = $derived((missionByLang[$lang] ?? missionByLang.he).form);
   const ml = $derived((missionByLang[$lang] ?? missionByLang.he).location);
 
@@ -856,7 +858,6 @@
     }
   }
 
-  let cencel = ' ביטול';
   let addS = false;
   let rishon = 0;
   let rishonves = 0;

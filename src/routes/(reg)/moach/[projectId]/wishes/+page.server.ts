@@ -1,16 +1,22 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
+import { serverTranslator } from '$lib/server/notices/translate';
 import { stripHtml } from '$lib/utils/stripHtml';
 import type { PageServerLoad } from './$types';
 import { rtKey } from '$lib/realtime/scopes.js';
 
-function nameOf(user: any): string {
-  if (!user) return 'משתמש/ת';
+type Tr = ReturnType<typeof serverTranslator>;
+
+function nameOf(user: any, tr: Tr): string {
+  if (!user) return tr('common.someone');
   const a = user.attributes || user;
-  return a.username || 'משתמש/ת';
+  return a.username || tr('common.someone');
 }
-function initials(name: string): string {
+function initials(name: string, tr: Tr): string {
   const parts = String(name || '').trim().split(/\s+/);
-  return ((parts[0]?.[0] || '') + (parts[1]?.[0] || parts[0]?.[1] || '')).slice(0, 2) || 'מש';
+  return (
+    ((parts[0]?.[0] || '') + (parts[1]?.[0] || parts[0]?.[1] || '')).slice(0, 2) ||
+    tr('common.someoneInitials')
+  );
 }
 function shortCode(id: string | number): string {
   const s = String(id).padStart(6, '0');
@@ -37,8 +43,9 @@ export type IncomingWishProposal = {
   categories: string[];
 };
 
-export const load: PageServerLoad = async ({ params, fetch, depends }) => {
+export const load: PageServerLoad = async ({ params, fetch, depends, locals }) => {
   depends(rtKey('wish:*'));
+  const tr = serverTranslator((locals as any)?.lang);
   const projectId = params.projectId;
   let proposals: IncomingWishProposal[] = [];
   let loadOk = false;
@@ -61,7 +68,7 @@ export const load: PageServerLoad = async ({ params, fetch, depends }) => {
         if (!ratNode) return null;
         const ra = ratNode.attributes || {};
         const owners = ra.users_permissions_users?.data ?? [];
-        const ownerName = nameOf(owners[0]);
+        const ownerName = nameOf(owners[0], tr);
         return {
           proposalId: String(p.id),
           status: pa.status_proposal || 'suggested',
@@ -70,14 +77,14 @@ export const load: PageServerLoad = async ({ params, fetch, depends }) => {
           createdAt: pa.createdAt ?? null,
           ratsonId: ratNode.id ? String(ratNode.id) : null,
           ratsonCode: ratNode.id ? shortCode(ratNode.id) : null,
-          ratsonName: ra.name || '(ללא שם)',
+          ratsonName: ra.name || tr('common.untitled'),
           ratsonLongDes: stripHtml(ra.longDes || ra.desc || ''),
           ratsonStatus: ra.status_ratson || 'open',
           ratsonStart: ra.startDate ?? null,
           ratsonFinish: ra.finnishDate ?? null,
           ratsonTotalBounti: typeof ra.totalbounti === 'number' ? ra.totalbounti : null,
           ratsonOwnerName: ownerName,
-          ratsonOwnerAvatar: initials(ownerName),
+          ratsonOwnerAvatar: initials(ownerName, tr),
           values: (ra.vallues?.data ?? []).map((v: any) => v.attributes?.valueName).filter(Boolean),
           categories: (ra.categories?.data ?? [])
             .map((c: any) => c.attributes?.name)

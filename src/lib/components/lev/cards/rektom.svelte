@@ -1,4 +1,4 @@
-﻿<script>
+<script>
   import Money from '$lib/components/money/Money.svelte';
   import { lang } from '$lib/stores/lang.js';
   import { t, isRtl} from '$lib/translations';
@@ -257,7 +257,7 @@
   class="{isMobileOrTablet()
     ? 'w-full h-full'
     : 'w-[90%] h-[90%]'} lg:w-[90%] {isVisible
-    ? $lang == 'he'
+    ? $isRtl
       ? 'boxleft'
       : 'boxright'
     : ''} flex d flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isVisible

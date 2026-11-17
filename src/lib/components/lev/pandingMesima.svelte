@@ -474,25 +474,17 @@
   let clicked = $state(false);
 
 
-  let u = 'הצבעה על פרסום הצעת משימה לרקמה';
+  let u = '';
 
   function hover(id) {
-    if (id == '0') {
-      u = 'הצבעה על פרסום הצעת משימה לרקמה';
-    } else {
-      u = id;
-    }
+    u = id == '0' ? $t('lev.hoverDefault.pendingMission') : id;
     onHover?.({
       id: u
     });
   }
 
   function hoverc(event) {
-    if (event.x == '0') {
-      u = 'הצבעה על פרסום הצעת משימה לרקמה';
-    } else {
-      u = event.x;
-    }
+    u = event.x == '0' ? $t('lev.hoverDefault.pendingMission') : event.x;
     onHover?.({
       id: u
     });
@@ -531,7 +523,7 @@
             style="margin: 0 auto;"
             onclick={close}
             class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-            title="ביטול"
+            title={$t('common.cancel')}
             ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
@@ -586,7 +578,7 @@
             style="margin: 0 auto;"
             onclick={close}
             class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-            title="ביטול"
+            title={$t('common.cancel')}
             ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
@@ -600,7 +592,7 @@
             rect={true}
             rikmaName={projectName}
             smalldes={name}
-            nameChatPartner={`הצבעה על ${name}`}
+            nameChatPartner={$t('lev.diun.voteOn', { name })}
             nameMe={page.data.un || 'Me'}
             {mypos}
             pendId={forumId}
@@ -618,7 +610,7 @@
             style="margin: 0 auto;"
             onclick={close}
             class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-            title="ביטול"
+            title={$t('common.cancel')}
             ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
@@ -636,7 +628,7 @@
               bind:clicked
               rect={forceRect || (noofusersOk > 0 && noofusersNo > 0)}
               smalldes={projectName}
-              nameChatPartner={`הצבעה על ${name}`}
+              nameChatPartner={$t('lev.diun.voteOn', { name })}
               {mypos}
               profilePicChatPartner={src}
               messages={messege}

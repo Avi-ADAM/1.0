@@ -42,7 +42,7 @@
   <!-- Header -->
   <div class="text-center mb-8">
     <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-      {$lang == 'en' ? (isonly == true ? "Action in Progress" : "Actions in Progress") : (isonly == true ? "פעולה" : "פעולות")} בתהליך ביצוע
+      {isonly == true ? $t('moach.tables.inProgressAction') : $t('moach.tables.inProgressActions')}
     </h1>
     <div class="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto rounded-full"></div>
   </div>
@@ -67,7 +67,7 @@
       <tbody class="divide-y divide-surfaceLine">
         <!-- Name Row -->
         <tr class="bg-gradient-to-r from-purple-500 to-pink-500 text-white sticky z-10" style:top={isonly == true ? "0px" : "77px"}>
-          <td class="px-6 py-4 font-bold text-lg border-r border-purple-300 bg-purple-600">{$lang == 'en' ? "Name" : "שם"}</td>
+          <td class="px-6 py-4 font-bold text-lg border-r border-purple-300 bg-purple-600">{$t('moach.tables.name')}</td>
           {#each bmiData as data, i}
             <td class="px-6 py-4 font-bold text-lg border-r border-purple-300 last:border-r-0">{data.attributes.name}</td>
           {/each}
@@ -75,7 +75,7 @@
 
         <!-- Description Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200">
-          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$lang == 'en' ? "Description" : "תיאור"}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$t('moach.tables.description')}</td>
           {#each bmiData as data, i}
             <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0">
               <div class="max-w-xs">
@@ -89,7 +89,7 @@
 
         <!-- Execution Date Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200">
-          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$lang == 'en' ? "Execution Date" : "תאריך ביצוע"}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$t('moach.tables.executionDate')}</td>
           {#each bmiData as data, i}
             <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0">
               {#if data.attributes.Sqadualed !== undefined}
@@ -103,16 +103,16 @@
 
         <!-- Public Links Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200">
-          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$lang == 'en' ? "Public Links" : "קישורים ציבוריים"}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$t('moach.tables.publicLinks')}</td>
           {#each bmiData as data, i}
             <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0">
               {#if data.attributes.publicklinks !== undefined && data.attributes.publicklinks !== "undefined" && data.attributes.publicklinks !== null && data.attributes.publicklinks !== "" && data.attributes.publicklinks !== "null"}
                 <a target="_blank" rel="noreferrer" href="{data.attributes.publicklinks}" 
                    class="inline-flex items-center px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 rounded-lg transition-colors duration-200 font-medium">
-                  <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                   </svg>
-                  {$lang == 'en' ? "Link" : "קישור"}
+                  {$t('moach.tables.link')}
                 </a>
               {/if}
             </td>
@@ -121,7 +121,7 @@
 
         <!-- Special Notes Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200">
-          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$lang == 'en' ? "Special Notes for My Fabric" : "הערות יחודיות לרקמה שלי"}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$t('moach.tables.rikmaNotes')}</td>
           {#each bmiData as data, i}
             <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0">
               {#if data.attributes.hearotMeyuchadot !== undefined && data.attributes.hearotMeyuchadot !== "undefined" && data.attributes.hearotMeyuchadot !== null && data.attributes.hearotMeyuchadot !== "" && data.attributes.hearotMeyuchadot !== "null"}
@@ -135,16 +135,16 @@
 
         <!-- Private Links Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200">
-          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$lang == 'en' ? "Private Links for My Fabric" : "קישורים יחודיים לרקמה שלי"}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$t('moach.tables.rikmaLinks')}</td>
           {#each bmiData as data, i}
             <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0">
               {#if data.attributes.privatlinks !== undefined && data.attributes.privatlinks !== "undefined" && data.attributes.privatlinks !== null && data.attributes.privatlinks !== "" && data.attributes.privatlinks !== "null"}
                 <a rel="noreferrer" target="_blank" href="{data.attributes.privatlinks}"
                    class="inline-flex items-center px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-lg transition-colors duration-200 font-medium">
-                  <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                   </svg>
-                  {$lang == 'en' ? "Private Link" : "קישור פרטי"}
+                  {$t('moach.tables.privateLink')}
                 </a>
               {/if}
             </td>
@@ -153,15 +153,15 @@
 
         <!-- Hours Required Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200" id="hoursD">
-          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$lang == 'en' ? "How many hours should it take?" : "כמה שעות זה אמור לקחת?"}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$t('moach.tables.estimatedHours')}</td>
           {#each bmiData as data, i}
             <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0">
               {#if data.attributes.hoursassinged > 0}
                 <span class="inline-flex items-center px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">
-                  <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4 me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                   </svg>
-                  {data.attributes.hoursassinged} {$lang == 'en' ? "hours" : "שעות"}
+                  {data.attributes.hoursassinged} {$t('common.hours')}
                 </span>
               {/if}
             </td>
@@ -170,12 +170,12 @@
 
         <!-- Hourly Rate Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200" id="vallueperhourN">
-          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$lang == 'en' ? "How much is an hour worth?" : "כמה שווה שעה?"}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$t('moach.tables.hourlyRate')}</td>
           {#each bmiData as data, i}
             <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0">
               {#if data.attributes.perhour > 0}
                 <span class="inline-flex items-center px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-medium">
-                  <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4 me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
                   </svg>
                   <Money amount={data.attributes.perhour} entry={data.attributes} />
@@ -187,12 +187,12 @@
 
         <!-- Total Value Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200 bg-gradient-to-r from-green-50 to-emerald-50">
-          <td class="px-6 py-4 font-bold text-gray-800 bg-gradient-to-r from-green-200 to-emerald-200 border-r border-surfaceLine">{$lang == 'en' ? "Total Value for Task" : "שווי סך הכל למשימה"}</td>
+          <td class="px-6 py-4 font-bold text-gray-800 bg-gradient-to-r from-green-200 to-emerald-200 border-r border-surfaceLine">{$t('moach.tables.totalMissionValue')}</td>
           {#each bmiData as data, i}
             <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0">
               {#if data.attributes.perhour > 0 && data.attributes.hoursassinged > 0}
                 <span class="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-lg font-bold text-lg">
-                  <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-5 h-5 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 8h6m-5 0a3 3 0 110 6H9l3 3m-3-6h6m6 1a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                   </svg>
                   <Money amount={data.attributes.perhour * data.attributes.hoursassinged} entry={data.attributes} />
@@ -206,7 +206,7 @@
 
         <!-- Progress Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200" id="total">
-          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$lang == 'en' ? "Already Completed" : "כבר בוצעו"}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$t('moach.tables.alreadyCompleted')}</td>
           {#each bmiData as data, i}
             <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0" dir="ltr">
               <div class="flex flex-col items-center space-y-2">
@@ -229,12 +229,12 @@
 
         <!-- User Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200">
-          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$lang == 'en' ? "Performed by" : "מבוצע על ידי"}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$t('moach.tables.performedBy')}</td>
           {#each bmiData as data, i}
             <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0">
               <a rel="noreferrer" target="_blank" href="/user/{data.attributes.users_permissions_user.data.id}"
                  class="inline-flex items-center px-3 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg transition-colors duration-200 font-medium">
-                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                 </svg>
                 {data.attributes.users_permissions_user.data.attributes.username}
@@ -253,13 +253,13 @@
 
         <!-- Actions Row -->
         <tr class="bg-gradient-to-r from-purple-600 to-pink-600 sticky bottom-0 z-10">
-          <td class="px-6 py-4 font-bold text-white text-lg border-r border-purple-300">{$lang == 'en' ? "Options" : "אפשרויות"}</td>
+          <td class="px-6 py-4 font-bold text-white text-lg border-r border-purple-300">{$t('moach.tables.options')}</td>
           {#each bmiData as data, i}
             <td class="px-6 py-4 border-r border-purple-300 last:border-r-0">
               <div class="flex justify-center space-x-2">
                 <button
                   class="bg-surface hover:bg-surface2 text-purple-600 p-3 rounded-full shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105"
-                  title={$lang == 'en' ? "Edit" : "עריכה"}
+                  title={$t('moach.tables.edit')}
                   onclick={() => edit(data.id)}
                 >
                   <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">

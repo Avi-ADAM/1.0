@@ -204,7 +204,7 @@
                 newValues
             });
             if (!result.success) {
-                toast.error(result.error?.message ?? 'שגיאה בשליחת ההצעה');
+                toast.error(result.error?.message ?? $t('pages.availResource.sendOfferError'));
                 negoLoading = false;
                 return;
             }
@@ -214,7 +214,7 @@
             toast.success(`${$t('pages.availResource.fnnn')}`);
         } catch (e) {
             console.error(e);
-            toast.error('אירעה שגיאה');
+            toast.error($t('pages.availResource.genericError'));
             negoLoading = false;
         }
     }
@@ -239,8 +239,12 @@
     let sourceName = $derived(
         data.alld?.project?.data?.attributes?.projectName ??
             (isMaagadSrc
-                ? `${$lang === 'he' ? 'מאגד ביקוש' : 'demand pool'}${maagadInfo?.name ? ` · ${maagadInfo.name}` : ''}`
-                : `${$lang === 'he' ? "קונסיירז'" : 'concierge'}${ratsonName ? ` · ${ratsonName}` : ''}`)
+                ? maagadInfo?.name
+                    ? $t('lev.feed.maagadNamed', { name: maagadInfo.name })
+                    : $t('lev.feed.maagad')
+                : ratsonName
+                    ? $t('lev.feed.conciergeNamed', { name: ratsonName })
+                    : $t('lev.feed.concierge'))
     );
 
     // ── UGC translation (PLAN_UGC_TRANSLATION §4, §7.1) ──────────────────
@@ -292,7 +296,7 @@
         <DialogOverlay isOpen={negoOpen} onDismiss={closeNego} class="overlay">
             <div transition:fly={{ y: 40, opacity: 0, duration: 250 }}>
                 <DialogContent class="nego surface-dialog" aria-label="form">
-                    <button onclick={closeNego} style="margin: 0 auto;" class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full" aria-label="סגירה">✕</button>
+                    <button onclick={closeNego} style="margin: 0 auto;" class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full" aria-label={$t('common.close')}>✕</button>
                     {#if negoLoading}
                         <Spinner size="lg" />
                     {:else if negoOpen && data.alld}
@@ -452,9 +456,9 @@
                                             </span>
                                         {/if}
                                         {#if data.alld.kindOf != "total" && !(data.alld.recurring && !data.alld.sqadualedf)}
-                                            <span>  =  {((Number(data.alld.price) || 0) * units * cycles).toLocaleString('en-US')}
+                                            <span>  =  {((Number(data.alld.price) || 0) * units * cycles).toLocaleString($lang)}
                                                 {#if data.alld.price != data.alld.easy}
-                                                    <span> ↔️ {((Number(data.alld.easy) || 0) * units * cycles).toLocaleString('en-US')}</span>
+                                                    <span> ↔️ {((Number(data.alld.easy) || 0) * units * cycles).toLocaleString($lang)}</span>
                                                 {/if}
                                                 {$t('pages.availResource.total')}
                                             </span>
@@ -476,7 +480,7 @@
                                         </div>
                                     {/if}
 
-                                    <p onmouseenter={() => hover('הערות')} onmouseleave={() => hover('0')} class="text-gray-100 lg:text-2xl max-h-16 cd text-sm d overflow-y-auto mt-2">
+                                    <p onmouseenter={() => hover($t('common.notes'))} onmouseleave={() => hover('0')} class="text-gray-100 lg:text-2xl max-h-16 cd text-sm d overflow-y-auto mt-2">
                                         {data.alld.spnot !== undefined && data.alld.spnot !== null && data.alld.spnot !== 'undefined' ? data.alld.spnot : ''}
                                     </p>
                                     
@@ -602,7 +606,7 @@
             </div>
         {:else}
             <div class="text-center pt-14">
-                <h3 class="text-barbi sm:text-xl my-5">error | שגיאה</h3>
+                <h3 class="text-barbi sm:text-xl my-5">{$t('pages.availResource.error')}</h3>
                 {#if page.data.tok != false}
                     <a href="/lev" class="text-lturk hover:text-barbi hover:border-barbi border border-gold rounded-xl px-4 py-2 sm:text-xl">{$t('pages.availResource.tolev')}</a>
                 {:else}
@@ -620,7 +624,7 @@
         {/if}
     {:else}
         <div class="text-center pt-14">
-            <h3 class="text-barbi sm:text-xl my-5">error | שגיאה</h3>
+            <h3 class="text-barbi sm:text-xl my-5">{$t('pages.availResource.error')}</h3>
             {#if page.data.tok != false}
                 <a href="/lev" class="text-lturk hover:text-barbi hover:border-barbi border border-gold rounded-xl px-4 py-2 sm:text-xl">{$t('pages.availResource.tolev')}</a>
             {:else}

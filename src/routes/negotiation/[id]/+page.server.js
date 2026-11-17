@@ -99,7 +99,8 @@ export async function load({ params, fetch }) {
       } else {
         return {
           id,
-          error: 'דיון לא נמצא',
+          // The screen translates this (`negotiation.discussion_not_found`).
+          errorKey: 'discussion_not_found',
           isNew: false
         };
       }
@@ -107,7 +108,8 @@ export async function load({ params, fetch }) {
       console.error('Error loading negotiation:', error);
       return {
         id,
-        error: 'שגיאה בטעינת הדיון',
+        // The screen translates this (`negotiation.error_loading`).
+        errorKey: 'error_loading',
         isNew: false
       };
     }

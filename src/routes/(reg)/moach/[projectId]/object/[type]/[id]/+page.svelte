@@ -93,7 +93,7 @@
     if (!value) return '';
     try {
       return new Date(value).toLocaleDateString(
-        $lang === 'he' ? 'he-IL' : $lang === 'ar' ? 'ar' : 'en-GB',
+        $lang || 'he',
         { day: 'numeric', month: 'short', year: 'numeric' }
       );
     } catch {

@@ -1,6 +1,6 @@
 <script lang="ts">
   import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
-  import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import type { Snippet } from 'svelte';
   import When from '../When.svelte';
@@ -104,7 +104,7 @@
     <button
       type="button"
       class="relative flex items-center gap-3 z-10 bg-transparent border-0 p-0 m-0 cursor-pointer hover:opacity-90 transition-opacity"
-      title={$lang === 'he' ? 'לצפיה בפרויקט' : 'View Project'}
+      title={$t('lev.cards.common.watchpr')}
       onclick={goToProject}
     >
       {@render identity()}

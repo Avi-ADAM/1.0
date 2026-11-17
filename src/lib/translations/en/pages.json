@@ -176,7 +176,10 @@
       "maagad": "1💗1 | Demand-pool resource: \"{{name}}\"",
       "wish": "1💗1 | Wish resource: \"{{name}}\"",
       "project": "1💗1 | Proposal to share the resource \"{{name}}\" in the rikma {{projectName}}"
-    }
+    },
+    "error": "Something went wrong",
+    "sendOfferError": "The offer could not be sent",
+    "genericError": "Something went wrong"
   },
   "availMission": {
     "fnnn": "request has sent sucsesfully",
@@ -215,7 +218,13 @@
       "withdrawn": "Your candidacy was withdrawn. You can apply again at any time.",
       "failed": "We could not withdraw the candidacy right now. Please try again in a moment.",
       "allMine": "All my requests"
-    }
+    },
+    "seeWish": "See the wish",
+    "negoUnavailable": "Negotiation is not available for concierge missions",
+    "sendOfferError": "The offer could not be sent",
+    "sendRequestError": "The request could not be sent",
+    "genericError": "Something went wrong",
+    "projectLoadError": "The project details could not be loaded"
   },
   "gift": {
     "gift": "Product",
@@ -475,7 +484,19 @@
     "type": "Type",
     "unlimited": "Unlimited",
     "outOfStock": "Out of Stock",
-    "tryAgain": "Try Again"
+    "tryAgain": "Try Again",
+    "saleDoneUnits": "Sale of {{units}} units of \"{{name}}\" completed successfully!",
+    "saleDone": "Sale completed successfully!",
+    "saleFailed": "The sale could not be completed",
+    "shareText": "Check out this product: {{name}}",
+    "linkCopied": "Link copied to clipboard",
+    "linkCopyFailed": "Failed to copy the link",
+    "refreshed": "Product data refreshed",
+    "unknownProject": "Unknown project",
+    "claimsMineOne": "You have 1 sale report awaiting your response on the heart page",
+    "claimsMineMany": "You have {{count}} sale reports awaiting your response on the heart page",
+    "claimsWaitingOne": "1 sale report awaiting the holder’s consent",
+    "claimsWaitingMany": "{{count}} sale reports awaiting the holder’s consent"
   },
   "meetings": {
     "title": "Magic Meetings",

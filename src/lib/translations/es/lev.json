@@ -18,7 +18,14 @@
     "oneMonent": "un momento, por favor",
     "editTimer": "editar temporizador",
     "timerRunning": "El temporizador sigue en marcha. Detenlo y guárdalo antes de entregar la misión.",
-    "noHours": "Aún no se guardaron horas para esta misión. Usa el temporizador (o edítalo), guarda y luego entrégala."
+    "noHours": "Aún no se guardaron horas para esta misión. Usa el temporizador (o edítalo), guarda y luego entrégala.",
+    "timerStoppedTitle": "1💗1 Temporizador detenido",
+    "timerQuotaReached": "Hola {{name}}, el temporizador de {{mission}} se detuvo porque se agotaron las horas acordadas. Crea una nueva misión.",
+    "timerNearEndTitle": "1💗1 Temporizador por terminar",
+    "timerWarn10Pct": "Hola {{name}}, queda solo el 10% del tiempo en {{mission}}; conviene preparar una nueva misión.",
+    "timerWarn5Pct": "Hola {{name}}, queda solo el 5% del tiempo en {{mission}}; conviene preparar una nueva misión.",
+    "timerWarn5Min": "Hola {{name}}, quedan solo 5 minutos en {{mission}}; conviene preparar una nueva misión.",
+    "timerWarn1Min": "Hola {{name}}, queda solo 1 minuto en {{mission}}; conviene preparar una nueva misión."
   },
   "cards": {
     "approve": "Lo quiero",
@@ -62,13 +69,16 @@
       "addReceiverHint": "Para que el cliente pueda transferirte el dinero, añádete como receptor",
       "addMeReceiver": "Añadirme como receptor del dinero",
       "removeMeReceiver": "Quitarme de la lista",
-      "activeSale": "VENTA ACTIVA"
+      "activeSale": "VENTA ACTIVA",
+      "you": "Tú",
+      "pendingShort": "Pendiente..."
     },
     "voteStatus": {
       "approved": "Aprobada",
       "oldVersion": "Versión antigua",
       "waiting": "Esperando",
-      "rejected": "Rechazada"
+      "rejected": "Rechazada",
+      "showAll": "Mostrar todo"
     },
     "filter": {
       "heartTitle": "Corazón del sistema",
@@ -141,7 +151,9 @@
       "hintEditTimer": "Haz clic para editar el temporizador",
       "hintComplete": "Haz clic para terminar la misión",
       "hintStartTimer": "Iniciar el temporizador",
-      "hintStopTimer": "Detener el temporizador"
+      "hintStopTimer": "Detener el temporizador",
+      "start": "Iniciar",
+      "pause": "Pausar"
     },
     "openChat": "Abrir chat",
     "withdraw": "Retirar la oferta",
@@ -199,7 +211,8 @@
       "confirmTo": "Transferir a {{name}}:",
       "confirmHint": "El dinero en sí pasa entre ustedes, fuera del sitio. Aquí registras a quién pagaste, y {{name}} confirma cuando llegue.",
       "confirmYes": "Sí, transfiero",
-      "confirmBack": "Volver"
+      "confirmBack": "Volver",
+      "chatTitle": "Aprobación de venta"
     },
     "dowegeot": {
       "head": "Confirmación de recepción exitosa de un recurso",
@@ -288,7 +301,8 @@
       "openingChat": "Abriendo chat...",
       "error": "Error",
       "transferStatus": "Transferencia de dinero",
-      "complete": "Completado"
+      "complete": "Completado",
+      "chatTitle": "Resumen de transferencia"
     },
     "wishOffer": {
       "cardType": "Oferta para cumplir tu deseo",
@@ -390,7 +404,26 @@
     },
     "wishApplied": "Tu oferta se envió con éxito",
     "toProfile": "a la página de perfil",
-    "awaitingClient": "Tu voto quedó registrado. Esta parte es del trato de una clienta, así que solo entra cuando ella también lo apruebe."
+    "awaitingClient": "Tu voto quedó registrado. Esta parte es del trato de una clienta, así que solo entra cuando ella también lo apruebe.",
+    "pma": {
+      "updatedOffer": "Propuesta revisada",
+      "recurringHead": "🔁 Recurso recurrente · confirmación mensual",
+      "approveHead": "Aprobación de recurso",
+      "autoApproveIn": "Aprobación automática en:",
+      "price": "Precio",
+      "offeredValue": "Valor propuesto",
+      "billingType": "Tipo de cobro",
+      "frequency": "Frecuencia",
+      "everyMonth": "Cada mes",
+      "everyYear": "Cada año",
+      "everyMonths": "Cada {{count}} meses",
+      "everyYears": "Cada {{count}} años",
+      "estMonthlyCost": "Costo mensual estimado",
+      "monthlyChargeHint": "Cada mes se abrirá un cargo para confirmar el gasto real",
+      "activeUpdatedOffer": "Propuesta revisada activa",
+      "changesMade": "Cambios realizados:",
+      "pleaseReview": "Se presentó una propuesta revisada para este recurso; por favor revísala."
+    }
   },
   "taskApproval": {
     "approve": "Aprobar",
@@ -467,7 +500,10 @@
     "labelDiscussion": "Mensaje - por favor, ten en cuenta los mensajes anteriores",
     "labelForum": "Escribe un mensaje...",
     "typing": "{{names}} escribiendo…",
-    "typingSomeone": "Alguien está escribiendo…"
+    "typingSomeone": "Alguien está escribiendo…",
+    "minChars": "Mínimo {{count}} caracteres",
+    "vote": "Votación",
+    "voteOn": "Votación sobre {{name}}"
   },
   "productRequest": {
     "request": "Solicitar"
@@ -1282,5 +1318,43 @@
     "withdrawn": "Tu candidatura fue retirada.",
     "failed": "No pudimos retirar la candidatura ahora. Inténtalo de nuevo en un momento.",
     "loadFailed": "No pudimos cargar tus solicitudes ahora."
+  },
+  "feed": {
+    "someone": "Miembro",
+    "unnamedMission": "misión",
+    "voteFavor": "{{name}} a favor",
+    "voteAgainst": "{{name}} en contra",
+    "oldVersion": "versión anterior",
+    "oldVersionParen": "(versión anterior)",
+    "reason": "Motivo: {{reason}}",
+    "askedToJoin": "{{name}} pidió unirse a {{mission}}",
+    "didNego": "{{name}} negoció cambios",
+    "diffHours": "Horas: {{current}} horas en lugar de {{previous}} horas",
+    "diffPerHour": "Por hora: {{current}} en lugar de {{previous}}",
+    "diffTotal": "Total: {{current}} en lugar de {{previous}}",
+    "diffName": "Nombre: \"{{current}}\" en lugar de \"{{previous}}\"",
+    "diffDescription": "Descripción: \"{{current}}\" en lugar de \"{{previous}}\"",
+    "diffNotes": "Notas: \"{{current}}\" en lugar de \"{{previous}}\"",
+    "diffValue": "\"{{current}}\" en lugar de \"{{previous}}\"",
+    "diffResQty": "Cantidad del recurso: {{current}} en lugar de {{previous}}",
+    "diffResPrice": "Precio del recurso: {{current}} en lugar de {{previous}}",
+    "diffResOffered": "Valor propuesto: {{current}} en lugar de {{previous}}",
+    "diffResTotal": "Total del recurso: {{current}} en lugar de {{previous}}",
+    "diffResKind": "Tipo de recurso: \"{{current}}\" en lugar de \"{{previous}}\"",
+    "monthly": "Mensual",
+    "oneTime": "Una vez",
+    "maagad": "Grupo de demanda",
+    "maagadNamed": "Grupo · {{name}}",
+    "concierge": "Conserjería",
+    "conciergeNamed": "Conserje · {{name}}"
+  },
+  "hoverDefault": {
+    "pendingMission": "Votación para publicar una propuesta de misión en la rikma",
+    "pendingResource": "Votación sobre una solicitud de recurso para la rikma",
+    "finishApproval": "Solicitud para aprobar la finalización de la misión",
+    "resourceSuggest": "Propuesta para compartir un recurso y unirse a la rikma",
+    "joinMission": "Votación sobre una solicitud para realizar una misión y unirse a la rikma",
+    "resourceReceived": "Solicitud para confirmar la recepción del recurso",
+    "negoSoonHint": "La negociación aquí estará disponible pronto; por ahora indica el motivo y crea un nuevo recurso con las condiciones deseadas."
   }
 }

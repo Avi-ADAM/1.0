@@ -2,7 +2,7 @@
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
   import EditProjectDetails from '$lib/components/prPr/EditProjectDetails.svelte';
-  import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
 
   let { data } = $props();
 
@@ -16,7 +16,7 @@
 </script>
 
 <svelte:head>
-  <title>{projectBase?.projectName ? `${projectBase.projectName} · ` : ''}{$lang === 'he' ? 'עריכה' : $lang === 'ar' ? 'تعديل' : 'Edit'} · 1lev1</title>
+  <title>{projectBase?.projectName ? `${projectBase.projectName} · ` : ''}{$t('moach.layout.editDetails')} · 1lev1</title>
 </svelte:head>
 
 <div class="max-w-4xl mx-auto py-8">

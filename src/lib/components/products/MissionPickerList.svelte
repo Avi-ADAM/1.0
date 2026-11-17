@@ -1,6 +1,7 @@
 <script lang="ts">
   import Money from '$lib/components/money/Money.svelte';
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import MissionDetailsModal from './MissionDetailsModal.svelte';
   import CostShapePicker from './CostShapePicker.svelte';
   import type {
@@ -44,73 +45,6 @@
     currency,
     adding = false
   }: Props = $props();
-
-  const t = $derived(
-    $lang === 'he'
-      ? {
-          empty: 'אין משימות עדיין. כדי להתחיל לתמחר, אפשר להוסיף שורה.',
-          add: '+ הוספת משימה',
-          modeExisting: 'משימה קיימת בפרויקט',
-          modeNew: 'משימה חדשה',
-          pickExisting: 'בחר משימה פעילה',
-          pickExistingPh: '— בחר משימה בתהליך —',
-          noExisting: 'אין משימות פעילות בפרויקט. צור משימה חדשה.',
-          nameph: 'שם המשימה',
-          desc: 'תיאור קצר',
-          hoursPerUnit: 'שעות ליחידה',
-          unitsPerProduct: 'יחידות במוצר',
-          ratePerHour: 'תעריף ש"ח/ש',
-          rowTotal: 'סה"כ לשורה',
-          remove: 'הסר שורה',
-          assignedTo: 'בעלים',
-          chooseMember: '— בחר חבר פרויקט —',
-          unassigned: 'טרם שויך',
-          unassignedWarning:
-            'ללא בעלים → המוצר ייסומן ללקוחות כתלוי בספק שעדיין לא נמצא',
-          onlyPartOfTag: 'לא פעילה עד מכירה',
-          onlyPartOfHelp:
-            'המשימה תיווצר כסקיצה (onlyPartOf=true) ותופעל כשמישהו יקנה את המוצר',
-          pendmFlow:
-            '⚠ פרויקט עם 2+ חברים - כל משימה חדשה תיווצר ראשית כ-pendm להצבעה',
-          singleFlow: '👤 חבר יחיד בפרויקט - המשימה תיווצר ישירות אצלך',
-          ownerFromExisting: 'הבעלים יורש מהמשימה הקיימת',
-          fullDetails: '⚙ פרטים מלאים (כישורים, תפקיד, הערות...)',
-          fullDetailsSet: '✓ פרטים מלאים נשמרו',
-          detailsSubtitle: 'אופציונלי - אפשר להשאיר ריק ולהמשיך'
-        }
-      : {
-          empty: 'No missions yet. Add a row to start pricing.',
-          add: '+ Add mission',
-          modeExisting: 'Existing project mission',
-          modeNew: 'New mission',
-          pickExisting: 'Pick an active mission',
-          pickExistingPh: '— Select mission in progress —',
-          noExisting: 'No active missions in the project. Create a new one.',
-          nameph: 'Mission name',
-          desc: 'Short description',
-          hoursPerUnit: 'Hours/unit',
-          unitsPerProduct: 'Units/product',
-          ratePerHour: 'Rate ₪/h',
-          rowTotal: 'Row total',
-          remove: 'Remove row',
-          assignedTo: 'Owner',
-          chooseMember: '— Choose project member —',
-          unassigned: 'Unassigned',
-          unassignedWarning:
-            'No owner → the product will be flagged to customers as "supplier not yet found"',
-          onlyPartOfTag: 'Inactive until purchase',
-          onlyPartOfHelp:
-            'The mission will be created as a draft (onlyPartOf=true) and activated when someone buys the product',
-          pendmFlow:
-            '⚠ Multi-member project - every new mission first becomes a pendm for vote',
-          singleFlow:
-            '👤 Single project member - the mission will be created directly under you',
-          ownerFromExisting: 'Owner is inherited from the existing mission',
-          fullDetails: '⚙ Full details (skills, role, notes...)',
-          fullDetailsSet: '✓ Full details saved',
-          detailsSubtitle: 'optional - you can skip and continue'
-        }
-  );
 
   function add() {
     rows = [
@@ -238,7 +172,7 @@
   }
 
   function memberLabel(id: string | null): string {
-    if (!id) return t.unassigned;
+    if (!id) return $t('products.mission.unassigned');
     const m = projectMembers.find((u) => u.id === id);
     return m?.attributes.username ?? `#${id}`;
   }
@@ -262,15 +196,15 @@
 
 <div class="picker">
   {#if rows.length === 0 && !adding}
-    <div class="empty">{t.empty}</div>
+    <div class="empty">{$t('products.mission.empty')}</div>
   {/if}
 
   {#if adding}
     <!-- The product's proposal says what happens to the line. -->
   {:else if multiMember}
-    <div class="flow-note flow-multi">{t.pendmFlow}</div>
+    <div class="flow-note flow-multi">{$t('products.mission.pendmFlow')}</div>
   {:else}
-    <div class="flow-note flow-single">{t.singleFlow}</div>
+    <div class="flow-note flow-single">{$t('products.mission.singleFlow')}</div>
   {/if}
 
   {#each rows as r, i (i)}
@@ -285,33 +219,33 @@
             class:active={r.mode === 'consumeExisting'}
             onclick={() => setMode(i, 'consumeExisting')}
           >
-            {t.modeExisting}
+            {$t('products.mission.modeExisting')}
           </button>
           <button
             type="button"
             class:active={r.mode === 'createNew'}
             onclick={() => setMode(i, 'createNew')}
           >
-            {t.modeNew}
+            {$t('products.mission.modeNew')}
           </button>
         </div>
-        <button class="x" type="button" aria-label={t.remove} onclick={() => remove(i)}>
+        <button class="x" type="button" aria-label={$t('products.mission.remove')} onclick={() => remove(i)}>
           ×
         </button>
       </div>
 
       {#if r.mode === 'consumeExisting'}
         {#if availableMissions.length === 0}
-          <div class="empty-inline">{t.noExisting}</div>
+          <div class="empty-inline">{$t('products.mission.noExisting')}</div>
         {:else}
           <label class="field">
-            <span>{t.pickExisting}</span>
+            <span>{$t('products.mission.pickExisting')}</span>
             <select
               class="input"
               value={r.mesimabetahalichId ?? ''}
               onchange={(e) => pickExisting(i, (e.currentTarget as HTMLSelectElement).value)}
             >
-              <option value="">{t.pickExistingPh}</option>
+              <option value="">{$t('products.mission.pickExistingPh')}</option>
               {#each availableMissions as m (m.id)}
                 <option value={m.id}>{m.attributes.name}</option>
               {/each}
@@ -320,38 +254,38 @@
         {/if}
       {:else}
         <label class="field">
-          <span>{t.nameph}</span>
+          <span>{$t('products.mission.nameph')}</span>
           <input
             class="input"
             bind:value={r.name}
-            placeholder={t.nameph}
+            placeholder={$t('products.mission.nameph')}
             list={missionTemplates.length > 0 ? 'compose-mission-name-options' : undefined}
             onchange={(e) =>
               hydrateFromTemplate(i, (e.currentTarget as HTMLInputElement).value)}
           />
         </label>
         <label class="field">
-          <span>{t.desc} <small class="hint">{t.detailsSubtitle}</small></span>
+          <span>{$t('products.mission.desc')} <small class="hint">{$t('products.mission.detailsSubtitle')}</small></span>
           <textarea
             class="input textarea"
             rows="2"
             bind:value={r.notes}
-            placeholder={t.desc}
+            placeholder={$t('products.mission.desc')}
           ></textarea>
         </label>
       {/if}
 
       <div class="grid">
         <label class="field">
-          <span>{t.hoursPerUnit}</span>
+          <span>{$t('products.mission.hoursPerUnit')}</span>
           <input class="input" type="number" min="0" step="0.25" bind:value={r.hoursPerUnit} />
         </label>
         <label class="field">
-          <span>{t.unitsPerProduct}</span>
+          <span>{$t('products.mission.unitsPerProduct')}</span>
           <input class="input" type="number" min="0" step="1" bind:value={r.unitsPerProduct} />
         </label>
         <label class="field">
-          <span>{t.ratePerHour}</span>
+          <span>{$t('products.mission.ratePerHour')}</span>
           <input class="input" type="number" min="0" step="5" bind:value={r.ratePerHour} />
         </label>
       </div>
@@ -362,9 +296,9 @@
 
       {#if r.mode === 'createNew'}
         <label class="field">
-          <span>{t.assignedTo}</span>
+          <span>{$t('products.mission.assignedTo')}</span>
           <select class="input" bind:value={r.assignedMemberId}>
-            <option value={null}>{t.chooseMember}</option>
+            <option value={null}>{$t('products.mission.chooseMember')}</option>
             {#each projectMembers as m (m.id)}
               <option value={m.id}>{m.attributes.username}</option>
             {/each}
@@ -373,11 +307,11 @@
 
         {#if !adding}
         <div class="badges">
-          <span class="badge badge-info" title={t.onlyPartOfHelp}>
-            🏷 {t.onlyPartOfTag}
+          <span class="badge badge-info" title={$t('products.mission.onlyPartOfHelp')}>
+            🏷 {$t('products.mission.onlyPartOfTag')}
           </span>
           {#if r.extraDetails}
-            <span class="badge badge-success">{t.fullDetailsSet}</span>
+            <span class="badge badge-success">{$t('products.mission.fullDetailsSet')}</span>
           {/if}
         </div>
 
@@ -387,15 +321,15 @@
           class:filled={!!r.extraDetails}
           onclick={() => (detailsOpenFor = i)}
         >
-          {t.fullDetails}
+          {$t('products.mission.fullDetails')}
         </button>
 
         {#if !r.assignedMemberId}
-          <div class="warning">⚠ {t.unassignedWarning}</div>
+          <div class="warning">⚠ {$t('products.mission.unassignedWarning')}</div>
         {/if}
         {/if}
       {:else if r.mesimabetahalichId}
-        <div class="info-line">👤 {memberLabel(r.assignedMemberId)} - {t.ownerFromExisting}</div>
+        <div class="info-line">👤 {memberLabel(r.assignedMemberId)} - {$t('products.mission.ownerFromExisting')}</div>
       {/if}
 
       <div class="row-foot">
@@ -404,19 +338,19 @@
             {#if r.assignedMemberId}
               👤 {memberLabel(r.assignedMemberId)}
             {:else}
-              ⚡ {t.unassigned}
+              ⚡ {$t('products.mission.unassigned')}
             {/if}
           </span>
         {/if}
         <span class="row-total">
-          {t.rowTotal}:
+          {$t('products.mission.rowTotal')}:
           <strong><Money amount={rowTotal(r)} {currency} /></strong>
         </span>
       </div>
     </div>
   {/each}
 
-  <button class="add" type="button" onclick={add}>{t.add}</button>
+  <button class="add" type="button" onclick={add}>{$t('products.mission.add')}</button>
 
   {#if missionTemplates.length > 0}
     <datalist id="compose-mission-name-options">

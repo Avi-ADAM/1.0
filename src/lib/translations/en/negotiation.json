@@ -76,5 +76,20 @@
   "discussion_not_found": "Discussion not found",
   "loading": "Loading...",
   "anonymous": "Anonymous",
-  "discussion_created_by": "Discussion opened by"
+  "discussion_created_by": "Discussion opened by",
+  "layout": {
+    "docOpen": "Discussion: {{topic}} - dispute resolution",
+    "docNew": "New discussion - dispute resolution",
+    "docDefault": "Dispute resolution",
+    "joinDesc": "Join an open discussion and settle the disagreement",
+    "newDesc": "Open a new discussion and invite others to take part",
+    "srTopic": "Open discussion on: {{topic}}",
+    "srNew": "Creating a new discussion"
+  },
+  "view": {
+    "addMinLine1": "Add at least 2 positions",
+    "addMinLine2": "to see the dimension analysis",
+    "refreshAi": "Refresh the AI analysis"
+  },
+  "unitsShort": "units"
 }

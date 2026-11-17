@@ -76,7 +76,7 @@
   <title
     >{data.projectBase?.projectName
       ? `${data.projectBase.projectName} · `
-      : ''}{$lang === 'he' ? 'פעולות' : $lang === 'ar' ? 'أعمال' : 'Acts'} · 1lev1</title
+      : ''}{$t('moach.layout.acts')} · 1lev1</title
   >
 </svelte:head>
 
@@ -118,7 +118,7 @@
         <button
           onclick={dismissCreate}
           class="p-1.5 rounded-lg text-surfaceMuted hover:text-surfaceInk hover:bg-surface2 dark:hover:bg-zinc-800 transition"
-          aria-label="סגור"
+          aria-label={$t('common.close')}
         >
           <svg
             class="w-5 h-5"

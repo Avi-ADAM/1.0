@@ -77,5 +77,20 @@
   "discussion_not_found": "Discusión no encontrada",
   "loading": "Cargando...",
   "anonymous": "Anónimo",
-  "discussion_created_by": "Debate abierto por"
+  "discussion_created_by": "Debate abierto por",
+  "layout": {
+    "docOpen": "Debate: {{topic}} - resolución de disputas",
+    "docNew": "Nuevo debate - resolución de disputas",
+    "docDefault": "Resolución de disputas",
+    "joinDesc": "Únete a un debate abierto y resolvamos la discrepancia",
+    "newDesc": "Abre un debate nuevo e invita a otros a participar",
+    "srTopic": "Debate abierto sobre: {{topic}}",
+    "srNew": "Creando un debate nuevo"
+  },
+  "view": {
+    "addMinLine1": "Añade al menos 2 posturas",
+    "addMinLine2": "para ver el análisis de dimensiones",
+    "refreshAi": "Actualizar el análisis de IA"
+  },
+  "unitsShort": "ud."
 }

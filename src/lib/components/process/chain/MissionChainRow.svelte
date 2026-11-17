@@ -3,6 +3,7 @@
   import ChainConnector from './ChainConnector.svelte';
   import AsksNode from './AsksNode.svelte';
   import ActsGroup from './ActsGroup.svelte';
+  import { t } from '$lib/translations';
 
   let {
     chain,
@@ -22,49 +23,6 @@
   // ---------------------------------------------------------------------------
   // Localized labels
   // ---------------------------------------------------------------------------
-  const labels = {
-    he: {
-      pendm: 'משימה ממתינה',
-      open_mission: 'משימה פתוחה',
-      asks: 'בקשות',
-      mesimabetahalich: 'בביצוע',
-      acts: 'מטלות',
-      finiapruval: 'אישור סיום',
-      finnished_mission: 'הושלמה',
-      loadBtn: 'טען משימה שהסתיימה',
-      loading: 'טוען…',
-      collapse: 'כווץ',
-      openPage: 'פתח עמוד תהליך'
-    },
-    en: {
-      pendm: 'Pending Mission',
-      open_mission: 'Open Mission',
-      asks: 'Asks',
-      mesimabetahalich: 'In Progress',
-      acts: 'Acts',
-      finiapruval: 'Final Approval',
-      finnished_mission: 'Completed',
-      loadBtn: 'Load completed mission',
-      loading: 'Loading…',
-      collapse: 'Collapse',
-      openPage: 'Open process page'
-    },
-    ar: {
-      pendm: 'مهمة معلقة',
-      open_mission: 'مهمة مفتوحة',
-      asks: 'طلبات',
-      mesimabetahalich: 'قيد التنفيذ',
-      acts: 'مهام',
-      finiapruval: 'موافقة نهائية',
-      finnished_mission: 'مكتملة',
-      loadBtn: 'تحميل المهمة المكتملة',
-      loading: 'جارٍ التحميل…',
-      collapse: 'طي',
-      openPage: 'فتح صفحة العملية'
-    }
-  };
-
-  let t = $derived(labels[lang] ?? labels.en);
 
   // ---------------------------------------------------------------------------
   // Derived helpers
@@ -197,15 +155,15 @@
   // Current stage badge for collapsed strip
   let currentStage = $derived(() => {
     if (showFinnished)
-      return { label: t.finnished_mission, cls: 'stage-green' };
-    if (showFiniapruvals) return { label: t.finiapruval, cls: 'stage-gold' };
+      return { label: $t('moach.chainMission.completed'), cls: 'stage-green' };
+    if (showFiniapruvals) return { label: $t('moach.chainMission.finalApproval'), cls: 'stage-gold' };
     if (showBetha)
       return {
-        label: t.mesimabetahalich,
+        label: $t('moach.chainMission.inProgress'),
         cls: bethaIsActive ? 'stage-rose' : 'stage-grey'
       };
-    if (showOpenMission) return { label: t.open_mission, cls: 'stage-sky' };
-    if (showPendm) return { label: t.pendm, cls: 'stage-gold' };
+    if (showOpenMission) return { label: $t('moach.chainMission.open'), cls: 'stage-sky' };
+    if (showPendm) return { label: $t('moach.chainMission.pendm'), cls: 'stage-gold' };
     return null;
   });
 
@@ -287,7 +245,7 @@
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <polyline points="18 15 12 9 6 15" />
         </svg>
-        {t.collapse}
+        {$t('moach.chainMission.collapse')}
       </button>
     </div>
 
@@ -297,15 +255,11 @@
         {#if showPendm}
           {#if needsConnectorBefore('pendm')}<ChainConnector {lang} />{/if}
           <ChainNode
-            label={t.pendm}
+            label={$t('moach.chainMission.pendm')}
             name={chain.pendm.attributes?.name ?? chain.pendm.id}
             status={chain.pendm.attributes?.archived
-              ? lang === 'he'
-                ? 'ארכיון'
-                : 'Archived'
-              : lang === 'he'
-                ? 'ממתין'
-                : 'Pending'}
+              ? $t('moach.chainMission.statusArchived')
+              : $t('moach.chainMission.statusPending')}
             statusColor={chain.pendm.attributes?.archived ? 'grey' : 'yellow'}
             user={null}
             hasForum={false}
@@ -319,15 +273,11 @@
               {lang}
             />{/if}
           <ChainNode
-            label={t.open_mission}
+            label={$t('moach.chainMission.open')}
             name={chain.openMission.attributes?.name ?? chain.openMission.id}
             status={chain.openMission.attributes?.archived
-              ? lang === 'he'
-                ? 'ארכיון'
-                : 'Archived'
-              : lang === 'he'
-                ? 'פתוח'
-                : 'Open'}
+              ? $t('moach.chainMission.statusArchived')
+              : $t('moach.chainMission.statusOpen')}
             statusColor={chain.openMission.attributes?.archived
               ? 'grey'
               : 'blue'}
@@ -348,16 +298,12 @@
               {lang}
             />{/if}
           <ChainNode
-            label={t.mesimabetahalich}
+            label={$t('moach.chainMission.inProgress')}
             name={chain.mesimabetahalich.attributes?.name ??
               chain.mesimabetahalich.id}
             status={bethaIsActive
-              ? lang === 'he'
-                ? 'פעיל'
-                : 'Active'
-              : lang === 'he'
-                ? 'ארכיון'
-                : 'Archived'}
+              ? $t('moach.chainMission.statusActive')
+              : $t('moach.chainMission.statusArchived')}
             statusColor={bethaStatusColor}
             user={bethaUser()}
             hasForum={bethaHasForum}
@@ -379,15 +325,11 @@
           <div class="fini-group">
             {#each chain.finiapruvals as fini (fini.id)}
               <ChainNode
-                label={t.finiapruval}
+                label={$t('moach.chainMission.finalApproval')}
                 name={fini.attributes?.missname ?? fini.id}
                 status={fini.attributes?.archived
-                  ? lang === 'he'
-                    ? 'ארכיון'
-                    : 'Archived'
-                  : lang === 'he'
-                    ? 'ממתין'
-                    : 'Pending'}
+                  ? $t('moach.chainMission.statusArchived')
+                  : $t('moach.chainMission.statusPending')}
                 statusColor={fini.attributes?.archived ? 'grey' : 'yellow'}
                 user={null}
                 hasForum={false}
@@ -406,9 +348,9 @@
           {#if loadedFinnished || chain?.finnishedMission}
             {@const entity = loadedFinnished ?? chain.finnishedMission}
             <ChainNode
-              label={t.finnished_mission}
+              label={$t('moach.chainMission.completed')}
               name={entity.attributes?.missionName ?? entity.id}
-              status={lang === 'he' ? 'הושלם' : 'Completed'}
+              status={$t('moach.chainMission.statusCompleted')}
               statusColor="green"
               user={null}
               hasForum={false}
@@ -417,14 +359,14 @@
             />
           {:else if chain?.finnishedMissionId}
             <div class="lazy-card">
-              <span class="lazy-label">{t.finnished_mission}</span>
+              <span class="lazy-label">{$t('moach.chainMission.completed')}</span>
               {#if finnishedLoading}
                 <div class="lazy-loading" aria-live="polite">
                   <svg class="spinner" viewBox="0 0 24 24" aria-hidden="true">
                     <circle class="spinner-track" cx="12" cy="12" r="10" />
                     <path class="spinner-arc" d="M4 12a8 8 0 018-8v8H4z" />
                   </svg>
-                  <span>{t.loading}</span>
+                  <span>{$t('moach.chainMission.loading')}</span>
                 </div>
               {:else}
                 <button
@@ -432,7 +374,7 @@
                   class="lazy-btn"
                   onclick={handleLazyLoadClick}
                 >
-                  {t.loadBtn}
+                  {$t('moach.chainMission.loadBtn')}
                 </button>
               {/if}
             </div>
@@ -444,7 +386,7 @@
       <!-- Footer: link to full page (future) -->
       <div class="exp-footer">
         <a href="/moach/{projectId}/processes/{chain.id}" class="open-page-link" tabindex="0">
-          {t.openPage}
+          {$t('moach.chainMission.openPage')}
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path
               d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"

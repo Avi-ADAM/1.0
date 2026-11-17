@@ -18,17 +18,17 @@
   import { browser } from '$app/environment';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import Tile from '$lib/celim/tile.svelte';
-  import { t } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   // New AI components (copy to $lib/negotiation/)
   import DimensionsView from '$lib/negotiation/DimensionsView.svelte';
   import PositionFormAI from '$lib/negotiation/PositionFormAI.svelte';
   import RoundFeedback from '$lib/negotiation/RoundFeedback.svelte';
 
-  /** @type {{ id: string, label: string, icon: import('$lib/celim/icons/entityIcons').EntityIconKind }[]} */
+  /** @type {{ id: string, key: string, icon: import('$lib/celim/icons/entityIcons').EntityIconKind }[]} */
   const VIEW_TABS = [
-    { id: 'spectrum', label: 'ספקטרום', icon: 'chart' },
-    { id: 'dimensions', label: 'ממדים', icon: 'search' },
-    { id: 'add', label: 'הוסף עמדה', icon: 'add' }
+    { id: 'spectrum', key: 'negotiation.spectrum', icon: 'chart' },
+    { id: 'dimensions', key: 'negotiation.dimensions', icon: 'search' },
+    { id: 'add', key: 'negotiation.add_position', icon: 'add' }
   ];
 
   let { data } = $props();
@@ -53,6 +53,12 @@
   let negotiationData = $state(data?.negotiation || null);
   let loading = $state(false);
   let error = $state('');
+  // The loader reports a failure by key (`discussion_not_found` / `error_loading`)
+  // so the message is translated here instead of being sent in Hebrew.
+  let serverErrorDismissed = $state(false);
+  let serverError = $derived(
+    !serverErrorDismissed && data?.errorKey ? $t('negotiation.' + data.errorKey) : ''
+  );
 
   // ── User / Session ─────────────────────────────────────────────
   let userName = $state(page.data.un || '');
@@ -451,14 +457,17 @@
 {/if}
 
 <!-- Error toast -->
-{#if error}
+{#if error || serverError}
   <div
     class="fixed top-4 inset-x-4 z-50 bg-red-50 border border-red-200 rounded-xl px-4 py-3 shadow-lg flex justify-between items-center"
-    dir="rtl"
+    dir={$isRtl ? 'rtl' : 'ltr'}
   >
-    <span class="text-red-700 text-sm">{error}</span>
+    <span class="text-red-700 text-sm">{error || serverError}</span>
     <button
-      onclick={() => (error = '')}
+      onclick={() => {
+        error = '';
+        serverErrorDismissed = true;
+      }}
       class="text-red-400 hover:text-red-600 text-xl leading-none">×</button
     >
   </div>
@@ -470,7 +479,7 @@
 {#if !isTopicSet}
   <div
     class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-gradient-to-br from-violet-900 to-indigo-950 p-4"
-    dir="rtl"
+    dir={$isRtl ? 'rtl' : 'ltr'}
   >
     <div
       class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden"
@@ -533,7 +542,7 @@
 {#if isTopicSet && !isFirstPositionSet && isNewNegotiation}
   <div
     class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4"
-    dir="rtl"
+    dir={$isRtl ? 'rtl' : 'ltr'}
   >
     <div
       class="bg-white w-full max-w-md rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
@@ -603,7 +612,7 @@
 {#if showShareModal}
   <div
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-    dir="rtl"
+    dir={$isRtl ? 'rtl' : 'ltr'}
   >
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
       <div class="text-center">
@@ -660,7 +669,7 @@
 {#if showResults}
   <div
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-    dir="rtl"
+    dir={$isRtl ? 'rtl' : 'ltr'}
   >
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
       <div class="text-center">
@@ -711,7 +720,7 @@
 <!-- ══════════════════════════════════════════════════════════ -->
 <div
   class="fixed inset-0 flex flex-col bg-gradient-to-br from-violet-900 via-indigo-900 to-slate-900"
-  dir="rtl"
+  dir={$isRtl ? 'rtl' : 'ltr'}
 >
   <!-- ── Top Bar ── -->
   {#if isTopicSet}
@@ -774,7 +783,7 @@
             : 'text-white/50 hover:text-white/80'}"
         >
           <EntityIcon kind={tab.icon} size={16} />
-          <span>{tab.label}</span>
+          <span>{$t(tab.key)}</span>
         </button>
       {/each}
     </div>
@@ -820,14 +829,14 @@
                 y={h / 2 + 24}
                 text-anchor="middle"
                 font-size="9"
-                fill="rgba(255,255,255,0.4)">שמרני</text
+                fill="rgba(255,255,255,0.4)">{$t('negotiation.conservative')}</text
               >
               <text
                 x={w * 0.95}
                 y={h / 2 + 24}
                 text-anchor="middle"
                 font-size="9"
-                fill="rgba(255,255,255,0.4)">מתקדם</text
+                fill="rgba(255,255,255,0.4)">{$t('negotiation.progressive')}</text
               >
 
               <!-- Center of mass indicator -->
@@ -848,7 +857,7 @@
                   text-anchor="middle"
                   font-size="8"
                   fill="gold"
-                  opacity="0.8">מרכז</text
+                  opacity="0.8">{$t('negotiation.center')}</text
                 >
               {/if}
 
@@ -921,7 +930,9 @@
                           ><EntityIcon kind="vote" size={10} /> {point.voters?.length || 0}</span
                         >
                         {#if point.author === userName}
-                          <span class="text-[9px] text-amber-300">• שלי</span>
+                          <span class="text-[9px] text-amber-300"
+                            >• {$t('negotiation.my_position')}</span
+                          >
                         {/if}
                       </div>
                     </div>
@@ -941,8 +952,8 @@
                      hover:bg-violet-500 active:scale-95 transition-all border border-white/20"
             >
               <div class="mb-1 flex justify-center"><EntityIcon kind="add" size={30} /></div>
-              <p class="text-sm font-bold">הוסף עמדה ראשונה</p>
-              <p class="text-xs text-white/70 mt-0.5">AI ימקם אותה בספקטרום</p>
+              <p class="text-sm font-bold">{$t('negotiation.add_first_position')}</p>
+              <p class="text-xs text-white/70 mt-0.5">{$t('negotiation.ai_will_place')}</p>
             </button>
           </div>
         {/if}
@@ -954,7 +965,9 @@
         {#if points.length < 2}
           <div class="text-center py-12 text-white/50">
             <div class="mb-3 flex justify-center"><EntityIcon kind="search" size={36} /></div>
-            <p class="text-sm">הוסף לפחות 2 עמדות<br />כדי לראות ניתוח ממדים</p>
+            <p class="text-sm"
+              >{$t('negotiation.view.addMinLine1')}<br />{$t('negotiation.view.addMinLine2')}</p
+            >
           </div>
         {:else}
           <!-- Consensus overview -->
@@ -963,7 +976,7 @@
           >
             <div class="flex justify-between items-center">
               <div>
-                <p class="text-white/70 text-xs">הסכמה כוללת</p>
+                <p class="text-white/70 text-xs">{$t('negotiation.overall_consensus')}</p>
                 <p class="text-white font-bold text-2xl">{consensusScore}%</p>
               </div>
               <div
@@ -1020,7 +1033,7 @@
             class="bg-amber-400/20 border border-amber-400/30 backdrop-blur-md rounded-2xl p-4 mb-4"
           >
             <p class="text-amber-200 text-xs font-semibold mb-2">
-              <EntityIcon kind="idea" size={14} /> AI מציע לדון בממדים אלה:
+              <EntityIcon kind="idea" size={14} /> {$t('negotiation.ai_suggests_dimensions')}
             </p>
             <div class="flex flex-wrap gap-2">
               {#each topicSuggestions.suggestedDimensions as dim}
@@ -1047,7 +1060,7 @@
         {#if points.length > 0}
           <div class="mt-4 space-y-2">
             <p class="text-white/60 text-xs font-medium px-1">
-              עמדות קיימות - לעיון
+              {$t('negotiation.existing_positions')}
             </p>
             {#each points as p}
               <div
@@ -1098,9 +1111,10 @@
                  hover:bg-violet-400 active:scale-95 transition-all shadow-lg"
         >
           {#if currentRound >= maxRounds}
-            <EntityIcon kind="finish" size={15} /> סיים דיון
+            <EntityIcon kind="finish" size={15} /> {$t('negotiation.finish_discussion')}
           {:else}
-            <EntityIcon kind="refresh" size={15} /> סבב {currentRound + 1}
+            <EntityIcon kind="refresh" size={15} />
+            {$t('negotiation.next_round', { count: currentRound + 1 })}
           {/if}
         </button>
 
@@ -1111,7 +1125,7 @@
           class="py-3 px-4 rounded-xl font-medium text-sm bg-white/15 text-white
                  hover:bg-white/25 active:scale-95 transition-all
                  disabled:opacity-40"
-          title="עדכן ניתוח AI"
+          title={$t('negotiation.view.refreshAi')}
         >
           {#if dimensionsLoading}
             <span
@@ -1127,7 +1141,9 @@
           onclick={resetSystem}
           class="py-3 px-4 rounded-xl font-medium text-sm bg-white/10 text-white/70
                  hover:bg-white/20 active:scale-95 transition-all"
-          title="איפוס"><EntityIcon kind="reset" size={15} /></button
+          title={$t('negotiation.reset')}
+          ><EntityIcon kind="reset" size={15} /></button
+        >
         >
       </div>
     </div>

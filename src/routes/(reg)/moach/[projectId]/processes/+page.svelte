@@ -44,7 +44,7 @@
   // lifecycle object also has a standalone page, independent of its process.</script>
 
 <svelte:head>
-  <title>{page.data.projectBase?.projectName ? `${page.data.projectBase.projectName} · ` : ''}{$lang === 'he' ? 'תהליכים' : $lang === 'ar' ? 'العمليات' : 'Processes'} · 1lev1</title>
+  <title>{page.data.projectBase?.projectName ? `${page.data.projectBase.projectName} · ` : ''}{$t('moach.layout.processes')} · 1lev1</title>
 </svelte:head>
 
 <div class="processes-page space-y-6">

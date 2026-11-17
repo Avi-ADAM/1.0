@@ -37,14 +37,14 @@
   function holderLabel(s) {
     const hs = s?.attributes?.holderStatus;
     const holderName = s?.attributes?.users_permissions_user?.data?.attributes?.username ?? '';
-    if (hs === 'self') return $lang === 'he' ? 'מאומת (עצמי)' : 'verified (self)';
-    if (hs === 'open') return $lang === 'he' ? `בהסכמה מול ${holderName}` : `awaiting ${holderName}'s consent`;
+    if (hs === 'self') return $t('moach.sale.holderSelf');
+    if (hs === 'open') return $t('moach.sale.holderOpen', { name: holderName });
     if (hs === 'confirmed') {
       return s?.attributes?.confirmedBy === 'timeout'
-        ? ($lang === 'he' ? 'אושר בשתיקה' : 'auto-approved')
-        : ($lang === 'he' ? 'אושר' : 'confirmed');
+        ? $t('moach.sale.holderAutoApproved')
+        : $t('moach.sale.holderConfirmed');
     }
-    return $lang === 'he' ? 'לא מאומת (legacy)' : 'unverified (legacy)';
+    return $t('moach.sale.holderLegacy');
   }
 
   let jsonLd = $derived(sale ? {

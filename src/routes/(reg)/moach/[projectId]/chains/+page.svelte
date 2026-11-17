@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/translations';
   import ProcessChainView from '$lib/components/process/ProcessChainView.svelte';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import { page } from '$app/state';
@@ -164,7 +165,7 @@
 </script>
 
 <svelte:head>
-  <title>{data.projectBase?.projectName ? `${data.projectBase.projectName} · ` : ''}{$lang === 'he' ? 'שרשראות' : $lang === 'ar' ? 'سلاسل' : 'Chains'} · 1lev1</title>
+  <title>{data.projectBase?.projectName ? `${data.projectBase.projectName} · ` : ''}{$t('moach.layout.chains')} · 1lev1</title>
 </svelte:head>
 
 <div class="chains-page p-4">

@@ -14,7 +14,7 @@
 </script>
 
 <svelte:head>
-  <title>{projectBase?.projectName ? `${projectBase.projectName} · ` : ''}{$lang === 'he' ? 'ראשי' : $lang === 'ar' ? 'الرئيسية' : 'Main'} · 1lev1</title>
+  <title>{projectBase?.projectName ? `${projectBase.projectName} · ` : ''}{$t('moach.layout.main')} · 1lev1</title>
 </svelte:head>
 
 <svelte:window bind:innerWidth />

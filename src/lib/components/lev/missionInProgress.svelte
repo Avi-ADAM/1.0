@@ -1,4 +1,4 @@
-﻿<script>
+<script>
   import TimerDialogs from '../timers/TimerDialogs.svelte';
   import { nutifi } from '$lib/func/nutifi.svelte';
   import { toast } from 'svelte-sonner';
@@ -73,7 +73,7 @@
     hearotMeyuchadot,
     src = 'coin.png',
     link,
-    linkDescription = 'לביצוע',
+    linkDescription,
     projectId,
     linkP = '/project/',
     hourstotal,
@@ -220,12 +220,8 @@
       ) ?? [];
   });
 
-  /** להוסיף פונקציה לבקשת תוספת שעות
- * $: if (percentage(zman,mstotal) >= 100 && running == true){
-           azor ()
-    let text = `שלום ${usernames} הטיימר של  ${missionName} נעצר מפני שמכסת השעות שסוכמה הסתיימה, יש ליצור משימה חדשה` ;
-    nutifi("1💗1 טיימר נעצר",text,"lev" )
-        }**/
+  // TODO: add hour-extension request when percentage(zman, mstotal) >= 100 && running
+  // (uses lev.missionInProgress.timerStoppedTitle / timerQuotaReached)
 
   let error1;
 
@@ -383,10 +379,7 @@
     isOpen = false;
     already = false;
   }
-  let errorM = {
-    ein: 'יש להעלות קובץ המכיל את ביצוע המשימה או לתאר במילים',
-    timer: ' יש לכבות את הטיימר לפני הגשת המשימה לאישור'
-  };
+  let linkHint = $derived(linkDescription || $t('lev.cards.inpro.taskLink'));
   let activE = $state();
   let why = $state();
   let what = $state();
@@ -397,13 +390,13 @@
 
     // --- keep local validations for fast UX feedback ---
     if (!why && !what) {
-      activE = errorM.ein;
+      activE = $t('lev.missionInProgress.uploadDescription');
       butt = false;
       already = false;
       return;
     }
     if (running) {
-      activE = errorM.timer;
+      activE = $t('lev.missionInProgress.timerRunning');
       butt = false;
       already = false;
       return;
@@ -426,7 +419,7 @@
         console.log('upload ok', newwhat);
       } catch (err) {
         console.error('upload failed', err);
-        activE = 'העלאת הקובץ נכשלה, נסה שוב';
+        activE = $t('moach.progress.uploadFailed');
         butt = false;
         already = false;
         return;
@@ -601,21 +594,21 @@
   // via the $effect block near the top — no manual onMount/interval needed here.
   $effect(() => {
     if (percentage(zman, mstotal) == 90) {
-      let text = `שלום ${usernames} נשארו רק עשרה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה`;
-      nutifi('1💗1 טיימר קרוב לסיום', text, 'lev');
+      let text = $t('lev.missionInProgress.timerWarn10Pct', { name: usernames, mission: missionName });
+      nutifi($t('lev.missionInProgress.timerNearEndTitle'), text, 'lev');
     } else if (percentage(zman, mstotal) == 95) {
-      let text = `שלום ${usernames} נשארו רק חמישה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה`;
-      nutifi('1💗1 טיימר קרוב לסיום', text, 'lev');
+      let text = $t('lev.missionInProgress.timerWarn5Pct', { name: usernames, mission: missionName });
+      nutifi($t('lev.missionInProgress.timerNearEndTitle'), text, 'lev');
     }
   });
   $effect(() => {
     if (mstotal - zman == 300000) {
-      let text = `שלום ${usernames} נשארו רק חמש דקות לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה`;
-      nutifi('1💗1 טיימר קרוב לסיום', text, 'lev');
+      let text = $t('lev.missionInProgress.timerWarn5Min', { name: usernames, mission: missionName });
+      nutifi($t('lev.missionInProgress.timerNearEndTitle'), text, 'lev');
     } else if (mstotal - zman == 60000) {
       console.log('timer stop min');
-      let text = `שלום ${usernames} נשארה רק דקה לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה`;
-      nutifi('1💗1 טיימר קרוב לסיום', text, 'lev');
+      let text = $t('lev.missionInProgress.timerWarn1Min', { name: usernames, mission: missionName });
+      nutifi($t('lev.missionInProgress.timerNearEndTitle'), text, 'lev');
     }
   });
   // lapse refers to the number of milliseconds in the stopwatch
@@ -953,7 +946,7 @@
   missionId={mId}
   {projectId}
   myId={String(page.data.uid ?? '')}
-  {linkDescription}
+  linkDescription={linkHint}
   {running}
   {show}
   {hourstotal}

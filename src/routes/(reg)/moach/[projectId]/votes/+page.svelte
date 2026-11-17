@@ -120,7 +120,7 @@
 </script>
 
 <svelte:head>
-  <title>{page.data.projectBase?.projectName ? `${page.data.projectBase.projectName} · ` : ''}{$lang === 'he' ? 'הצבעות' : $lang === 'ar' ? 'التصويتات' : 'Votes'} · 1lev1</title>
+  <title>{page.data.projectBase?.projectName ? `${page.data.projectBase.projectName} · ` : ''}{$trans('moach.layout.votes')} · 1lev1</title>
 </svelte:head>
 
 <div class="votes-page space-y-8">

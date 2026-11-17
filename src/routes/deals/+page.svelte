@@ -34,7 +34,7 @@
   const activeList = $derived(tab === 'purchase' ? purchases : tab === 'sale' ? sales : []);
   const deals = $derived(
     tab === 'purchase' || tab === 'sale'
-      ? activeList.map((s) => saleToDeal(s, tab as DealKind))
+      ? activeList.map((s) => saleToDeal(s, tab as DealKind, $t))
       : []
   );
   const stats = $derived(salesToStats(activeList));
@@ -87,15 +87,9 @@
   {#if customerCycles.length > 0}
     <section class="cycles-section anim">
       <h2 class="cycles-title">
-        {$lang === 'he'
-          ? `הוראות קבע - עדכון חודשי (${customerCycles.length})`
-          : `Standing orders - monthly update (${customerCycles.length})`}
+        {$t('deals.cycles.titleCustomer', { count: customerCycles.length })}
       </h2>
-      <p class="cycles-sub">
-        {$lang === 'he'
-          ? 'כמה העברת החודש? העדכון שלך יאפשר למוכר לאשרר שהתקבל. גם 0 הוא עדכון.'
-          : 'How much did you transfer this month? Your update lets the seller confirm receipt. 0 counts too.'}
-      </p>
+      <p class="cycles-sub">{$t('deals.cycles.subCustomer')}</p>
       <div class="cycles-grid">
         {#each customerCycles as cycle (cycle.id)}
           <RecurringCycleCard {cycle} role="customer" onDone={() => invalidateAll()} />

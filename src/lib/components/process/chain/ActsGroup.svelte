@@ -1,4 +1,6 @@
 <script>
+  import { t } from '$lib/translations';
+
   let {
     acts = [],
     onActClick,
@@ -7,37 +9,6 @@
 
   let showAll = $state(false);
 
-  const i18n = {
-    he: {
-      showMore:     (n) => `הצג עוד ${n}`,
-      showLess:     'הצג פחות',
-      actLabel:     'מטלה',
-      done:         'בוצע',
-      myApproval:   'אישורי',
-      validApproval:'אישור תקף',
-      noActs:       'אין מטלות'
-    },
-    en: {
-      showMore:     (n) => `+${n} more`,
-      showLess:     'Show less',
-      actLabel:     'Act',
-      done:         'Done',
-      myApproval:   'My approval',
-      validApproval:'Valid approval',
-      noActs:       'No acts'
-    },
-    ar: {
-      showMore:     (n) => `عرض ${n} المزيد`,
-      showLess:     'عرض أقل',
-      actLabel:     'مهمة',
-      done:         'تم',
-      myApproval:   'موافقتي',
-      validApproval:'موافقة صالحة',
-      noActs:       'لا توجد مهام'
-    }
-  };
-
-  let t          = $derived(i18n[lang] ?? i18n.en);
   let visibleActs = $derived(showAll || acts.length <= 3 ? acts : acts.slice(0, 3));
   let hiddenCount = $derived(acts.length - 3);
 
@@ -53,13 +24,13 @@
   function actAriaLabel(act) {
     const name   = act?.attributes?.shem ?? '';
     const status = act?.attributes?.status ?? '';
-    return status ? `${t.actLabel}: ${name} - ${status}` : `${t.actLabel}: ${name}`;
+    return status ? `${$t('moach.actsGroup.actLabel')}: ${name} - ${status}` : `${$t('moach.actsGroup.actLabel')}: ${name}`;
   }
 </script>
 
 <div class="acts-group">
   {#if acts.length === 0}
-    <p class="acts-empty">{t.noActs}</p>
+    <p class="acts-empty">{$t('moach.actsGroup.noActs')}</p>
   {:else}
     {#each visibleActs as act (act.id)}
       {@const attrs = act?.attributes ?? {}}
@@ -69,7 +40,7 @@
         aria-label={actAriaLabel(act)}
         onclick={() => onActClick(act)}
       >
-        <span class="act-label">{t.actLabel}</span>
+        <span class="act-label">{$t('moach.actsGroup.actLabel')}</span>
         <span class="act-name">{attrs.shem ?? '—'}</span>
 
         {#if attrs.status != null}
@@ -83,36 +54,36 @@
           <span
             class="indicator"
             class:indicator--on={attrs.naasa}
-            title={t.done}
+            title={$t('moach.actsGroup.done')}
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <polyline points="20 6 9 17 4 12" />
             </svg>
-            <span class="sr-only">{t.done}</span>
+            <span class="sr-only">{$t('moach.actsGroup.done')}</span>
           </span>
 
           <span
             class="indicator indicator--user"
             class:indicator--on={attrs.myIshur}
-            title={t.myApproval}
+            title={$t('moach.actsGroup.myApproval')}
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
               <circle cx="12" cy="7" r="4" />
             </svg>
-            <span class="sr-only">{t.myApproval}</span>
+            <span class="sr-only">{$t('moach.actsGroup.myApproval')}</span>
           </span>
 
           <span
             class="indicator indicator--shield"
             class:indicator--on={attrs.valiIshur}
-            title={t.validApproval}
+            title={$t('moach.actsGroup.validApproval')}
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
               <polyline points="22 4 12 14.01 9 11.01" />
             </svg>
-            <span class="sr-only">{t.validApproval}</span>
+            <span class="sr-only">{$t('moach.actsGroup.validApproval')}</span>
           </span>
         </div>
       </button>
@@ -124,7 +95,7 @@
         class="show-more-btn"
         onclick={() => (showAll = !showAll)}
       >
-        {showAll ? t.showLess : t.showMore(hiddenCount)}
+        {showAll ? $t('moach.actsGroup.showLess') : $t('moach.actsGroup.showMore', { count: hiddenCount })}
       </button>
     {/if}
   {/if}

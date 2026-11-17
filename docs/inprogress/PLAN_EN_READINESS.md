@@ -1,6 +1,6 @@
 # מוכנות ללקוחות באנגלית: רשימת תיקונים
 
-> **סטטוס: inprogress, שלב 1 הושלם.** נכתב 2026-11-17, אחרי מיזוג `main` (`b23abef`). המסמך מסכם
+> **סטטוס: inprogress, שלבים 1–3 הושלמו.** נכתב 2026-11-17, אחרי מיזוג `main` (`b23abef`). המסמך מסכם
 > סריקה של טקסט עברי שנכתב ישירות בקוד, כלומר לא דרך `$t()`. לקוח שהממשק שלו
 > באנגלית רואה את הטקסט הזה בעברית. הבדיקות האוטומטיות לא תופסות את זה, כי
 > `check:i18n` בודק רק מפתחות קיימים.
@@ -12,6 +12,7 @@
 | `npm run check:i18n` | ✓ 84 קבצי תרגום × 5 שפות. אזהרה: אף מסך לא משתמש ב־`ask` ו־`nuti` |
 | `npm run check:script` | ✓ אין מילים שמערבבות אותיות משתי שפות |
 | `npm run check:translatable` | ✓ |
+| `npm run check:ui-hebrew` | ✓ אין עברית ב־markup ב־153 רכיבים (חדש בשלב 3) |
 | התאמה בין `he` ל־`en` | ✓ אין מפתח חסר ואין טקסט עברי בקבצי `en`. `offerings.storefront.empty` ריק בכל השפות, וזה מכוון |
 
 ## מה כבר תוקן ✅
@@ -71,35 +72,83 @@
 `rejected` מוצג למציע כ"לא נבחרה", לפי עיקרון "אין לא מוחלט".
 
 **נמצא בדרך, עדיין פתוח:**
-- **"Brains" בתפריט:** ב־`/concierge`, הכפתור שמוביל ל־`/moach` מוצג באנגלית
-  כ־"Brains" (`concierge.moach`), ואילו `concierge.new.nav.moach` הוא "Rikmas". צריך לאחד.
+- ~~**"Brains" בתפריט:**~~ ✅ אוחד בשלב 2: `concierge.moach` עודכן ב־5 שפות (`Rikmas` / `الريكمات` / `Рикмы` / `Rikmas`).
 - **ריבוי באנגלית:** מופיע למשל "1 Missions", כי המפתחות הקיימים לא מבחינים בין יחיד לרבים.
 
-### שלב 2: הלב והמוח, איפה שחברי רקמה עובדים כל יום (P1)
+### שלב 2: הלב והמוח, איפה שחברי רקמה עובדים כל יום (P1) — ✅ תוקן (2026-11-17)
 
-| # | קובץ | מה מופיע בעברית |
-|---|---|---|
-| 2.1 | `src/lib/utils/levProcessors.ts:254-346` | הודעות פיד ההחלטות: `'בעד'`/`'נגד'`, `'גרסה ישנה'`, `'ביצע משא ומתן'`, `` `X שעות במקום Y` ``, `'לפי שעה'`, `'סה"כ'`, `'שם … במקום'`, `'תיאור … במקום'`. ה־HTML נבנה כמחרוזת, ולכן צריך להעביר לפונקציה את `t` מבחוץ |
-| 2.2 | `src/lib/components/prPr/pendsM.svelte` | כל כותרות הטבלה: `'שם'`, `'תיאור'`, `'כישורים נדרשים'`, `'סוג משימה'`… (נטען מ־`moach/ActionModal` ומ־`MissionModal`) |
-| 2.3 | `src/lib/components/prPr/openM.svelte` | `'פעולה פתוחה'`/`'פעולות פתוחות'` וכותרות הטבלה |
-| 2.4 | `src/lib/components/prPr/mashmam.svelte` | `'משאבים נדרשים שפורסמו'` וכותרות הטבלה |
-| 2.5 | `src/lib/components/lev/cards/pma.svelte` | תוויות ההשוואה במשא ומתן על משאב: `'שם'`, `'תיאור'`, `'מחיר'`, `'שווי מוצע'`, `'כמות'`, `'מיקום'`, `'משאב חוזר'`/`'חד פעמי'` |
-| 2.6 | `src/lib/components/lev/cards/haluka.svelte:781-794` | `'בעד'`, `'טרם'`, `'נגד'`, `'סך ההצבעות בעד'`, `'לא הצביעו'` |
-| 2.7 | `src/lib/components/lev/cards/inpro.svelte:470-473` | `'הפסקה'`, `'התחלה'` |
-| 2.8 | `src/lib/components/lev/halukaask.svelte:333` | `alert('מינימום 20 תווים')` |
-| 2.9 | `src/lib/components/lev/missionInProgress.svelte:226` | ההודעה "הטיימר נעצר מפני שמכסת השעות…" שנשלחת לחבר |
-| 2.10 | `src/lib/components/timers/TimersCalendar.svelte` | `'משימה ללא שם'` ועוד |
+| # | קובץ | מה היה בעברית | סטטוס |
+|---|---|---|---|
+| 2.1 | `src/lib/utils/levProcessors.ts`, `src/lib/stores/levDerived.ts` | הודעות פיד ההחלטות/הצבעות/משא ומתן ותגיות מקור (קונסירג׳, מאגד ביקוש) ב־7 מעבדים | ✅ `TranslateFn` מועבר ריאקטיבית מ־`levDerived.ts` (`$t`). מפתחות `lev.feed.*` + `mash.*` ב־5 שפות, בריחת HTML (`escHtml`), תיקון באג `vote.what === false` ב־`processPmashes`, ובדיקת יחידה `levProcessors.i18n.test.ts` לכל 5 השפות |
+| 2.2 | `src/lib/components/prPr/pendsM.svelte` | כותרת הטבלה, כל עמודות הטבלה וכותרות כפתורים/SVG | ✅ `moach.tables.*` ו־`common.hours` ב־5 שפות, `dir={$isRtl ? 'rtl' : 'ltr'}`, תאריכים לפי `$lang`, שינוי שם משתנה לולאה `t` ל־`idx` |
+| 2.3 | `src/lib/components/prPr/openM.svelte` | `'פעולה פתוחה'`/`'פעולות פתוחות'`, עמודות הטבלה וכותרות כפתורים | ✅ `moach.tables.*` ב־5 שפות, `dir` לפי `$isRtl` |
+| 2.4 | `src/lib/components/prPr/mashmam.svelte` | `'משאבים נדרשים שפורסמו'`, כותרות עמודות, סוגי משאב ויחידות חיוב | ✅ `moach.tables.*` + `mash.*` ב־5 שפות, `dir` לפי `$isRtl` |
+| 2.5 | `src/lib/components/lev/cards/pma.svelte` | השוואת משא ומתן, תדירות/מיקום, כותרות, טיימר, הערות hover, פירוט מחיר/שווי, ספירת הצבעות | ✅ `lev.cards.pma.*` + מפתחות גלובליים קיימים ב־5 שפות, `changes` עבר ל־`$derived`, חץ וצל לפי `$isRtl` |
+| 2.6 | `src/lib/components/lev/cards/haluka.svelte` | `'בעד'`, `'טרם'`, `'נגד'` וטולטיפי hover | ✅ `lev.cards.voteCard.*`, `lev.cards.common.against`, `vots.{totalin,totalno}`, צל לפי `$isRtl` |
+| 2.7 | `src/lib/components/lev/cards/inpro.svelte` | `'הפסקה'` / `'התחלה'` במילון מקומי לפי `$lang === 'he'` | ✅ `lev.cards.inpro.{pause,start}` ב־5 שפות, צל לפי `$isRtl` |
+| 2.8 | `src/lib/components/lev/halukaask.svelte` | `alert('מינימום 20 תווים')` | ✅ `$t('lev.diun.minChars', { count: 20 })` ב־5 שפות |
+| 2.9 | `src/lib/components/lev/missionInProgress.svelte` | התראות טיימר (`10%`, `5%`, `5 דק׳`, `1 דק׳`, עצירה), שגיאות אימות/העלאה, וברירת מחדל `'לביצוע'` | ✅ `lev.missionInProgress.*`, `moach.progress.uploadFailed`, `lev.cards.inpro.taskLink` ב־5 שפות |
+| 2.10 | `src/lib/components/timers/TimersCalendar.svelte` | `'משימה ללא שם'`, כותרות, סטטיסטיקות, מקרא, טולטיפ ומודאל פרטים, ו־`locale: 'he'` קבוע | ✅ `timers.cal.*` ב־5 שפות, `locale: $lang` ו־`direction` ריאקטיבי לפי `$isRtl`, בריחת HTML בטולטיפ |
 
-### שלב 3: עסקאות, מוצרים ותהליכים (P1)
+**תפיסות ובאגים נוספים שתוקנו על הדרך ב־לב, מוח, `prPr` וטיימרים (0 עברית חשופה בסריקה חוזרת):**
 
-| # | קובץ | מה מופיע בעברית |
-|---|---|---|
-| 3.1 | `src/routes/deals/request/[id]/+page.svelte` | סוגי התשלום (`'מינוי חודשי'`…) וכל הודעות ה־toast (`'הבקשה אושרה'`, `'שגיאה באישור הבקשה'`…) |
-| 3.2 | `src/routes/deals/[id]/+page.svelte` | סטטוסים: `'בביצוע'`, `'ממתין לאישור'`… |
-| 3.3 | `src/lib/services/dealsService.ts` | אותן תוויות סוגי תשלום. כדאי לאחד ל־`$t()` אחד עם 3.1 |
-| 3.4 | `src/routes/negotiation/+layout.svelte`, `src/routes/negotiation/[id]/+page.svelte` | תוויות לשוניות (`'ספקטרום'`, `'הוסף עמדה'`) |
-| 3.5 | `src/lib/components/products/MatanotPublicView.svelte`, `MissionPickerList.svelte`, `ResourcePickerList.svelte`, `MissionDetailsModal.svelte`, `ResourceDetailsModal.svelte` | **מוצגים באנגלית** דרך `$lang === 'he' ? … : …`, אבל זה מילון מקומי. אם השפה היא `ar`, `ru` או `es`, הקורא מקבל אנגלית. להעביר ל־JSON |
-| 3.6 | `src/lib/components/process/lifecycle/ProcessLifecycle.svelte`, `SaleLifecycle.svelte`, `process/chain/MissionChainRow.svelte`, `ResourceChainRow.svelte` | אותו דפוס בדיוק: מילון `{he, en}` מקומי |
+- **טופס יצירת משימה ברוסית וספרדית (`prPr/mission.svelte`):** `missionByLang` כלל רק `{ he, en, ar }` ונפל חזרה לעברית ב־`ru`/`es`. נוספו `ruMission` ו־`esMission`.
+- **טבלאות ורכיבי `prPr` נוספים:** `betaha.svelte` (טבלת פעולות בביצוע), `negoM.svelte` ו־`negoPend.svelte` (שדות גשר המו״מ), `chosNed.svelte`, `tasks/Myacts.svelte`, `tasks/taskModal.svelte`, `tasks/chooseM.svelte`, `choosMission.svelte`, `gantt/gant.svelte`, `sheirut/sheirutShow.svelte`, ותיקון ג׳יבריש קידוד (`'—'`) ב־`Kanbanboard.svelte`.
+- **כרטיסים ורכיבי הלב הנוספים:** `welcomTo.svelte` (הסרת טקסט תועה `שי` בתחילת הקובץ), `lev/+page.svelte`, `cards/{CardHeader,VoteStatusDisplay,SaleCard,CustomerSaleCard,SheirutHalukaCard,hachlata,fini,rektom}.svelte`, `{diun,didiget,mesima,pandingMesima,pmas,fiappru,mashsuggest,reqtojoin,weget,projectSuggestor,sv}.svelte`.
+- **צ׳אט וסטורים:** `celim/messeges.svelte` (זמנים יחסיים עברו ממילון `{he,en,ar}` ל־`common.chat.*` ב־5 שפות ו־`dir="auto"`), `stores/pendMisMes.js` (כותרות העברה/מכירה בצ׳אט) ו־`stores/pgishot.js` (`common.chat.meetingCreated`).
+- **טיימרים:** `timers/timer.svelte` (`aria-label` של הפעלה/עצירה/עריכה ותצוגת שעות — כולל תיקון היפוך מונה/מכנה באנגלית דרך `timers.proHoursOf`) וכותרת `routes/(reg)/timers/+page.svelte`.
+- **נתיבי המוח ודפי הזדמנויות:** 15 תגיות `<title>` ב־`moach/[projectId]/**` עברו ל־`moach.layout.*`, סטטוסי מחזיק כסף ב־`sales/[saleId]`, שגיאות וחץ RTL ב־`chains/[chainId]`, `ProcessCreator.svelte`, `object/[type]` (תאריכים ב־`$lang`), `moach/[projectId]/wishes/+page.server.ts` (`serverTranslator`), ותגיות מאגד ביקוש / קונסירג׳ ב־`availableMission/[id]` ו־`availiableResorce/[id]`.
+
+### שלב 3: עסקאות, מוצרים ותהליכים (P1) — ✅ תוקן (2026-11-17)
+
+| # | קובץ | מה היה בעברית | סטטוס |
+|---|---|---|---|
+| 3.1 | `src/routes/deals/request/[id]/+page.svelte` | סוגי התשלום (`'מינוי חודשי'`…), כל ה־toast, תגי הסטטוס, כרטיסי הפרטים, `dir="rtl"` קבוע, ותאריך בפורמט `d.m.y` | ✅ `deals.request.*`; סוגי התשלום קוראים ל־`deals.kind*` הקיימים; תאריכים דרך `toLocaleDateString($lang)`; `dir` לפי `$isRtl` |
+| 3.2 | `src/routes/deals/[id]/+page.svelte` | `STATUS_LABEL`, שני ה־toast, הודעות „לא נמצאה”, תגי קונה/מוכר, תאריכי התחלה וסיום ושלושת מדדי הכותרת | ✅ ממופה ל־`deals.statusInProgress` / `statusCoordination` / `pendingApproval` / `statusDone` הקיימים, ונוספו `deals.dealPage.*` |
+| 3.3 | `src/lib/services/dealsService.ts` | סוגי תשלום, ציר הזמן, שמות הצדדים, „אתה”/„לקוח”, וכותרות האישורים הממתינים | ✅ מקבל `TranslateFn` (`$t`) כמו מעבדי הלב בשלב 2, עם `identityT` כברירת מחדל; `/deals` ו־`/deals/[id]` מעבירים `$t` ריאקטיבית. המפתחות: `deals.service.*` |
+| 3.4 | `src/routes/negotiation/+layout.svelte`, `[id]/+page.svelte` | כותרת הדף, מטא־תגיות השיתוף, תוכן קורא־המסך, תוויות הלשוניות, צירי הספקטרום, מצבי הריק והכפתורים העליונים; `dir="rtl"` בכל ששת השורשים | ✅ `negotiation.layout.*` ו־`negotiation.view.*`; השאר משתמש במפתחות הקיימים (`spectrum`, `add_position`, `overall_consensus`…); `onMount` שהוסיף `document.title` הוחלף ב־`<title>` ב־`svelte:head` |
+| 3.5 | `src/lib/components/products/MatanotPublicView.svelte`, `MissionPickerList.svelte`, `ResourcePickerList.svelte`, `MissionDetailsModal.svelte`, `ResourceDetailsModal.svelte` | חמישה מילונים מקומיים `$lang === 'he' ? … : …` — קורא ב־`ar`/`ru`/`es` קיבל אנגלית | ✅ namespace חדש `products` (101 מפתחות × 5 שפות): `view.*`, `mission.*`, `resource.*`, `missionDetails.*`, `resourceDetails.*`. נשמר ב־`routes.js` ל־`/lev`, `/gift`, `/deals`, `/moach/<project>` |
+| 3.6 | `src/lib/components/process/lifecycle/{ProcessLifecycle,SaleLifecycle}.svelte`, `process/chain/{MissionChainRow,ResourceChainRow}.svelte` | מילוני `{he, en, ar}` מקומיים (בלי `ru`/`es`) + טרנרים `lang === 'he' ? 'ארכיון' : 'Archived'` בכל תג | ✅ `moach.lifecycle.*`, `moach.saleLife.*`, `moach.chainMission.*`, `moach.chainResource.*`; ריבוי „הצעה אחת/הצעות” דרך `offersOne`/`offersMany` במקום „1 offers” |
+
+**שכבות נוספות שנוקו בדרך (0 עברית חשופה ב־markup בכל התיקיות האלה):**
+
+- **מסך מרכז המכירות** (`routes/deals/sales-center/+page.svelte`): תשעה טרנרים `$lang === 'he' ? … : …`
+  (toast של מכירה, שיתוף מוצר, העתקת קישור, רענון, שם פרויקט לא מזוהה, ושני באנרים של דיווחים
+  ממתינים) — `pages.salesCenter.*` + `deals.cycles.*`. הריבוי עבר למפתחות `claimsMineOne/Many`
+  ו־`claimsWaitingOne/Many`, כי `דיווח/דיווחים` ו־`report/reports` אינם אותו דבר.
+- **`routes/deals/+page.svelte`**: כותרת והסבר של „הוראות קבע” — `deals.cycles.titleCustomer` / `subCustomer`.
+- **`src/lib/components/sales/SaleComponent.svelte`**: ארבע שורות של „לקוח (אופציונלי)” נכתבו
+  ב־`$lang === 'en' ? … : עברית`, כלומר `ar`/`ru`/`es` קיבלו עברית. הן עברו למפתחות
+  `sales.shopSkin.*` **שכבר היו קיימים** ולא היו מחוברים.
+- **`src/lib/components/process/ProcessChainView.svelte`, `chain/{ActsGroup,AsksNode,ChainConnector}.svelte`,
+  `lifecycle/LifecycleStation.svelte`, `VoteRounds.svelte`**: אותה משפחת מילונים; עברו ל־`moach.chainView.*`,
+  `moach.actsGroup.*`, `moach.asksNode.*`, `moach.voteRounds.*`, וחץ המחבר + כיווניות לפי `$isRtl`.
+  תאריכים ומספרים לפי `$lang` במקום `en-GB`/`en-US` קבועים.
+- **`src/routes/negotiation/[id]/+page.server.js` + `[id]/+page.svelte`**: שני מסרי שגיאה בעברית
+  הוחלפו ב־`errorKey` (`discussion_not_found`, `error_loading`), **והמסך מחובר אליהם** —
+  `serverError` נגזר מה־`data.errorKey` ומוצג ב־toast השגיאה הקיים (אפשר לסגור אותו).
+- **`src/lib/negotiation/RoundFeedback.svelte`**: `יח'` — `negotiation.unitsShort` בחמש שפות.
+- **שלושת העמודים הציבוריים** (`gift/[id]`, `availableMission/[id]`, `availiableResorce/[id]`):
+  „כבר שלחת בקשת רכישה”, „עריכת BOM / מוצר”, `'he' === $lang ? 'לצפיה במשאלה' : 'See the wish'`,
+  הודעות ה־toast של שליחת בקשה/הצעה, `aria-label="סגירה"`, טולטיפ „הערות”, כותרת `error | שגיאה`
+  שהציגה אנגלית ועברית יחד, ו־`toLocaleString('en-US')` על מספרים — `offerings.page.*` ו־`pages.avail{Resource,Mission}.*`.
+
+**בדיקה חדשה שמונעת רגרסיה ✅:** `npm run check:ui-hebrew` (`scripts/check-ui-hebrew.mjs`) קורא רק את
+חצי ה־markup של `.svelte` (מחרוזת עברית בתוך `<script>` היא השוואת נתונים או ערך לפי שפת הנמען,
+וזה מותר), מסיר הערות, ונכשל על כל אות עברית שנשארה. הוא מכסה 153 רכיבים ב־17 תיקיות: מסכי
+שלבים 1–3 (`concierge`, `wish`, `moach`, `lev`, `timers`, `deals`, `negotiation`), שלושת
+העמודים הציבוריים (`gift`, `availableMission`, `availiableResorce`), והרכיבים שלהם.
+ה־allowlist היחיד הוא שם של שפה בתצוגת התרגום של AI (`עברית:`), כי שם של שפה אינו מתורגם.
+תיקייה חדשה מתווספת ל־`ROOTS` אחרי שהיא מתורגמת — ומאותו רגע אי אפשר להחזיר לשם עברית.
+
+**מה שנשאר פתוח בשלב הזה (ולא שייך למסך):**
+
+- **`src/lib/sheirut/dealDue.ts:347`**: שם חלופי לשורת משימה — `` `${productName} - משימה` ``.
+  `buildDealLines` לא נקרא בפרודקשן (רק בבדיקות), ולכן לא הוחלף: שינוי השם החלופי עלול לשבש
+  את התאמת השורות לפי שם. אם וכאשר הוא יחובר, לתת לו `TranslateFn` כמו ל־`dealsService`.
+- **`src/lib/services/{salesService,projectMembershipService}.js`** ו־`src/lib/utils/errorHandling.js`:
+  מפות `{ he, en }` ל־`getErrorMessage`. אין להן קוראים בקוד היום, ולכן הן לא מגיעות למסך; אם
+  יחוברו, צריך להעביר אותן למפתחות `$t()` (שלוש השפות הנוספות חסרות בהן).
 
 ### שלב 4: הודעות מהשרת שמגיעות למשתמש (P1)
 
@@ -130,6 +179,9 @@
 הנמען, שה־CLAUDE.md מתיר. הרשימה שלמעלה היא מה שמגיע בפועל למסך של קורא
 באנגלית.
 
-כדאי להוסיף לבדיקות בדיקה בסגנון `check:script` שנכשלת על טקסט עברי ב־markup
-של `.svelte` בתוך `src/routes` ו־`src/lib/components`, עם allowlist לקבצים
-שמוחרגים בכוונה. כך אי אפשר להכניס רגרסיות חדשות.
+~~כדאי להוסיף לבדיקות בדיקה בסגנון `check:script` שנכשלת על טקסט עברי ב־markup
+של `.svelte`~~ ✅ **נוסף בשלב 3:** `npm run check:ui-hebrew`. הוא לא סורק את כל
+`src/routes` ו־`src/lib/components` אלא את `ROOTS` — התיקיות שכבר תורגמו (שלבים
+1–3). זו הבחירה הנכונה: בדיקה על כל הריפו הייתה נכשלת על עשרות מסכים שעוד לא
+תורגמו, ומדליקה אזהרה שכולם לומדים להתעלם ממנה. סיום שלב 4 או 5 = הוספת התיקייה
+ל־`ROOTS`, וזה כל מה שצריך כדי לנעול אותה.

@@ -72,7 +72,17 @@
     "system": "מערכת 1💗1",
     "loading": "טוען…",
     "onlineStatus": "סטטוס זמינות",
-    "meetingFallback": "פגישה"
+    "meetingFallback": "פגישה",
+    "now": "עכשיו",
+    "minsAgo": "לפני {{count}} דק'",
+    "hoursAgo": "לפני {{count}} שעות",
+    "yesterday": "אתמול",
+    "receivingFrom": "קבלת {{amount}} מ-{{name}}",
+    "sendingTo": "העברת {{amount}} ל-{{name}}",
+    "saleLabel": "מכירה: {{name}}",
+    "saleReport": "דיווח מכירה",
+    "saleReportNamed": "דיווח מכירה: {{name}}",
+    "meetingCreated": "הפגישה נוצרה"
   },
   "footer": {
     "brain": "מוח הרקמות",
@@ -247,5 +257,7 @@
   "someoneInitials": "מש",
   "wishNotFound": "משאלה לא נמצאה",
   "wishNotPublic": "משאלה זו אינה פתוחה לציבור",
-  "untitled": "(ללא שם)"
+  "untitled": "(ללא שם)",
+  "error": "שגיאה",
+  "proposals": "הצעות"
 }
