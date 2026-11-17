@@ -760,6 +760,116 @@
     "ofr_title": "¿Con qué quieres ayudar?",
     "ofr_intro": "Elige las misiones y los recursos con los que quieres ayudar. Se enviará un aviso sobre tu propuesta y más adelante te llegarán más detalles.",
     "sending": "Enviando…",
-    "send_offer": "Enviar propuesta"
+    "send_offer": "Enviar propuesta",
+    "status": {
+      "suggested": "Sugerida",
+      "viewed": "Vista",
+      "accepted": "Aceptada",
+      "rejected": "No elegida",
+      "expired": "Vencida"
+    }
+  },
+  "demo": {
+    "mine": {
+      "w1": {
+        "title": "Un día libre para mamá en su cumpleaños",
+        "excerpt": "Mi mamá cuida a los niños todos los días y pronto es su cumpleaños. Quiero regalarle un día entero libre…",
+        "lastEvent": "Tamar L. aprobó la propuesta de cuidado de niños"
+      },
+      "w2": {
+        "title": "Alguien que me ayude a mover un armario",
+        "excerpt": "Tengo un armario grande y pesado que hay que subir a un tercer piso sin ascensor. Necesito 2 pares de brazos fuertes durante una hora.",
+        "lastEvent": "Se encontraron 2 coincidencias de 1 rikma",
+        "when": "La próxima semana"
+      },
+      "w3": {
+        "title": "Un taller de arte para la clase de mi hijo",
+        "excerpt": "Una profesora de arte que dé un taller de dos horas a una clase de segundo grado, tema libre, tenemos todo el material.",
+        "when": "Dentro de un mes"
+      }
+    },
+    "pub": {
+      "p1": {
+        "author": "M.K.",
+        "title": "Arreglar una bicicleta eléctrica",
+        "excerpt": "La batería se agota a los 8 km. Escuché que se puede reacondicionar en vez de comprar una nueva: busco a alguien que sepa.",
+        "tag1": "Reparación",
+        "tag2": "Bicicletas"
+      },
+      "p2": {
+        "author": "T.S.",
+        "title": "Compañía al cementerio en el aniversario",
+        "excerpt": "Soy mayor y me cuesta ir sola. Me encantaría que alguien viajara conmigo al cementerio de Haifa; hablaremos de mamá por el camino.",
+        "budget": "Una donación de corazón",
+        "tag1": "Acompañamiento",
+        "tag2": "Presencia"
+      },
+      "p3": {
+        "author": "N.P.",
+        "title": "Comidas de Shabat para el personal de primera línea",
+        "excerpt": "Cada semana preparamos 40 comidas calientes para el personal de un hospital. Buscamos cocinas que se encarguen de una línea del menú cada vez.",
+        "when": "Semanal",
+        "budget": "Financiado por una fundación",
+        "tag1": "Cocina",
+        "tag2": "Voluntariado"
+      },
+      "p4": {
+        "author": "Y.M.",
+        "title": "Una fiesta de cumpleaños para un niño de 8 años",
+        "excerpt": "Quiero algo que no sé hacer sola: un mago, un taller de arte, alguien divertido con 12 niños en el patio.",
+        "tag1": "Niños",
+        "tag2": "Evento"
+      }
+    },
+    "values": {
+      "reciprocity": "Reciprocidad",
+      "generosity": "Generosidad",
+      "community": "Comunidad",
+      "creativity": "Creatividad",
+      "sustainability": "Sostenibilidad",
+      "ecology": "Ecología",
+      "family": "Familia"
+    },
+    "tips": {
+      "t1": "Un deseo espera una decisión: un día libre para mamá. Queda una línea abierta.",
+      "t2": "¿Busco más socios para las comidas de Shabat? Hay 3 rikmas nuevas cerca.",
+      "t3": "Ya puedes publicar el \"taller de arte\" para la comunidad: hay profesoras de arte activas en la zona."
+    },
+    "wish": {
+      "long": "Mi mamá cuida a los niños todos los días y pronto es su cumpleaños. Quiero regalarle un día entero libre: un tratamiento de spa, una buena comida, alguien que cuide a los niños y alguien que se asegure de que vaya y vuelva bien. Quiero organizarlo todo de antemano sin que ella haga ni una llamada.",
+      "author": "Noa Ben-David",
+      "project": "Particular · Haifa",
+      "publishedAt": "Publicado ayer a las 21:14",
+      "where": "Haifa y los Krayot"
+    },
+    "missions": {
+      "babysitter": "Niñera",
+      "ride": "Transporte",
+      "spa": "Tratamiento de spa",
+      "restaurant": "Reserva de restaurante"
+    },
+    "resources": {
+      "quietPlace": "Un lugar tranquilo y verde",
+      "mealForTwo": "Una comida para dos",
+      "flowers": "Un ramo de flores"
+    },
+    "supporters": {
+      "s1": {
+        "name": "Noa Golan",
+        "role": "Spa natural"
+      },
+      "s2": {
+        "name": "Tamar L.",
+        "role": "Mamás que ayudan"
+      },
+      "s3": {
+        "name": "Yoav K.",
+        "role": "Lift · traslados"
+      },
+      "more": {
+        "name": "y {{count}} más",
+        "role": "En revisión estos días"
+      }
+    }
   }
 }

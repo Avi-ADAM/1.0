@@ -759,6 +759,116 @@
     "ofr_title": "What would you like to help with?",
     "ofr_intro": "Pick the missions and resources you'd like to help with. A notification goes out about your proposal, and more details will reach you later.",
     "sending": "Sending…",
-    "send_offer": "Send proposal"
+    "send_offer": "Send proposal",
+    "status": {
+      "suggested": "Suggested",
+      "viewed": "Viewed",
+      "accepted": "Accepted",
+      "rejected": "Not chosen",
+      "expired": "Expired"
+    }
+  },
+  "demo": {
+    "mine": {
+      "w1": {
+        "title": "A day off for Mom on her birthday",
+        "excerpt": "My mom looks after the kids every day, and her birthday is coming up. I want to give her one whole free day…",
+        "lastEvent": "Tamar L. approved the childcare proposal"
+      },
+      "w2": {
+        "title": "Someone to help me move a wardrobe",
+        "excerpt": "I have a big, heavy wardrobe that needs to go up to the third floor with no elevator. I need 2 strong pairs of hands for an hour.",
+        "lastEvent": "2 matches found from 1 rikma",
+        "when": "This coming week"
+      },
+      "w3": {
+        "title": "An art workshop for my son's class",
+        "excerpt": "An art teacher to run a two-hour workshop for a second-grade class, any theme, we have all the supplies.",
+        "when": "Within a month"
+      }
+    },
+    "pub": {
+      "p1": {
+        "author": "M.K.",
+        "title": "Fixing an electric bike",
+        "excerpt": "The battery dies after 8 km. I heard it can be refurbished instead of buying a new one - looking for someone who knows how.",
+        "tag1": "Repair",
+        "tag2": "Bikes"
+      },
+      "p2": {
+        "author": "T.S.",
+        "title": "Company to the cemetery on the anniversary",
+        "excerpt": "I'm old and it's hard for me alone. I'd love someone to travel with me to the cemetery in Haifa; we'll talk about Mom on the way.",
+        "budget": "A donation from the heart",
+        "tag1": "Companionship",
+        "tag2": "Presence"
+      },
+      "p3": {
+        "author": "N.P.",
+        "title": "Shabbat meals for front-line workers",
+        "excerpt": "Every week we prepare 40 hot meals for a hospital team. We're looking for kitchens to take one line of the menu each time.",
+        "when": "Weekly",
+        "budget": "Funded by a foundation",
+        "tag1": "Cooking",
+        "tag2": "Volunteering"
+      },
+      "p4": {
+        "author": "Y.M.",
+        "title": "A birthday party for an 8-year-old",
+        "excerpt": "I want something I can't do on my own - a magician, an art workshop, someone fun with 12 kids in the yard.",
+        "tag1": "Kids",
+        "tag2": "Event"
+      }
+    },
+    "values": {
+      "reciprocity": "Reciprocity",
+      "generosity": "Generosity",
+      "community": "Community",
+      "creativity": "Creativity",
+      "sustainability": "Sustainability",
+      "ecology": "Ecology",
+      "family": "Family"
+    },
+    "tips": {
+      "t1": "One wish is waiting for a decision - a day off for Mom. One line is still open.",
+      "t2": "Should I look for more partners for the Shabbat meals? There are 3 new rikmas nearby.",
+      "t3": "You can now publish \"art workshop\" to the community - art teachers are active in the area."
+    },
+    "wish": {
+      "long": "My mom looks after the kids every day, and her birthday is coming up. I want to give her one whole free day - a spa treatment, a good meal, someone to watch the kids, and someone to make sure she gets there and back safely. I'd like everything arranged in advance without her making a single call.",
+      "author": "Noa Ben-David",
+      "project": "Private citizen · Haifa",
+      "publishedAt": "Published yesterday at 21:14",
+      "where": "Haifa and the Krayot"
+    },
+    "missions": {
+      "babysitter": "Babysitter",
+      "ride": "A ride",
+      "spa": "Spa treatment",
+      "restaurant": "Restaurant booking"
+    },
+    "resources": {
+      "quietPlace": "A quiet, green place",
+      "mealForTwo": "A meal for two",
+      "flowers": "A bouquet of flowers"
+    },
+    "supporters": {
+      "s1": {
+        "name": "Noa Golan",
+        "role": "Nature spa"
+      },
+      "s2": {
+        "name": "Tamar L.",
+        "role": "Moms helping moms"
+      },
+      "s3": {
+        "name": "Yoav K.",
+        "role": "Lift · rides"
+      },
+      "more": {
+        "name": "and {{count}} more",
+        "role": "Being reviewed these days"
+      }
+    }
   }
 }

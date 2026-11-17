@@ -41,34 +41,45 @@
     return $t('concierge.pub.published_weeks', { count: Math.round(diff / 604800) });
   }
 
-  /* ===== Mock fallback — used when no real data ===== */
-  const MOCK_WISH = {
+  /* ===== Mock fallback — used when there is no wish at all =====
+     The words live in concierge.demo.* so the demo reads in the visitor's language. */
+  const D = (k, vars) => $t(`concierge.demo.${k}`, vars);
+  const initialsOf = (name) =>
+    String(name || '')
+      .replace(/\./g, ' ')
+      .trim()
+      .split(/\s+/)
+      .map((w) => w[0] || '')
+      .join('')
+      .slice(0, 2);
+  const MOCK_WISH = $derived({
     code: 'R-7f3a91',
-    title: 'יום חופש לאמא ליום הולדתה',
-    long: 'אמא שלי מטפלת בילדים כל יום ובקרוב יום הולדתה. אני רוצה לתת לה יום שלם משוחרר - טיפול ספא, ארוחה טובה, מישהי שתשגיח על הילדים, ובן אדם שיבטיח שתגיע ותחזור בשלום. מבקשת לארגן את הכל מראש בלי שתעשה אפילו פנייה אחת.',
-    author: 'נעה ב.',
-    avatar: 'נב',
-    project: 'אזרחית פרטית · חיפה',
-    publishedAt: 'פורסמה אתמול 21:14',
-    when: 'ה׳, 19 ביוני · יום שישי',
-    where: 'חיפה והקריות',
-    budget: '₪ 850–1,200',
+    title: D('mine.w1.title'),
+    long: D('wish.long'),
+    author: D('wish.author'),
+    avatar: initialsOf(D('wish.author')),
+    project: D('wish.project'),
+    publishedAt: D('wish.publishedAt'),
+    // a Thursday — the day is part of the story
+    when: new Date(2025, 5, 19).toLocaleDateString($locale, { weekday: 'short', day: 'numeric', month: 'long' }),
+    where: D('wish.where'),
+    budget: `${fmtMoney(850)}–${fmtMoney(1200)}`,
     proposalsCount: 6,
-    accessNote: 'משאלה ציבורית · נראית לכל מבקר/ת'
-  };
+    accessNote: $t('concierge.pub.access_note')
+  });
 
-  const MOCK_MISSIONS = [
-    { name: 'בייביסיטר', hours: 6, imp: 'must' },
-    { name: 'הסעה', hours: 2, imp: 'must' },
-    { name: 'טיפול ספא', hours: 2, imp: 'must' },
-    { name: 'הזמנת מסעדה', hours: 0.5, imp: 'nice' }
-  ];
-  const MOCK_RESOURCES = [
-    { name: 'מקום שקט וצמחי', qty: 1, imp: 'must' },
-    { name: 'ארוחה לשניים', qty: 2, imp: 'nice' },
-    { name: 'זר פרחים', qty: 1, imp: 'nice' }
-  ];
-  const MOCK_VALUES = ['הדדיות', 'נדיבות', 'משפחתיות'];
+  const MOCK_MISSIONS = $derived([
+    { name: D('missions.babysitter'), hours: 6, imp: 'must' },
+    { name: D('missions.ride'), hours: 2, imp: 'must' },
+    { name: D('missions.spa'), hours: 2, imp: 'must' },
+    { name: D('missions.restaurant'), hours: 0.5, imp: 'nice' }
+  ]);
+  const MOCK_RESOURCES = $derived([
+    { name: D('resources.quietPlace'), qty: 1, imp: 'must' },
+    { name: D('resources.mealForTwo'), qty: 2, imp: 'nice' },
+    { name: D('resources.flowers'), qty: 1, imp: 'nice' }
+  ]);
+  const MOCK_VALUES = $derived([D('values.reciprocity'), D('values.generosity'), D('values.family')]);
 
   const wish = $derived(
     data?.wish
@@ -113,12 +124,17 @@
     data?.wish ? (data.wish.values ?? []) : MOCK_VALUES
   );
 
-  const SUPPORTERS = [
-    { avatar: 'נג', name: 'נועה גולן', role: 'ספא טבע', color: 'green' },
-    { avatar: 'תל', name: 'תמר ל.', role: 'אמהות עוזרות', color: 'green' },
-    { avatar: 'יכ', name: 'יואב כ.', role: 'Lift · הסעות', color: 'blue' },
-    { avatar: '+3', name: 'ועוד 3', role: 'בבחינה בימים אלה', color: 'gold' }
-  ];
+  const SUPPORTERS = $derived([
+    ...[
+      { n: 's1', color: 'green' },
+      { n: 's2', color: 'green' },
+      { n: 's3', color: 'blue' }
+    ].map(({ n, color }) => {
+      const name = D(`supporters.${n}.name`);
+      return { avatar: initialsOf(name), name, role: D(`supporters.${n}.role`), color };
+    }),
+    { avatar: '+3', name: D('supporters.more.name', { count: 3 }), role: D('supporters.more.role'), color: 'gold' }
+  ]);
 
   function discBorder(c) {
     return c === 'green'
@@ -493,7 +509,11 @@
             <div class="mp-card">
               <div class="mp-row">
                 <span class="mp-kind">{p.kind === 'custom_offer' ? $t('concierge.pub.kind_custom') : $t('concierge.pub.kind_invite')}</span>
-                <span class="mp-status mp-status--{p.status}">{p.status}</span>
+                <span class="mp-status mp-status--{p.status}"
+                  >{['suggested', 'viewed', 'accepted', 'rejected', 'expired'].includes(p.status)
+                    ? $t(`concierge.pub.status.${p.status}`)
+                    : p.status}</span
+                >
               </div>
               {#if p.coveredMissions?.length}
                 <div class="mp-items">
