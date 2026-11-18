@@ -15,6 +15,11 @@ import { dev } from '$app/environment';
 import { guessCurrency } from '$lib/money/guess.js';
 import { normalizeCode } from '$lib/money/currencies.js';
 import {
+  SUPPORTED_LANGS,
+  LOCALE_PATHS,
+  getLanguage
+} from '$lib/server/siteLang.js';
+import {
   DEFAULT_THEME,
   THEME_COOKIE,
   THEME_COOKIE_MAX_AGE,
@@ -187,44 +192,13 @@ const cl = {
   es: 'es-ES'
 };
 
-// Every locale the site can actually render. Kept in one place so the URL/cookie
-// resolution below and the per-locale metadata maps above can't drift apart —
-// an unlisted locale used to reach transformPageChunk and stamp `undefined`
-// into <title>, the description and the manifest link.
-const SUPPORTED_LANGS = ['he', 'en', 'ar', 'ru', 'es'];
-
-// The legacy per-locale homepage paths, 301'd to `?lang=` below.
-const LOCALE_PATHS = new Set(SUPPORTED_LANGS.map((l) => `/${l}`));
-
+// Language resolution lives in its own pure module (PLAN_EN_READINESS stage
+// 5.3). The old `accept-language.includes('he')` test matched the "he" in
+// `en-US,en;q=0.9,he;q=0.8` and served Hebrew, and gave an `ar`/`ru`/`es`
+// browser English instead of its own language. `getLanguage` now parses the
+// header by q-order against the five supported locales, and `siteLang.test.js`
+// holds that precedence down.
 let lang = 'he'; // Default language set to Hebrew
-
-// Helper function to get language from URL or cookies
-function getLanguage(event) {
-  let qlang = event.url.searchParams.get('lang');
-  const coociLang = event.cookies.get('lang');
-  const userAgent = event.request.headers.get('accept-language');
-
-  if (qlang && SUPPORTED_LANGS.includes(qlang)) {
-    return qlang;
-  }
-  const fromPath = event.url.pathname.slice(1);
-  if (SUPPORTED_LANGS.includes(fromPath)) {
-    return fromPath;
-  }
-  if (!coociLang) {
-    // No header at all is not "not Hebrew" - it is no signal, and the answer
-    // to no signal is the site's default. Every browser sends the header, so
-    // this branch is almost only crawlers, and they are exactly who must see
-    // Hebrew here: the hreflang table and the sitemap both declare the bare
-    // address to be the Hebrew one. Returning `en` made the bare URL serve a
-    // language it had just told Google lived at `?lang=en`.
-    if (!userAgent) return 'he';
-    return userAgent.includes('he') ? 'he' : 'en';
-  }
-  // The cookie is user-writable, so validate it too — an unknown value here
-  // would propagate into locals.lang and out to the metadata maps.
-  return SUPPORTED_LANGS.includes(coociLang) ? coociLang : 'he';
-}
 // Appearance is two cookies: `theme` (personal|business) and `mode`
 // (light|dark|system). Both are user-writable, so both are validated here
 // before they reach the markup. `system` cannot be resolved server-side — the

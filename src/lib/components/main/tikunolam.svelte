@@ -1,117 +1,173 @@
 <script>
-let amort = $state("אני || שם || לעולם לא אנהג באלימות ולא אפגע באף אדם")
-let amorts =  $state("כי אין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס אשר מצדיק פגיעה בחייו של אדם, אלימות וכפיה בכוח")
-let amortt = $state(" אני || שם || אתן את אמוני בטוב ובכך שכאשר כל האנושות תחתום: אלימות, קרבות ומשטור יפסיקו להיות צורה של תקשורת אנושית")
-let amortf = $state("כאשר כל || שם מקום || תסכים עם אמנה זו אני || שם || אוותר על כלי הנשק שלי ועל השוטרים החמושים שמדינת || שם מקום || ממנה בשמי")
-let amorth = $state("אני || שם || אוותר על כלי הנשק של צבא || שם מקום || כאשר כל האנושות תסכים עם האמנה הזו")
-let amortq = "אני || שם || לעולם לא אנהג באלימות ולא אפגע באף אדם"
-let amortsq =  "כי אין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס אשר מצדיק פגיעה בחייו של אדם, אלימות וכפיה בכוח"
-let amorttq = " אני || שם || אתן את אמוני בטוב ובכך שכאשר כל האנושות תחתום: אלימות, קרבות ומשטור יפסיקו להיות צורה של תקשורת אנושית"
-let amortfq = "כאשר כל || שם מקום || תסכים עם אמנה זו אני || שם || אוותר על כלי הנשק שלי ועל השוטרים החמושים שמדינת || שם מקום || ממנה בשמי"
-let amorthq = "אני || שם || אוותר על כלי הנשק של צבא || שם מקום || כאשר כל האנושות תסכים עם האמנה הזו"
-let already = $state(false);
+  /**
+   * The "tikun olam" declaration form (rendered by amana.svelte on /hascama).
+   * The five statements, the labels and the button used to be Hebrew literals
+   * in the markup, so a reader in any other language got Hebrew — including
+   * the text they were invited to edit and sign (PLAN_EN_READINESS stage 5.2).
+   *
+   * The defaults are derived, so switching language before signing changes
+   * them too. Once a member edits a statement, their own words win: a locale
+   * switch must not throw away what they wrote.
+   */
+  import { t, isRtl } from '$lib/translations';
+
+  let edited = $state({
+    amort: false,
+    amorts: false,
+    amortt: false,
+    amortf: false,
+    amorth: false
+  });
+  let ownText = $state({
+    amort: '',
+    amorts: '',
+    amortt: '',
+    amortf: '',
+    amorth: ''
+  });
+
+  let amort = $derived(edited.amort ? ownText.amort : $t('tikunolam.decl1'));
+  let amorts = $derived(edited.amorts ? ownText.amorts : $t('tikunolam.decl2'));
+  let amortt = $derived(edited.amortt ? ownText.amortt : $t('tikunolam.decl3'));
+  let amortf = $derived(edited.amortf ? ownText.amortf : $t('tikunolam.decl4'));
+  let amorth = $derived(edited.amorth ? ownText.amorth : $t('tikunolam.decl5'));
+  let already = $state(false);
   let more = $state(), come = $state(), name = $state(), email = $state();
-let error1;
+  let error1;
 
-/**
- * @typedef {Object} Props
- * @property {() => void} [onDone] - Callback for when the operation is successful.
- * @property {() => void} [onErore] - Callback for when an error occurs.
- */
+  /**
+   * @typedef {Object} Props
+   * @property {() => void} [onDone] - Callback for when the operation is successful.
+   * @property {() => void} [onErore] - Callback for when an error occurs.
+   */
 
-/** @type {Props} */
-let { onDone, onErore } = $props();
+  /** @type {Props} */
+  let { onDone, onErore } = $props();
 
-let miDatan = [];
-async function add (){
-already = true;
-        try {
-            miDatan = await fetch('/api/tikun', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        amort,
-                        amorts,
-                        amortt,
-                        amortf,
-                        amorth,
-                        more,
-                        notes: come,
-                        name,
-                        email
-                    })
-                })
-                .then(r => r.json());
-            console.log(miDatan);
-            onDone?.()
-        } catch (e) {
-            error1 = e
-            console.log(error1);
-                        onErore?.()
+  let miDatan = [];
+  async function add() {
+    already = true;
+    try {
+      miDatan = await fetch('/api/tikun', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amort,
+          amorts,
+          amortt,
+          amortf,
+          amorth,
+          more,
+          notes: come,
+          name,
+          email
+        })
+      }).then((r) => r.json());
+      console.log(miDatan);
+      onDone?.();
+    } catch (e) {
+      error1 = e;
+      console.log(error1);
+      onErore?.();
+    }
+  }
+</script>
 
-        }
-}
+<div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput">
+  <textarea
+    id="hoursny"
+    name="hoursn"
+    value={amort}
+    oninput={(e) => { edited.amort = true; ownText.amort = e.currentTarget.value; }}
+    class="input d"
+    required
+  ></textarea>
+  <label for="hoursny" class="label">{$t('tikunolam.decl1')}</label>
+  <span class="line"></span>
+</div>
+<br />
+<div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput sec">
+  <textarea
+    id="hoursn"
+    name="hoursn"
+    value={amorts}
+    oninput={(e) => { edited.amorts = true; ownText.amorts = e.currentTarget.value; }}
+    class="input d"
+    required
+  ></textarea>
+  <label for="hoursn" class="seci">{$t('tikunolam.decl2')}</label>
+  <span class="line"></span>
+</div>
+<br />
 
-  </script>
-  
-<div dir="rtl" class='textinput'>
-  <textarea id="hoursny" name="hoursn"  bind:value={amort} class='input d' required></textarea>
-  <label for="hoursny" class='label'>{amortq}</label>
-  <span class='line'></span>
+<div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput sec">
+  <textarea
+    id="hoursna"
+    name="hoursn"
+    value={amortt}
+    oninput={(e) => { edited.amortt = true; ownText.amortt = e.currentTarget.value; }}
+    class="input d"
+    required
+  ></textarea>
+  <label for="hoursna" class="seci">{$t('tikunolam.decl3')}</label>
+  <span class="line"></span>
 </div>
-<br>
-<div dir="rtl" class='textinput sec'>
-  <textarea id="hoursn" name="hoursn"  bind:value={amorts} class='input d' required></textarea>
-  <label for="hoursn" class=' seci'>{amortsq}</label>
-  <span class='line'></span>
+<br />
+<div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput sec">
+  <textarea
+    id="hoursnp"
+    name="hoursn"
+    value={amortf}
+    oninput={(e) => { edited.amortf = true; ownText.amortf = e.currentTarget.value; }}
+    class="input d"
+    required
+  ></textarea>
+  <label for="hoursnp" class="seci">{$t('tikunolam.decl4')}</label>
+  <span class="line"></span>
 </div>
-<br>
-
-<div dir="rtl" class='textinput sec'>
-  <textarea id="hoursna" name="hoursn"  bind:value={amortt} class='input d' required></textarea>
-  <label for="hoursna" class='seci'>{amorttq}</label>
-  <span class='line'></span>
+<br />
+<div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput sec">
+  <textarea
+    id="hoursnl"
+    name="hoursn"
+    value={amorth}
+    oninput={(e) => { edited.amorth = true; ownText.amorth = e.currentTarget.value; }}
+    class="input d"
+    required
+  ></textarea>
+  <label for="hoursnl" class="seci">{$t('tikunolam.decl5')}</label>
+  <span class="line"></span>
 </div>
-<br>
-<div dir="rtl" class='textinput sec'>
-  <textarea  id="hoursnp" name="hoursn"  bind:value={amortf} class='input d' required></textarea>
-  <label for="hoursnp" class='seci'>{amortfq}</label>
-  <span class='line'></span>
+<div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput">
+  <textarea id="hoursnm" name="hoursn" bind:value={more} class="input d" required></textarea>
+  <label for="hoursnm" class="label">{$t('tikunolam.addition')}</label>
+  <span class="line"></span>
 </div>
-<br>
-<div dir="rtl" class='textinput sec'>
-  <textarea  id="hoursnl" name="hoursn"  bind:value={amorth} class='input d' required></textarea>
-  <label for="hoursnl" class='seci'>{amorthq}</label>
-  <span class='line'></span>
+<div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput">
+  <textarea id="hoursnu" name="hoursn" bind:value={come} class="input d" required></textarea>
+  <label for="hoursnu" class="label">{$t('tikunolam.notes')}</label>
+  <span class="line"></span>
 </div>
-<div dir="rtl" class='textinput'>
-  <textarea  id="hoursnm" name="hoursn"  bind:value={more} class='input d' required></textarea>
-  <label for="hoursnm" class='label'>תוספת</label>
-  <span class='line'></span>
+<div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput">
+  <input type="text" id="hoursng" name="hoursn" bind:value={name} class="input" required />
+  <label for="hoursng" class="label">{$t('tikunolam.name')}</label>
+  <span class="line"></span>
 </div>
-<div dir="rtl" class='textinput'>
-  <textarea  id="hoursnu" name="hoursn"  bind:value={come} class='input d' required></textarea>
-  <label for="hoursnu" class='label'>הערות</label>
-  <span class='line'></span>
-</div>
-<div dir="rtl" class='textinput'>
-  <input type="text" id="hoursng" name="hoursn"  bind:value={name} class='input' required>
-  <label for="hoursng" class='label'>שם</label>
-  <span class='line'></span>
-</div>
-<div dir="rtl" class='textinput'>
-  <input type="email" id="hoursni" name="hoursn"  bind:value={email} class='input' required>
-  <label for="hoursni" class='label'>מייל</label>
-  <span class='line'></span>
+<div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput">
+  <input type="email" id="hoursni" name="hoursn" bind:value={email} class="input" required />
+  <label for="hoursni" class="label">{$t('tikunolam.email')}</label>
+  <span class="line"></span>
 </div>
 {#if already == false}
-<div class="flex items-center justify-center">
-<button style="margin: 5px auto;"  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
- onclick={add} >שליחה</button>
- </div>
- {/if}
+  <div class="flex items-center justify-center">
+    <button
+      style="margin: 5px auto;"
+      class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2 rounded-full"
+      onclick={add}>{$t('tikunolam.submit')}</button
+    >
+  </div>
+{/if}
+
 <style>
   textarea.input {
   resize: vertical;

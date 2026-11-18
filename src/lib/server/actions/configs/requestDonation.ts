@@ -1,5 +1,6 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
+import { actionTranslator } from '../actionErrors.js';
 
 /**
  * A supporter's donation intent → the rikma's members (PLAN_VOLUNTEER_RIKMA §2.2).
@@ -69,29 +70,28 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     }
   }
 
-  const donor = from?.trim() || (context.lang === 'en' ? 'A supporter' : 'תומך/ת');
+  const t = actionTranslator(context.lang);
+  const donor = from?.trim() || t('server.donation.supporter');
   const amountPart =
     typeof amount === 'number' && amount > 0 ? ` (${amount}₪)` : '';
 
   if (notifier) {
     const details: string[] = [];
     if (missionName) {
-      details.push(
-        (context.lang === 'en' ? 'For the mission: ' : 'עבור המשימה: ') + missionName
-      );
+      details.push(t('server.donation.forMission', { name: missionName }));
       if (missionStipendRate != null) {
         const budget =
           missionHours != null ? Math.round(missionStipendRate * missionHours) : null;
         details.push(
-          context.lang === 'en'
-            ? `to fund its subsistence stipend (${missionStipendRate}/hour${budget ? `, up to ${budget}` : ''})`
-            : `למימון מלגת הקיום שלה (₪${missionStipendRate} לשעה${budget ? `, עד ₪${budget}` : ''})`
+          budget
+            ? t('server.donation.stipendWithBudget', { rate: missionStipendRate, budget })
+            : t('server.donation.stipend', { rate: missionStipendRate })
         );
       }
     }
     if (msg?.trim()) details.push(msg.trim());
     if (contact?.trim())
-      details.push((context.lang === 'en' ? 'Contact: ' : 'ליצירת קשר: ') + contact.trim());
+      details.push(t('server.donation.contact', { contact: contact.trim() }));
     const tail = details.length ? ` - ${details.join(' · ')}` : '';
 
     await notifier.notify(

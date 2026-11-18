@@ -38,6 +38,7 @@ import {
 } from '$lib/server/assistant/session.js';
 import { nextShareExpiry } from '$lib/server/assistant/shareKey.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
+import { actionTranslator } from '../actionErrors.js';
 
 const SITE = 'https://www.1lev1.com';
 
@@ -342,6 +343,7 @@ const materializeHandler: ActionExecutionHandler = async (params, context, { str
     ]);
 
   const lang = langOf(context);
+  const t = actionTranslator(context.lang);
   let current = row;
   const outcome = await runMaterialization(
     state,
@@ -393,7 +395,7 @@ const materializeHandler: ActionExecutionHandler = async (params, context, { str
         );
         if ('row' in saved) current = saved.row;
       },
-      leftoverTitle: lang === 'en' ? 'More from the import' : lang === 'ar' ? 'المزيد من الاستيراد' : 'עוד מהייבוא',
+      leftoverTitle: t('server.assistant.leftoverTitle'),
       lang
     }
   );

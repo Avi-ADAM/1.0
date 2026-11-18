@@ -84,9 +84,17 @@ for (const f of all) {
         }
     }
     const nsRe = new RegExp(`\\$?\\b(?:${[...names].join('|')})\\(\\s*[\`'"]([a-zA-Z0-9_]+)\\.`, 'g');
+    // In plain JS and `<script module>` the store is read with `get(t)`:
+    // `get(t)('ask.askedTo')`. Same namespace, one more call shape — without
+    // it a namespace that is genuinely used is reported as an orphan.
+    const getNsRe = new RegExp(
+        `\\bget\\(\\s*(?:${[...names].join('|')})\\s*\\)\\s*\\(\\s*[\`'\"]([a-zA-Z0-9_]+)\\.`,
+        'g'
+    );
 
     const ns = new Set();
     for (const m of src.matchAll(nsRe)) if (knownNs.has(m[1])) ns.add(m[1]);
+    for (const m of src.matchAll(getNsRe)) if (knownNs.has(m[1])) ns.add(m[1]);
     own.set(f, ns);
 
     // Leftovers of a deleted `const t = { he: …, en: … }` dictionary whose

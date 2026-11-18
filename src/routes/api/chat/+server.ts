@@ -335,28 +335,37 @@ function detectRenderComponents(userText: string) {
   const t = userText.toLowerCase();
   const components = [];
 
-  if (t.includes('סיכום') || t.includes('שותפויות') || t.includes('כל המידע')) {
+  // Demo data only: the Hebrew phrases are detection examples, not copy. The
+  // card's own labels come from `bot.card.*` in the reader's language.
+  if (
+    t.includes('סיכום') || t.includes('שותפויות') || t.includes('כל המידע') ||
+    /\b(summary|partnerships|all information|сводка|resumen|ملخص)\b/.test(t)
+  ) {
     components.push({
       type: 'summary',
       props: {
         partnerships: [
-          { name: 'אלון נכסים', stake: '34%', value: '₪2.4M', trend: 'up', change: '+8.2% השנה', members: 3 },
-          { name: 'גליל טק', stake: '18%', value: '₪890K', trend: 'up', change: '+22% השנה', members: 5 },
-          { name: 'מרכז מסחרי ב', stake: '50%', value: '₪1.1M', trend: 'down', change: '-3.1% השנה', members: 2 },
-          { name: 'קרן ירוקה', stake: '12%', value: '₪340K', trend: 'up', change: '+5.4% השנה', members: 8 },
+          { name: 'Alon Assets', stake: '34%', value: '₪2.4M', trend: 'up', change: '+8.2%', members: 3 },
+          { name: 'Galil Tech', stake: '18%', value: '₪890K', trend: 'up', change: '+22%', members: 5 },
+          { name: 'Commercial Center B', stake: '50%', value: '₪1.1M', trend: 'down', change: '-3.1%', members: 2 },
+          { name: 'Green Fund', stake: '12%', value: '₪340K', trend: 'up', change: '+5.4%', members: 8 },
         ],
       },
     });
   }
 
-  if (t.includes('הצבעה') || t.includes('הצביע') || t.includes('פתוח')) {
+  if (
+    t.includes('הצבעה') || t.includes('הצביע') || t.includes('פתוח') ||
+    /\b(vote|voting|ballot|голос|votación|تصويت)\b/.test(t)
+  ) {
     components.push({
       type: 'voting',
       props: {
-        proposal: 'חלוקת רווח שנתית 2024 - 70% הון עצמי / 30% השקעה חוזרת',
-        options: ['בעד', 'נגד', 'נמנע'],
+        proposal: 'Annual profit distribution 2024 - 70% equity / 30% reinvestment',
+        // Codes, not Hebrew words: VotingCard translates them for the reader.
+        options: ['for', 'against', 'abstain'],
         deadline: '28.02.2025',
-        partnership: 'אלון נכסים',
+        partnership: 'Alon Assets',
       },
     });
   }

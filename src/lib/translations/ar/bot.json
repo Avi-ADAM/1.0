@@ -61,5 +61,21 @@
   "sugUserReportBug": "الإبلاغ عن خطأ",
   "reportSuccessMsg": "تم إرسال طلبك بنجاح! سيتواصل معك الفريق قريباً.",
   "reportErrorMsg": "فشل إرسال الطلب. يرجى المحاولة مرة أخرى.",
-  "reportTypePrompt": "ما نوع الطلب؟ (خطأ / ميزة / شراكة / تواصل)"
+  "reportTypePrompt": "ما نوع الطلب؟ (خطأ / ميزة / شراكة / تواصل)",
+  "card": {
+    "voteCommand": "صوّتّ \"{{option}}\" على: {{proposal}}",
+    "saleRecorded": "سُجِّلت عملية البيع بنجاح!",
+    "back": "رجوع",
+    "productsAvailable": "منتجات متاحة: {{count}}",
+    "chooseProduct": "اختر منتجاً لتسجيل عملية بيع",
+    "activeVote": "تصويت نشط · {{partnership}}",
+    "deadline": "آخر موعد: {{deadline}}",
+    "recorded": "سُجِّل",
+    "partnership": "شراكة",
+    "yourShare": "حصتك",
+    "partners": "شركاء",
+    "voteFor": "مع",
+    "voteAgainst": "ضد",
+    "voteAbstain": "امتناع"
+  }
 }

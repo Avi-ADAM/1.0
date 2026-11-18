@@ -2,7 +2,7 @@
   import { nameOf } from '$lib/translation/memberName';
   import Money from '$lib/components/money/Money.svelte';
   import SaleComponent from '$lib/components/sales/SaleComponent.svelte';
-  import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
 
   let {
     products,
@@ -57,13 +57,13 @@
     <div class="sale-done">
       <div class="done-icon">✅</div>
       <div class="done-text">
-        {$lang === 'he' ? 'המכירה נרשמה בהצלחה!' : 'Sale recorded successfully!'}
+        {$t('bot.card.saleRecorded')}
       </div>
     </div>
   {:else if selectedProduct}
     <div class="sale-form-wrapper">
       <button class="back-btn" onclick={() => { selectedProduct = null; inProgress = false; }}>
-        ← {$lang === 'he' ? 'חזרה' : 'Back'}
+        ← {$t('bot.card.back')}
       </button>
       <div class="selected-product-name">{selectedProduct.name}</div>
       <div class="selected-project-name">{selectedProduct.projectName}</div>
@@ -86,11 +86,10 @@
       <div class="pl-badge">🛍️</div>
       <div class="pl-meta">
         <div class="pl-label">
-          {products.length}
-          {$lang === 'he' ? 'מוצרים זמינים' : 'available products'}
+          {$t('bot.card.productsAvailable', { count: products.length })}
         </div>
         <div class="pl-title">
-          {$lang === 'he' ? 'בחר/י מוצר לדיווח מכירה' : 'Choose a product to report a sale'}
+          {$t('bot.card.chooseProduct')}
         </div>
       </div>
     </div>

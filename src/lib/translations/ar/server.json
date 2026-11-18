@@ -1,0 +1,62 @@
+{
+  "error": {
+    "priceRequired": "يجب أن يكون السعر أكبر من صفر",
+    "nameRejected": "لم يجتز الاسم فحص المحتوى ({{reasons}})",
+    "rikmaMembersOnly": "يمكن لأعضاء الريكمة فقط إنشاء منتج فيها",
+    "rikmaNameRequired": "اسم الريكمة مفقود",
+    "rikmaCreateFailed": "تعذّر إنشاء الريكمة",
+    "homeRikmaCreateFailed": "تعذّر إنشاء الريكمة المنزلية",
+    "productCreateFailed": "تعذّر إنشاء المنتج",
+    "offerCreateFailed": "تعذّر إنشاء عرض المهمة",
+    "offerUpdateFailed": "تعذّر تحديث عرض المهمة",
+    "resourcePriceRequired": "يلزم سعر لنشر المورد كمنتج للعملاء",
+    "resourceProductCreateFailed": "تعذّر إنشاء المنتج من المورد",
+    "wishConsentClosed": "أُغلقت الموافقة بالفعل - أُنشئت الريكمة والصفقة. تجدونها في «الصفقات».",
+    "wishNoProduct": "لا يوجد منتج مركّب بعد - ادعوا مزوّدين وابنوا الخطة أولاً",
+    "wishNoParts": "لا توجد أجزاء في الخطة لإنتاجها - أضيفوا مهام أو موارد أولاً",
+    "wishUnassignedParts": "ما زال هناك {{count}} أجزاء بلا مزوّد معتمد - لا يمكن إغلاق الموافقة بعد",
+    "wishNoProviders": "لم يُعثر على مزوّدين معتمدين للخطة",
+    "wishWeaveCreateFailed": "تعذّر إنشاء ريكمة الشركاء",
+    "wishProductLinkFailed": "تعذّر ربط المنتج بالريكمة",
+    "wishSheirutpendCreateFailed": "تعذّر فتح الموافقة (Sheirutpend)",
+    "wishDealCreateFailed": "أُنشئت الريكمة لكن تعذّر فتح الصفقة - يمكن المحاولة مجدداً من الصفقات",
+    "nameRequired": "الاسم مطلوب"
+  },
+  "moderation": {
+    "empty": "فارغ",
+    "too_long": "طويل جداً",
+    "link": "رابط",
+    "contact": "بيانات اتصال",
+    "spam": "أحرف متكررة",
+    "blocked_word": "كلمة محظورة",
+    "other": "أخرى"
+  },
+  "wish": {
+    "untitled": "أمنية",
+    "partnersRikma": "{{name}} - ريكمة شركاء",
+    "rikmaDescription": "ريكمة شركاء أُنشئت من الأمنية \"{{name}}\".",
+    "chatSeed": "اكتملت الدائرة — أُنشئت ريكمة شركاء وبدأت الصفقة. 💗"
+  },
+  "meeting": {
+    "alreadyLiveTitle": "الاجتماع جارٍ",
+    "alreadyLiveMessage": "الاجتماع جارٍ بالفعل — انضم الآن!",
+    "startedTitle": "بدأ الاجتماع!",
+    "startedMessage": "جميع المشاركين جاهزون — الاجتماع جارٍ!",
+    "readyTitle": "جاهز!",
+    "waitingFor": "بانتظار {{count}} مشارك إضافي...",
+    "waitingTitle": "بانتظار المشاركين...",
+    "waitingApproval": "بانتظار موافقة {{count}} مشارك",
+    "meetingReadyTitle": "الاجتماع جاهز!",
+    "allOnline": "الجميع متصل بالاجتماع: {{name}}"
+  },
+  "donation": {
+    "supporter": "أحد الداعمين",
+    "forMission": "للمهمة: {{name}}",
+    "stipend": "لتمويل مخصص العيش الخاص بها ({{rate}} في الساعة)",
+    "stipendWithBudget": "لتمويل مخصص العيش الخاص بها ({{rate}} في الساعة، حتى {{budget}})",
+    "contact": "للتواصل: {{contact}}"
+  },
+  "assistant": {
+    "leftoverTitle": "المزيد من الاستيراد"
+  }
+}

@@ -126,7 +126,27 @@
       "entrance": "Entrada {{value}}"
     },
     "note": {
-      "title": "Notas"
+      "title": "Notas",
+      "variantOff": "Línea {{line}}: la variante está desactivada (active=false)",
+      "belowMin": "Línea {{line}}: la cantidad {{quantity}} está por debajo del mínimo {{min}}",
+      "aboveMax": "Línea {{line}}: la cantidad {{quantity}} está por encima del máximo {{max}}",
+      "oversold": "Línea {{line}}: venta excedida — quedaban {{remaining}}, se pidieron {{quantity}}",
+      "shippingFeeSeparate": "La tarifa de envío ({{fee}}) quedó aparte y no se registró como venta: el producto de envío #{{id}} no está disponible para ello (sin publicar, sin precio fijo, con variantes o pedido también como producto).",
+      "amountMismatch": "El importe cobrado ({{charged}}) difiere de las líneas más el envío ({{computed}})",
+      "belowCatalog": "Por debajo de los precios de catálogo y promociones: se pagó {{paid}}, según catálogo {{catalog}} (diferencia {{gap}}, {{pct}}%)",
+      "belowCatalogOverArranged": "Por debajo de los precios de catálogo y promociones: se pagó {{paid}}, según catálogo {{catalog}} (diferencia {{gap}}, {{pct}}%) — más de lo que la rikma permite acordar a un miembro en solitario",
+      "belowCatalogShort": " — por debajo del precio de catálogo ({{catalog}})",
+      "arrangedPaid": "Pagado por acuerdo — {{amount}} ({{methodLabel}}){{underPhrase}}",
+      "shippingOptionMissing": "La opción de envío elegida en el sitio ({{optionId}}) no se ofrece hoy para esta dirección según la configuración de envíos de la rikma.",
+      "shippingFeeDifferent": "La tarifa de envío cobrada ({{charged}}) difiere del precio configurado en la rikma para el método \"{{methodName}}\" ({{configured}}).",
+      "unknown": "Nota del sistema",
+      "method": {
+        "bit": "Bit",
+        "paybox": "PayBox",
+        "transfer": "Transferencia bancaria",
+        "cash": "Efectivo",
+        "other": "Otro"
+      }
     },
     "payment": {
       "title": "Pago",

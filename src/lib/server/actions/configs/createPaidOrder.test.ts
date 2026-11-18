@@ -631,7 +631,8 @@ describe('arranged orders', () => {
     const r = await confirm({ amount: 380, method: 'cash', note: 'הנחת חבר' });
     expect(r.underCatalog).toBe(true);
     expect(db.sales.map((s) => s.in)).toEqual([310, 40, 20]);
-    expect(db.orders[0].data.note).toContain('מתחת למחיר הקטלוג (760)');
+    expect(db.orders[0].data.note).toContain('order.note.arrangedPaid');
+    expect(db.orders[0].data.note).toContain('760');
     expect(db.orders[0].data.note).toContain('הנחת חבר');
   });
 
@@ -723,7 +724,7 @@ describe('promotions (PLAN_SHOP_PROMOTIONS §5.3)', () => {
     const r = await run(order());
     expect(r.status).toBe('paid');
     expect(r.belowCatalog).toEqual({ catalogTotal: 740, by: 140, pct: 18.92 });
-    expect(db.orders[0].data.note).toContain('מתחת למחיר הקטלוג והמבצעים');
+    expect(db.orders[0].data.note).toContain('order.note.belowCatalog');
     expect(notices[0].intent).toBe('review');
     expect(notices[0].templates.body.he).toContain('פחות ממחיר הקטלוג והמבצעים');
   });
@@ -889,7 +890,8 @@ describe('a delivery fee recorded as a product line', () => {
     expect(db.lines.map((l) => l.matanot)).toEqual(['1901']);
     expect(db.sales).toHaveLength(1);
     expect(db.orders[0].shipping).toMatchObject({ asLine: false, fee: 30 });
-    expect(db.orders[0].data.note).toContain('#900');
+    expect(db.orders[0].data.note).toContain('order.note.shippingFeeSeparate');
+    expect(decodeURIComponent(db.orders[0].data.note)).toContain('900');
   });
 
   it('the shipping product also in the cart is sold as an item, not refused', async () => {

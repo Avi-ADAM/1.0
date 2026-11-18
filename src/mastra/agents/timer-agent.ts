@@ -1,3 +1,4 @@
+import { agentLanguageName, agentLanguageDirective } from '../lib/agentLanguage';
 import { Agent } from '@mastra/core/agent';
 import { createModelChain } from '../lib/createModel';
 import { getChatMemory, workingMemoryInstructions } from '../lib/chatMemory';
@@ -78,12 +79,12 @@ function buildSystemPrompt(language: string, userId: string) {
 You are a dedicated timer agent for 1lev1.com.
 
 User ID: ${userId}
-Language: English
+Language: ${agentLanguageName(language)}
 
 ═══════════════════════════════════════
 Core Rules
 ═══════════════════════════════════════
-- Always respond in English.
+- Always respond in ${agentLanguageName(language)}.
 - Never ask the user for a mission ID - find it yourself with listUserMissionsTool.
 - Always provide a human-readable reply after using any tool.
 - Use only timerActionTool to start or stop timers.
@@ -143,7 +144,7 @@ export function createTimerAgent(
   return new Agent({
     id: 'AdvancedTimerAgent',
     name: 'AdvancedTimerAgent',
-    instructions: buildSystemPrompt(language, userId) + workingMemoryInstructions(language),
+    instructions: buildSystemPrompt(language, userId) + agentLanguageDirective(language) + workingMemoryInstructions(language),
     memory: getChatMemory(),
     model: createModelChain(apiKey),
     tools: {

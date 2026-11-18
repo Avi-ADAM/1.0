@@ -13,10 +13,12 @@
 
 import { normalizeCode } from '$lib/money/currencies.js';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { actionTranslator, moderationReasons } from '../actionErrors.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, util) => {
   const { strapi } = util;
+  const t = actionTranslator(context.lang);
   const {
     projectName,
     publicDescription,
@@ -44,7 +46,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   };
 
   if (!projectName || !String(projectName).trim()) {
-    throw new Error('שם הרקמה חסר');
+    throw new Error(t('server.error.rikmaNameRequired'));
   }
 
   const now = new Date().toISOString();
@@ -92,7 +94,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   );
 
   const project = pRes?.data?.createProject?.data;
-  if (!project?.id) throw new Error('יצירת הרקמה נכשלה');
+  if (!project?.id) throw new Error(t('server.error.rikmaCreateFailed'));
 
   return {
     data: {

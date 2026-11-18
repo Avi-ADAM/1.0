@@ -1,3 +1,4 @@
+import { agentLanguageName, agentLanguageDirective } from '../lib/agentLanguage';
 import { Agent } from '@mastra/core/agent';
 import { createModelChain } from '../lib/createModel';
 import { saleActionTool } from '../tools/saleActionTool';
@@ -9,7 +10,7 @@ function buildSystemPrompt(language: string, userId: string) {
 אתה סוכן מכירות ייעודי עבור 1lev1.com.
 
 מזהה משתמש: ${userId}
-שפה: עברית
+שפה: ${agentLanguageName(language)}
 
 ═══════════════════════════════════════
 תפקידך
@@ -27,7 +28,7 @@ function buildSystemPrompt(language: string, userId: string) {
 You are a dedicated sales agent for 1lev1.com.
 
 User ID: ${userId}
-Language: English
+Language: ${agentLanguageName(language)}
 
 ═══════════════════════════════════════
 Your role
@@ -46,7 +47,7 @@ export function createSaleAgent(apiKey: string, language: string = 'he', userId:
   return new Agent({
     id: 'SaleAgent',
     name: 'SaleAgent',
-    instructions: buildSystemPrompt(language, userId) + workingMemoryInstructions(language),
+    instructions: buildSystemPrompt(language, userId) + agentLanguageDirective(language) + workingMemoryInstructions(language),
     memory: getChatMemory(),
     model: createModelChain(apiKey),
     tools: { saleActionTool }

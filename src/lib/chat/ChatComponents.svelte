@@ -9,6 +9,8 @@
    * will appear in this response" was simply untrue wherever it was made.
    */
   import type { ChatComponent } from '$lib/types/chat';
+  import { get } from 'svelte/store';
+  import { t } from '$lib/translations';
   import VotingCard from './components/VotingCard.svelte';
   import PartnershipGrid from './components/PartnershipGrid.svelte';
   import MissionList from './components/MissionList.svelte';
@@ -21,7 +23,7 @@
   }: { components?: ChatComponent[]; onAction?: (text: string) => void } = $props();
 
   function handleVote(option: string, proposal: string) {
-    onAction(`הצבעתי "${option}" על: ${proposal}`);
+    onAction(get(t)('bot.card.voteCommand', { option, proposal }));
   }
 </script>
 

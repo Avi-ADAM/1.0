@@ -157,7 +157,7 @@
         </div>
       </div>
 
-      {#if form?.error}
+      {#if form?.errorKey || form?.error}
         <p class="error-msg" in:fly={{ y: -6, duration: 300 }}>{form.errorKey ? $t(`reg.signup.err.${form.errorKey}`) : form.error}</p>
       {/if}
 

@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { VotingProps } from '$lib/types/chat';
+  import { t } from '$lib/translations';
 
   let {
     proposal,
@@ -12,16 +13,26 @@
   let voted = $state<string | null>(null);
   let hovered = $state<string | null>(null);
 
-  const meta: Record<string, { icon: string; color: string }> = {
-    'בעד':  { icon: '✓', color: 'var(--teal)' },
-    'נגד':  { icon: '✕', color: 'var(--rose)' },
-    'נמנע': { icon: '–', color: 'var(--amber)' },
+  // The API sends language-neutral option codes; the card says them in the
+  // reader's language. Unknown options stay verbatim — they are data, not UI.
+  const META: Record<string, { icon: string; color: string }> = {
+    for: { icon: '✓', color: 'var(--teal)' },
+    against: { icon: '✕', color: 'var(--rose)' },
+    abstain: { icon: '–', color: 'var(--amber)' }
   };
+  const FALLBACK_META = { icon: '•', color: 'var(--border-2)' };
+
+  function labelOf(opt: string): string {
+    if (opt === 'for') return $t('bot.card.voteFor');
+    if (opt === 'against') return $t('bot.card.voteAgainst');
+    if (opt === 'abstain') return $t('bot.card.voteAbstain');
+    return opt;
+  }
 
   function vote(opt: string) {
     if (voted) return;
     voted = opt;
-    onVote?.(opt, proposal);
+    onVote?.(labelOf(opt), proposal);
   }
 </script>
 
@@ -29,18 +40,18 @@
   <div class="card-header">
     <div class="badge-icon">⚖</div>
     <div class="card-meta">
-      <span class="label">הצבעה פעילה · {partnership}</span>
+      <span class="label">{$t('bot.card.activeVote', { partnership })}</span>
       <p class="proposal">{proposal}</p>
     </div>
   </div>
 
   <div class="deadline">
-    <span class="clock">⏱</span> תאריך אחרון: {deadline}
+    <span class="clock">⏱</span> {$t('bot.card.deadline', { deadline })}
   </div>
 
   <div class="options">
     {#each options as opt}
-      {@const m = meta[opt]}
+      {@const m = META[opt] ?? FALLBACK_META}
       <button
         class="vote-btn"
         class:voted={voted === opt}
@@ -52,9 +63,9 @@
         disabled={!!voted}
       >
         <span class="opt-icon">{m.icon}</span>
-        <span>{opt}</span>
+        <span>{labelOf(opt)}</span>
         {#if voted === opt}
-          <span class="confirmed">נרשם</span>
+          <span class="confirmed">{$t('bot.card.recorded')}</span>
         {/if}
       </button>
     {/each}

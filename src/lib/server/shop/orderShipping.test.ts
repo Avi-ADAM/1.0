@@ -46,13 +46,15 @@ describe('shippingRecordFrom', () => {
 
   it('a fee that moved is a note, not a refusal', () => {
     const r = shippingRecordFrom(quote, { preference: 'delivery', optionId: 'm:center:courier', fee: 20 });
-    expect(r.note).toContain('(20)');
+    expect(r.note).toContain('order.note.shippingFeeDifferent');
+    expect(decodeURIComponent(r.note ?? '')).toContain('20');
     expect(r.record.fee).toBe(20);
   });
 
   it('an option that is no longer offered is a note too', () => {
     const r = shippingRecordFrom(quote, { preference: 'delivery', optionId: 'm:north:post', fee: 20 });
-    expect(r.note).toContain('m:north:post');
+    expect(r.note).toContain('order.note.shippingOptionMissing');
+    expect(decodeURIComponent(r.note ?? '')).toContain('m:north:post');
     expect(r.record.zoneId).toBeNull();
   });
 

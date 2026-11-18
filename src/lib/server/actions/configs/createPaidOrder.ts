@@ -5,6 +5,7 @@ import { recordOrderSales } from '$lib/server/shop/orderSales.js';
 import { shippingRecordOf, storedOrderShipping } from '$lib/server/shop/orderShipping.js';
 import { buyerFactsOf } from '$lib/shop/orderMail';
 import { formatMoney } from '$lib/money/format.js';
+import { noteLine } from '$lib/shop/orderNotes.js';
 import { rikmaCurrency } from '$lib/money/resolve.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
 import {
@@ -467,11 +468,15 @@ function belowCatalogOf(promo: PaidOrderPricing | null) {
 }
 
 function belowCatalogNote(promo: PaidOrderPricing, currency: string): string {
-  return (
-    `מתחת למחיר הקטלוג והמבצעים: שולם ${formatMoney(promo.paidTotal, currency, 'he')}, ` +
-    `לפי הקטלוג ${formatMoney(promo.catalogTotal, currency, 'he')} (פער ${formatMoney(promo.gap, currency, 'he')}, ${promo.gapPct}%)` +
-    (promo.overArranged ? ' — מעבר למה שהרקמה מאפשרת לסכם לבד' : '')
-  );
+  // A marker, not a sentence: the order note is read later, by members who may
+  // speak any of the five languages (PLAN_EN_READINESS stage 4.2).
+  return noteLine(promo.overArranged ? 'belowCatalogOverArranged' : 'belowCatalog', {
+    paid: promo.paidTotal,
+    catalog: promo.catalogTotal,
+    gap: promo.gap,
+    pct: promo.gapPct,
+    currency
+  });
 }
 
 /** A stored order, in the action's result shape. */

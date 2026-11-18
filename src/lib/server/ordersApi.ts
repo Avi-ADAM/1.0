@@ -25,6 +25,7 @@ import { normalizeCode } from '$lib/money/currencies.js';
 import { productStatusOf, pricingModeOf } from './apiPublic/dto.js';
 import { checkoutOf, imageOf, num, str } from './apiPublic/shop.js';
 import { countOf, LEGACY_UNLIMITED } from '$lib/shop/stock.js';
+import { noteLine } from '$lib/shop/orderNotes.js';
 
 export const ORDERS_CREATE_SCOPE = 'orders:create';
 export const ORDERS_READ_SCOPE = 'orders:read';
@@ -628,13 +629,13 @@ export function planOrder(args: {
     const name = str(a.name) ?? `#${input.productId}`;
     const n = i + 1;
 
-    if (v && v.active === false) notes.push(`שורה ${n}: הווריאנט כבוי (active=false)`);
+    if (v && v.active === false) notes.push(noteLine('variantOff', { line: n }));
     const minOrder = num(a.minOrder);
     const maxOrder = num(a.maxOrder);
     if (minOrder !== null && input.quantity < minOrder)
-      notes.push(`שורה ${n}: כמות ${input.quantity} מתחת למינימום ${minOrder}`);
+      notes.push(noteLine('belowMin', { line: n, quantity: input.quantity, min: minOrder }));
     if (maxOrder !== null && input.quantity > maxOrder)
-      notes.push(`שורה ${n}: כמות ${input.quantity} מעל המקסימום ${maxOrder}`);
+      notes.push(noteLine('aboveMax', { line: n, quantity: input.quantity, max: maxOrder }));
 
     // Running stock — a variant's own when the line has one, else the product's.
     const stockKey = v ? `v:${input.variantId}` : `p:${input.productId}`;
@@ -653,7 +654,10 @@ export function planOrder(args: {
       if (oversold) shortBy = input.quantity - Math.max(before, 0);
       remaining.set(stockKey, before - input.quantity);
     }
-    if (oversold) notes.push(`שורה ${n}: מכירת-יתר — נותרו ${Math.max(before, 0)}, הוזמנו ${input.quantity}`);
+    if (oversold)
+      notes.push(
+        noteLine('oversold', { line: n, remaining: Math.max(before, 0), quantity: input.quantity })
+      );
 
     const optionLabel = v
       ? (str(v.name) ??
@@ -714,7 +718,7 @@ export function planOrder(args: {
       shippingAsLine = true;
     } else {
       notes.push(
-        `דמי המשלוח (${round2(shippingLine.unitPrice)}) נשארו בנפרד ולא נרשמו כמכירה: מוצר המשלוח #${id} לא זמין לכך (לא פורסם, בלי מחיר קבוע, עם וריאציות, או שהוזמן גם כמוצר).`
+        noteLine('shippingFeeSeparate', { fee: round2(shippingLine.unitPrice), id })
       );
     }
   }
@@ -724,9 +728,7 @@ export function planOrder(args: {
   const computedTotal = round2(subtotal + separateFee);
   const total = payload.amount ?? computedTotal;
   if (payload.amount !== null && round2(payload.amount) !== computedTotal) {
-    notes.push(
-      `הסכום שנגבה (${round2(payload.amount)}) שונה מסכום השורות והמשלוח (${computedTotal})`
-    );
+    notes.push(noteLine('amountMismatch', { charged: round2(payload.amount), computed: computedTotal }));
   }
 
   return {
@@ -1062,11 +1064,27 @@ export function splitReceived(received: number, lineTotals: number[], fee: numbe
   return { amounts, catalogTotal, received: got, under: true };
 }
 
-/** The line an order's note gets when its arranged payment is recorded. */
-export function arrangedNoteOf(split: ReceivedSplit, method: ArrangedMethod, note: string | null): string {
-  const under = split.under ? ` — מתחת למחיר הקטלוג (${split.catalogTotal})` : '';
-  const own = note ? `: ${note}` : '';
-  return `שולם בתיאום — ${split.received} (${method})${under}${own}`;
+/**
+ * The line an order's note gets when its arranged payment is recorded.
+ * A marker, not a sentence: the member who reads the order may speak another
+ * language than the member who confirmed the payment (stage 4.2).
+ */
+export function arrangedNoteOf(
+  split: ReceivedSplit,
+  method: ArrangedMethod,
+  note: string | null,
+  currency?: string | null
+): string {
+  const marker = noteLine('arrangedPaid', {
+    amount: split.received,
+    method,
+    under: split.under,
+    catalog: split.catalogTotal,
+    ...(currency ? { currency } : {})
+  });
+  // What the member wrote is their own words, in their own language: it stays
+  // plain text beside the marker, never encoded inside it.
+  return note ? `${marker}: ${note}` : marker;
 }
 
 // ─── webhooks (§5.6) ────────────────────────────────────────────────────────

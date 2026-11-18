@@ -1,3 +1,4 @@
+import { agentLanguageName, agentLanguageDirective } from '../lib/agentLanguage';
 import { Agent } from '@mastra/core/agent';
 import { createModelChain } from '../lib/createModel';
 import { createProjectTool } from '../tools/createProjectTool';
@@ -145,7 +146,7 @@ No context: "open a task for the developers role" -> {"type": "task", "confidenc
     id: 'IntentAgent',
     name: 'IntentAgent',
 
-    instructions: systemPrompt,
+    instructions: systemPrompt + agentLanguageDirective(language),
     tools: {
       createProjectTool
     },

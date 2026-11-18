@@ -26,6 +26,9 @@ const at = (...paths) =>
  * @type {Record<string, RegExp[]>}
  */
 export const ROUTED = {
+    // The public "about the agreement" page (PLAN_EN_READINESS stage 5.1):
+    // one long-form page, its own namespace, routed to that page alone.
+    about: at('/about'),
     onboard: at('/onboard'),
     // The picture upload link an agent hands out (MCP createUploadSession).
     upload: at('/upload'),

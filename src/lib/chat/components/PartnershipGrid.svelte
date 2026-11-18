@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { PartnershipData } from '$lib/types/chat';
+  import { t } from '$lib/translations';
   let { partnerships }: { partnerships: PartnershipData[] } = $props();
 </script>
 
@@ -8,7 +9,7 @@
     <div class="card" style:animation-delay="{i * 60}ms">
       <div class="card-top">
         <div>
-          <div class="mono-label">שותפות</div>
+          <div class="mono-label">{$t('bot.card.partnership')}</div>
           <div class="name">{p.name}</div>
         </div>
         <div class="value-col">
@@ -20,11 +21,11 @@
       </div>
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">חלקך</div>
+          <div class="stat-label">{$t('bot.card.yourShare')}</div>
           <div class="stat-val stake">{p.stake}</div>
         </div>
         <div class="stat">
-          <div class="stat-label">שותפים</div>
+          <div class="stat-label">{$t('bot.card.partners')}</div>
           <div class="stat-val">{p.members}</div>
         </div>
       </div>

@@ -8,6 +8,7 @@
   import { t, locale } from '$lib/translations';
   import { page } from '$app/state';
   import { addressExtras, addressLine, type ShopOrder } from '$lib/shop/manage';
+  import { renderOrderNote } from '$lib/shop/orderNotes.js';
 
   let { order }: { order: ShopOrder } = $props();
   let extras = $derived(addressExtras(order.delivery.address, (k, v) => $t(k, v)));
@@ -17,6 +18,8 @@
       new Date(order.paidAt ?? order.createdAt ?? Date.now())
     )
   );
+  // The paper note reads the order's system notes in the reader's language.
+  let note = $derived(renderOrderNote(order.note, $t, $locale));
 </script>
 
 <div class="sh-print dn" aria-hidden="true">
@@ -57,7 +60,7 @@
       {/each}
     </tbody>
   </table>
-  {#if order.note}<p class="dn-note">{order.note}</p>{/if}
+  {#if note}<p class="dn-note">{note}</p>{/if}
 </div>
 
 <style>

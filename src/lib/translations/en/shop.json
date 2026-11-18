@@ -126,7 +126,27 @@
       "entrance": "Entrance {{value}}"
     },
     "note": {
-      "title": "Notes"
+      "title": "Notes",
+      "variantOff": "Line {{line}}: the variant is switched off (active=false)",
+      "belowMin": "Line {{line}}: quantity {{quantity}} is below the minimum {{min}}",
+      "aboveMax": "Line {{line}}: quantity {{quantity}} is above the maximum {{max}}",
+      "oversold": "Line {{line}}: oversold — {{remaining}} left, {{quantity}} ordered",
+      "shippingFeeSeparate": "The delivery fee ({{fee}}) stayed separate and was not recorded as a sale: shipping product #{{id}} is not available for it (unpublished, no fixed price, has variants, or was also ordered as a product).",
+      "amountMismatch": "The amount charged ({{charged}}) differs from the lines plus delivery ({{computed}})",
+      "belowCatalog": "Below the catalog and promotion prices: {{paid}} paid, catalog {{catalog}} (gap {{gap}}, {{pct}}%)",
+      "belowCatalogOverArranged": "Below the catalog and promotion prices: {{paid}} paid, catalog {{catalog}} (gap {{gap}}, {{pct}}%) — more than the rikma lets a member arrange alone",
+      "belowCatalogShort": " — below the catalog price ({{catalog}})",
+      "arrangedPaid": "Paid by arrangement — {{amount}} ({{methodLabel}}){{underPhrase}}",
+      "shippingOptionMissing": "The delivery option chosen on the site ({{optionId}}) is not offered for this address today according to the rikma shipping settings.",
+      "shippingFeeDifferent": "The delivery fee charged ({{charged}}) differs from the rikma setting for method \"{{methodName}}\" ({{configured}}).",
+      "unknown": "System note",
+      "method": {
+        "bit": "Bit",
+        "paybox": "PayBox",
+        "transfer": "Bank transfer",
+        "cash": "Cash",
+        "other": "Other"
+      }
     },
     "payment": {
       "title": "Payment",

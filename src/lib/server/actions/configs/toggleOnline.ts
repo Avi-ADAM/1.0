@@ -1,6 +1,7 @@
 
 import type { ActionConfig } from '../types.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
+import { actionTranslator } from '../actionErrors.js';
 
 /**
  * Being available is never open-ended: people switch it on and forget, and the
@@ -32,6 +33,7 @@ export const toggleOnlineConfig: ActionConfig = {
     graphqlOperation: async (params, context, { strapi, notifier }) => {
         const { status, meetingId, durationMinutes, autoExpired } = params; // status: boolean, meetingId?: string
         const userId = context.userId;
+        const t = actionTranslator(context.lang);
         console.log('toggleOnline', params, context);
         // 1. Get all user meeting records
         const userMeetingRes = await strapi.execute(
@@ -258,10 +260,8 @@ export const toggleOnlineConfig: ActionConfig = {
             updatedCount: targets.length,
             toast: status && notificationsSent.length > 0 ? {
                 type: 'success',
-                title: context.lang === 'en' ? 'Meeting Ready!' : 'פגישה מוכנה!',
-                message: context.lang === 'en'
-                    ? `Everyone is online for ${notificationsSent[0].mName}`
-                    : `כולם אונליין לפגישה: ${notificationsSent[0].mName}`,
+                title: t('server.meeting.meetingReadyTitle'),
+                message: t('server.meeting.allOnline', { name: notificationsSent[0].mName }),
                 duration: 5000
             } : null
         };

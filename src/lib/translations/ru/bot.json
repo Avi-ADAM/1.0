@@ -61,5 +61,21 @@
   "sugUserReportBug": "Сообщить об ошибке",
   "reportSuccessMsg": "Ваш запрос успешно отправлен! Команда свяжется с вами в ближайшее время.",
   "reportErrorMsg": "Не удалось отправить запрос. Попробуйте снова.",
-  "reportTypePrompt": "Тип обращения? (ошибка / функция / партнёрство / контакт)"
+  "reportTypePrompt": "Тип обращения? (ошибка / функция / партнёрство / контакт)",
+  "card": {
+    "voteCommand": "Я проголосовал «{{option}}» по: {{proposal}}",
+    "saleRecorded": "Продажа успешно записана!",
+    "back": "Назад",
+    "productsAvailable": "Доступно продуктов: {{count}}",
+    "chooseProduct": "Выберите продукт, чтобы записать продажу",
+    "activeVote": "Активное голосование · {{partnership}}",
+    "deadline": "Крайний срок: {{deadline}}",
+    "recorded": "Записано",
+    "partnership": "Партнёрство",
+    "yourShare": "Ваша доля",
+    "partners": "Участники",
+    "voteFor": "За",
+    "voteAgainst": "Против",
+    "voteAbstain": "Воздержался"
+  }
 }

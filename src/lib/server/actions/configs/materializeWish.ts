@@ -29,6 +29,7 @@
 
 import { pricedResourceRows } from '$lib/pooling/bomPrice';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { actionTranslator, moderationReasons } from '../actionErrors.js';
 import { createSheirutFromPendingConfig } from './createSheirutFromPending.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { resolveRikmaPictureId } from '$lib/server/concierge/rikmaPicture.js';
@@ -40,6 +41,7 @@ import { fixedDealPrice } from '$lib/sheirut/dealSupport';
 
 const handler: ActionExecutionHandler = async (params, context, util) => {
   const { strapi } = util;
+  const t = actionTranslator(context.lang);
   const { ratsonId, profilePicId, openGaps = false } = params as {
     ratsonId: string;
     profilePicId?: string | null;
@@ -68,17 +70,17 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   // Idempotent: the wish is marked fulfilled only after the weave + Sheirut
   // exist (step 8), so a second click must not mint a second partnership.
   if (ratAttrs.status_ratson === 'fulfilled' || ratAttrs.fulfilled === true) {
-    throw new Error('ההסכמה כבר נסגרה - הרקמה והדיל כבר נוצרו. אפשר למצוא אותם ב"עסקאות".');
+    throw new Error(t('server.error.wishConsentClosed'));
   }
 
   const matanotId = ratAttrs.derivedComplexMatanot?.data?.id
     ? String(ratAttrs.derivedComplexMatanot.data.id)
     : null;
   if (!matanotId) {
-    throw new Error('אין עדיין מוצר מורכב - צריך קודם להזמין ספקים ולהרכיב את התכנית');
+    throw new Error(t('server.error.wishNoProduct'));
   }
 
-  const wishName = ratAttrs.name || 'משאלה';
+  const wishName = ratAttrs.name || t('server.wish.untitled');
   const startDate = ratAttrs.startDate ?? null;
   const finnishDate = ratAttrs.finnishDate ?? null;
 
@@ -96,14 +98,12 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   const recipeResources: any[] = pricedResourceRows(mAttrs.matanot_recipe_resources?.data ?? []);
   const allLines = [...recipeMissions, ...recipeResources];
   if (allLines.length === 0) {
-    throw new Error('אין חלקים בתכנית כדי לייצר - יש להוסיף משימות/משאבים קודם');
+    throw new Error(t('server.error.wishNoParts'));
   }
 
   const unassigned = allLines.filter((l) => !l.attributes?.assignedMember?.data?.id);
   if (unassigned.length > 0) {
-    throw new Error(
-      `עוד יש ${unassigned.length} חלקים ללא ספק מאושר - לא ניתן לסגור את ההסכמה עדיין`
-    );
+    throw new Error(t('server.error.wishUnassignedParts', { count: unassigned.length }));
   }
 
   // ── 3. Collect providers, total, and bind each part to its provider ────────
@@ -148,7 +148,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   }
 
   const providers = [...providerIds];
-  if (providers.length === 0) throw new Error('לא נמצאו ספקים מאושרים לתכנית');
+  if (providers.length === 0) throw new Error(t('server.error.wishNoProviders'));
 
   // ── 4. Create the dedicated partner weave (members = providers) ─────────────
   // A face for it: the customer's pick, the wish's own logo, or the concierge
@@ -166,8 +166,8 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
     '166crWishWeave',
     {
       members: providers,
-      projectName: `${wishName} - רקמה`,
-      descripFor: `רקמת שותפים שנוצרה מהמשאלה "${wishName}".`,
+      projectName: t('server.wish.partnersRikma', { name: wishName }),
+      descripFor: t('server.wish.rikmaDescription', { name: wishName }),
       isOt: true,
       ...(profilePic ? { profilePic } : {}),
       publishedAt: now
@@ -178,7 +178,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   const weaveId = weaveRes?.data?.createProject?.data?.id
     ? String(weaveRes.data.createProject.data.id)
     : null;
-  if (!weaveId) throw new Error('יצירת רקמת השותפים נכשלה');
+  if (!weaveId) throw new Error(t('server.error.wishWeaveCreateFailed'));
 
   // ── 5. Host the composed product on the weave + activate it ────────────────
   try {
@@ -191,7 +191,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
     );
   } catch (e) {
     console.error('[materializeWish] hosting product on weave failed:', e);
-    throw new Error('שיוך המוצר לרקמה נכשל');
+    throw new Error(t('server.error.wishProductLinkFailed'));
   }
 
   // ── 6. Open a Sheirutpend (client = wisher) for the composed product ───────
@@ -214,7 +214,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   const sheirutpendId = spRes?.data?.createSheirutpend?.data?.id
     ? String(spRes.data.createSheirutpend.data.id)
     : null;
-  if (!sheirutpendId) throw new Error('פתיחת ההסכמה (Sheirutpend) נכשלה');
+  if (!sheirutpendId) throw new Error(t('server.error.wishSheirutpendCreateFailed'));
 
   // ── 6b. The pricing track the deal is signed under (PLAN_DEAL_PRICING_TRACKS P1) ──
   // Best-effort: a failed read leaves it null, which is `atCost` — how the deal behaves anyway.
@@ -239,7 +239,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
     serviceId = (out as any)?.data?.serviceId ?? null;
   } catch (e) {
     console.error('[materializeWish] createSheirutFromPending failed:', e);
-    throw new Error('הרקמה נוצרה אך פתיחת הדיל נכשלה - אפשר לנסות שוב מתוך הדילים');
+    throw new Error(t('server.error.wishDealCreateFailed'));
   }
 
   // Written only when someone chose a track: null is legacy = atCost, so a deal nobody
@@ -304,7 +304,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
           fidn: parseInt(String(chatForumId), 10),
           idL: context.userId,
           da: now,
-          mes: 'המעגל נסגר - נוצרה רקמת שותפים והדיל יצא לדרך. 💗'
+          mes: t('server.wish.chatSeed')
         },
         context.jwt,
         context.fetch

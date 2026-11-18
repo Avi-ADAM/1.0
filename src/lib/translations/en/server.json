@@ -1,0 +1,62 @@
+{
+  "error": {
+    "priceRequired": "The price must be greater than zero",
+    "nameRejected": "The name did not pass the content check ({{reasons}})",
+    "rikmaMembersOnly": "Only a member of the rikma can create a product in it",
+    "rikmaNameRequired": "The rikma needs a name",
+    "rikmaCreateFailed": "Could not create the rikma",
+    "homeRikmaCreateFailed": "Could not create the home rikma",
+    "productCreateFailed": "Could not create the product",
+    "offerCreateFailed": "Could not create the mission offer",
+    "offerUpdateFailed": "Could not update the mission offer",
+    "resourcePriceRequired": "A price is needed to publish a resource as a product",
+    "resourceProductCreateFailed": "Could not create the product from the resource",
+    "wishConsentClosed": "This consent is already closed - the rikma and the deal were created. You can find them under Deals.",
+    "wishNoProduct": "There is no assembled product yet - invite providers and build the plan first",
+    "wishNoParts": "The plan has no parts to build - add missions or resources first",
+    "wishUnassignedParts": "{{count}} parts still have no approved provider - the consent cannot be closed yet",
+    "wishNoProviders": "No approved providers were found for the plan",
+    "wishWeaveCreateFailed": "Could not create the partners rikma",
+    "wishProductLinkFailed": "Could not link the product to the rikma",
+    "wishSheirutpendCreateFailed": "Could not open the consent (Sheirutpend)",
+    "wishDealCreateFailed": "The rikma was created but the deal could not be opened - you can retry from Deals",
+    "nameRequired": "A name is required"
+  },
+  "moderation": {
+    "empty": "empty",
+    "too_long": "too long",
+    "link": "link",
+    "contact": "contact details",
+    "spam": "repeated characters",
+    "blocked_word": "blocked word",
+    "other": "other"
+  },
+  "wish": {
+    "untitled": "Wish",
+    "partnersRikma": "{{name}} - partners rikma",
+    "rikmaDescription": "A partners rikma created from the wish \"{{name}}\".",
+    "chatSeed": "The circle is closed — a partners rikma was created and the deal is on its way. 💗"
+  },
+  "meeting": {
+    "alreadyLiveTitle": "Meeting is Live",
+    "alreadyLiveMessage": "The meeting is already live - join now!",
+    "startedTitle": "Meeting Started!",
+    "startedMessage": "All participants are ready - meeting is live!",
+    "readyTitle": "Ready!",
+    "waitingFor": "Waiting for {{count}} more participant(s)...",
+    "waitingTitle": "Waiting for participants...",
+    "waitingApproval": "Waiting for {{count}} participant(s) to approve",
+    "meetingReadyTitle": "Meeting Ready!",
+    "allOnline": "Everyone is online for the meeting: {{name}}"
+  },
+  "donation": {
+    "supporter": "A supporter",
+    "forMission": "For the mission: {{name}}",
+    "stipend": "to fund its subsistence stipend ({{rate}}/hour)",
+    "stipendWithBudget": "to fund its subsistence stipend ({{rate}}/hour, up to {{budget}})",
+    "contact": "Contact: {{contact}}"
+  },
+  "assistant": {
+    "leftoverTitle": "More from the import"
+  }
+}

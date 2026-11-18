@@ -1,3 +1,4 @@
+import { agentLanguageName, agentLanguageDirective } from '../lib/agentLanguage';
 import { Agent } from '@mastra/core/agent';
 import { createModelChain } from '../lib/createModel';
 import { findUserProjectsTool } from '../tools/findUserProjectsTool';
@@ -24,7 +25,7 @@ ${SITE_CONTEXT}
 
 User context:
 - User ID: ${userId}
-- Language: ${language === 'he' ? 'Hebrew' : language === 'ar' ? 'Arabic' : language === 'ru' ? 'Russian' : 'English'}
+- Language: ${agentLanguageName(language)}
 
 Your tools:
 - findUserProjectsTool: list the user's projects (resolve a project name → projectId). Always pass userId="${userId}".
@@ -51,7 +52,7 @@ Rules:
   return new Agent({
     id: 'TaskAgent',
     name: 'TaskAgent',
-    instructions: instructions + workingMemoryInstructions(language),
+    instructions: instructions + agentLanguageDirective(language) + workingMemoryInstructions(language),
     model,
     memory: getChatMemory(),
     tools: {

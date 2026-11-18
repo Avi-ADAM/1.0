@@ -271,7 +271,7 @@ describe('planOrder — what is recorded, never refused', () => {
     expect(plan.ok).toBe(true);
     if (plan.ok === false) return;
     expect(plan.oversold).toBe(true);
-    expect(plan.notes.join()).toContain('מכירת-יתר');
+    expect(plan.notes.join()).toContain('order.note.oversold');
     expect(plan.lines[0].shortBy).toBe(2); // 5 ordered, 3 left
   });
 
@@ -320,14 +320,15 @@ describe('planOrder — what is recorded, never refused', () => {
       )
     });
     if (plan.ok === false) throw new Error(plan.message);
-    expect(plan.notes.join('\n')).toMatch(/כבוי/);
-    expect(plan.notes.join('\n')).toMatch(/מעל המקסימום 8/);
+    expect(plan.notes.join('\n')).toContain('order.note.variantOff');
+    expect(plan.notes.join('\n')).toContain('order.note.aboveMax');
   });
 
   it('records what was charged, and notes a gap instead of refusing it', () => {
     const plan = planOrder({ payload: payload({ amount: 650 } as any), ...both() });
     if (plan.ok === false) throw new Error(plan.message);
     expect(plan.total).toBe(650);
+    expect(plan.notes.join()).toContain('order.note.amountMismatch');
     expect(plan.notes.join()).toContain('650');
   });
 
