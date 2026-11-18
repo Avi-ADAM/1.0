@@ -22,7 +22,7 @@
     "previewDraft": "Draft — only the rikma's members see this page",
     "previewProposed": "Awaiting the rikma's approval — only its members see this page",
     "previewNoRegister": "Registration opens once the page is published",
-    "minutes": "{{count}} minutes",
+    "minutes": "{{count; 1:{{count}} minute; default:{{count}} minutes;}}",
     "minutesShort": "{{count}} min",
     "soon": "Soon",
     "cta": "Save my seat",
@@ -36,7 +36,7 @@
     "noDateTitle": "No open date right now",
     "noDateBody": "Leave your details and we'll write when the next date opens.",
     "yourTime": "Your time: {{time}}",
-    "seatsLeft": "{{count}} seats left",
+    "seatsLeft": "{{count; 1:{{count}} seat; default:{{count}} seats;}} left",
     "fullWaitlist": "Full — you can join the waiting list",
     "faq": "Questions"
   },

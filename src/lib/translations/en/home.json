@@ -703,7 +703,7 @@
     "axisYears": "years",
     "stopMark": "you stop working",
     "stopLabel": "You stop working in year {{year}}",
-    "afterLabel": "{{years}} years later",
+    "afterLabel": "{{years; 1:{{years}} year; default:{{years}} years;}} later",
     "beforeLabel": "before stopping",
     "partnershipDot": "another partnership opened here",
     "note": "The numbers are relative to a starting salary (100%), not amounts. An employee draws unemployment pay for three months and then nothing; a freelancer stops the same day; a partner opens no new rikmas after stopping, and their share of the existing ones thins too — whoever keeps contributing grows the denominator. So their income falls, but it settles on a floor rather than on zero: what you already gave stays in the numerator for good.",

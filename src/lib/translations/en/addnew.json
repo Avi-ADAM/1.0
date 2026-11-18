@@ -35,7 +35,7 @@
     "continuous": "Ongoing rikma",
     "oneTimed": "One-off rikma",
     "continuousLevel": "Is the rikma meant to be a one-off or an ongoing thing? For example: producing one event, versus founding an event-production business",
-    "seedPlanWaiting": "We drafted {{count}} proposals for this rikma - products, missions and resources. They will be waiting on your board after it is created, for you to approve one by one.",
+    "seedPlanWaiting": "We drafted {{count; 1:one proposal for this rikma. It will be waiting; default:{{count}} proposals for this rikma - products, missions and resources. They will be waiting;}} on your board after it is created, for you to approve {{count; 1:it; default:one by one;}}.",
     "eyebrow": "A new partnership · by consent",
     "lede": "Here you set the partnership's name, its story and how it reaches agreement. Four short steps, and the rikma goes out into the world.",
     "draftTitle": "The assistant prepared a draft for you",

@@ -33,13 +33,13 @@
   },
   "hours": {
     "title": "Accrued hours",
-    "accrued": "{{count}} hours accrued",
+    "accrued": "{{count; 1:{{count}} hour; default:{{count}} hours;}} accrued",
     "none": "No hours accrued",
     "credit": "Credited to the member",
     "waive": "Agreed waiver",
     "transfer": "Moved to another mission",
     "endOfCycle": "Takes effect at the end of the cycle",
-    "creditAmount": "Credit {{count}} hours",
+    "creditAmount": "Credit {{count; 1:{{count}} hour; default:{{count}} hours;}}",
     "transferTo": "Moving to: {{name}}",
     "effectiveFrom": "Effective from {{date}}"
   },
@@ -118,7 +118,7 @@
     "title": "Rikma archive",
     "empty": "Nothing has been archived here yet",
     "when": "Archived on {{date}}",
-    "hoursCredited": "{{count}} hours credited",
+    "hoursCredited": "{{count; 1:{{count}} hour; default:{{count}} hours;}} credited",
     "openDecision": "Open the decision"
   },
   "edit": {

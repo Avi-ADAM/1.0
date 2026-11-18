@@ -2,6 +2,7 @@ import i18n from 'sveltekit-i18n';
 import { derived } from 'svelte/store';
 import lang from './lang.json';
 import { LOCALES, ROUTED } from './routes.js';
+import { customModifiers } from './modifiers.js';
 
 /**
  * The loader table is *generated*, not hand-written.
@@ -45,7 +46,10 @@ for (const locale of LOCALES) {
 
 export const config = {
     translations: Object.fromEntries(LOCALES.map((l) => [l, { lang }])),
-    loaders
+    loaders,
+    // `{{count:plural; one:…; few:…; other:…;}}` — see ./modifiers.js. The
+    // server translator registers the same set, so both render alike.
+    parserOptions: { customModifiers }
 };
 
 // The parser's default payload type only permits a `default` key, so any named

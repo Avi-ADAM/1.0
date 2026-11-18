@@ -103,7 +103,7 @@
   "hub_items_active": "активных элементов",
   "meta_title_suffix": "Пул спроса · 1💗1",
   "meta_status_offer": "подписали {{signed}} из {{min}}",
-  "meta_status_members": "{{members}} домохозяйств ищут поставщика",
+  "meta_status_members": "{{members:plural; one:{{members}} домохозяйство ищет; few:{{members}} домохозяйства ищут; many:{{members}} домохозяйств ищут; other:{{members}} домохозяйства ищут;}} поставщика",
   "meta_days_left": "осталось {{count}} дн.",
   "share_nudge_title": "Ещё {{count}} — и это случится",
   "share_nudge_body": "Каждая подпись приближает предложение к порогу. Отправьте ссылку тем, кому это тоже нужно — превью уже показывает, сколько подписали.",

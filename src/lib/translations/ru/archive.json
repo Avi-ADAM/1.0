@@ -39,7 +39,7 @@
     "waive": "Согласованный отказ",
     "transfer": "Перенести в другую задачу",
     "endOfCycle": "Вступит в силу в конце цикла",
-    "creditAmount": "Зачесть {{count}} часов",
+    "creditAmount": "Зачесть {{count:plural; one:{{count}} час; few:{{count}} часа; many:{{count}} часов; other:{{count}} часа;}}",
     "transferTo": "Куда: {{name}}",
     "effectiveFrom": "Действует с {{date}}"
   },

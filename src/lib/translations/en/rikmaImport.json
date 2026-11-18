@@ -95,7 +95,7 @@
   "error": "Creating did not work. Try again in a moment.",
   "result": {
     "title": "Created",
-    "created": "{{count}} items were created.",
+    "created": "{{count; 1:{{count}} item was; default:{{count}} items were;}} created.",
     "failed": "Not created:",
     "proposals": "The rows you did not tick were kept as proposals on the rikma's planning board.",
     "openRikma": "Go to the rikma",
@@ -109,7 +109,7 @@
     "noEmail": "No email was given for {{name}}, so no email invitation was sent. Share the join link:",
     "emailFailed": "We could not email {{name}}. Copy and send them the join link:",
     "emailSkipped": "No email was sent to {{name}} because of their email preferences. Share the join link:",
-    "rateLimited": "The email invitation limit was reached. Share the join link and try again in about {{minutes}} minutes.",
+    "rateLimited": "The email invitation limit was reached. Share the join link and try again in about {{minutes; 1:{{minutes}} minute; default:{{minutes}} minutes;}}.",
     "copy": "Copy join link",
     "copied": "Link copied",
     "copyFailed": "Could not copy automatically; select and copy the link above.",
@@ -137,7 +137,7 @@
     "joinDoorDesc": "Open missions, skills and partnership shares",
     "lookingForHeading": "Who we are looking for",
     "team": "Partners in the rikma",
-    "hoursBadge": "{{hours}} hrs",
+    "hoursBadge": "{{hours; 1:{{hours}} hr; default:{{hours}} hrs;}}",
     "perHour": "/ hr",
     "consentClock": "Consent clock: {{label}}",
     "totalValue": "Estimated total value: {{amount}}"
@@ -159,7 +159,7 @@
     "minus": "Decrease hours",
     "plus": "Increase hours",
     "plusFive": "+5h",
-    "hoursBadge": "{{hours}} hrs",
+    "hoursBadge": "{{hours; 1:{{hours}} hr; default:{{hours}} hrs;}}",
     "rateMinus": "Decrease rate",
     "ratePlus": "Increase rate"
   },
@@ -186,7 +186,7 @@
   "share": {
     "button": "Preview link for partners",
     "making": "Making a link…",
-    "ready": "Here is the link - whoever gets it can see, not edit. It works for {{days}} days; a new link cancels the previous one.",
+    "ready": "Here is the link - whoever gets it can see, not edit. It works for {{days; 1:{{days}} day; default:{{days}} days;}}; a new link cancels the previous one.",
     "copy": "Copy",
     "copied": "Copied",
     "error": "We couldn't make a link. Try again."

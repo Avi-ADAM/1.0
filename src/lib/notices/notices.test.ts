@@ -78,7 +78,10 @@ describe('notices.json', () => {
 
   it('uses only {{name}} placeholders the parser can fill, the same ones in every locale', () => {
     for (const [key, he] of leaves(notices.he)) {
-      const names = (s: string) => [...s.matchAll(/\{\{(\w+)\}\}/g)].map((m) => m[1]).sort();
+      // a plural block `{{count; 1:…; default:…;}}` names `count` at its head and
+      // may repeat it inside its forms: compare the set of names, not occurrences.
+      const names = (s: string) =>
+        [...new Set([...s.matchAll(/\{\{\s*([A-Za-z_]\w*)/g)].map((m) => m[1]))].sort();
       for (const l of LOCALES) {
         const s = lookup(l, `notices.${key}`) as string;
         expect(s, `${l}.${key}: single-brace placeholder`).not.toMatch(/(^|[^{])\{\w+\}(?!\})/);

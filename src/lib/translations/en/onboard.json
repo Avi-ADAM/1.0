@@ -130,7 +130,7 @@
         "title": "Here's what we found",
         "sub": "Mark what is correct · Everything can be edited"
       },
-      "summary": "✓ Found {{total}} items · <b>{{matched}}</b> matching · <b>{{suggested}}</b> suggestions · <b>{{newItems}}</b> new",
+      "summary": "✓ Found {{total; 1:{{total}} item; default:{{total}} items;}} · <b>{{matched}}</b> matching · <b>{{suggested}}</b> suggestions · <b>{{newItems}}</b> new",
       "sections": {
         "vallues": {
           "label": "Top Values"

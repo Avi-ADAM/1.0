@@ -602,9 +602,9 @@
     "approvalVote": "Голосование об одобрении",
     "approved": "Одобрено",
     "offersOne": "{{count}} предложение",
-    "offersMany": "{{count}} предложений",
+    "offersMany": "{{count:plural; one:{{count}} предложение; few:{{count}} предложения; many:{{count}} предложений; other:{{count}} предложения;}}",
     "offersLabelOne": "{{count}} предложение — развернуть",
-    "offersLabelMany": "{{count}} предложений — развернуть",
+    "offersLabelMany": "{{count:plural; one:{{count}} предложение; few:{{count}} предложения; many:{{count}} предложений; other:{{count}} предложения;}} — развернуть",
     "collapseOffers": "Свернуть",
     "noOffers": "Нет предложений",
     "collapse": "Свернуть",
@@ -631,7 +631,7 @@
     "noActs": "Заданий нет"
   },
   "asksNode": {
-    "countLabel": "{{count}} заявок — нажмите, чтобы развернуть",
+    "countLabel": "{{count:plural; one:{{count}} заявка; few:{{count}} заявки; many:{{count}} заявок; other:{{count}} заявки;}} — нажмите, чтобы развернуть",
     "collapseLabel": "Свернуть заявки",
     "asks": "Заявки",
     "noAsks": "Заявок нет",

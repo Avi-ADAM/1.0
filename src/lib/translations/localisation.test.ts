@@ -66,8 +66,11 @@ function flatten(node: unknown, trail = ''): Record<string, string> {
     return out;
 }
 
+// The set of names a string reads. A plural block — `{{count; 1:…; default:…;}}`
+// or `{{count:plural; …}}` — reads its head name, and may repeat it inside its
+// forms any number of times; a locale may use a block where Hebrew has none.
 function placeholders(text: string): string[] {
-    return [...text.matchAll(/\{\{\s*([^}:\s]+)\s*\}\}/g)].map((m) => m[1]).sort();
+    return [...new Set([...text.matchAll(/\{\{\s*([A-Za-z_][A-Za-z0-9_]*)/g)].map((m) => m[1]))].sort();
 }
 
 describe('five-locale parity of the stage 4–5 words', () => {

@@ -18,7 +18,7 @@
   "issuesHint": "An issue labelled {{label}} opens as a task in the rikma. When it is closed on GitHub the rikma is told, and when the task is marked done a comment is left on the issue.",
   "pick": {
     "title": "Which repository joins the rikma?",
-    "intro": "GitHub gave access to {{count}} repositories. Pick one to connect — you can connect another one later.",
+    "intro": "GitHub gave access to {{count; 1:{{count}} repository; default:{{count}} repositories;}}. Pick one to connect — you can connect another one later.",
     "search": "Filter by name",
     "connect": "Connect this repository",
     "cancel": "Cancel",
@@ -56,7 +56,7 @@
     "loading": "Loading work from GitHub…",
     "failed": "Could not read the work from GitHub. Try refreshing.",
     "empty": "No merged PRs in the connected repositories yet.",
-    "mineOpen": "{{count}} pieces of your work can be filed as hours.",
+    "mineOpen": "{{count; 1:{{count}} piece; default:{{count}} pieces;}} of your work can be filed as hours.",
     "linkFirst": "For the rikma to recognise your work, link your GitHub account.",
     "linkFirstCta": "Link it in settings",
     "pull": "PR",

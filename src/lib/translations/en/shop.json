@@ -11,12 +11,12 @@
     "crumbManage": "Manage"
   },
   "banner": {
-    "toShip": "{{count}} orders waiting to ship",
+    "toShip": "{{count; 1:{{count}} order; default:{{count}} orders;}} waiting to ship",
     "toShipOne": "1 order waiting to ship",
-    "short": "{{count}} orders are short on stock",
+    "short": "{{count; 1:{{count}} order is; default:{{count}} orders are;}} short on stock",
     "shortOne": "1 order is short on stock",
     "cta": "Handle",
-    "leads": "{{count}} enquiries waiting for an answer",
+    "leads": "{{count; 1:{{count}} enquiry; default:{{count}} enquiries;}} waiting for an answer",
     "leadsOne": "One enquiry waiting for an answer",
     "leadsCta": "See them"
   },
@@ -43,10 +43,10 @@
     "oldest": "Oldest: {{when}}",
     "noneWaiting": "Everything is out",
     "short": "Short on stock",
-    "shortUnits": "{{count}} units short",
+    "shortUnits": "{{count; 1:{{count}} unit; default:{{count}} units;}} short",
     "shortUnitsOne": "1 unit short",
     "month": "Sales in the last 30 days",
-    "monthSub": "{{count}} sales · {{share}}% from your site",
+    "monthSub": "{{count; 1:{{count}} sale; default:{{count}} sales;}} · {{share}}% from your site",
     "attention": "Need attention",
     "attentionSub": "of {{count}} in progress"
   },
@@ -93,7 +93,7 @@
   },
   "order": {
     "number": "Order {{number}}",
-    "items": "{{count}} items",
+    "items": "{{count; 1:{{count}} item; default:{{count}} items;}}",
     "itemsOne": "1 item",
     "deliverTo": "Delivery to {{city}}",
     "delivery": "Delivery",
@@ -199,7 +199,7 @@
     "tag": "{{count}} short",
     "tagOne": "1 short",
     "title": "The buyer paid for more than you have in stock",
-    "body": "{{count}} units are missing. You can make them and update the stock, or agree a later date with the buyer.",
+    "body": "{{count; 1:{{count}} unit is; default:{{count}} units are;}} missing. You can make them and update the stock, or agree a later date with the buyer.",
     "bodyOne": "1 unit is missing. You can make it and update the stock, or agree a later date with the buyer.",
     "updateStock": "Update stock",
     "contactBuyer": "Buyer details"
@@ -224,7 +224,7 @@
     "action": "Cancel order",
     "title": "Cancel order {{number}}?",
     "body": "Do this once you've agreed with the buyer and refunded them through your site. The order's sales will be reset.",
-    "inSplit": "{{count}} sales are already in a split. They won't change, and the rikma will be told so you can settle the refund together.",
+    "inSplit": "{{count; 1:{{count}} sale is already in a split. It won't; default:{{count}} sales are already in a split. They won't;}} change, and the rikma will be told so you can settle the refund together.",
     "inSplitOne": "1 sale is already in a split. It won't change, and the rikma will be told so you can settle the refund together.",
     "restock": "Return the items to stock",
     "restockHint": "On by default when the order hasn't shipped",
@@ -241,7 +241,7 @@
     "searchLabel": "Search products",
     "priceFrom": "From {{price}}",
     "priceQuote": "Price on request",
-    "variants": "{{count}} variants",
+    "variants": "{{count; 1:{{count}} variant; default:{{count}} variants;}}",
     "variantsOne": "1 variant",
     "noVariants": "No variants",
     "inStock": "{{count}} in stock",
@@ -392,7 +392,7 @@
       "split": "Split"
     },
     "total": "Total in range: {{amount}}",
-    "count": "{{count}} sales",
+    "count": "{{count; 1:{{count}} sale; default:{{count}} sales;}}",
     "countOne": "1 sale",
     "export": "Export CSV"
   },
@@ -462,10 +462,10 @@
     "noProductsBody": "A sale needs at least one product — you can create it here.",
     "whatSold": "What was sold",
     "splitTitle": "Split proposal",
-    "splitSub": "{{count}} sales · {{partners}} partners",
+    "splitSub": "{{count; 1:{{count}} sale; default:{{count}} sales;}} · {{partners; 1:{{partners}} partner; default:{{partners}} partners;}}",
     "kpiLabel": "At a glance",
     "kpiTotal": "All sales",
-    "salesCount": "{{count}} sales",
+    "salesCount": "{{count; 1:{{count}} sale; default:{{count}} sales;}}",
     "salesCountOne": "1 sale",
     "votesOf": "{{yes}} of {{total}} approved",
     "noVote": "No open proposal",
@@ -556,7 +556,7 @@
     "targetMission": "to whoever holds the mission \"{{mission}}\"",
     "targetRole": "to the \"{{role}}\" role",
     "targetMember": "to {{member}}",
-    "dueIn": "within {{hours}} hours",
+    "dueIn": "within {{hours; 1:{{hours}} hour; default:{{hours}} hours;}}",
     "perLine": "a task per item",
     "when": {
       "any": "Every paid order",
@@ -708,7 +708,7 @@
     "coversEverywhere": "Any address",
     "coversNothing": "Covers no address yet",
     "coversDistricts": "Districts {{list}}",
-    "coversCities": "{{count}} localities",
+    "coversCities": "{{count; 1:{{count}} locality; default:{{count}} localities;}}",
     "coversPostal": "Postal codes {{list}}",
     "moveUp": "Move up",
     "moveDown": "Move down",
@@ -745,7 +745,7 @@
     "notePh": "e.g. The courier calls before arriving",
     "free": "Free",
     "freeOverShort": "free over {{amount}}",
-    "etaDays": "{{count}} days",
+    "etaDays": "{{count; 1:{{count}} day; default:{{count}} days;}}",
     "etaRange": "{{min}}–{{max}} days",
     "zoneRules": "Sends the parcels: {{names}}",
     "whoDelivers": "Who sends the parcels for this zone? A rule that opens a task for the courier —",
@@ -845,8 +845,8 @@
       "early": "ended early",
       "superseded": "replaced by another version"
     },
-    "used": "{{count}} units sold on this promotion",
-    "usedOfCap": "{{used}} of {{cap}} units",
+    "used": "{{count; 1:{{count}} unit; default:{{count}} units;}} sold on this promotion",
+    "usedOfCap": "{{used}} of {{cap; 1:{{cap}} unit; default:{{cap}} units;}}",
     "pausedUntil": "Paused until {{date}}, then it runs again",
     "counterOpen": "Another version of this promotion is on the table",
     "toVote": "To the vote",
@@ -908,7 +908,7 @@
     "preview": {
       "now": "Goes out at once — the rikma is notified",
       "vote": "This goes to a vote of the rikma",
-      "reaches": "Applies to {{count}} products",
+      "reaches": "Applies to {{count; 1:{{count}} product; default:{{count}} products;}}",
       "blocked": "Not included: {{names}}",
       "earliest": "With no answer, it is approved on {{date}} at the earliest"
     },
@@ -956,7 +956,7 @@
     "endsOnCapFieldHint": "Not used — the promotion ends when the units are sold.",
     "endsOnCapNeedsCap": "To end on a cap, fill in the unit cap above.",
     "untilStock": "until stock runs out",
-    "untilStockLeft": "until stock runs out — {{left}} of {{cap}} units left"
+    "untilStockLeft": "until stock runs out — {{left}} of {{cap; 1:{{cap}} unit; default:{{cap}} units;}} left"
   },
   "leads": {
     "taken": "It's yours now",
@@ -1236,10 +1236,10 @@
       "title": "No customers yet",
       "body": "Whoever paid — a site order or an enquiry that became a sale — shows up here, one person per row."
     },
-    "count": "{{count}} customers",
+    "count": "{{count; 1:{{count}} customer; default:{{count}} customers;}}",
     "search": "Search by name, phone or email",
     "ordersOne": "One order",
-    "orders": "{{count}} orders",
+    "orders": "{{count; 1:{{count}} order; default:{{count}} orders;}}",
     "fromLead": "Came from an enquiry",
     "last": "last {{when}}",
     "detail": {

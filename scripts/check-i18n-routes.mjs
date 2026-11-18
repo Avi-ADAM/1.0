@@ -220,11 +220,53 @@ const badPlaceholders = [];
  */
 const shortPlaceholders = [];
 
+/**
+ * Modifier blocks — `{{count; 1:{{count}} mission; default:{{count}} missions;}}`
+ * or `{{count:plural; one:…; few:…; other:…;}}` — are parsed by regexes that
+ * fail quietly: a missing `;` before `}}`, a stray `:` inside a value, or an
+ * unknown modifier name renders the wrong form or nothing, with no error.
+ * `modifierProblem` resolves blocks innermost-first, as the parser does, and
+ * names the first thing it cannot read. Keep KNOWN_MODIFIERS in step with the
+ * parser's built-ins and `src/lib/translations/modifiers.js`.
+ */
+const KNOWN_MODIFIERS = new Set([
+    'eq', 'ne', 'lt', 'lte', 'gt', 'gte', 'number', 'date', 'ago', 'currency', 'plural'
+]);
+const modifierProblems = [];
+function modifierProblem(str) {
+    if (!str.includes('{{')) return null;
+    if (str.split('{{').length !== str.split('}}').length) return 'unbalanced {{ }}';
+    let s = str;
+    for (let guard = 0; s.includes('{{') && guard < 50; guard++) {
+        const m = /\{\{((?:(?!\{\{|\}\}).)*)\}\}/s.exec(s);
+        if (!m) return 'a {{ with no matching }}';
+        const body = m[1];
+        if (/[;:]/.test(body)) {
+            const head = /^\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?::\s*([A-Za-z]+))?\s*;/.exec(body);
+            if (!head) return `cannot read the block {{${body}}}`;
+            if (head[1].length < 2) return `placeholder {{${head[1]}}} is shorter than 2 chars`;
+            if (head[2] && !KNOWN_MODIFIERS.has(head[2])) return `unknown modifier :${head[2]}`;
+            if (!/;\s*$/.test(body)) return `block {{${head[1]}; …}} must end with ";}}"`;
+            const opts = body.slice(head[0].length).split(';').map((o) => o.trim()).filter(Boolean);
+            for (const o of opts) {
+                const i = o.indexOf(':');
+                if (i <= 0) return `option "${o}" has no key:`;
+                if (o.indexOf(':', i + 1) !== -1) return `option "${o}" has a second ":" — escape it as \\:`;
+            }
+            if (!opts.length && !head[2]) return `block {{${head[1]}; …}} has no options`;
+        }
+        s = s.slice(0, m.index) + 'X' + s.slice(m.index + m[0].length);
+    }
+    return null;
+}
+
 for (const locale of LOCALES) {
     for (const ns of nsFiles[locale]) {
         const p = path.join(TR, locale, `${ns}.json`);
         (function walk(node, trail) {
             if (typeof node === 'string') {
+                const mp = modifierProblem(node);
+                if (mp) modifierProblems.push(`${locale}/${ns}.json  ${trail}  →  ${mp}`);
                 for (const m of node.matchAll(/(?<!\{)\{([A-Za-z_][A-Za-z0-9_]*)\}(?!\})/g)) {
                     if (!manualReplace.has(m[1])) {
                         badPlaceholders.push(`${locale}/${ns}.json  ${trail}  →  {${m[1]}}`);
@@ -292,6 +334,19 @@ if (shortPlaceholders.length) {
     );
     for (const s of shortPlaceholders) console.error(`    ${s}`);
     console.error('\n  Fix: rename it (`{{n}}` → `{{count}}`) here and at the call site.\n');
+}
+
+if (modifierProblems.length) {
+    failed = true;
+    console.error(
+        `✗ ${modifierProblems.length} plural/modifier block(s) the parser cannot read —\n` +
+        `  they render the wrong form or nothing:\n`
+    );
+    for (const m of modifierProblems) console.error(`    ${m}`);
+    console.error(
+        '\n  Syntax: {{count; 1:{{count}} item; default:{{count}} items;}}' +
+        '  or  {{count:plural; one:…; few:…; other:…;}}\n'
+    );
 }
 
 if (localeGaps.length) {

@@ -54,7 +54,7 @@
   "overlap": {
     "requested": "Запрошено",
     "free": "Свободно у вас",
-    "days": "Пересечение {{count}} дней",
+    "days": "Пересечение {{count:plural; one:{{count}} день; few:{{count}} дня; many:{{count}} дней; other:{{count}} дня;}}",
     "none": "Даты не пересекаются",
     "full": "Полное пересечение",
     "next_free": "Свободно с",

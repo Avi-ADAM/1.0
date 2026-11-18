@@ -61,7 +61,7 @@
     "connectorPrompt": "I have connected the 1lev1 connector. Use its tools to build me a professional demo rikma from this idea.\n\nThe idea:\n{{idea}}\n\n1. Build the rikma like a professional business consultant: products with their audience and price, missions with hours and a market hourly rate, missing resources and their value, and who brings each one (me, or open to partners). Do not invent prices or emails — ask me.\n2. If I do not have a 1lev1 account yet: ask me for my name and email, and prepare the rikma with prepareSignup (intent \"idea\" together with the rikma blueprint). Give me both links — the public rikma page (previewUrl) and the editing page (manageUrl), where I edit it, sign up, and the rikma is created right after signup.\n3. If I already have an account: create it as a draft with proposeRikmaBlueprint and give me the link so I can review and approve it.\n4. Finally, the main risks and the first step worth taking this week.",
     "disclaimer": "This is a reduced preview our AI prepares from your description, and nothing is saved. On the site the draft is fuller: you edit every mission, hours and rates, invite partners and watch the split update.",
     "missions": "Missions open to partners",
-    "hoursAtRate": "{{hours}} hours × {{rate}} per hour",
+    "hoursAtRate": "{{hours; 1:{{hours}} hour; default:{{hours}} hours;}} × {{rate}} per hour",
     "shareNote": "The percentage is the starting share of whoever takes the mission, if each mission is taken by a different partner. In a real rikma the share updates by the hours actually approved, and includes money and equipment too.",
     "resources": "Missing resources",
     "products": "What the business will sell",

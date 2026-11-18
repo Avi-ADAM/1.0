@@ -76,7 +76,7 @@
   "attachLinkPlaceholder": "https://…",
   "attachLinkAdd": "Добавить",
   "attachLinkInvalid": "Это не похоже на корректный веб-адрес",
-  "attachLinkFull": "Не больше {{count}} ссылок, и они должны уместиться в одну строку",
+  "attachLinkFull": "Не больше {{count:plural; one:{{count}} ссылки; few:{{count}} ссылок; many:{{count}} ссылок; other:{{count}} ссылок;}}, и они должны уместиться в одну строку",
   "attachFileLabel": "Прикрепить файл",
   "attachUploading": "Загрузка…",
   "attachFileFailed": "Не удалось загрузить файл",

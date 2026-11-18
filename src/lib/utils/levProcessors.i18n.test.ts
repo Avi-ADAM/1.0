@@ -13,6 +13,7 @@ import ruMash from '$lib/translations/ru/mash.json';
 import esMash from '$lib/translations/es/mash.json';
 
 import type { TranslateFn } from './levProcessors';
+import { fillTemplate } from '$lib/server/notices/translate';
 
 vi.mock('$lib/utils/projectHelpers.js', () => ({
   createProjectInfo: (pid: string) =>
@@ -50,7 +51,8 @@ function makeT(locale: Locale): TranslateFn {
       throw new Error(`Missing key [${locale}] ${key}`);
     }
     if (!payload) return raw;
-    return raw.replace(/\{\{(\w+)\}\}/g, (_m, k) => String(payload[k] ?? ''));
+    // the same parser the pages run, so plural blocks resolve as in the app
+    return fillTemplate(raw, payload, locale, key);
   };
 }
 

@@ -14,7 +14,7 @@
     "where": "Where",
     "online": "Remotely (online)",
     "parts": "What it includes",
-    "hours": "{{count}} hours",
+    "hours": "{{count; 1:{{count}} hour; default:{{count}} hours;}}",
     "qty": "× {{count}}",
     "total": "Total",
     "nextTitle": "What happens once you take it",

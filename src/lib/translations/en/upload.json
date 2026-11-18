@@ -1,6 +1,6 @@
 {
   "title": "Upload pictures",
-  "intro": "Pick or drop up to {{count}} pictures for the product. They are saved in the rikma's media library, and your assistant attaches them to the product.",
+  "intro": "Pick or drop up to {{count; 1:{{count}} picture; default:{{count}} pictures;}} for the product. They are saved in the rikma's media library, and your assistant attaches them to the product.",
   "pick": "Choose pictures",
   "full": "This link has all the pictures it accepts",
   "formats": "JPG, PNG or WebP. Large photos are scaled down before sending.",

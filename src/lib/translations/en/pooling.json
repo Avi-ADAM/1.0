@@ -7,7 +7,7 @@
     "stepCapacity": "Participants per unit",
     "perUnitHint": "Each participant needs her own, like a flight or a meal.",
     "sharedHint": "One cost for the whole group. The more people join, the less each pays. A guide, for example.",
-    "steppedHint": "Another unit for every {{capacity}} participants, like a bus or a room.",
+    "steppedHint": "Another unit for every {{capacity; 1:{{capacity}} participant; default:{{capacity}} participants;}}, like a bus or a room.",
     "forGroup": "This product will also be offered to a group (a demand pool)",
     "forGroupHint": "Only if several people will buy it together on one shared departure. Then you can set, for each mission and resource, how its cost is divided between the participants."
   },
@@ -19,7 +19,7 @@
   "departure": {
     "now": "Now",
     "ceiling": "At most",
-    "dropAt": "At {{count}} participants",
+    "dropAt": "At {{count; 1:{{count}} participant; default:{{count}} participants;}}",
     "linesTitle": "What the price is made of",
     "note": "You don't sign a price here. The price moves with the size of the group, and every rise comes with a notice. Until the price locks you can leave at any moment, with a full refund. It never goes above the ceiling without your explicit consent.",
     "lockAt": "The price locks on {{date}}",

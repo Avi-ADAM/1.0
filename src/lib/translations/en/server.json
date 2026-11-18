@@ -14,7 +14,7 @@
     "wishConsentClosed": "This consent is already closed - the rikma and the deal were created. You can find them under Deals.",
     "wishNoProduct": "There is no assembled product yet - invite providers and build the plan first",
     "wishNoParts": "The plan has no parts to build - add missions or resources first",
-    "wishUnassignedParts": "{{count}} parts still have no approved provider - the consent cannot be closed yet",
+    "wishUnassignedParts": "{{count; 1:{{count}} part still has; default:{{count}} parts still have;}} no approved provider - the consent cannot be closed yet",
     "wishNoProviders": "No approved providers were found for the plan",
     "wishWeaveCreateFailed": "Could not create the partners rikma",
     "wishProductLinkFailed": "Could not link the product to the rikma",
@@ -61,7 +61,7 @@
   },
   "cv": {
     "badRequest": "Invalid request",
-    "minChars": "Please write at least {{count}} characters about yourself",
+    "minChars": "Please write at least {{count; 1:{{count}} character; default:{{count}} characters;}} about yourself",
     "noFile": "No file was received",
     "tooLarge": "File is too large - 5MB maximum",
     "badFormat": "Unsupported format. Please upload a PDF, Word (.docx) or text file",

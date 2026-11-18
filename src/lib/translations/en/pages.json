@@ -496,7 +496,7 @@
     "unlimited": "Unlimited",
     "outOfStock": "Out of Stock",
     "tryAgain": "Try Again",
-    "saleDoneUnits": "Sale of {{units}} units of \"{{name}}\" completed successfully!",
+    "saleDoneUnits": "Sale of {{units; 1:{{units}} unit; default:{{units}} units;}} of \"{{name}}\" completed successfully!",
     "saleDone": "Sale completed successfully!",
     "saleFailed": "The sale could not be completed",
     "shareText": "Check out this product: {{name}}",

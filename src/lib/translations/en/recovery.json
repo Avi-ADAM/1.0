@@ -31,13 +31,13 @@
     "tip": "Pick people who would recognise you by voice or in person, and who are unlikely to all be reachable by a con artist on the same day.",
     "agreed": "agreed",
     "waitingConsent": "waiting for consent",
-    "pendingConsent": "A new list was signed. It takes effect on {{date}}, provided at least {{threshold}} guardians have agreed. Until then the previous list stays in force."
+    "pendingConsent": "A new list was signed. It takes effect on {{date}}, provided at least {{threshold; 1:{{threshold}} guardian has; default:{{threshold}} guardians have;}} agreed. Until then the previous list stays in force."
   },
   "alerts": {
     "title": "A recovery is under way on your account",
     "desc": "A new device is asking to join your account with your guardians' approval. If this isn't you, you can stop it here.",
     "fingerprint": "Device fingerprint",
-    "vouches": "{{count}} of {{threshold}} guardians approved",
+    "vouches": "{{count}} of {{threshold; 1:{{threshold}} guardian; default:{{threshold}} guardians;}} approved",
     "readyAt": "The device registers on {{date}} unless someone objects",
     "protested": "Objection recorded on {{date}}. Approvals given until then were voided.",
     "protest": "This isn't me",

@@ -54,7 +54,7 @@
   "overlap": {
     "requested": "Requested",
     "free": "Free with you",
-    "days": "{{count}} days overlap",
+    "days": "{{count; 1:{{count}} day; default:{{count}} days;}} overlap",
     "none": "No date overlap",
     "full": "Full overlap",
     "next_free": "Free from",

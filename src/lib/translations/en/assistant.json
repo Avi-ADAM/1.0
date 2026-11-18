@@ -37,7 +37,7 @@
     "wish": "Saved to the wish."
   },
   "nothingToSave": "Nothing changed to save.",
-  "keptAnswered": "{{count}} rows you marked \"not now\" stayed, because a supplier answered a row after them.",
+  "keptAnswered": "{{count; 1:{{count}} row; default:{{count}} rows;}} you marked \"not now\" stayed, because a supplier answered a row after them.",
   "publishOnSite": "Publishing to the community is the wish's publish button.",
   "offers": {
     "title": "Open missions that fit you"

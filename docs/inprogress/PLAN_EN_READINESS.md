@@ -89,7 +89,12 @@ payload-ים של התראות שנשלחות לפי שפת הנמען, ומוס
 
 **נמצא בדרך, עדיין פתוח:**
 - ~~**"Brains" בתפריט:**~~ ✅ אוחד בשלב 2: `concierge.moach` עודכן ב־5 שפות (`Rikmas` / `الريكمات` / `Рикмы` / `Rikmas`).
-- **ריבוי באנגלית:** מופיע למשל "1 Missions", כי המפתחות הקיימים לא מבחינים בין יחיד לרבים.
+- ~~**ריבוי באנגלית:**~~ ✅ (2026-11-18) ~178 מחרוזות `en` שנשאו מונה (`{{count}} missions`, `{{hours}} hours`, `{{value}} partners`…) נכתבו מחדש בתחביר ה־modifier של ה־parser: `{{count; 1:{{count}} mission; default:{{count}} missions;}}`, כולל התאמת פועל היכן שהמשפט דורש (`1 order is` / `2 orders are`, `1 part still has`). נשארו בכוונה: מספרים סודרים (`Participant {{count}} adds…`) ו־`harmony_hint` ("all N parties", תמיד ≥2).
+  - **שרת:** `serverTranslator` (`src/lib/server/notices/translate.ts`) מפעיל עכשיו את אותו `@sveltekit-i18n/parser-default` שהדפים מפעילים (במקום regex של `{{name}}`), כך ש־modifier ב־`notices`/`lev`/`common`/`server`/`shop` לא מגיע גולמי ל־MCP / push / צ׳אט. בדיקה: `translate.test.ts`.
+  - **`plural`:** modifier משותף ב־`src/lib/translations/modifiers.js` (רשום גם בקונפיג של הדפים וגם בשרת) שבוחר צורה לפי `Intl.PluralRules` — `{{count:plural; one:…; few:…; many:…; other:…;}}`.
+  - **רוסית:** 27 מחרוזות גלויות שהיו `{{count}} <שם עצם ברבים גניטיב>` (`{{value}} партнёров`, `Минимум {{count}} символов`, `каждые {{count}} лет`…) עברו ל־`:plural` עם 1 / 2-4 / 5+. רוב שאר המחרוזות הרוסיות כבר עוקפות ריבוי בתבנית `Существительное: N` או בקיצור (`ч.`, `дн.`, `мин.`) ונשארו.
+  - **עדיין פתוח:** ערבית (0/1/2/3-10/11+) — עוד לא הוסבה; ה־`:plural` מוכן לה. ספרדית: אותו מבנה כמו אנגלית (`1:` / `default:`), לא הוסבה. רכיבים שמרכיבים מספר + `$t('…missions')` בקוד (לא במחרוזת אחת) לא נסרקו.
+  - `npm run check:i18n` בודק עכשיו גם תקינות בלוקי modifier (`;}}` חסר, `:` שני בתוך ערך, modifier לא מוכר, שם קצר מ־2 תווים בראש בלוק).
 
 ### שלב 2: הלב והמוח, איפה שחברי רקמה עובדים כל יום (P1) — ✅ תוקן (2026-11-17)
 
