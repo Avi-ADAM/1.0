@@ -538,6 +538,13 @@
                   >{$t('project.bethas.totalAllMonths')}: {hrs(ledger.totalDone)}</span
                 >
               {/if}
+              <!-- What one hour is worth, in the rikma's currency (<Money>
+                   reads it from the moach context and marks a conversion ≈). -->
+              {#if Number(m.attributes?.perhour) > 0}
+                <span class="pb-hours-rate" title={$t('common.valph')}>
+                  <Money amount={m.attributes?.perhour} /> {$t('common.perhour')}
+                </span>
+              {/if}
             </div>
 
             <!-- equity: what your share of the rikma is worth once this is done.
@@ -1091,6 +1098,12 @@
   .pb-hours-total {
     font-size: 0.66rem;
     color: var(--pb-text-3);
+  }
+  .pb-hours-rate {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--pb-gold);
+    white-space: nowrap;
   }
 
   .pb-role-tags {

@@ -23,6 +23,7 @@
   import TimerSessions from '$lib/components/mission/TimerSessions.svelte';
   import MissionControls from '$lib/components/mission/MissionControls.svelte';
   import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
+  import Money from '$lib/components/money/Money.svelte';
   import MissionStipendOffer from '$lib/components/stipend/MissionStipendOffer.svelte';
   import { commitmentOf } from '$lib/shifts/commitment';
   import { forum, isChatOpen, newChat, nowChatId } from '$lib/stores/pendMisMes.js';
@@ -225,6 +226,16 @@
           {hrs(attrs.howmanyhoursalready)} / {hrs(attrs.hoursassinged)}
         </span>
       </div>
+      {#if Number(attrs.perhour) > 0}
+        <!-- What one hour is worth, in the rikma's currency (<Money> reads it
+             from the moach context and marks a conversion ≈). -->
+        <div class="mp-stat">
+          <span class="mp-stat-label">{$t('common.valph')}</span>
+          <span class="mp-stat-value">
+            <Money amount={attrs.perhour} /> {$t('common.perhour')}
+          </span>
+        </div>
+      {/if}
       {#if showDate(attrs.start) || showDate(attrs.dates)}
         <div class="mp-stat">
           <span class="mp-stat-label">{$t('project.bethas.monthCol')}</span>
