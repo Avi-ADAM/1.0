@@ -166,27 +166,15 @@
     %sveltekit.head%
 
     <!--
-      Site-wide fallbacks. They sit AFTER %sveltekit.head% on purpose: a page
-      that declares its own title/description/og/canonical in svelte:head then
-      owns the first such tag in the document, and browsers and crawlers alike
-      take the first one they meet. Anything a page leaves undeclared falls
-      through to the values below — which is how the ~13 public pages that
-      never set a canonical get a self-referencing one, and how the five that
-      set no title at all stopped sharing the homepage's. Moving this block above %sveltekit.head% would stamp
-      the homepage title onto all ~90 pages that set their own.
-      (Written without literal tag syntax: a tag name spelled out here, even
-      inside a comment, turns up when the raw HTML is grepped for it.)
+      Site-wide fallbacks (canonical, title, description, og and twitter
+      title/description/image), built per request in hooks.server.js by
+      buildSeoFallbacks: only the tags the page did not declare itself. They
+      used to be literal tags here, after the page head, on the theory that
+      the first tag wins. Google does take the first; the Facebook scraper,
+      which also builds WhatsApp link previews, takes the LAST - so every
+      page shared as the homepage card. Each tag must appear once.
     -->
-    <link rel="canonical" href="%canonical%" />
-    <title>%title%</title>
-    <meta name="description" content="%desc%">
-    <meta property="og:title" content="%xtitle%" />
-    <meta property="og:description" content="%desci%" />
-    <meta property="og:image" content="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png" />
-    <meta name="twitter:title" content="%xtitle%">
-    <meta name="twitter:description" content="%xdes%">
-    <meta name="twitter:image"
-      content="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png">
+%seoFallback%
   </head>
   <body>
     <div id="svelte">%sveltekit.body%</div>

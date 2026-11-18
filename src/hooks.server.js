@@ -9,6 +9,7 @@ import { isExpiredJwt, clearStaleAuthCookies } from '$lib/server/session.js';
 import { resolveEventIdentity } from '$lib/server/identity.js';
 import { log, requestId } from '$lib/server/log.js';
 import { csrfRejection } from '$lib/server/csrf.js';
+import { buildSeoFallbacks } from '$lib/server/seoFallback.js';
 import { allowedCorsOrigins } from '$lib/server/corsOrigins.js';
 import { dev } from '$app/environment';
 import { guessCurrency } from '$lib/money/guess.js';
@@ -174,6 +175,9 @@ const title = {
 // Public address of the site, used to build og:url. Not derived from
 // event.url.origin: behind the proxy that is an internal host.
 const SITE_ORIGIN = 'https://1lev1.com';
+// The share-card image for pages that declare none of their own.
+const SITE_SHARE_IMAGE =
+  'https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png';
 
 const cl = {
   he: 'he-IL',
@@ -559,6 +563,16 @@ async function handleRequest({ event, resolve }) {
           isSecure
             ? '<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">'
             : ''
+        )
+        // Before the others: it reads the page's own head (everything above
+        // the slot) to emit only what the page left undeclared.
+        .replace('%seoFallback%', (_m, offset, whole) =>
+          buildSeoFallbacks(whole.slice(0, offset), {
+            title: title[lang],
+            desc: desc[lang],
+            canonical,
+            image: SITE_SHARE_IMAGE
+          })
         )
         .replaceAll('%themeclass%', themeClass)
         .replaceAll('%lang%', lang)
