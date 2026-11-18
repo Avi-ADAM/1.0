@@ -38,6 +38,9 @@ cd /home/ubuntu/api
 docker compose -f docker-compose.api.yml run --rm scheduler node /app/scheduler.mjs --status
 docker compose -f docker-compose.api.yml run --rm scheduler node /app/scheduler.mjs --once --dry
 docker compose -f docker-compose.api.yml up -d scheduler
+# is the loop alive and is every job on time? (exit 1 if not) — deploy-api.ps1
+# runs this after every API deploy via scripts/deploy/api-switch.sh
+docker exec 1lev1-scheduler node /app/scheduler.mjs --check
 docker logs -f 1lev1-scheduler
 ```
 

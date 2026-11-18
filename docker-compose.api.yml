@@ -2,7 +2,18 @@
 # Deployed by deploy-api.ps1 (image built locally, pushed to GHCR and pulled
 # here — or shipped with docker save/load via -Tarball; no `build:` on purpose).
 # Private GHCR package: run `docker login ghcr.io` once on the server so
-# `docker-compose pull` can fetch it (this VPS has compose v1: `docker-compose`).
+# `docker compose pull` can fetch it. Needs the compose v2 plugin (`docker
+# compose`); the old v1 `docker-compose` is no longer supported here.
+#
+# The API runs as TWO colours, sveltekit-api-a and sveltekit-api-b, of which
+# only one is up between deploys (docs/inprogress/PLAN_VPS_ONLY.md V2). Both
+# carry the network alias `sveltekit-api`, so nginx (`set $api_backend
+# "sveltekit-api:3000"`, re-resolved every 10s) and the scheduler reach
+# whichever one is live with no change on their side. A deploy starts the
+# other colour, waits for it to answer, lets nginx's DNS cache see both, and
+# only then stops the old one: there is always at least one container behind
+# the alias. Each colour sits in its own compose profile, so a bare
+# `docker compose up -d` never starts the second one by accident.
 #
 # Expected layout on the server (default: /home/ubuntu/api — ubuntu, not root):
 #   docker-compose.api.yml   <- this file (pushed by the script)
@@ -19,15 +30,20 @@
 #                               AXIOM_TOKEN=xaat-...     (vector service, below)
 #                               AXIOM_DATASET=vps-docker
 #
-# Strapi stays bound to 127.0.0.1 / the internal docker network — only this
-# service and Nginx (TLS -> 127.0.0.1:3000) are reachable from outside.
+# Nothing here publishes a host port: nginx (app-nginx-1, the Strapi repo's
+# compose) terminates TLS and reaches the API over app-network. The old
+# `127.0.0.1:3000:3000` mapping is gone because two colours cannot both bind it.
 # See docs/done/PLAN_PROXY_SECURITY.md stage 3 and docs/DEPLOY_API_DOCKER.md.
 
-services:
-  sveltekit-api:
-    image: ghcr.io/avi-adam/1lev1-sveltekit-api:latest
-    container_name: sveltekit-api
+x-sveltekit-api: &sveltekit-api
+    # API_TAG is the git sha deploy-api.ps1 just pushed, so the new colour runs
+    # exactly that build and a rollback is a deploy of an older tag. A bare
+    # `up` with no API_TAG falls back to :latest.
+    image: ghcr.io/avi-adam/1lev1-sveltekit-api:${API_TAG:-latest}
     restart: unless-stopped
+    # adapter-node drains open requests on SIGTERM (SHUTDOWN_TIMEOUT, 30s by
+    # default); docker's own 10s would cut the long ones off mid-flight.
+    stop_grace_period: 35s
     env_file: .env
     environment:
       - NODE_ENV=production
@@ -72,17 +88,28 @@ services:
       # it out for a backup without touching the container.
       - space-docs:/data/space-docs
       - translate-state:/data/translate-state
-    ports:
-      # loopback only — Nginx terminates TLS and proxies to 127.0.0.1:3000
-      - "127.0.0.1:3000:3000"
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 15s
+      start_interval: 2s
     networks:
-      - app-network
+      app-network:
+        aliases:
+          - sveltekit-api
+
+services:
+  sveltekit-api-a:
+    <<: *sveltekit-api
+    container_name: sveltekit-api-a
+    profiles: ["a"]
+
+  sveltekit-api-b:
+    <<: *sveltekit-api
+    container_name: sveltekit-api-b
+    profiles: ["b"]
 
   # ---- The box's Postgres (docs/done/PLAN_MASTRA_STORAGE.md) ----
   # Started as Mastra's store; since the 2026-11 server move it also holds
@@ -197,8 +224,9 @@ services:
     volumes:
       - ./scheduler.mjs:/app/scheduler.mjs:ro
       - scheduler-state:/state
-    depends_on:
-      - sveltekit-api
+    # No depends_on: the API is two profiled colours, and the scheduler only
+    # needs the `sveltekit-api` alias to answer when a job is due — it retries
+    # on its own clock, so a deploy in between costs nothing.
     logging: *json-log
     networks:
       - app-network

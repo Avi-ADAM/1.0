@@ -20,6 +20,7 @@
  *   node scheduler.mjs --once      run whatever is due right now, then exit
  *   node scheduler.mjs --run monthi   force one job, ignoring its schedule
  *   node scheduler.mjs --status    print state and what is due, change nothing
+ *   node scheduler.mjs --check     is the loop alive and is every job on time? (exit 1 if not)
  *   node scheduler.mjs --dry       decide out loud, and ask monthi for a dry run
  *
  * `--once` exists so this can equally be driven by a systemd timer or plain
@@ -479,9 +480,89 @@ function printStatus() {
   }
 }
 
+/**
+ * Is the clock actually running? Exit 0 when it is, 1 when not, with a line per
+ * job either way. deploy's api-switch.sh runs this inside the container after
+ * every API deploy (docs/inprogress/PLAN_VPS_ONLY.md V2), so a scheduler that
+ * quietly stopped is found at the next deploy and not at the next missed month.
+ *
+ * Three ways to be broken, all read from the state file the loop writes:
+ *   · the loop itself is dead — it rewrites the file every tick, so a file
+ *     older than a few ticks means no pass has run;
+ *   · a job is failing — its last attempt errored (failures > 0);
+ *   · a job is overdue — it was already due GRACE ago and still has not run.
+ *     Asking `due()` about `now - GRACE` reuses each job's own schedule, so
+ *     interval, daily and monthly jobs need no separate rule here. GRACE has
+ *     to cover a long job ahead of it in the sequential pass (monthi may take
+ *     15 minutes).
+ * A job held by configuration (SCHEDULER_DISABLE, a missing secret) is listed,
+ * not counted as a failure: it is held on purpose.
+ */
+function checkHealth() {
+  const now = new Date();
+  const graceMs = num('SCHEDULER_CHECK_GRACE_MINUTES', 30) * 60 * 1000;
+  const loopMaxAgeMs = Math.max(3 * TICK_MS, 5 * 60 * 1000);
+  const problems = [];
+
+  let mtime = null;
+  try {
+    mtime = fs.statSync(STATE_FILE).mtime;
+  } catch {
+    /* missing: reported below */
+  }
+  if (!mtime) {
+    problems.push(`state file ${STATE_FILE} does not exist — the loop has never completed a pass`);
+  } else if (now - mtime > loopMaxAgeMs) {
+    problems.push(
+      `state file last written ${Math.round((now - mtime) / 60000)}m ago (expected every ${TICK_MS / 1000}s) — the loop is not running`
+    );
+  }
+
+  const state = readState();
+  const earlier = new Date(now.getTime() - graceMs);
+  for (const job of JOBS) {
+    const s = state[job.name] ?? {};
+    const missing = (job.requires ?? []).find(([, v]) => !v)?.[0];
+    const configHold = DISABLED.has(job.name)
+      ? 'disabled by SCHEDULER_DISABLE'
+      : missing
+        ? `${missing} is not set`
+        : null;
+    if (configHold) {
+      console.log(`  held     ${job.name} — ${configHold}`);
+      continue;
+    }
+    if ((s.failures ?? 0) > 0) {
+      problems.push(`${job.name}: failing, ${s.failures} in a row — ${s.lastError ?? 'no error recorded'}`);
+      console.log(`  FAILING  ${job.name} — ${s.lastError ?? '?'} (${s.failures} in a row)`);
+      continue;
+    }
+    const overdue = job.due(earlier, s);
+    if (overdue) {
+      problems.push(`${job.name}: overdue by more than ${graceMs / 60000}m — ${overdue}`);
+      console.log(`  OVERDUE  ${job.name} — ${overdue}`);
+      continue;
+    }
+    console.log(`  ok       ${job.name} — last success ${s.lastSuccess ?? 'never'}`);
+  }
+
+  if (problems.length) {
+    console.log(`\nscheduler check FAILED (${problems.length}):`);
+    for (const p of problems) console.log(`  - ${p}`);
+    return false;
+  }
+  console.log('\nscheduler check ok');
+  return true;
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const dry = args.includes('--dry');
+
+  if (args.includes('--check')) {
+    process.exitCode = checkHealth() ? 0 : 1;
+    return;
+  }
 
   if (args.includes('--help') || args.includes('-h')) {
     console.log(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('*/')[0]);

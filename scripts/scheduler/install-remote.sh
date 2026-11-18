@@ -120,7 +120,8 @@ fi
 
 if [ "${DOCKER_MODE:-0}" = 1 ]; then
   step "Timezone of the API container (this is the one that decides months)"
-  API_TZ=$(docker exec sveltekit-api sh -c 'echo -n "$TZ"' 2>/dev/null || echo '')
+  API_C=$(docker ps --format '{{.Names}}' --filter name=^sveltekit-api | head -1)  # a colour since V2
+  API_TZ=$(docker exec "$API_C" sh -c 'echo -n "$TZ"' 2>/dev/null || echo '')
   if [ "$API_TZ" = "$TZ_WANT" ]; then
     ok "sveltekit-api runs in $API_TZ"
   else

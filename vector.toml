@@ -31,6 +31,12 @@ type = "remap"
 inputs = ["docker"]
 source = '''
 .service = .container_name
+# The API runs as two colours, sveltekit-api-a / -b (docs/inprogress/
+# PLAN_VPS_ONLY.md V2). Queries filter on one service name across deploys;
+# container_name still says which colour wrote the line.
+if starts_with(to_string(.container_name) ?? "", "sveltekit-api-") {
+  .service = "sveltekit-api"
+}
 
 parsed, err = parse_json(.message)
 if err == null && is_object(parsed) {

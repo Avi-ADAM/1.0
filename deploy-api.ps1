@@ -165,45 +165,42 @@ if ($LASTEXITCODE -ne 0) { Fail "scp of scheduler.mjs failed" }
 
 Invoke-Remote "cd $RemoteDir && test -f .env || { echo 'MISSING $RemoteDir/.env on server (STRAPI_URL, ORIGIN, secrets) — create it first'; exit 1; }"
 
-# ---------- 3. deliver + restart on the server ----------
 
-# compose v1 (1.29.2, what this VPS has) cannot RECREATE a container that
-# declares volumes against a modern Docker: it dies with
-# `KeyError: 'ContainerConfig'` in get_container_data_volumes. Worse, it renames
-# the old container to `<hash>_<name>` BEFORE that step, so a failed run leaves
-# a stale container behind and the next `up` hits a name conflict too.
-# Forcing the create path (no existing container to inherit from) sidesteps
-# both. `docker ps -aq --filter name=` matches substrings, so the renamed
-# leftovers are caught as well. Volumes are named, so postgres keeps its data.
-#   Long-term fix: install the compose v2 plugin on the server — the $DC probe
-#   below already prefers it, and v2 does not have this bug.
-# EVERY container in the compose file has to be in this list: one that is left
-# out gets recreated by v1 and the whole deploy dies (that is how the scheduler
-# broke it). The guard below fails the deploy before any container is touched
-# if a new service's container_name was not added here.
-$StaleNames = @("sveltekit-api", "mastra-postgres", "vector", "1lev1-scheduler")
-$ComposeNames = Select-String -Path "$RepoRoot\docker-compose.api.yml" -Pattern '^\s*container_name:\s*[''"]?([^''"\s]+)' |
-    ForEach-Object { $_.Matches[0].Groups[1].Value }
-$Missing = $ComposeNames | Where-Object { $StaleNames -notcontains $_ }
-if ($Missing) { Fail "docker-compose.api.yml has container(s) not in `$StaleNames: $($Missing -join ', ') — add them, or compose v1 will crash recreating them" }
-$StaleFilters = ($StaleNames | ForEach-Object { "--filter name=$_" }) -join " "
-$RemoveStale = "docker ps -aq $StaleFilters | xargs -r docker rm -f >/dev/null 2>&1 || true"
+# The switch itself runs on the server (scripts/deploy/api-switch.sh), so the
+# whole start-wait-retire sequence survives a dropped ssh session halfway.
+Step "Uploading api-switch.sh (zero-downtime colour switch)"
+& scp @sshArgs "$RepoRoot\scripts\deploy\api-switch.sh" "$User@${Server}:$RemoteDir/api-switch.sh"
+if ($LASTEXITCODE -ne 0) { Fail "scp of api-switch.sh failed" }
+# A Windows checkout may hand it over with CRLF, which bash reads as part of each command.
+Invoke-Remote "sed -i 's/\r`$//' $RemoteDir/api-switch.sh"
+Invoke-Remote "docker compose version >/dev/null 2>&1 || { echo 'compose v2 plugin (docker compose) missing on the server'; exit 1; }"
+
+# ---------- 3. deliver the image ----------
 if (-not $Tarball) {
-    # ---- default: push to GHCR, pull on the server ----
-    Step "Pushing $FullImage to $Registry"
-    docker push $FullImage
-    if ($LASTEXITCODE -ne 0) { Fail "docker push failed — run 'docker login $Registry -u <github-user>' locally first (PAT needs write:packages)" }
-    docker push $LatestImage
-    if ($LASTEXITCODE -ne 0) { Fail "docker push (latest) failed" }
-    Ok "pushed $FullImage and :latest"
+    # ---- default: push to GHCR; the server pulls the exact tag ----
+    # A rollback (-SkipBuild -Tag <older sha>) usually has no local copy of
+    # that image any more; it is on GHCR already, so there is nothing to push.
+    $haveLocal = $true
+    docker image inspect $FullImage *> $null
+    if ($LASTEXITCODE -ne 0) { $haveLocal = $false }
 
-    Step "Pulling image and restarting container"
-    # compose 'pull' always fetches the current :latest (server must be logged in for a private package).
-    # This VPS has compose v1 (`docker-compose`); fall back to the v2 plugin if present.
-    # The old containers are force-removed AFTER the pull (minimal downtime) and
-    # before 'up' — see $RemoveStale above for why this is mandatory, not just
-    # a name-conflict workaround.
-    Invoke-Remote "cd $RemoteDir && DC=`$(docker compose version >/dev/null 2>&1 && echo 'docker compose' || echo docker-compose) && `$DC -f docker-compose.api.yml pull && ($RemoveStale) && `$DC -f docker-compose.api.yml up -d && docker image prune -f"
+    if ($haveLocal) {
+        Step "Pushing $FullImage to $Registry"
+        docker push $FullImage
+        if ($LASTEXITCODE -ne 0) { Fail "docker push failed — run 'docker login $Registry -u <github-user>' locally first (PAT needs write:packages)" }
+        if (-not $SkipBuild) {
+            # :latest only moves on a fresh build, never on a rollback.
+            docker push $LatestImage
+            if ($LASTEXITCODE -ne 0) { Fail "docker push (latest) failed" }
+        }
+        Ok "pushed $FullImage"
+    }
+    elseif ($SkipBuild) {
+        Ok "$FullImage is not local — the server will pull it from $Registry"
+    }
+    else {
+        Fail "built image $FullImage is missing locally"
+    }
 }
 else {
     # ---- fallback: docker save -> scp tarball -> docker load ----
@@ -220,23 +217,28 @@ else {
     if ($LASTEXITCODE -ne 0) { Fail "scp of image tar failed" }
     Remove-Item $TarFile -Force
 
-    Step "Loading image and restarting container"
-    Invoke-Remote "cd $RemoteDir && DC=`$(docker compose version >/dev/null 2>&1 && echo 'docker compose' || echo docker-compose) && docker load -i sveltekit-api.tar && rm -f sveltekit-api.tar && ($RemoveStale) && `$DC -f docker-compose.api.yml up -d && docker image prune -f"
+    Step "Loading image on the server"
+    Invoke-Remote "cd $RemoteDir && docker load -i sveltekit-api.tar && rm -f sveltekit-api.tar"
 }
 
-# ---------- 4. health check ----------
-Step "Health check"
-Start-Sleep -Seconds 5
-& ssh @sshArgs "$User@$Server" "curl -sf http://127.0.0.1:3000/api/health"
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "health check failed — recent logs:" -ForegroundColor Yellow
-    & ssh @sshArgs "$User@$Server" "docker logs --tail 50 sveltekit-api"
-    Fail "container is not healthy"
+# ---------- 4. switch colours (no downtime) + health through nginx ----------
+# Starts the idle colour on $Tag, waits for healthy, lets nginx see both,
+# retires the old one, then checks https://api.1lev1.com/api/health via nginx.
+# On failure the new colour is removed and the old one keeps serving.
+Step "Switching to $Tag"
+# 2>&1 on the far side: compose writes warnings to stderr, and Windows PowerShell
+# 5.1 with ErrorActionPreference=Stop turns any native stderr line into a
+# terminating error — which killed the ssh session halfway through a switch.
+& ssh @sshArgs "$User@$Server" "bash $RemoteDir/api-switch.sh $Tag 2>&1"
+$switchExit = $LASTEXITCODE
+if ($switchExit -eq 2) {
+    Fail "the API is deployed and live, but the SCHEDULER check failed — see above (manual check: docker exec 1lev1-scheduler node /app/scheduler.mjs --check)"
 }
+if ($switchExit -ne 0) { Fail "switch failed — see the output above; the previous container is still serving unless it says otherwise" }
 Write-Host ""
 Ok "deployed $FullImage to $Server ($RemoteDir)"
 
 if ($Logs) {
     Step "Tailing logs (Ctrl+C to stop)"
-    & ssh @sshArgs "$User@$Server" "docker logs -f --tail 20 sveltekit-api"
+    & ssh @sshArgs "$User@$Server" "docker logs -f --tail 20 `$(docker ps --format '{{.Names}}' --filter name=^sveltekit-api- | head -1)"
 }

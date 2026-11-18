@@ -1,7 +1,7 @@
 # PLAN_VPS_ONLY — כל האתר על השרת שלנו, ו-Strapi בשלושה עותקים
 
-> מצב: **inprogress**. נכתב 2026-11-17. **V0 ו-V1 חיים בשרת מאותו יום** (§4.1). השינויים ב-1.0main וב-1.0b
-> עוד לא בקומיט. V2–V6 פתוחים.
+> מצב: **inprogress**. נכתב 2026-11-17. **V0 ו-V1 חיים בשרת מאותו יום** (§4.1), וגם בקומיט (1.0main
+> `40863ab2`, 1.0b `4103997` / release 1.31). V2 נבנה ב-2026-11-18 (§4.2). V3–V6 פתוחים.
 > שרת: `91.90.82.93` (vps2, ראו `db-backups/SERVER_RUNBOOK.md`).
 
 ## 4.1 מה נבנה (2026-11-17)
@@ -37,9 +37,57 @@
 - `sveltekit-api` → `strapi:1337` עובר דרך nginx. בתוך השרת ה-API עונה ב-34ms.
 - זיכרון: כל עותק Strapi בערך 215–240MB. סה"כ בשימוש בשרת 1.7GB מתוך 11GB. ב-`tov` יש 6 חיבורים.
 
-**לפני הקומיט ב-1.0b:** ב-`~/app` בשרת אותם קבצים שונו מקומית (הועלו ב-scp). אחרי push, `git pull`
-בדיפלוי ייכשל על "local changes" וימשיך עם הקבצים המקומיים, שהם זהים לקומיט. ניקוי חד-פעמי:
-`cd ~/app && git checkout -- . && git pull`.
+ה-checkout ב-`~/app` בשרת נקי על release 1.31. הניקוי החד-פעמי כבר נעשה.
+
+## 4.2 V2: מה נבנה (2026-11-18)
+
+**שני צבעים ו-alias אחד.** ב-`docker-compose.api.yml` רצים `sveltekit-api-a` ו-`sveltekit-api-b`. שניהם
+מוגדרים מ-anchor אחד, וכל אחד יושב ב-profile משלו (`a` / `b`), כך ש-`docker compose up -d` בלי profile לא
+מפעיל אף אחד מהם. לשניהם יש network alias בשם `sveltekit-api`. זה השם היחיד ש-nginx
+(`set $api_backend "sveltekit-api:3000"`) וה-scheduler מכירים, ולכן אצלם לא השתנה כלום. בזמן הדיפלוי
+השם מחזיר שתי כתובות, ו-nginx מתחלק ביניהן. בין דיפלויים רץ צבע אחד בלבד. זה פשוט יותר מ-upstream
+שמסמנים בו `down` עם reload, כפי שתוכנן למטה.
+- `scripts/deploy/api-switch.sh <tag>` רץ בשרת, ו-`deploy-api.ps1` מעלה ומפעיל אותו. מה הוא עושה: מזהה את
+  הצבע החי (`-a`, `-b`, או `sveltekit-api` הישן), מפעיל את הצבע השני על התגית המדויקת (`API_TAG`) ומחכה
+  ל-healthy (בדיקה כל 2 שניות, `start_interval`). אחרי זה הוא מחכה 12 שניות ל-cache של ה-resolver ב-nginx,
+  עוצר את הישן (`stop -t 35`, ו-adapter-node מסיים את הבקשות הפתוחות), מוחק אותו, ובודק 5 פעמים את
+  `api.1lev1.com/api/health` דרך nginx. אם הצבע החדש לא עולה, הסקריפט מוחק אותו, והישן לא נעצר בכלל.
+- rollback הוא `.\deploy-api.ps1 -SkipBuild -Tag <sha קודם>`. כשה-image לא קיים מקומית, השרת מושך אותו
+  מ-GHCR, ו-`:latest` זז רק ב-build חדש.
+- הפורט `127.0.0.1:3000` יצא, כי שני צבעים לא יכולים לתפוס אותו יחד. אף אחד בשרת לא השתמש בו חוץ מבדיקת
+  הבריאות הישנה.
+- תמיכה ב-compose v1 וב-`$RemoveStale` (`rm -f` לכל הקונטיינרים לפני `up`) יצאו מהסקריפט. בשרת רץ compose
+  v5.7, והסקריפט נכשל מראש אם אין `docker compose`.
+- `scheduler` כבר לא `depends_on` את ה-API. הוא מנסה שוב לבד.
+- **בדיקת ה-scheduler בכל דיפלוי** (שלב 6 ב-`api-switch.sh`):
+  - אם `scheduler.mjs` השתנה, הוא מופעל מחדש. ההשוואה היא מול `.scheduler.sha256`, כי בלי restart התהליך
+    ממשיך להריץ את הקוד שכבר טען.
+  - אם הוא לא רץ, הוא מופעל. בודקים שהוא לא בלולאת restart ושהוא מגיע ל-`sveltekit-api:3000`.
+  - בסוף רצה הבדיקה `scheduler.mjs --check`. היא בודקת שקובץ ה-state נכתב בשלושת ה-ticks האחרונים, כלומר
+    שהלולאה חיה. היא בודקת גם שאף משימה לא נכשלת ואף משימה לא באיחור של יותר מ-30 דקות. האיחור נמדד
+    כך: שואלים את `due()` של כל משימה על `now - 30m`, וכך כל משימה נבדקת לפי לוח הזמנים שלה.
+    `SCHEDULER_CHECK_GRACE_MINUTES` משנה את מרווח ה-30 דקות.
+  - כשל בשלב הזה מחזיר exit 2, ו-`deploy-api.ps1` אומר במפורש שה-API עלה ושה-scheduler צריך טיפול.
+  - בדיקה ידנית: `docker exec 1lev1-scheduler node /app/scheduler.mjs --check`.
+  - 2026-11-18, מול ה-state החי: כל 11 המשימות ok.
+
+**הוחל בשרת (2026-11-18):** nginx עבר render ו-reload. אחרי זה רצו שתי החלפות של אותו image
+(`b23abefe`, `-SkipBuild`): `sveltekit-api` הישן → `-a`, ואחר כך `-a` → `-b`. probe שבודק את
+`api.1lev1.com/api/health` דרך nginx פעמיים בשנייה רץ לאורך שתיהן: **0 תשובות שאינן 200 מתוך 454**. היו שתי
+בקשות איטיות, 5.0 ו-2.2 שניות, בהחלפה הראשונה. זה ה-`proxy_connect_timeout 5s` על כתובת שנשארה ב-cache של
+ה-resolver. להקטנה אפשר `resolver valid=2s` ב-nginx.conf של 1.0b. ה-build המלא לא רץ, כי במחשב היו פנויים
+7.8GB זיכרון והוא צריך 13GB. הדיפלוי הבא של קוד חדש הוא `.\deploy-api.ps1` רגיל.
+- **נמצא בדרך:** ב-Windows PowerShell 5.1 עם `ErrorActionPreference=Stop`, כל שורה ב-stderr של ssh, למשל
+  אזהרה של compose, הופכת לשגיאה שעוצרת את הסקריפט וסוגרת את ה-ssh באמצע ההחלפה. עכשיו ה-switch רץ עם
+  `2>&1` בצד השרת.
+- `vector.toml`: הלוגים של `sveltekit-api-*` מקבלים `service = "sveltekit-api"`, כך ששאילתות ב-Axiom לא
+  תלויות בצבע. השדה `container_name` עדיין אומר איזה צבע כתב את השורה.
+- 1.0b: `deploy.ps1` מאתר את קונטיינר ה-API לפי הקידומת. ב-`nginx/default.conf.template` נקבע
+  `proxy_connect_timeout 5s` ל-api (היה 60s): כתובת של צבע שכבר נעצר נשארת ב-cache עד 10 שניות, וחיבור
+  שנכשל עובר לכתובת השנייה (ברירת המחדל של `proxy_next_upstream` היא `error`, ו-POST שלא הגיע לשרת
+  בטוח לשליחה חוזרת).
+- **המחיר:** כמה שניות שבהן שני תהליכים עונים. יומן ה-relay, קודי OAuth ומגבלת הקצב של MCP שמורים בכל
+  תהליך בנפרד. כל אחד מהם גם ככה מתחיל ריק בכל אתחול, וזה מה שהתהליך הזה מחליף.
 
 **סקריפטים ישנים שעדיין מדברים blue/green** (לא בשימוש, לא לגעת בהם בלי לעדכן): `deploy.sh`,
 `deploy-branch.sh`/`.ps1`, ו-`fix-deployment.sh`. האחרון עושה `docker-compose down --remove-orphans`,

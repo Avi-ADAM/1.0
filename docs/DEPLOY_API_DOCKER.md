@@ -11,7 +11,7 @@
 |------|-------|
 | `Dockerfile` | build רב-שלבי (node:22-alpine). `ADAPTER` לא מוגדר → adapter-node. ה-`.env` מוזרק ל-build כ-**BuildKit secret** ולא נשמר באף layer. |
 | `.dockerignore` | מצמצם את ה-context (בלי `node_modules`, `android`, `remotion`, `socket-server`, `.env`...). |
-| `docker-compose.api.yml` | הרצת הקונטיינרים בשרת: `sveltekit-api` (פורט 3000 על loopback בלבד, `env_file: .env` מקומי לשרת), `postgres` (אחסון Mastra) ו-`vector` (שילוח לוגים). כולם על רשת `app_app-network` המשותפת עם Strapi וה-socket-server. |
+| `docker-compose.api.yml` | הרצת הקונטיינרים בשרת: `sveltekit-api-a` / `-b`: שני צבעים, ובין דיפלויים רק אחד מהם רץ. שניהם נושאים את ה-alias `sveltekit-api` ברשת, ואין להם פורט על ה-host (`env_file: .env` מקומי לשרת; החלפה בלי השבתה דרך `scripts/deploy/api-switch.sh`, ראו `docs/inprogress/PLAN_VPS_ONLY.md` V2), `postgres` (אחסון Mastra) ו-`vector` (שילוח לוגים). כולם על רשת `app_app-network` המשותפת עם Strapi וה-socket-server. |
 | `vector.toml` | קונפיג ה-log shipper. נשלח ל-`/home/ubuntu/api/vector.toml` ע"י `deploy-api.ps1` ומוצמד ל-container ב-bind mount. |
 | `deploy-api.ps1` | build **לוקאלי** → `docker push` ל-GHCR → בשרת `docker-compose pull` + `up -d` + health check. עם `-Tarball` חוזרים ל-`docker save`→scp→`docker load` (fallback ללא רישום). ה-build נשאר לוקאלי בכוונה — ל-VPS יש 1.9GB RAM בלי swap והוא יקרוס (OOM) על vite build. |
 | `src/routes/api/health/+server.js` | endpoint ל-HEALTHCHECK של Docker ול-Nginx. |
