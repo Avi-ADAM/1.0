@@ -217,6 +217,7 @@ async function startMeetingNow(
     meetingName: string,
     context: any
 ): Promise<any> {
+    const t = actionTranslator(context.lang);
     const publishedAt = new Date().toISOString();
 
     // Update meeting to live

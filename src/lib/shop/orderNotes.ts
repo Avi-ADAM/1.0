@@ -19,7 +19,8 @@
  * note carries a currency, else a locale number), never frozen into the text.
  */
 
-import { formatMoney, intlLocale, type CurrencyCode } from '../money/format.js';
+import { formatMoney, intlLocale } from '../money/format.js';
+import type { CurrencyCode } from '../money/currencies.js';
 
 export type OrderNoteTranslate = (key: string, params?: Record<string, unknown>) => string;
 export type OrderNoteParams = Record<string, unknown>;

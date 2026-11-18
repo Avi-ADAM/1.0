@@ -338,8 +338,9 @@ function detectRenderComponents(userText: string) {
   // Demo data only: the Hebrew phrases are detection examples, not copy. The
   // card's own labels come from `bot.card.*` in the reader's language.
   if (
-    t.includes('סיכום') || t.includes('שותפויות') || t.includes('כל המידע') ||
-    /\b(summary|partnerships|all information|сводка|resumen|ملخص)\b/.test(t)
+    // Hebrew-only on purpose: these cards are fake demo data, and widening the
+    // trigger words would show invented partnerships to every member.
+    t.includes('סיכום') || t.includes('שותפויות') || t.includes('כל המידע')
   ) {
     components.push({
       type: 'summary',
@@ -355,8 +356,7 @@ function detectRenderComponents(userText: string) {
   }
 
   if (
-    t.includes('הצבעה') || t.includes('הצביע') || t.includes('פתוח') ||
-    /\b(vote|voting|ballot|голос|votación|تصويت)\b/.test(t)
+    t.includes('הצבעה') || t.includes('הצביע') || t.includes('פתוח')
   ) {
     components.push({
       type: 'voting',
