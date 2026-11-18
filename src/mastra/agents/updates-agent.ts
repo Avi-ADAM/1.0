@@ -1,3 +1,4 @@
+import { agentLanguageName, agentLanguageDirective } from '../lib/agentLanguage';
 import { Agent } from '@mastra/core/agent';
 import { createModelChain } from '../lib/createModel';
 import { getMyUpdatesTool } from '../tools/myUpdatesTool';
@@ -17,8 +18,7 @@ import { getChatMemory, workingMemoryInstructions } from '../lib/chatMemory';
 export function createUpdatesAgent(apiKey: string, language: string = 'he', userId: string) {
   const model = createModelChain(apiKey);
 
-  const languageName =
-    language === 'he' ? 'Hebrew' : language === 'ar' ? 'Arabic' : language === 'ru' ? 'Russian' : language === 'es' ? 'Spanish' : 'English';
+  const languageName = agentLanguageName(language);
 
   const instructions = `
 You tell users of the 1💗1 (1lev1.com) platform what is new for them and what waits for them.
@@ -53,7 +53,7 @@ Rules:
   return new Agent({
     id: 'UpdatesAgent',
     name: 'UpdatesAgent',
-    instructions: instructions + workingMemoryInstructions(language),
+    instructions: instructions + agentLanguageDirective(language) + workingMemoryInstructions(language),
     model,
     memory: getChatMemory(),
     tools: {

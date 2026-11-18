@@ -1,6 +1,7 @@
 
 import type { ActionConfig } from '../types.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
+import { actionTranslator } from '../actionErrors.js';
 
 /**
  * Join a pending meeting - confirm readiness
@@ -14,6 +15,7 @@ export const joinMeetingConfig: ActionConfig = {
     graphqlOperation: async (params, context, { strapi, notifier }) => {
         const { meetingId } = params;
         const userId = context.userId;
+        const t = actionTranslator(context.lang);
 
         // 1. Get meeting details
         const meetingRes = await strapi.execute(
@@ -43,10 +45,8 @@ export const joinMeetingConfig: ActionConfig = {
                 forumId: forumId,
                 toast: {
                     type: 'info',
-                    title: context.lang === 'en' ? 'Meeting is Live' : 'הפגישה פעילה',
-                    message: context.lang === 'en'
-                        ? 'The meeting is already live - join now!'
-                        : 'הפגישה כבר פעילה - הצטרף עכשיו!',
+                    title: t('server.meeting.alreadyLiveTitle'),
+                    message: t('server.meeting.alreadyLiveMessage'),
                     duration: 3000
                 }
             };
@@ -206,10 +206,8 @@ export const joinMeetingConfig: ActionConfig = {
                 forumId: forumId,
                 toast: {
                     type: 'success',
-                    title: context.lang === 'en' ? 'Meeting Started!' : 'הפגישה התחילה!',
-                    message: context.lang === 'en'
-                        ? 'All participants are ready - meeting is live!'
-                        : 'כל המשתתפים מוכנים - הפגישה פעילה!',
+                    title: t('server.meeting.startedTitle'),
+                    message: t('server.meeting.startedMessage'),
                     duration: 5000
                 }
             };
@@ -227,10 +225,8 @@ export const joinMeetingConfig: ActionConfig = {
             forumId: forumId,
             toast: {
                 type: 'info',
-                title: context.lang === 'en' ? 'Ready!' : 'מוכן!',
-                message: context.lang === 'en'
-                    ? `Waiting for ${totalCount - readyCount} more participant(s)...`
-                    : `ממתין לעוד ${totalCount - readyCount} משתתפ/ים...`,
+                title: t('server.meeting.readyTitle'),
+                message: t('server.meeting.waitingFor', { count: totalCount - readyCount }),
                 duration: 3000
             }
         };

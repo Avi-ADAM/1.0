@@ -1,6 +1,7 @@
 import type { ProbeRun } from '$lib/server/apiPublic/schemaProbe.js';
 import { shippingSchemaLive } from './shippingConfig.js';
 import { orderShippingOf, readOrderShipping, type OrderShipping, type ShippingQuote } from '$lib/shop/shipping';
+import { noteLine } from '$lib/shop/orderNotes.js';
 
 /**
  * How a reported order travels, priced again on our side
@@ -19,7 +20,7 @@ export interface ShippingRecord {
   record: OrderShipping;
   /** The synthetic product line to add to the order, when linked and charged. */
   line: { productId: string; unitPrice: number; settled?: boolean } | null;
-  /** A fact for the order's note, in the rikma's working language. */
+  /** A language-neutral marker for the order's note, rendered by the screen. */
   note: string | null;
 }
 
@@ -37,9 +38,13 @@ export function shippingRecordFrom(
   const record = orderShippingOf(option, wanted, delivery.fee);
   let note: string | null = null;
   if (!option && delivery.optionId) {
-    note = `שיטת המשלוח שנבחרה באתר (${delivery.optionId}) לא מוצעת היום לכתובת הזו לפי הגדרות המשלוח של הרקמה.`;
+    note = noteLine('shippingOptionMissing', { optionId: delivery.optionId });
   } else if (option && delivery.fee !== null && round2(delivery.fee) !== round2(option.fee)) {
-    note = `דמי המשלוח שנגבו (${round2(delivery.fee)}) שונים מהמחיר בהגדרות הרקמה לשיטה "${option.name || option.kind}" (${round2(option.fee)}).`;
+    note = noteLine('shippingFeeDifferent', {
+      charged: round2(delivery.fee),
+      methodName: option.name || option.kind,
+      configured: round2(option.fee)
+    });
   }
   const line = record.asLine && record.productId && delivery.fee !== null && delivery.fee > 0
     ? { productId: record.productId, unitPrice: round2(delivery.fee) }

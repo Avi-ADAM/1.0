@@ -11,7 +11,12 @@
 
 import type { Translate } from '$lib/notices';
 
-const files = import.meta.glob('../../translations/*/{notices,lev,common}.json', {
+// `server` holds the words an action says back to the person who ran it —
+// errors, toasts and names it writes into a record another member reads
+// (PLAN_EN_READINESS stage 4.1); `shop` holds the order notes the server
+// writes and the shop screens render. Both are platform words, in five
+// locales, so they belong here rather than in a `{ he, en }` object.
+const files = import.meta.glob('../../translations/*/{notices,lev,common,server,shop}.json', {
   eager: true,
   import: 'default'
 }) as Record<string, Record<string, unknown>>;

@@ -1,3 +1,4 @@
+import { agentLanguageName, agentLanguageDirective } from '../lib/agentLanguage';
 import { Agent } from '@mastra/core/agent';
 import { createModelChain } from '../lib/createModel';
 import { navigateToPageTool } from '../tools/navigateToPageTool';
@@ -11,7 +12,7 @@ export function createNavigationAgent(
   language: string = 'he',
   userId: any = null
 ) {
-  console.log('נ Creating navigation agent with language:', language);
+  console.log('🌐 Creating navigation agent with language:', language);
 const systemPrompt =
     language === 'he'
       ? `
@@ -164,7 +165,7 @@ Your tools:
 3. Call navigateToPageTool with url="/moach" and the project's idPr
 
 ## Important Guidelines:
-- Always respond in user's language: ${language === 'he' ? 'Hebrew (׳¢׳‘׳¨׳™׳×)' : language === 'ar' ? 'Arabic (״§„״¹״±״¨״©)' : 'English'}
+- Always respond in the user's language: ${agentLanguageName(language)}
 - Navigation must work: ALWAYS use tools for navigation requests - never just describe what to do
 - Project navigation: Always find project ID using findUserProjectsTool before navigating
 - Be context-aware: Use previous conversation context
@@ -185,7 +186,7 @@ Your tools:
   return new Agent({
     id: 'NavigationAgent',
     name: 'NavigationAgent',
-    instructions: systemPrompt + workingMemoryInstructions(language),
+    instructions: systemPrompt + agentLanguageDirective(language) + workingMemoryInstructions(language),
     memory: getChatMemory(),
     model: createModelChain(apiKey),
     tools: { getSitePagesTool, navigateToPageTool, findUserProjectsTool, getChatHistoryTool }

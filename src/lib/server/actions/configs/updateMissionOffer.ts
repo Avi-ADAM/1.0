@@ -8,10 +8,12 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { actionTranslator, moderationReasons } from '../actionErrors.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, util) => {
   const { strapi } = util;
+  const t = actionTranslator(context.lang);
   const uid = String(context.userId);
   const jwt = context.jwt as string;
   const f = context.fetch as typeof fetch;
@@ -60,7 +62,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
     f
   );
   const updated = res?.data?.updateMissionOffer?.data;
-  if (!updated?.id) throw new Error('עדכון הצעת המשימה נכשל');
+  if (!updated?.id) throw new Error(t('server.error.offerUpdateFailed'));
 
   // ── Archive side-effect: prune missions_i_can_do when no live offer left ──
   if (params.archived === true && missionId) {

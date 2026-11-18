@@ -771,7 +771,8 @@ async function activateOffer(
           {
             userId: context.userId,
             jwt: context.jwt,
-            fetch: context.fetch
+            fetch: context.fetch,
+            lang: context.lang
           },
           strapi
         );

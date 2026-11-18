@@ -16,23 +16,25 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { actionTranslator, moderationReasons } from '../actionErrors.js';
 import { screenLabel } from '../../vocab/moderation.js';
 import { findOrCreateMissionTemplate } from '$lib/server/missions/missionTemplate.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, util) => {
   const { strapi } = util;
+  const t = actionTranslator(context.lang);
   const uid = String(context.userId);
   const jwt = context.jwt as string;
   const f = context.fetch as typeof fetch;
 
   const name = String(params.name ?? '').trim();
-  if (!name) throw new Error('name is required');
+  if (!name) throw new Error(t('server.error.nameRequired'));
 
   // Inline moderation — same non-bypassable screen as the vocab pipeline.
   const verdict = screenLabel(name, { checkLength: false });
   if (verdict.flagged) {
-    throw new Error(`השם לא עבר בדיקת תוכן (${verdict.reasons.join(', ')})`);
+    throw new Error(t('server.error.nameRejected', { reasons: moderationReasons(verdict.reasons, t) }));
   }
 
   // ── 1. Resolve the mission template ──────────────────────────────────────
@@ -71,7 +73,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
     f
   );
   const offerId = oRes?.data?.createMissionOffer?.data?.id;
-  if (!offerId) throw new Error('יצירת הצעת המשימה נכשלה');
+  if (!offerId) throw new Error(t('server.error.offerCreateFailed'));
 
   // ── 3. Sync missions_i_can_do (append) ────────────────────────────────────
   try {

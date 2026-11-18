@@ -1,3 +1,4 @@
+import { agentLanguageName, agentLanguageDirective } from '../lib/agentLanguage';
 import { Agent } from '@mastra/core/agent';
 import {
   getMissionDetailsTool,
@@ -38,7 +39,7 @@ ${SITE_CONTEXT}
 
 User Context:
 - User ID: ${userId}
-- Language: ${lang === 'he' ? 'Hebrew' : lang === 'ar' ? 'Arabic' : 'English'}
+- Language: ${agentLanguageName(lang)}
 
 Important timer rule:
 - Use only timerActionTool for starting or stopping timers.
@@ -70,6 +71,7 @@ Planning rule:
 
 Behavior rules:
 - Always respond in the user's language.
+${agentLanguageDirective(lang)}
 - Always use tools for navigation requests.
 - Never ask the user for a mission ID.
 - After using a tool, always explain the result in a human-readable reply.

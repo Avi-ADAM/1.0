@@ -13,6 +13,7 @@
   import { addressExtras, addressLine, type ShopOrder } from '$lib/shop/manage';
   import { shopOrdersKey } from '$lib/shop/keys';
   import { withTracking } from '$lib/shop/tracking';
+  import { renderOrderNote } from '$lib/shop/orderNotes.js';
 
   let {
     order,
@@ -36,8 +37,10 @@
     const gap = Math.round((order.total - order.lines.reduce((s, l) => s + (l.lineTotal ?? 0), 0)) * 100) / 100;
     return gap > 0 ? gap : 0;
   });
-  // The note without the tracking line — that has a place of its own, beside the address.
-  let noteText = $derived(withTracking(order.note, null));
+  // The note without the tracking line — that has a place of its own, beside
+  // the address. System notes are stored as language-neutral markers, so they
+  // are rendered here in the reader's language, not in the writer's.
+  let noteText = $derived(renderOrderNote(withTracking(order.note, null), $t, $locale));
   let shipEta = $derived(
     ship && (ship.etaMinDays !== null || ship.etaMaxDays !== null)
       ? ship.etaMinDays !== null && ship.etaMaxDays !== null && ship.etaMinDays !== ship.etaMaxDays

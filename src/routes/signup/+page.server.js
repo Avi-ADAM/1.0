@@ -59,7 +59,7 @@ export async function load({ cookies, url, fetch }) {
 }
 
 export const actions = {
-  default: async ({ request, cookies, fetch, url }) => {
+  default: async ({ request, cookies, fetch, url, locals }) => {
     const data = await request.formData();
     const email = String(data.get('email') || '')
       .trim()
@@ -82,14 +82,11 @@ export const actions = {
       : [];
 
     if (!email || !password) {
-      return fail(400, { errorKey: 'missing', error: 'נא למלא את כל השדות' });
+      return fail(400, { errorKey: 'missing' });
     }
 
     if (password.length < 8 || !/[A-Z]/.test(password)) {
-      return fail(400, {
-        errorKey: 'weakPassword',
-        error: 'הסיסמה חייבת להכיל לפחות 8 תווים ואות גדולה באנגלית'
-      });
+      return fail(400, { errorKey: 'weakPassword' });
     }
 
     const username = displayName
@@ -113,19 +110,17 @@ export const actions = {
 
       if (!res.ok) {
         const err = await res.json();
-        const msg = err?.error?.message || 'שגיאה ברישום';
-        if (
-          msg.toLowerCase().includes('already taken') ||
-          msg.toLowerCase().includes('already exist')
-        ) {
-          return fail(400, {
-            errorKey: 'emailTaken',
-            error: 'כתובת המייל כבר רשומה במערכת. נסו להתחבר.'
-          });
-        }
-        // Strapi's own message is English and specific; with none, the
-        // reader's language takes over.
-        return fail(400, { errorKey: err?.error?.message ? null : 'failed', error: msg });
+        const msg = err?.error?.message || '';
+        // The only upstream message we act on is a duplicate email; everything
+        // else is a technical Strapi/JS sentence. Log it, never show it: the
+        // screen answers with `reg.signup.err.*` in all five languages.
+        console.error('[signup] registration failed:', msg || err);
+        return fail(400, {
+          errorKey:
+            msg.toLowerCase().includes('already taken') || msg.toLowerCase().includes('already exist')
+              ? 'emailTaken'
+              : 'failed'
+        });
       }
 
       const { jwt, user } = await res.json();
@@ -188,7 +183,7 @@ export const actions = {
           await actionService.executeAction(
             'linkEventSignup',
             { token: eventToken, userId: String(user.id) },
-            { userId: '', jwt: adminToken(), lang: 'he', fetch }
+            { userId: '', jwt: adminToken(), lang: locals?.lang || cookies.get('lang') || 'he', fetch }
           );
         } catch (err) {
           console.error('[signup] event registration link failed:', err);
@@ -199,11 +194,11 @@ export const actions = {
       throw redirect(303, '/signup/check-email');
     } catch (err) {
       if (/** @type {any} */ (err)?.status === 303) throw err;
-      const message = /** @type {any} */ (err)?.message;
-      return fail(400, {
-        errorKey: message ? null : 'unknown',
-        error: message || 'שגיאה לא ידועה, נסו שוב'
-      });
+      // A raw JS error message is technical English, not something a person
+      // signing up should read. It belongs in the log; the screen shows its
+      // own translated `unknown` line (PLAN_EN_READINESS stage 4.4).
+      console.error('[signup] unexpected error:', err);
+      return fail(400, { errorKey: 'unknown' });
     }
   }
 };

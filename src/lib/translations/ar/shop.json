@@ -126,7 +126,27 @@
       "entrance": "مدخل {{value}}"
     },
     "note": {
-      "title": "ملاحظات"
+      "title": "ملاحظات",
+      "variantOff": "السطر {{line}}: الخيار غير مفعّل (active=false)",
+      "belowMin": "السطر {{line}}: الكمية {{quantity}} أقل من الحد الأدنى {{min}}",
+      "aboveMax": "السطر {{line}}: الكمية {{quantity}} أعلى من الحد الأقصى {{max}}",
+      "oversold": "السطر {{line}}: بيع زائد — تبقّى {{remaining}}، طُلب {{quantity}}",
+      "shippingFeeSeparate": "بقيت رسوم التوصيل ({{fee}}) منفصلة ولم تُسجَّل كعملية بيع: منتج الشحن #{{id}} غير متاح لذلك (غير منشور، بلا سعر ثابت، له خيارات، أو طُلب أيضاً كمنتج).",
+      "amountMismatch": "المبلغ المحصَّل ({{charged}}) يختلف عن مجموع السطور والتوصيل ({{computed}})",
+      "belowCatalog": "أقل من أسعار الكتالوج والعروض: دُفع {{paid}}، حسب الكتالوج {{catalog}} (الفرق {{gap}}، {{pct}}%)",
+      "belowCatalogOverArranged": "أقل من أسعار الكتالوج والعروض: دُفع {{paid}}، حسب الكتالوج {{catalog}} (الفرق {{gap}}، {{pct}}%) — أكثر مما تسمح الريكمة لعضو بترتيبه وحده",
+      "belowCatalogShort": " — أقل من سعر الكتالوج ({{catalog}})",
+      "arrangedPaid": "دُفع بالتنسيق — {{amount}} ({{methodLabel}}){{underPhrase}}",
+      "shippingOptionMissing": "طريقة التوصيل التي اختيارها في الموقع ({{optionId}}) غير معروضة اليوم لهذا العنوان حسب إعدادات شحن الريكمة.",
+      "shippingFeeDifferent": "رسوم التوصيل المحصَّلة ({{charged}}) تختلف عن السعر في إعدادات الريكمة لطريقة \"{{methodName}}\" ({{configured}}).",
+      "unknown": "ملاحظة من النظام",
+      "method": {
+        "bit": "Bit",
+        "paybox": "PayBox",
+        "transfer": "تحويل بنكي",
+        "cash": "نقداً",
+        "other": "أخرى"
+      }
     },
     "payment": {
       "title": "الدفع",

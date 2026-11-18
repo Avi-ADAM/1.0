@@ -12,6 +12,7 @@
 
 import { env } from '$env/dynamic/private';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
+import { localeFromAcceptLanguage } from '../../i18n/acceptLanguage.js';
 
 export const MCP_LANGS = ['he', 'en', 'ar', 'ru', 'es'] as const;
 export type McpLang = (typeof MCP_LANGS)[number];
@@ -23,22 +24,8 @@ function supported(v: unknown): McpLang | null {
 
 /** The first supported language in an `Accept-Language` header, by q-weight. */
 export function langFromAcceptLanguage(header: string | null | undefined): McpLang | null {
-  if (!header) return null;
-  const ranked = header
-    .split(',')
-    .map((part, i) => {
-      const [tag, ...params] = part.trim().split(';');
-      const q = params.map((p) => p.trim()).find((p) => p.startsWith('q='));
-      const weight = q ? Number(q.slice(2)) : 1;
-      return { tag, weight: Number.isFinite(weight) ? weight : 0, i };
-    })
-    .filter((r) => r.tag && r.weight > 0)
-    .sort((a, b) => b.weight - a.weight || a.i - b.i);
-  for (const r of ranked) {
-    const l = supported(r.tag);
-    if (l) return l;
-  }
-  return null;
+  const l = localeFromAcceptLanguage(header, MCP_LANGS);
+  return l ? (supported(l) as McpLang) : null;
 }
 
 /** A key named `MCP · <client>` was minted by the OAuth consent screen. */

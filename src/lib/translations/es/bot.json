@@ -62,5 +62,21 @@
   "sugUserReportBug": "Reportar un error",
   "reportSuccessMsg": "¡Tu reporte se envió correctamente! El equipo se pondrá en contacto contigo pronto.",
   "reportErrorMsg": "No se pudo enviar el reporte. Inténtalo de nuevo.",
-  "reportTypePrompt": "¿Qué tipo de reporte? (error / función / asociación / contacto)"
+  "reportTypePrompt": "¿Qué tipo de reporte? (error / función / asociación / contacto)",
+  "card": {
+    "voteCommand": "Voté \"{{option}}\" sobre: {{proposal}}",
+    "saleRecorded": "¡Venta registrada correctamente!",
+    "back": "Volver",
+    "productsAvailable": "Productos disponibles: {{count}}",
+    "chooseProduct": "Elige un producto para registrar una venta",
+    "activeVote": "Votación activa · {{partnership}}",
+    "deadline": "Fecha límite: {{deadline}}",
+    "recorded": "Registrado",
+    "partnership": "Asociación",
+    "yourShare": "Tu parte",
+    "partners": "Socios",
+    "voteFor": "A favor",
+    "voteAgainst": "En contra",
+    "voteAbstain": "Abstención"
+  }
 }

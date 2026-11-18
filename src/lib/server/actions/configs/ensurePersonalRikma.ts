@@ -13,11 +13,14 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { actionTranslator } from '../actionErrors.js';
 
 type MinimalContext = {
   userId: string | number;
   jwt: string;
   fetch: typeof fetch;
+  /** Caller's language, for the one message this helper can throw. */
+  lang?: string;
 };
 
 type StrapiExec = {
@@ -38,6 +41,7 @@ export async function ensurePersonalRikmaFor(
   context: MinimalContext,
   strapi: StrapiExec
 ): Promise<{ projectId: string; projectName: string; created: boolean }> {
+  const t = actionTranslator(context.lang);
   const uid = String(context.userId);
 
   const uRes = await strapi.execute(
@@ -81,7 +85,7 @@ export async function ensurePersonalRikmaFor(
     context.fetch
   );
   const project = pRes?.data?.createProject?.data;
-  if (!project?.id) throw new Error('יצירת רקמת הבית נכשלה');
+  if (!project?.id) throw new Error(t('server.error.homeRikmaCreateFailed'));
 
   await strapi.execute(
     '251setUserPersonalProject',

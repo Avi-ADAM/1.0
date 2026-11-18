@@ -61,5 +61,21 @@
   "sugUserReportBug": "דיווח על תקלה",
   "reportSuccessMsg": "הפנייה נשלחה בהצלחה! הצוות יחזור אליך בהקדם.",
   "reportErrorMsg": "אירעה שגיאה בשליחת הפנייה. נסה שנית.",
-  "reportTypePrompt": "מה סוג הפנייה? (תקלה / פיצ'ר / שותפות / יצירת קשר)"
+  "reportTypePrompt": "מה סוג הפנייה? (תקלה / פיצ'ר / שותפות / יצירת קשר)",
+  "card": {
+    "voteCommand": "הצבעתי \"{{option}}\" על: {{proposal}}",
+    "saleRecorded": "המכירה נרשמה בהצלחה!",
+    "back": "חזרה",
+    "productsAvailable": "מוצרים זמינים: {{count}}",
+    "chooseProduct": "בחר/י מוצר לדיווח מכירה",
+    "activeVote": "הצבעה פעילה · {{partnership}}",
+    "deadline": "תאריך אחרון: {{deadline}}",
+    "recorded": "נרשם",
+    "partnership": "שותפות",
+    "yourShare": "חלקך",
+    "partners": "שותפים",
+    "voteFor": "בעד",
+    "voteAgainst": "נגד",
+    "voteAbstain": "נמנע"
+  }
 }

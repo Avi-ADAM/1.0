@@ -15,6 +15,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { actionTranslator, moderationReasons } from '../actionErrors.js';
 import { screenLabel } from '../../vocab/moderation.js';
 import { ensurePersonalRikmaFor } from './ensurePersonalRikma.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
@@ -33,6 +34,7 @@ const KINDOF_MAP: Record<string, string> = {
 
 const handler: ActionExecutionHandler = async (params, context, util) => {
   const { strapi } = util;
+  const t = actionTranslator(context.lang);
   const spId = String(params.spId ?? '');
   const offerScope = String(params.offerScope ?? '') as OfferScope;
   const priceOverride =
@@ -46,7 +48,8 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   const ctx = {
     userId: context.userId as string,
     jwt: context.jwt as string,
-    fetch: context.fetch as typeof fetch
+    fetch: context.fetch as typeof fetch,
+    lang: context.lang
   };
 
   // ── Load + ownership guard ────────────────────────────────────────────────
@@ -69,13 +72,13 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   if (goingPublic) {
     const price = priceOverride ?? (sp.price != null ? Number(sp.price) : null);
     if (!price || price <= 0) {
-      throw new Error('נדרש מחיר כדי לפרסם משאב כמוצר ללקוחות');
+      throw new Error(t('server.error.resourcePriceRequired'));
     }
 
     // Inline moderation — same non-bypassable screen as /api/vocab/create.
     const verdict = screenLabel(String(sp.name ?? ''), { checkLength: false });
     if (verdict.flagged) {
-      throw new Error(`השם לא עבר בדיקת תוכן (${verdict.reasons.join(', ')})`);
+      throw new Error(t('server.error.nameRejected', { reasons: moderationReasons(verdict.reasons, t) }));
     }
 
     const home = await ensurePersonalRikmaFor(ctx, strapi);
@@ -131,7 +134,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
       matanotId = mRes?.data?.createMatanot?.data?.id
         ? String(mRes.data.createMatanot.data.id)
         : null;
-      if (!matanotId) throw new Error('יצירת המוצר מהמשאב נכשלה');
+      if (!matanotId) throw new Error(t('server.error.resourceProductCreateFailed'));
     }
 
     await strapi.execute(

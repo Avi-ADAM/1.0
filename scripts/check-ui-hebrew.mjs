@@ -46,7 +46,22 @@ const ROOTS = [
     'src/lib/components/deals',
     'src/lib/components/sales',
     'src/lib/components/timers',
-    'src/lib/negotiation'
+    'src/lib/negotiation',
+    // Stages 4–5: the order/delivery notes are rendered here (§4.2), and the
+    // public about page is now translated word for word (§5.1).
+    'src/lib/components/shop',
+    // The assistant's rich cards are mounted by the global bot popup.
+    'src/lib/chat',
+    'src/routes/about'
+];
+
+/**
+ * Single components localised inside a folder that is not clean yet. Adding a
+ * whole folder would fail on its other screens; a finished file can still be
+ * locked down on its own.
+ */
+const FILES = [
+    'src/lib/components/main/tikunolam.svelte'
 ];
 
 /**
@@ -76,7 +91,7 @@ function markupOf(src) {
     return out;
 }
 
-const files = [];
+const files = [...FILES.map((f) => path.join(ROOT, f))];
 for (const root of ROOTS) {
     const abs = path.join(ROOT, root);
     if (!fs.existsSync(abs)) {
@@ -116,4 +131,7 @@ if (hits.length) {
     process.exit(1);
 }
 
-console.log(`✓ no hard-coded Hebrew in markup — ${files.length} component(s) across ${ROOTS.length} roots.`);
+console.log(
+    `✓ no hard-coded Hebrew in markup — ${files.length} component(s) across ` +
+        `${ROOTS.length} roots and ${FILES.length} single file(s).`
+);

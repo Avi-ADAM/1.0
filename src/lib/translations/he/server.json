@@ -1,0 +1,62 @@
+{
+  "error": {
+    "priceRequired": "נדרש מחיר גדול מאפס",
+    "nameRejected": "השם לא עבר בדיקת תוכן ({{reasons}})",
+    "rikmaMembersOnly": "רק חבר רקמה יכול ליצור בה מוצר",
+    "rikmaNameRequired": "שם הרקמה חסר",
+    "rikmaCreateFailed": "יצירת הרקמה נכשלה",
+    "homeRikmaCreateFailed": "יצירת רקמת הבית נכשלה",
+    "productCreateFailed": "יצירת המוצר נכשלה",
+    "offerCreateFailed": "יצירת הצעת המשימה נכשלה",
+    "offerUpdateFailed": "עדכון הצעת המשימה נכשל",
+    "resourcePriceRequired": "נדרש מחיר כדי לפרסם משאב כמוצר ללקוחות",
+    "resourceProductCreateFailed": "יצירת המוצר מהמשאב נכשלה",
+    "wishConsentClosed": "ההסכמה כבר נסגרה - הרקמה והדיל כבר נוצרו. אפשר למצוא אותם ב\"עסקאות\".",
+    "wishNoProduct": "אין עדיין מוצר מורכב - צריך קודם להזמין ספקים ולהרכיב את התכנית",
+    "wishNoParts": "אין חלקים בתכנית כדי לייצר - יש להוסיף משימות/משאבים קודם",
+    "wishUnassignedParts": "עוד יש {{count}} חלקים ללא ספק מאושר - לא ניתן לסגור את ההסכמה עדיין",
+    "wishNoProviders": "לא נמצאו ספקים מאושרים לתכנית",
+    "wishWeaveCreateFailed": "יצירת רקמת השותפים נכשלה",
+    "wishProductLinkFailed": "שיוך המוצר לרקמה נכשל",
+    "wishSheirutpendCreateFailed": "פתיחת ההסכמה (Sheirutpend) נכשלה",
+    "wishDealCreateFailed": "הרקמה נוצרה אך פתיחת הדיל נכשלה - אפשר לנסות שוב מתוך הדילים",
+    "nameRequired": "נדרש שם"
+  },
+  "moderation": {
+    "empty": "ריק",
+    "too_long": "ארוך מדי",
+    "link": "קישור",
+    "contact": "פרטי קשר",
+    "spam": "תווים חוזרים",
+    "blocked_word": "מילה חסומה",
+    "other": "אחר"
+  },
+  "wish": {
+    "untitled": "משאלה",
+    "partnersRikma": "{{name}} - רקמה",
+    "rikmaDescription": "רקמת שותפים שנוצרה מהמשאלה \"{{name}}\".",
+    "chatSeed": "המעגל נסגר - נוצרה רקמת שותפים והדיל יצא לדרך. 💗"
+  },
+  "meeting": {
+    "alreadyLiveTitle": "הפגישה פעילה",
+    "alreadyLiveMessage": "הפגישה כבר פעילה - הצטרף עכשיו!",
+    "startedTitle": "הפגישה התחילה!",
+    "startedMessage": "כל המשתתפים מוכנים - הפגישה פעילה!",
+    "readyTitle": "מוכן!",
+    "waitingFor": "ממתין לעוד {{count}} משתתפ/ים...",
+    "waitingTitle": "ממתין למשתתפים...",
+    "waitingApproval": "ממתין ל-{{count}} משתתפ/ים לאישור",
+    "meetingReadyTitle": "פגישה מוכנה!",
+    "allOnline": "כולם אונליין לפגישה: {{name}}"
+  },
+  "donation": {
+    "supporter": "תומך/ת",
+    "forMission": "עבור המשימה: {{name}}",
+    "stipend": "למימון מלגת הקיום שלה (₪{{rate}} לשעה)",
+    "stipendWithBudget": "למימון מלגת הקיום שלה (₪{{rate}} לשעה, עד ₪{{budget}})",
+    "contact": "ליצירת קשר: {{contact}}"
+  },
+  "assistant": {
+    "leftoverTitle": "עוד מהייבוא"
+  }
+}

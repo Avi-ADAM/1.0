@@ -1,6 +1,5 @@
 <script lang="ts">
   import { t } from '$lib/translations';
-  console.log('mounted');
   let {
     missions,
     onAction
@@ -24,11 +23,12 @@
     if (selectedId) return;
     selectedId = missionId;
 
-    // Build the command directly to avoid i18n interpolation issues
+    // The command is sent back to the agent as if the member had typed it,
+    // so it must be in the member's language too.
     const command =
       action === 'start_timer'
-        ? `הפעלת טיימר עבור המשימה "${missionName}" (מזהה: ${missionId})`
-        : `עצירת טיימר עבור המשימה "${missionName}" (מזהה: ${missionId})`;
+        ? $t('bot.startTimerCommand', { missionName, missionId })
+        : $t('bot.stopTimerCommand', { missionName, missionId });
 
     onAction(command);
   }

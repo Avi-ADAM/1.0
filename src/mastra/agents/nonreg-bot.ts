@@ -1,3 +1,4 @@
+import { agentLanguageName, agentLanguageDirective } from '../lib/agentLanguage';
 import { Agent } from '@mastra/core/agent';
 import { createModelChain } from '../lib/createModel';
 import { SITE_CONTEXT } from '../../lib/bot/context.js';
@@ -17,11 +18,12 @@ You are a helpful information assistant for the 1lev1.com platform (1💗1). You
 Platform Context:
 ${SITE_CONTEXT}
 
-User Language: ${lang === 'he' ? 'Hebrew' : lang === 'ar' ? 'Arabic' : 'English'}
+User Language: ${agentLanguageName(lang)}
 
 Guidelines:
 - Answer questions ONLY based on the provided platform context
-- Respond in the user's language (${lang === 'he' ? 'Hebrew' : lang === 'ar' ? 'Arabic' : 'English'})
+- Respond in the user's language (${agentLanguageName(lang)})
+${agentLanguageDirective(lang)}
 - If a question cannot be answered from the context, politely state that you can only answer questions about the 1lev1 platform
 - Do NOT invent information beyond what's provided in the context
 - Be concise and helpful

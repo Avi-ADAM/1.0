@@ -1,0 +1,62 @@
+{
+  "error": {
+    "priceRequired": "El precio debe ser mayor que cero",
+    "nameRejected": "El nombre no pasó la revisión de contenido ({{reasons}})",
+    "rikmaMembersOnly": "Solo un miembro de la rikma puede crear un producto en ella",
+    "rikmaNameRequired": "Falta el nombre de la rikma",
+    "rikmaCreateFailed": "No se pudo crear la rikma",
+    "homeRikmaCreateFailed": "No se pudo crear la rikma personal",
+    "productCreateFailed": "No se pudo crear el producto",
+    "offerCreateFailed": "No se pudo crear la oferta de misión",
+    "offerUpdateFailed": "No se pudo actualizar la oferta de misión",
+    "resourcePriceRequired": "Se necesita un precio para publicar un recurso como producto",
+    "resourceProductCreateFailed": "No se pudo crear el producto a partir del recurso",
+    "wishConsentClosed": "Este consentimiento ya está cerrado: la rikma y el trato se crearon. Los encontrarás en Acuerdos.",
+    "wishNoProduct": "Aún no hay un producto armado: invita a proveedores y arma el plan primero",
+    "wishNoParts": "El plan no tiene partes que producir: añade misiones o recursos primero",
+    "wishUnassignedParts": "Quedan {{count}} partes sin proveedor aprobado: aún no se puede cerrar el consentimiento",
+    "wishNoProviders": "No se encontraron proveedores aprobados para el plan",
+    "wishWeaveCreateFailed": "No se pudo crear la rikma de socios",
+    "wishProductLinkFailed": "No se pudo vincular el producto a la rikma",
+    "wishSheirutpendCreateFailed": "No se pudo abrir el consentimiento (Sheirutpend)",
+    "wishDealCreateFailed": "La rikma se creó pero no se pudo abrir el trato: puedes reintentar desde Acuerdos",
+    "nameRequired": "Se necesita un nombre"
+  },
+  "moderation": {
+    "empty": "vacío",
+    "too_long": "demasiado largo",
+    "link": "enlace",
+    "contact": "datos de contacto",
+    "spam": "caracteres repetidos",
+    "blocked_word": "palabra bloqueada",
+    "other": "otro"
+  },
+  "wish": {
+    "untitled": "Deseo",
+    "partnersRikma": "{{name}} - rikma de socios",
+    "rikmaDescription": "Una rikma de socios creada a partir del deseo \"{{name}}\".",
+    "chatSeed": "El círculo se cerró: se creó una rikma de socios y el acuerdo echó a andar. 💗"
+  },
+  "meeting": {
+    "alreadyLiveTitle": "La reunión está en curso",
+    "alreadyLiveMessage": "La reunión ya está en curso, ¡únete ahora!",
+    "startedTitle": "¡La reunión comenzó!",
+    "startedMessage": "Todos los participantes están listos: la reunión está en curso.",
+    "readyTitle": "¡Listo!",
+    "waitingFor": "Esperando a {{count}} participante(s) más...",
+    "waitingTitle": "Esperando participantes...",
+    "waitingApproval": "Esperando la confirmación de {{count}} participante(s)",
+    "meetingReadyTitle": "¡Reunión lista!",
+    "allOnline": "Todos están en línea para la reunión: {{name}}"
+  },
+  "donation": {
+    "supporter": "Una persona que apoya",
+    "forMission": "Para la misión: {{name}}",
+    "stipend": "para financiar su subsidio de subsistencia ({{rate}} por hora)",
+    "stipendWithBudget": "para financiar su subsidio de subsistencia ({{rate}} por hora, hasta {{budget}})",
+    "contact": "Contacto: {{contact}}"
+  },
+  "assistant": {
+    "leftoverTitle": "Más de la importación"
+  }
+}

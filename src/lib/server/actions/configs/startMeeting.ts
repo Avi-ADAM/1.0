@@ -1,6 +1,7 @@
 
 import type { ActionConfig } from '../types.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
+import { actionTranslator } from '../actionErrors.js';
 
 /**
  * Request to start a meeting - initiates the "ready check" phase
@@ -17,6 +18,7 @@ export const startMeetingConfig: ActionConfig = {
     graphqlOperation: async (params, context, { strapi, notifier }) => {
         const { meetingId, videoLink } = params;
         const userId = context.userId;
+        const t = actionTranslator(context.lang);
         const publishedAt = new Date().toISOString();
 
         // 1. Get meeting details to get participant IDs
@@ -167,10 +169,8 @@ export const startMeetingConfig: ActionConfig = {
             waitingFor: otherParticipantIds.length,
             toast: {
                 type: 'info',
-                title: context.lang === 'en' ? 'Waiting for participants...' : 'ממתין למשתתפים...',
-                message: context.lang === 'en'
-                    ? `Waiting for ${otherParticipantIds.length} participant(s) to confirm`
-                    : `ממתין ל-${otherParticipantIds.length} משתתפ/ים לאישור`,
+                title: t('server.meeting.waitingTitle'),
+                message: t('server.meeting.waitingApproval', { count: otherParticipantIds.length }),
                 duration: 5000
             }
         };
@@ -282,10 +282,8 @@ async function startMeetingNow(
         videoLink: videoLink,
         toast: {
             type: 'success',
-            title: context.lang === 'en' ? 'Meeting Started!' : 'הפגישה התחילה!',
-            message: context.lang === 'en'
-                ? 'All participants are ready - meeting is live!'
-                : 'כל המשתתפים מוכנים - הפגישה פעילה!',
+            title: t('server.meeting.startedTitle'),
+            message: t('server.meeting.startedMessage'),
             duration: 5000
         }
     };

@@ -1,0 +1,62 @@
+{
+  "error": {
+    "priceRequired": "Цена должна быть больше нуля",
+    "nameRejected": "Название не прошло проверку содержимого ({{reasons}})",
+    "rikmaMembersOnly": "Только участник рикмы может создать в ней продукт",
+    "rikmaNameRequired": "У рикмы нет названия",
+    "rikmaCreateFailed": "Не удалось создать рикму",
+    "homeRikmaCreateFailed": "Не удалось создать домашнюю рикму",
+    "productCreateFailed": "Не удалось создать продукт",
+    "offerCreateFailed": "Не удалось создать предложение по миссии",
+    "offerUpdateFailed": "Не удалось обновить предложение по миссии",
+    "resourcePriceRequired": "Нужна цена, чтобы опубликовать ресурс как продукт",
+    "resourceProductCreateFailed": "Не удалось создать продукт из ресурса",
+    "wishConsentClosed": "Согласие уже закрыто - рикма и сделка созданы. Их можно найти в «Сделках».",
+    "wishNoProduct": "Сборного продукта ещё нет - сначала пригласите поставщиков и соберите план",
+    "wishNoParts": "В плане нет частей для производства - сначала добавьте миссии или ресурсы",
+    "wishUnassignedParts": "У {{count}} частей всё ещё нет утверждённого поставщика - согласие пока нельзя закрыть",
+    "wishNoProviders": "Для плана не найдено утверждённых поставщиков",
+    "wishWeaveCreateFailed": "Не удалось создать рикму партнёров",
+    "wishProductLinkFailed": "Не удалось привязать продукт к рикме",
+    "wishSheirutpendCreateFailed": "Не удалось открыть согласие (Sheirutpend)",
+    "wishDealCreateFailed": "Рикма создана, но сделку открыть не удалось - можно повторить из раздела «Сделки»",
+    "nameRequired": "Нужно название"
+  },
+  "moderation": {
+    "empty": "пусто",
+    "too_long": "слишком длинно",
+    "link": "ссылка",
+    "contact": "контактные данные",
+    "spam": "повторяющиеся символы",
+    "blocked_word": "запрещённое слово",
+    "other": "другое"
+  },
+  "wish": {
+    "untitled": "Желание",
+    "partnersRikma": "{{name}} — рикма партнёров",
+    "rikmaDescription": "Рикма партнёров, созданная из желания \"{{name}}\".",
+    "chatSeed": "Круг замкнулся — рикма партнёров создана, сделка началась. 💗"
+  },
+  "meeting": {
+    "alreadyLiveTitle": "Встреча идёт",
+    "alreadyLiveMessage": "Встреча уже идёт — присоединяйтесь сейчас!",
+    "startedTitle": "Встреча началась!",
+    "startedMessage": "Все участники готовы — встреча идёт!",
+    "readyTitle": "Готово!",
+    "waitingFor": "Ожидаем ещё {{count}} участника(ов)...",
+    "waitingTitle": "Ожидаем участников...",
+    "waitingApproval": "Ожидаем подтверждения от {{count}} участника(ов)",
+    "meetingReadyTitle": "Встреча готова!",
+    "allOnline": "Все онлайн для встречи: {{name}}"
+  },
+  "donation": {
+    "supporter": "Участник поддержки",
+    "forMission": "Для задачи: {{name}}",
+    "stipend": "на финансирование её базового пособия ({{rate}} в час)",
+    "stipendWithBudget": "на финансирование её базового пособия ({{rate}} в час, до {{budget}})",
+    "contact": "Для связи: {{contact}}"
+  },
+  "assistant": {
+    "leftoverTitle": "Ещё из импорта"
+  }
+}

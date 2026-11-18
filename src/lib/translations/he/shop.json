@@ -126,7 +126,27 @@
       "entrance": "כניסה {{value}}"
     },
     "note": {
-      "title": "הערות"
+      "title": "הערות",
+      "variantOff": "שורה {{line}}: הווריאנט כבוי (active=false)",
+      "belowMin": "שורה {{line}}: כמות {{quantity}} מתחת למינימום {{min}}",
+      "aboveMax": "שורה {{line}}: כמות {{quantity}} מעל המקסימום {{max}}",
+      "oversold": "שורה {{line}}: מכירת־יתר — נותרו {{remaining}}, הוזמנו {{quantity}}",
+      "shippingFeeSeparate": "דמי המשלוח ({{fee}}) נשארו בנפרד ולא נרשמו כמכירה: מוצר המשלוח #{{id}} לא זמין לכך (לא פורסם, בלי מחיר קבוע, עם וריאציות, או שהוזמן גם כמוצר).",
+      "amountMismatch": "הסכום שנגבה ({{charged}}) שונה מסכום השורות והמשלוח ({{computed}})",
+      "belowCatalog": "מתחת למחיר הקטלוג והמבצעים: שולם {{paid}}, לפי הקטלוג {{catalog}} (פער {{gap}}, {{pct}}%)",
+      "belowCatalogOverArranged": "מתחת למחיר הקטלוג והמבצעים: שולם {{paid}}, לפי הקטלוג {{catalog}} (פער {{gap}}, {{pct}}%) — מעבר למה שהרקמה מאפשרת לסכם לבד",
+      "belowCatalogShort": " — מתחת למחיר הקטלוג ({{catalog}})",
+      "arrangedPaid": "שולם בתיאום — {{amount}} ({{methodLabel}}){{underPhrase}}",
+      "shippingOptionMissing": "שיטת המשלוח שנבחרה באתר ({{optionId}}) לא מוצעת היום לכתובת הזו לפי הגדרות המשלוח של הרקמה.",
+      "shippingFeeDifferent": "דמי המשלוח שנגבו ({{charged}}) שונים מהמחיר בהגדרות הרקמה לשיטה \"{{methodName}}\" ({{configured}}).",
+      "unknown": "הערה מהמערכת",
+      "method": {
+        "bit": "ביט",
+        "paybox": "PayBox",
+        "transfer": "העברה בנקאית",
+        "cash": "מזומן",
+        "other": "אחר"
+      }
     },
     "payment": {
       "title": "תשלום",

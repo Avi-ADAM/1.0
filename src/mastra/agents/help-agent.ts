@@ -1,3 +1,4 @@
+import { agentLanguageName, agentLanguageDirective } from '../lib/agentLanguage';
 import { Agent } from '@mastra/core/agent';
 import { createModelChain } from '../lib/createModel';
 import { getChatHistoryTool } from '../tools/getChatHistoryTool';
@@ -94,7 +95,7 @@ Always be helpful and friendly, and provide comprehensive answers based on the a
 	return new Agent({
 		id: 'GeneralHelpAgent',
 		name: 'GeneralHelpAgent',
-		instructions: systemPrompt + workingMemoryInstructions(language),
+		instructions: systemPrompt + agentLanguageDirective(language) + workingMemoryInstructions(language),
 		model,
 		memory: getChatMemory(),
 		tools: {

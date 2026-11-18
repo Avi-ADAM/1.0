@@ -208,7 +208,7 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
       paymentMethod: method,
       total: split.received,
       oversold: plan.oversold,
-      note: orderNoteOf(a.note ?? null, [arrangedNoteOf(split, method, note), ...plan.notes])
+      note: orderNoteOf(a.note ?? null, [arrangedNoteOf(split, method, note, currency), ...plan.notes])
     }
   });
 

@@ -61,5 +61,21 @@
   "sugUserReportBug": "Report a bug",
   "reportSuccessMsg": "Your report was sent successfully! The team will get back to you soon.",
   "reportErrorMsg": "Failed to send report. Please try again.",
-  "reportTypePrompt": "What type of report? (bug / feature / partnership / contact)"
+  "reportTypePrompt": "What type of report? (bug / feature / partnership / contact)",
+  "card": {
+    "voteCommand": "I voted \"{{option}}\" on: {{proposal}}",
+    "saleRecorded": "Sale recorded successfully!",
+    "back": "Back",
+    "productsAvailable": "{{count}} available products",
+    "chooseProduct": "Choose a product to report a sale",
+    "activeVote": "Active vote · {{partnership}}",
+    "deadline": "Deadline: {{deadline}}",
+    "recorded": "Recorded",
+    "partnership": "Partnership",
+    "yourShare": "Your share",
+    "partners": "Partners",
+    "voteFor": "For",
+    "voteAgainst": "Against",
+    "voteAbstain": "Abstain"
+  }
 }
