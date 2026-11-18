@@ -19,6 +19,7 @@
   import { checkOwnName, NAME_FIELD, NAME_MAX, scriptsToAsk } from '$lib/translation/displayName';
   import { useMoney, setDisplayCurrency, adoptCurrencyFromProfile } from '$lib/money/context.svelte';
   import { formatMoney } from '$lib/money/format.js';
+  import { toast } from 'svelte-sonner';
   let { data } = $props();
 
   // The reader's display currency (PLAN_MULTI_CURRENCY D-C9).
@@ -75,6 +76,13 @@
     Object.fromEntries(askScripts.map((sc) => [sc, checkOwnName(names[NAME_FIELD[sc]], sc)]))
   );
 
+  // Any name field that differs from the saved copy opens EditB's save bar —
+  // its own snapshot cannot see fields rendered in this page's snippet.
+  let namesChanged = $derived(
+    !!data.nameScripts &&
+      askScripts.some((sc) => (names[NAME_FIELD[sc]] ?? '') !== (data.nameScripts[NAME_FIELD[sc]] ?? ''))
+  );
+
   /** Only fields that pass the same check the server runs; the rest stay unsaved and say why. */
   function nameParams() {
     if (!data.nameScripts) return {};
@@ -114,7 +122,7 @@
   });
 
   async function sendD() {
-    await executeAction('updateUserBasic', {
+    const res = await executeAction('updateUserBasic', {
       username: userName_value,
       bio: biog,
       frd: frd,
@@ -128,6 +136,8 @@
       location: locationVal,
       ...nameParams()
     });
+    // EditB already said "saved" optimistically; a refused save must not stay silent.
+    if (!res?.success) toast.error($t('pages.editBasic.error'));
     // updateUserBasic's updateStrategy reloads app:meProfile, which this
     // page depends on too, so meData refreshes automatically.
   }
@@ -226,6 +236,7 @@
       {mail}
       un={meData.username}
       bi={meData.bio}
+      extraChanged={namesChanged}
       {onMessage}
       {onGuid}
     >

@@ -70,9 +70,14 @@
     translationPref,
     currencyPref,
     githubAccount,
-    nameScripts
+    nameScripts,
+    // Fields the parent renders inside a snippet (the name in other scripts)
+    // are invisible to the snapshot below; the parent says when they differ
+    // from what is saved, or the save bar never opens for them.
+    extraChanged = false
   }: {
     location?: EditLocation;
+    extraChanged?: boolean;
     translationPref?: Snippet;
     nameScripts?: Snippet;
     currencyPref?: Snippet;
@@ -213,6 +218,7 @@
   $effect(() => {
     if (!initialValues) return;
     chan =
+      extraChanged ||
       un !== initialValues.un ||
       bi !== initialValues.bi ||
       githublink !== initialValues.githublink ||
