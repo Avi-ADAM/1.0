@@ -12,8 +12,11 @@ import { env } from '$env/dynamic/private';
 // https://chatgpt.com/connector_platform_oauth_redirect. Anything else — a
 // Gemini Enterprise tenant, an n8n instance, a self-hosted agent — is added by
 // the deployment through MCP_OAUTH_REDIRECT_HOSTS, which replaces this list.
+// stav-group.com is a partner agent platform (callback
+// https://stav-group.com/api/mcp-servers/oauth/callback) — the bare host only,
+// no wildcard, so none of its subdomains can register.
 const DEFAULT_HOSTS =
-  'claude.ai,*.claude.ai,claude.com,*.claude.com,chatgpt.com,*.chatgpt.com,openai.com,*.openai.com';
+  'claude.ai,*.claude.ai,claude.com,*.claude.com,chatgpt.com,*.chatgpt.com,openai.com,*.openai.com,stav-group.com';
 
 function allowedHosts(): string[] {
   return (env.MCP_OAUTH_REDIRECT_HOSTS ?? DEFAULT_HOSTS)
