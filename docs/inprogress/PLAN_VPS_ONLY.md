@@ -100,11 +100,11 @@
 `SSR_API_BASE`). אחרי המעבר עמוד שנטען על ה-VPS קורא ל-`/api/*` בתוך אותו תהליך ול-Strapi
 דרך הרשת הפנימית של docker.
 
-| | היום (Vercel + VPS) | אחרי (VPS + Cloudflare) |
+| | היום (Vercel + VPS) | אחרי (VPS בלבד, DNS נשאר ב-GoDaddy) |
 |---|---|---|
 | עמוד SSR | Vercel (ארה"ב) → VPS → Strapi | VPS → Strapi, בתוך המכונה |
 | cold start | יש | אין |
-| קבצים סטטיים | CDN של Vercel | CDN של Cloudflare (חינמי) |
+| קבצים סטטיים | CDN של Vercel | nginx על ה-VPS, `immutable` לשנה (CDN של Cloudflare אופציונלי, §V4) |
 | דיפלוי | שניים (push ל-Vercel + `deploy-api.ps1`), גרסאות יכולות להתפצל | אחד |
 | רישיון | Hobby אוסר שימוש מסחרי | אין בעיה |
 | מכסות | 1M הפעלות, 4 שעות CPU, 100GB לחודש | מה שהשרת נושא |
@@ -115,6 +115,8 @@
 - preview deploy לכל push, ו-rollback בלחיצה. כאן במקומם: תגית image קודמת + `deploy` (§5).
 - `@vercel/analytics`, שבשימוש ב-`src/routes/+layout.js` וב-`src/lib/components/main/amana.svelte`.
 - השרת הופך לנקודת כשל אחת לכל האתר. זה כמעט ממילא המצב, כי בלי ה-API האתר לא עובד.
+- CDN והגנת DDoS לדפים, שהיום Vercel נותן. ב-0.4 בקשות בשנייה (§1) nginx מגיש את הקבצים
+  הסטטיים בלי מאמץ. אם יהיה צורך, Cloudflare הוא שלב נפרד ואופציונלי (§V4).
 
 ## 1. מדידה (2026-11-17)
 
@@ -142,7 +144,7 @@
 ## 3. ארכיטקטורת היעד
 
 ```
-Cloudflare (DNS + CDN, proxied)
+DNS ב-GoDaddy (רשומות A ל-VPS)   [אופציונלי בעתיד: Cloudflare proxied, §V4]
    │
 nginx (app-nginx-1, :443)
    ├── 1lev1.com, www      → upstream web_pool   (sveltekit-web ×2)
@@ -261,7 +263,10 @@ nginx (app-nginx-1, :443)
    של השרת. ליצוא: `vercel env pull`, ואז השוואת hash לכל משתנה (ראו memory על `$` ב-compose v2).
 3. nginx: `server_name 1lev1.com www.1lev1.com` → `upstream web_pool { least_conn; server web-1:3000 resolve; server web-2:3000 resolve; }`.
    `/_app/immutable/*` עם `expires 1y; immutable`, ו-`client_max_body_size` כמו ב-api.
-4. TLS: certbot ל-`1lev1.com` ו-`www` (או Cloudflare Origin Certificate, §V4).
+4. TLS: certbot ל-`1lev1.com` ו-`www`, כמו לשאר תתי-הדומיינים. האתגר של certbot צריך את ה-DNS
+   כבר מופנה ל-VPS, אז להוציא את התעודה ב-webroot מיד אחרי שינוי הרשומה ב-V5, או מראש באתגר DNS
+   (רשומת TXT ידנית ב-GoDaddy, `certbot --manual --preferred-challenges dns`) כדי שה-HTTPS יעבוד
+   מהשנייה הראשונה.
 5. `VITE_API_BASE` נשאר `https://api.1lev1.com` בשלב הזה. הדפדפן ממשיך לדבר עם ה-API כמו היום,
    כך שהשינוי היחיד הוא מאיפה ה-HTML מוגש. איחוד לאותו origin הוא V6.
 
@@ -269,7 +274,18 @@ nginx (app-nginx-1, :443)
 לדף הבית, `/lev`, `/moach/<id>`, `/r/<slug>`, `/concierge`, `/gift/<id>`; התחברות; העלאת קובץ;
 MCP OAuth (`/oauth/token`, CSRF ב-`$lib/server/csrf.js`). מעבר ב-`npm run check:proxy`.
 
-### V4 — Cloudflare
+### V4 — Cloudflare (אופציונלי, נדחה — 2026-11-18)
+
+**הוחלט לא לעשות את זה כחלק מהמעבר.** V5 עובד ישירות מול GoDaddy, וה-rollback (רשומה אחת,
+TTL של 60 שניות) עובד שם באותה מידה. מה Cloudflare היה נותן כאן קטן: CDN לקבצים שהם כבר
+`immutable` בדפדפן, בתעבורה של 0.4 בקשות בשנייה. ומה שמפסידים אמיתי: `socket` וכנראה גם `api` חייבים
+להישאר DNS only (WebSocket נסגר אחרי 100 שניות, העלאות עד 100MB), כך שרק `1lev1.com` ו-`www`
+היו עוברים דרכו. חוץ מזה צריך `real_ip`, אחרת rate limit ולוגים רואים את Cloudflare בשקט, וההעברה
+עצמה מסכנת את רשומות המייל והאימותים. ה-proxy החינמי מחייב להעביר את ה-nameservers. אין מצב
+ביניים שבו ה-DNS נשאר ב-GoDaddy.
+
+**מתי לחזור לזה:** התקפה (DDoS), תעבורה גדולה ממקומות רחוקים מהשרת, או cache לדפים ציבוריים
+שכבר לא מספיק ב-nginx (§5). אז אלה הצעדים:
 
 1. להעביר את ה-nameservers של `1lev1.com` ל-Cloudflare (חינם). לייבא את הרשומות הקיימות ולוודא
    **כל** תת-דומיין: `api`, `tovmeod`, `socket`, `consensus`, MX, SPF/DKIM של המייל, ואימותי Google/Claude.
@@ -285,9 +301,10 @@ MCP OAuth (`/oauth/token`, CSRF ב-`$lib/server/csrf.js`). מעבר ב-`npm run 
 
 ### V5 — המעבר עצמו
 
-1. TTL של DNS ל-60 שניות יום לפני.
-2. להפנות את `1lev1.com` ל-VPS (דרך Cloudflare). **Vercel נשאר חי** כגיבוי 3–7 ימים: rollback הוא
-   שינוי רשומת DNS אחת.
+1. ב-GoDaddy: לרשום את הערכים הנוכחיים של `@` ו-`www` (ה-A וה-CNAME של Vercel), ואז TTL של 60
+   שניות לשתיהן יום לפני. לא לגעת בשום רשומה אחרת (MX, SPF/DKIM, `api`, `tovmeod`, `socket`, `consensus`).
+2. להפנות את `1lev1.com` ו-`www` ב-GoDaddy לרשומת A של `91.90.82.93`. **Vercel נשאר חי** כגיבוי
+   3–7 ימים: rollback הוא החזרת הערכים שנרשמו בסעיף 1. אחרי שבוע שקט, להחזיר את ה-TTL לשעה.
 3. מעקב: Axiom `vps-docker` (5xx, זמני תגובה), `docker stats`, `pg_stat_activity`.
 4. אחרי שבוע שקט: לנתק את הפרויקט ב-Vercel מה-repo, כדי ש-push לא יבנה. memory
    `feedback_single_commit_vercel` ו-`feedback_deploy_target_summary` מתעדכנים: push כבר לא מעלה כלום,
@@ -328,7 +345,8 @@ MCP OAuth (`/oauth/token`, CSRF ב-`$lib/server/csrf.js`). מעבר ב-`npm run 
 ```
 V0 (Postgres)  ──►  V1 (Strapi ×3)        יכול לעלות לבד, שיפור מיידי גם עם Vercel
 V2 (API בלי השבתה)                         בלתי תלוי
-V3 (web) ──► V4 (Cloudflare) ──► V5 (DNS) ──► V6
+V3 (web) ──► V5 (DNS ב-GoDaddy) ──► V6
+V4 (Cloudflare)                            אופציונלי, אחרי V5, רק אם יש סיבה
 ```
 
 V0–V2 מועילים גם אם מחליטים לא לעזוב את Vercel. V3–V5 הם המעבר עצמו.
