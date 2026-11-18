@@ -13,10 +13,11 @@ import { env } from '$env/dynamic/private';
 // Gemini Enterprise tenant, an n8n instance, a self-hosted agent — is added by
 // the deployment through MCP_OAUTH_REDIRECT_HOSTS, which replaces this list.
 // stav-group.com is a partner agent platform (callback
-// https://stav-group.com/api/mcp-servers/oauth/callback) — the bare host only,
-// no wildcard, so none of its subdomains can register.
+// https://stav-group.com/api/mcp-servers/oauth/callback, and the same path on
+// www.stav-group.com) — the two exact hosts only, no wildcard, so no other
+// subdomain of it can register.
 const DEFAULT_HOSTS =
-  'claude.ai,*.claude.ai,claude.com,*.claude.com,chatgpt.com,*.chatgpt.com,openai.com,*.openai.com,stav-group.com';
+  'claude.ai,*.claude.ai,claude.com,*.claude.com,chatgpt.com,*.chatgpt.com,openai.com,*.openai.com,stav-group.com,www.stav-group.com';
 
 function allowedHosts(): string[] {
   return (env.MCP_OAUTH_REDIRECT_HOSTS ?? DEFAULT_HOSTS)

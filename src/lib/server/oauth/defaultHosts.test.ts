@@ -19,8 +19,10 @@ describe('default redirect allowlist', () => {
     expect(isAllowedRedirectUri('https://platform.openai.com/cb')).toBe(true);
   });
 
-  it("accepts stav-group's MCP callback, but not its subdomains", () => {
+  it("accepts stav-group's MCP callback (bare and www), but no other subdomain", () => {
     expect(isAllowedRedirectUri('https://stav-group.com/api/mcp-servers/oauth/callback')).toBe(true);
+    expect(isAllowedRedirectUri('https://www.stav-group.com/api/mcp-servers/oauth/callback')).toBe(true);
+    expect(isAllowedRedirectUri('https://www.stav-group.com.evil.com/api/mcp-servers/oauth/callback')).toBe(false);
     expect(isAllowedRedirectUri('https://x.stav-group.com/api/mcp-servers/oauth/callback')).toBe(false);
     expect(isAllowedRedirectUri('http://stav-group.com/api/mcp-servers/oauth/callback')).toBe(false);
   });
