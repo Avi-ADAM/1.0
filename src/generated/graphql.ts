@@ -23532,6 +23532,10 @@ export type UsersPermissionsUser = {
   mission_offers?: Maybe<MissionOfferRelationResponseCollection>;
   missions_i_can_do?: Maybe<MissionRelationResponseCollection>;
   moachManualAlready?: Maybe<Scalars['Boolean']['output']>;
+  nameArabic?: Maybe<Scalars['String']['output']>;
+  nameCyrillic?: Maybe<Scalars['String']['output']>;
+  nameHebrew?: Maybe<Scalars['String']['output']>;
+  nameLatin?: Maybe<Scalars['String']['output']>;
   nego_mashes?: Maybe<NegoMashRelationResponseCollection>;
   negopendmissions?: Maybe<NegopendmissionRelationResponseCollection>;
   negotiations?: Maybe<NegotiationRelationResponseCollection>;
@@ -24333,6 +24337,10 @@ export type UsersPermissionsUserFiltersInput = {
   mission_offers?: InputMaybe<MissionOfferFiltersInput>;
   missions_i_can_do?: InputMaybe<MissionFiltersInput>;
   moachManualAlready?: InputMaybe<BooleanFilterInput>;
+  nameArabic?: InputMaybe<StringFilterInput>;
+  nameCyrillic?: InputMaybe<StringFilterInput>;
+  nameHebrew?: InputMaybe<StringFilterInput>;
+  nameLatin?: InputMaybe<StringFilterInput>;
   nego_mashes?: InputMaybe<NegoMashFiltersInput>;
   negopendmissions?: InputMaybe<NegopendmissionFiltersInput>;
   negotiations?: InputMaybe<NegotiationFiltersInput>;
@@ -24479,6 +24487,10 @@ export type UsersPermissionsUserInput = {
   mission_offers?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   missions_i_can_do?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   moachManualAlready?: InputMaybe<Scalars['Boolean']['input']>;
+  nameArabic?: InputMaybe<Scalars['String']['input']>;
+  nameCyrillic?: InputMaybe<Scalars['String']['input']>;
+  nameHebrew?: InputMaybe<Scalars['String']['input']>;
+  nameLatin?: InputMaybe<Scalars['String']['input']>;
   nego_mashes?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   negopendmissions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   negotiations?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
