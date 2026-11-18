@@ -83,5 +83,10 @@
     "toTimers": "לטיימרים — הפעלת משימה",
     "timersTitle": "הפעלה בטיימר",
     "allTimers": "לכל הטיימרים"
+  },
+  "page": {
+    "stale": "אין חיבור - מוצג מידע שמור",
+    "connectionProblem": "נראה שיש בעיה בחיבור, נא לנסות שוב",
+    "deleteResourceConfirm": "המשאב {{name}} יימחק. להמשיך?"
   }
 }

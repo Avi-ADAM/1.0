@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import { mastra } from '../../../mastra/index';
 import type { RequestHandler } from './$types';
+import { serverTranslator } from '$lib/server/notices/translate';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -17,12 +18,17 @@ const VALID_LANGS = new Set(['he', 'en', 'ar']);
 
 function pickLang(raw: unknown, cookieLang: string | undefined): 'he' | 'en' | 'ar' {
     const candidate = String(raw ?? cookieLang ?? 'he').toLowerCase();
-    return (VALID_LANGS.has(candidate) ? candidate : 'he') as 'he' | 'en' | 'ar';
+    if (VALID_LANGS.has(candidate)) return candidate as 'he' | 'en' | 'ar';
+    // The workflow writes he/en/ar only. A Russian or Spanish reader is better
+    // served by English than by Hebrew.
+    return candidate === 'ru' || candidate === 'es' ? 'en' : 'he';
 }
 
-export const POST: RequestHandler = async ({ request, cookies, url }) => {
+export const POST: RequestHandler = async ({ request, cookies, url, locals }) => {
     const contentType = request.headers.get('content-type') ?? '';
     const cookieLang = cookies.get('lang');
+    // The error a person reads, in their own language.
+    const t = serverTranslator(locals.lang ?? cookieLang);
 
     let inputData: {
         fileBuffer?: ArrayBuffer;
@@ -38,11 +44,11 @@ export const POST: RequestHandler = async ({ request, cookies, url }) => {
         try {
             body = await request.json();
         } catch {
-            throw error(400, 'בקשה לא תקינה');
+            throw error(400, t('server.cv.badRequest'));
         }
         const rawText = (body.text ?? '').trim();
         if (rawText.length < 50) {
-            throw error(400, 'נא לכתוב לפחות 50 תווים על עצמך');
+            throw error(400, t('server.cv.minChars', { count: 50 }));
         }
         inputData = { rawText, lang: pickLang(body.lang, cookieLang) };
     } else {
@@ -51,18 +57,18 @@ export const POST: RequestHandler = async ({ request, cookies, url }) => {
         try {
             formData = await request.formData();
         } catch {
-            throw error(400, 'בקשה לא תקינה');
+            throw error(400, t('server.cv.badRequest'));
         }
 
         const file = formData.get('cv');
         if (!(file instanceof File)) {
-            throw error(400, 'לא התקבל קובץ');
+            throw error(400, t('server.cv.noFile'));
         }
         if (file.size > MAX_FILE_SIZE) {
-            throw error(413, 'הקובץ גדול מדי - מקסימום 5MB');
+            throw error(413, t('server.cv.tooLarge'));
         }
         if (!ALLOWED_TYPES.has(file.type)) {
-            throw error(415, 'פורמט לא נתמך. אנא העלה PDF, Word (.docx), או קובץ טקסט');
+            throw error(415, t('server.cv.badFormat'));
         }
 
         const formLang = formData.get('lang');
@@ -74,7 +80,7 @@ export const POST: RequestHandler = async ({ request, cookies, url }) => {
         };
     }
 
-    const OVERLOAD_MSG = 'שירותי ה-AI עמוסים כרגע. אנא נסו שוב בעוד כחצי דקה.';
+    const OVERLOAD_MSG = t('server.cv.overloaded');
 
     function isOverloadError(e: unknown): boolean {
         if (!e || typeof e !== 'object') return false;
@@ -96,7 +102,8 @@ export const POST: RequestHandler = async ({ request, cookies, url }) => {
             if (isOverloadError(result.error)) {
                 throw error(503, OVERLOAD_MSG);
             }
-            throw error(500, result.error?.message ?? 'שגיאה בניתוח הקובץ');
+            // The workflow's own message is technical; it is logged above.
+            throw error(500, t('server.cv.failed'));
         }
 
         return json(result.result);
@@ -110,8 +117,7 @@ export const POST: RequestHandler = async ({ request, cookies, url }) => {
             console.error('analyze-cv overload:', (err as any)?.message);
             throw error(503, OVERLOAD_MSG);
         }
-        const msg = err instanceof Error ? err.message : 'שגיאה לא צפויה';
-        console.error('analyze-cv error:', msg);
-        throw error(500, msg);
+        console.error('analyze-cv error:', err instanceof Error ? err.message : err);
+        throw error(500, t('server.cv.unexpected'));
     }
 };

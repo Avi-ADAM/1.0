@@ -259,5 +259,19 @@
   "wishNotPublic": "Это желание закрыто для публики",
   "untitled": "(без названия)",
   "error": "Ошибка",
-  "proposals": "Предложения"
+  "proposals": "Предложения",
+  "pageNotFound": "Страница не найдена",
+  "maagadNotFound": "Пул спроса не найден",
+  "pageLoadError": "Ошибка загрузки страницы: {{message}}",
+  "sendFailed": "Не удалось отправить",
+  "errorStatus": "Ошибка {{status}}",
+  "errorTryAgain": "Ошибка — попробуйте ещё раз",
+  "unexpectedError": "Непредвиденная ошибка",
+  "errorDetail": "Ошибка: {{message}} ({{code}})",
+  "altCards": "Карточки",
+  "altCoins": "Монеты",
+  "joinPage": {
+    "title": "{{name}} — присоединиться",
+    "description": "Предложите себя в рикму {{name}} — на своих условиях"
+  }
 }

@@ -134,21 +134,17 @@
       if (result.success) {
         sent = true;
       } else {
-        errorMsg = result.error?.message || 'שליחה נכשלה';
+        errorMsg = result.error?.message || $t('common.sendFailed');
       }
     } catch (e) {
-      errorMsg = e?.message || 'שליחה נכשלה';
+      errorMsg = e?.message || $t('common.sendFailed');
     } finally {
       sending = false;
     }
   }
 
   let pageTitle = $derived(
-    attrs?.projectName
-      ? $lang === 'he'
-        ? `${attrs.projectName} - הצטרפות`
-        : `${attrs.projectName} - Join`
-      : '1💗1'
+    attrs?.projectName ? $t('common.joinPage.title', { name: attrs.projectName }) : '1💗1'
   );
 </script>
 
@@ -156,9 +152,7 @@
   <title>{pageTitle}</title>
   <meta
     name="description"
-    content={$lang === 'he'
-      ? `הציעו את עצמכם לרקמה ${attrs?.projectName ?? ''} - בתנאים שלכם`
-      : `Nominate yourself to ${attrs?.projectName ?? ''} - on your own terms`}
+    content={$t('common.joinPage.description', { name: attrs?.projectName ?? '' })}
   />
 </svelte:head>
 

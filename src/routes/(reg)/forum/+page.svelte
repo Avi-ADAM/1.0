@@ -4,7 +4,7 @@
 </script>
 
 <svelte:head>
-  <title>פורומים · 1lev1</title>
+  <title>{$t('common.forumLayout.title')} · 1lev1</title>
 </svelte:head>
 
 <div class="grid h-full min-h-[60vh] place-items-center p-8 text-center">

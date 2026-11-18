@@ -84,5 +84,10 @@
     "toTimers": "Temporizadores — iniciar una misión",
     "timersTitle": "Iniciar en el temporizador",
     "allTimers": "Todos los temporizadores"
+  },
+  "page": {
+    "stale": "Sin conexión: se muestran datos guardados",
+    "connectionProblem": "Parece que hay un problema de conexión, inténtalo de nuevo",
+    "deleteResourceConfirm": "El recurso {{name}} se eliminará. ¿Continuar?"
   }
 }

@@ -58,5 +58,15 @@
   },
   "assistant": {
     "leftoverTitle": "More from the import"
+  },
+  "cv": {
+    "badRequest": "Invalid request",
+    "minChars": "Please write at least {{count}} characters about yourself",
+    "noFile": "No file was received",
+    "tooLarge": "File is too large - 5MB maximum",
+    "badFormat": "Unsupported format. Please upload a PDF, Word (.docx) or text file",
+    "overloaded": "The AI services are busy right now. Please try again in about half a minute.",
+    "failed": "Error analysing the file",
+    "unexpected": "Unexpected error, please try again"
   }
 }

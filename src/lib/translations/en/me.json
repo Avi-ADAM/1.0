@@ -83,5 +83,10 @@
     "toTimers": "Timers — start a mission",
     "timersTitle": "Start on the timer",
     "allTimers": "All timers"
+  },
+  "page": {
+    "stale": "No connection - showing saved data",
+    "connectionProblem": "Seems there is a connection problem, please try again",
+    "deleteResourceConfirm": "The resource {{name}} will be deleted. Continue?"
   }
 }

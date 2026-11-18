@@ -35,13 +35,13 @@
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(body?.message ?? `שגיאה ${res.status}`);
+        throw new Error(body?.message ?? $t('common.errorStatus', { status: res.status }));
       }
       const result = await res.json();
       saveCvDraft(result, 'describe');
       goto('/onboard/provider/review');
     } catch (e) {
-      error = /** @type {any} */ (e)?.message || 'שגיאה - נסו שוב';
+      error = /** @type {any} */ (e)?.message || $t('common.errorTryAgain');
       submitting = false;
     }
   }

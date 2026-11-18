@@ -252,7 +252,7 @@
         {@render shortcutRow()}
       {/if}
     {:catch err}
-      <p class="text-red-400 text-center p-8">שגיאה בטעינת הדף: {err.message}</p>
+      <p class="text-red-400 text-center p-8">{$t('common.pageLoadError', { message: err.message })}</p>
     {/await}
   </main>
 </div>

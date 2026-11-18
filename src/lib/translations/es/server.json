@@ -58,5 +58,15 @@
   },
   "assistant": {
     "leftoverTitle": "Más de la importación"
+  },
+  "cv": {
+    "badRequest": "Solicitud no válida",
+    "minChars": "Escribe al menos {{count}} caracteres sobre ti",
+    "noFile": "No se recibió ningún archivo",
+    "tooLarge": "El archivo es demasiado grande: máximo 5 MB",
+    "badFormat": "Formato no compatible. Sube un PDF, un Word (.docx) o un archivo de texto",
+    "overloaded": "Los servicios de IA están ocupados ahora mismo. Inténtalo de nuevo en medio minuto.",
+    "failed": "Error al analizar el archivo",
+    "unexpected": "Error inesperado, inténtalo de nuevo"
   }
 }

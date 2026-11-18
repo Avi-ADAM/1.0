@@ -78,7 +78,7 @@
       const res = await fetch('/api/analyze-cv', { method: 'POST', body: form });
       if (!res.ok) {
         const b = await res.json().catch(() => ({}));
-        throw new Error(b.message ?? `שגיאה ${res.status}`);
+        throw new Error(b.message ?? $t('common.errorStatus', { status: res.status }));
       }
       const data = await res.json();
 
@@ -89,7 +89,7 @@
       setTimeout(() => goto('/onboard/provider/review'), 450);
     } catch (err: unknown) {
       stopStages(false);
-      error = err instanceof Error ? err.message : 'שגיאה לא צפויה';
+      error = err instanceof Error ? err.message : $t('common.unexpectedError');
       step = 'upload';
     }
   }

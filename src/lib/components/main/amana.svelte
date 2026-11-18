@@ -337,7 +337,10 @@
           fetch
         );
       } else {
-        erorim.msg = ` ${error.response.data.message}  ${error.response.data.statusCode} :טעות`;
+        erorim.msg = $t('common.errorDetail', {
+          message: error.response.data.message,
+          code: error.response.data.statusCode
+        });
         sendError(erorim.msg, '/amana.svelte', fetch);
       }
     }
@@ -408,7 +411,7 @@
     onkeydown={(e) => e.key === 'Escape' && closer()}
     role="button"
     tabindex="-1"
-    aria-label="סגור מודל"
+    aria-label={$t('common.close')}
     transition:fade={{ duration: 300 }}
   >
     <div
@@ -419,7 +422,7 @@
       role="presentation"
       transition:fly={{ y: 50, duration: 600, opacity: 0 }}
     >
-      <button class="premium-close-btn" onclick={closer} aria-label="סגור">
+      <button class="premium-close-btn" onclick={closer} aria-label={$t('common.close')}>
         <Close />
       </button>
 

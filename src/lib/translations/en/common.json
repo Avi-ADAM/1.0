@@ -259,5 +259,19 @@
   "wishNotPublic": "This wish isn't open to the public",
   "untitled": "(untitled)",
   "error": "Error",
-  "proposals": "Proposals"
+  "proposals": "Proposals",
+  "pageNotFound": "Page not found",
+  "maagadNotFound": "Demand pool not found",
+  "pageLoadError": "Error loading the page: {{message}}",
+  "sendFailed": "Sending failed",
+  "errorStatus": "Error {{status}}",
+  "errorTryAgain": "Error - please try again",
+  "unexpectedError": "Unexpected error",
+  "errorDetail": "Error: {{message}} ({{code}})",
+  "altCards": "Cards",
+  "altCoins": "Coins",
+  "joinPage": {
+    "title": "{{name}} - Join",
+    "description": "Nominate yourself to the rikma {{name}} - on your own terms"
+  }
 }

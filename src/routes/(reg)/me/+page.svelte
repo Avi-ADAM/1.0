@@ -357,10 +357,7 @@
     a = 3;
     const nj = event.nj;
     spid = event.id;
-    messege =
-      $lang == 'he'
-        ? `המשאב ${nj} ימחק האם להמשיך?`
-        : `the resource ${nj} will be deleted, do you want to continue?`;
+    messege = $t('me.page.deleteResourceConfirm', { name: nj });
   }
   async function han() {
     a = 2;
@@ -881,19 +878,15 @@
   >
 {/snippet}
 {#if (!online || data.loadError) && meData}
-  <div class="stale-banner" dir="rtl">
-    {$lang === 'he'
-      ? 'אין חיבור - מוצג מידע שמור'
-      : 'No connection - showing saved data'}
+  <div class="stale-banner" dir={$isRtl ? 'rtl' : 'ltr'}>
+    {$t('me.page.stale')}
   </div>
 {/if}
 {#if data.loadError && !meData}
-  <div class="body grid items-center justify-center text-center" dir="rtl">
+  <div class="body grid items-center justify-center text-center" dir={$isRtl ? 'rtl' : 'ltr'}>
     <div>
       <p class="text-barbi">
-        {$lang === 'he'
-          ? 'נראה שיש בעיה בחיבור, נא לנסות שוב'
-          : 'Seems there is a connection problem, please try again'}
+        {$t('me.page.connectionProblem')}
       </p>
       <button
         onclick={() => invalidateAll()}

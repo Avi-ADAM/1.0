@@ -259,5 +259,19 @@
   "wishNotPublic": "هذه الأمنية غير مفتوحة للعامة",
   "untitled": "(بلا اسم)",
   "error": "خطأ",
-  "proposals": "مقترحات"
+  "proposals": "مقترحات",
+  "pageNotFound": "الصفحة غير موجودة",
+  "maagadNotFound": "تجمع الطلب غير موجود",
+  "pageLoadError": "خطأ في تحميل الصفحة: {{message}}",
+  "sendFailed": "فشل الإرسال",
+  "errorStatus": "خطأ {{status}}",
+  "errorTryAgain": "خطأ - حاولوا مرة أخرى",
+  "unexpectedError": "خطأ غير متوقع",
+  "errorDetail": "خطأ: {{message}} ({{code}})",
+  "altCards": "بطاقات",
+  "altCoins": "عملات",
+  "joinPage": {
+    "title": "{{name}} - انضمام",
+    "description": "رشّحوا أنفسكم للريكما {{name}} - بشروطكم"
+  }
 }

@@ -1,5 +1,6 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { error } from '@sveltejs/kit';
+import { serverTranslator } from '$lib/server/notices/translate';
 import type { PageServerLoad } from './$types';
 import { rtKey } from '$lib/realtime/scopes.js';
 import {
@@ -38,7 +39,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
   });
 
   const node = res?.data?.maagad?.data;
-  if (!node) throw error(404, 'המאגד לא נמצא');
+  if (!node) throw error(404, serverTranslator(locals.lang)('common.maagadNotFound'));
   const a = node.attributes ?? {};
 
   const members = a.members?.data ?? [];

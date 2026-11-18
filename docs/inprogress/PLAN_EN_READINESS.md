@@ -199,6 +199,33 @@ payload-ים של התראות שנשלחות לפי שפת הנמען, ומוס
 **תשתית נוספת:** `serverTranslator` קורא מעתה גם את `server.json` ו־`shop.json`,
 כך שגם שרת בלי דף ו־store משתמש באותם קבצי תרגום כמו המסכים.
 
+### סריקה של כל הריפו אחרי שלבים 4–5 — ✅ (2026-11-18)
+
+`check:ui-hebrew` סורק רק את מה שננעל, ולכן הורצה אותה בדיקה על כל `src/`,
+יחד עם סריקה של מחרוזות בתוך `<script>` ושל שגיאות שרת. מה שקורא באנגלית ראה
+ותוקן:
+
+- **דף 404** (`NotFoundScreen.svelte`), ו־404 של המאגד (`maagad/[id]`) דרך `serverTranslator`.
+- **`/api/analyze-cv`** (העלאת קו״ח בהצטרפות): שבע שגיאות עבריות עברו ל־`server.cv.*`.
+  הודעת workflow טכנית נרשמת בלוג ולא מוצגת. `ru`/`es` מקבלים ניתוח באנגלית במקום בעברית,
+  כי ה־workflow כותב רק he/en/ar.
+- **ברירות מחדל לשגיאות** ב־`cvupload` ובשלושת דפי `onboard/*/describe|url`: `common.errorStatus` / `errorTryAgain` / `unexpectedError`.
+- **`/me`** (באנר אופליין, שגיאת חיבור, אישור מחיקת משאב: `me.page.*`, ו־`dir` לפי `$isRtl`),
+  **`/hub`** (שגיאת טעינה), **`/forum`** (כותרת), **דף ההצטרפות לרקמה** (כותרת, תיאור, שגיאת שליחה),
+  **`switch.svelte`** ו־**`amana.svelte`** (`alt`/`aria-label`/שגיאה).
+- כל אלה נוספו ל־`FILES` ב־`check-ui-hebrew` (184 רכיבים, 8 קבצים בודדים).
+
+**נמצא ולא תוקן, כי לא מוצג:** `userPr/api-keys.svelte`, `front/mobile.svelte`,
+`main/beinang.svelte` ו־`registration/vidValDate.svelte` לא מרונדרים בשום מקום.
+`SpaceProjectionShadow` כבוי עד `SPACE_SYNC_ENABLED`.
+
+**עדיין פתוח:**
+- **ריבוי:** כ־126 מחרוזות באנגלית בצורה `{{count}} <noun>s` מציגות "1 missions".
+  הפרסר תומך ב־`{{count; 1:…; default:…}}`, אבל `serverTranslator` מחליף רק `{{name}}`,
+  ולכן ב־`notices`/`lev`/`common`/`server`/`shop` צריך קודם להוסיף לו תמיכה במודיפיירים.
+- **תוכן שחברים כתבו** (T3) מוצג במקור עד ש־`TRANSLATE_SURFACES`/`TRANSLATE_WRITE`
+  מודלקים וה־backfill ממלא את המטמון.
+
 ## איך מודדים התקדמות
 
 הסקריפט שאיתו נמצאה הרשימה סופר שורות עם 2 אותיות עבריות ומעלה בקבצי

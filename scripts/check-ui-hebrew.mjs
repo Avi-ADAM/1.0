@@ -61,7 +61,16 @@ const ROOTS = [
  * locked down on its own.
  */
 const FILES = [
-    'src/lib/components/main/tikunolam.svelte'
+    'src/lib/components/main/tikunolam.svelte',
+    // The full-repo sweep after stages 4–5: screens an English reader reaches
+    // (the 404, the hub, /me, /forum, a rikma's join page, the agreement modal).
+    'src/lib/components/screens/NotFoundScreen.svelte',
+    'src/lib/celim/switch.svelte',
+    'src/lib/components/main/amana.svelte',
+    'src/routes/(reg)/forum/+page.svelte',
+    'src/routes/(reg)/hub/+page.svelte',
+    'src/routes/(reg)/me/+page.svelte',
+    'src/routes/(regandnon)/project/[id]/join/+page.svelte'
 ];
 
 /**

@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/translations';
   // based on suggestions from:
   // Inclusive Components by Heydon Pickering https://inclusive-components.design/toggle-button/
   // On Designing and Building Toggle Switches by Sara Soueidan https://www.sarasoueidan.com/blog/toggle-switch-design/
@@ -47,7 +48,7 @@
       <label for={`${option}-${uniqueID}`}>
         {#if option == true}
           <img
-            alt="קלפים"
+            alt={$t('common.altCards')}
             class="imgi"
             style:height="20px"
             style:display="inherit"
@@ -55,7 +56,7 @@
           />
         {:else}
           <img
-            alt="מטבעות"
+            alt={$t('common.altCoins')}
             class="imgin"
             style:height="20px"
             style:display="inherit"

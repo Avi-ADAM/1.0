@@ -48,7 +48,7 @@
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok || body?.ok === false) {
-        throw new Error(body?.message ?? `שגיאה ${res.status}`);
+        throw new Error(body?.message ?? $t('common.errorStatus', { status: res.status }));
       }
       sessionStorage.setItem('onboard.businessResult', JSON.stringify(body));
       sessionStorage.setItem('onboard.businessSource', 'describe');
@@ -62,7 +62,7 @@
       stashSeedPlan(body?.plan, 'describe');
       toMeWithPrefill(body);
     } catch (e) {
-      error = /** @type {any} */ (e)?.message || 'שגיאה - נסו שוב';
+      error = /** @type {any} */ (e)?.message || $t('common.errorTryAgain');
       submitting = false;
     }
   }

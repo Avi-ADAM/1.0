@@ -260,5 +260,19 @@
   "wishNotPublic": "Este deseo no está abierto al público",
   "untitled": "(sin nombre)",
   "error": "Error",
-  "proposals": "Propuestas"
+  "proposals": "Propuestas",
+  "pageNotFound": "Página no encontrada",
+  "maagadNotFound": "Grupo de demanda no encontrado",
+  "pageLoadError": "Error al cargar la página: {{message}}",
+  "sendFailed": "No se pudo enviar",
+  "errorStatus": "Error {{status}}",
+  "errorTryAgain": "Error: inténtalo de nuevo",
+  "unexpectedError": "Error inesperado",
+  "errorDetail": "Error: {{message}} ({{code}})",
+  "altCards": "Tarjetas",
+  "altCoins": "Monedas",
+  "joinPage": {
+    "title": "{{name}} - Unirse",
+    "description": "Postúlate a la rikma {{name}}, con tus propias condiciones"
+  }
 }

@@ -259,5 +259,19 @@
   "wishNotPublic": "משאלה זו אינה פתוחה לציבור",
   "untitled": "(ללא שם)",
   "error": "שגיאה",
-  "proposals": "הצעות"
+  "proposals": "הצעות",
+  "pageNotFound": "הדף לא נמצא",
+  "maagadNotFound": "המאגד לא נמצא",
+  "pageLoadError": "שגיאה בטעינת הדף: {{message}}",
+  "sendFailed": "השליחה נכשלה",
+  "errorStatus": "שגיאה {{status}}",
+  "errorTryAgain": "שגיאה - נסו שוב",
+  "unexpectedError": "שגיאה לא צפויה",
+  "errorDetail": "שגיאה: {{message}} ({{code}})",
+  "altCards": "קלפים",
+  "altCoins": "מטבעות",
+  "joinPage": {
+    "title": "{{name}} - הצטרפות",
+    "description": "הציעו את עצמכם לרקמה {{name}} - בתנאים שלכם"
+  }
 }
