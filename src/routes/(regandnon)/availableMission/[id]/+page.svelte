@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { toast } from 'svelte-sonner';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import SucssesConf from '$lib/celim/sucssesConf.svelte';
@@ -639,8 +640,7 @@
                       stipendRate={data.alld.attributes.stipendRate || 0}
                       costShare={data.alld.attributes.stipendCostShare ?? 1}
                       mode={data.alld.attributes.stipendMode || 'equity'}
-                      funderName={data.alld.attributes.stipendFunder?.data?.attributes
-                        ?.username || ''}
+                      funderName={$nameOf(data.alld.attributes.stipendFunder)}
                       monthly={data.alld.attributes.iskvua}
                     />
                   </div>

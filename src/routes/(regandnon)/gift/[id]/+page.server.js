@@ -2,6 +2,7 @@ import { sendToSer } from '$lib/send/sendToSer.js';
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 import { rtKey } from '$lib/realtime/scopes.js';
 import { salePricesFor } from '$lib/server/promotions/pricing';
+import { nameFieldsOf } from '$lib/translation/displayName.js';
 
 async function fetchPendingForMatanot(fetchFn, uid, matId) {
   try {
@@ -60,7 +61,7 @@ export async function load({ locals, params, fetch, depends }) {
         const ownerNode = meta.owner_user.data;
         personalSeller = {
           id: String(ownerNode.id),
-          username: ownerNode.attributes?.username ?? '',
+          ...nameFieldsOf(ownerNode.attributes), username: ownerNode.attributes?.username ?? '',
           picUrl:
             ownerNode.attributes?.profilePic?.data?.attributes?.formats?.small?.url ||
             ownerNode.attributes?.profilePic?.data?.attributes?.url ||

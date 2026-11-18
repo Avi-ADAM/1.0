@@ -1,6 +1,7 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 import { SendTo } from '$lib/send/sendTo.svelte';
+import { nameFieldsOf } from '$lib/translation/displayName.js';
 
 export interface ForumMessage {
     id: string | number;
@@ -46,7 +47,7 @@ export const forumStore = {
                     data{id attributes{
                         subject 
                         messages(filters:{archived: {ne:true}}){data{id attributes{
-                            content when users_permissions_user{data{id attributes{username profilePic{data{attributes{url formats}}}}}}
+                            content when users_permissions_user{data{id attributes{username nameLatin nameArabic nameCyrillic nameHebrew profilePic{data{attributes{url formats}}}}}}
                         }}}
                     }}
                 }
@@ -62,7 +63,7 @@ export const forumStore = {
                     return {
                         id: m.id,
                         message: m.attributes.content,
-                        username: m.attributes.users_permissions_user?.data?.attributes?.username || 'Unknown',
+                        ...nameFieldsOf(m.attributes.users_permissions_user?.data?.attributes), username: m.attributes.users_permissions_user?.data?.attributes?.username || 'Unknown',
                         pic: m.attributes.users_permissions_user?.data?.attributes?.profilePic?.data?.attributes?.url ||
                             m.attributes.users_permissions_user?.data?.attributes?.profilePic?.data?.attributes?.formats?.thumbnail?.url ||
                             'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png',

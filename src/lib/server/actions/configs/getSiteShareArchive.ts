@@ -21,6 +21,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { resolvePlatformProject } from '$lib/server/revenue/platformProject.js';
+import { nameFieldsOf } from '$lib/translation/displayName.js';
 
 interface Receiver {
   userId: string;
@@ -99,7 +100,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
           receivers.get(rid) ??
           {
             userId: rid,
-            username: recNode.attributes?.username ?? '',
+            ...nameFieldsOf(recNode.attributes), username: recNode.attributes?.username ?? '',
             pic: picOf(recNode),
             received: 0,
             inTransit: 0,
@@ -132,7 +133,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
         members.get(uid) ??
         {
           userId: userNode?.id ? String(userNode.id) : '',
-          username: userNode?.attributes?.username ?? '',
+          ...nameFieldsOf(userNode?.attributes), username: userNode?.attributes?.username ?? '',
           pic: picOf(userNode),
           committed: 0,
           received: 0,

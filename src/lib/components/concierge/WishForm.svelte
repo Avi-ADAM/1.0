@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { useFormatMoney, useRikmaCurrency } from '$lib/money/context.svelte';
   import { DEFAULT_CURRENCY } from '$lib/money/currencies';
   import Money from '$lib/components/money/Money.svelte';
@@ -2267,20 +2268,20 @@
                     {:else if p.avatar}
                       <img
                         src={p.avatar}
-                        alt={p.username}
+                        alt={$nameOf(p)}
                         style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:1px solid rgb(var(--cg-sky-rgb) / .4);flex-shrink:0"
                       />
                     {:else}
                       <span
                         style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgb(var(--cg-sky-rgb) / .12);color:var(--cg-sky);font-size:12px;flex-shrink:0"
-                        >{(p.username || '?').slice(0, 2)}</span
+                        >{($nameOf(p) || '?').slice(0, 2)}</span
                       >
                     {/if}
                     <div style="min-width:0;flex:1">
                       <div
                         style="font-family:'Bellefair',serif;font-size:13px;color:var(--cg-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
                       >
-                        {anon ? '••••••••' : p.username}
+                        {anon ? '••••••••' : $nameOf(p)}
                       </div>
                       {#if p.matchedSkills.length > 0 || p.distanceKm != null}
                         <div

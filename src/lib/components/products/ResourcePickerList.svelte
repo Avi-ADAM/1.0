@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { nameOf } from '$lib/translation/memberName';
   import Money from '$lib/components/money/Money.svelte';
   import { t } from '$lib/translations';
   import ResourceDetailsModal from './ResourceDetailsModal.svelte';
@@ -173,7 +174,7 @@
   function memberLabel(id: string | null): string {
     if (!id) return $t('products.resource.unassigned');
     const m = projectMembers.find((u) => u.id === id);
-    return m?.attributes.username ?? `#${id}`;
+    return $nameOf(m?.attributes) || `#${id}`;
   }
 
   // ── Full-details modal ─────────────────────────────────────────────────────
@@ -307,7 +308,7 @@
           <select class="input" bind:value={r.assignedMemberId}>
             <option value={null}>{$t('products.resource.chooseMember')}</option>
             {#each projectMembers as m (m.id)}
-              <option value={m.id}>{m.attributes.username}</option>
+              <option value={m.id}>{$nameOf(m.attributes)}</option>
             {/each}
           </select>
         </label>

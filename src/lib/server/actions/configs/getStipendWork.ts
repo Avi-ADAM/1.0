@@ -37,8 +37,8 @@ const TRANSFER_FIELDS = `
   amount hours stipendRate mode costShare equityMultiplier
   equityCredit equityDebit cycleStart cycleEnd status createdAt
   project { data { id attributes { projectName profilePic { data { attributes { url } } } } } }
-  funder { data { id attributes { username profilePic { data { attributes { url } } } } } }
-  recipient { data { id attributes { username profilePic { data { attributes { url } } } } } }
+  funder { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
+  recipient { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
   stipend_pledge { data { id attributes {
     mesimabetahaliches { data { id attributes { name } } }
   } } }
@@ -57,8 +57,8 @@ const handler: ActionExecutionHandler = async (_params, context) => {
           noticeCycles revenueTrigger recourse scope status descrip start end cycleSize lastSettledAt
           project { data { id attributes { projectName } } }
           stipend_program { data { id } }
-          funder { data { id attributes { username } } }
-          recipient { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          funder { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
+          recipient { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
           mashabetahalich { data { id } }
           mesimabetahaliches { data { id attributes { name } } }
           open_missions { data { id attributes { name } } }
@@ -72,8 +72,8 @@ const handler: ActionExecutionHandler = async (_params, context) => {
           noticeCycles revenueTrigger recourse scope status descrip start end cycleSize lastSettledAt
           project { data { id attributes { projectName } } }
           stipend_program { data { id } }
-          funder { data { id attributes { username profilePic { data { attributes { url } } } } } }
-          recipient { data { id attributes { username } } }
+          funder { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
+          recipient { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
           mashabetahalich { data { id } }
           mesimabetahaliches { data { id attributes { name } } }
           open_missions { data { id attributes { name } } }
@@ -86,7 +86,7 @@ const handler: ActionExecutionHandler = async (_params, context) => {
           amount hours stipendRate mode costShare equityMultiplier
           equityCredit equityDebit cycleStart cycleEnd status
           project { data { id attributes { projectName profilePic { data { attributes { url } } } } } }
-          funder { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          funder { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
           stipend_pledge { data { id attributes {
             mesimabetahaliches { data { id attributes { name } } }
           } } }

@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { lang } from '$lib/stores/lang.js';
   import ComparisonDisplay from './ComparisonDisplay.svelte';
   import { getProjectData } from '$lib/stores/projectStore';
@@ -84,7 +85,7 @@
                   'un',
                   attrs.users_permissions_user?.data?.id
                 ) ||
-                  attrs.users_permissions_user?.data?.attributes.username ||
+                  $nameOf(attrs.users_permissions_user?.data?.attributes) ||
                   'Unknown'}
               </span>
             {/if}

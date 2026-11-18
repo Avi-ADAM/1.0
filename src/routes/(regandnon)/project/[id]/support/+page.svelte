@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { useFormatMoney } from '$lib/money/context.svelte';
   import { provideRikmaCurrency } from '$lib/money/context.svelte';
   import Money from '$lib/components/money/Money.svelte';
@@ -542,13 +543,13 @@
                 <button
                   onclick={() => goto(`/user/${user.id}`)}
                   class="team-avatar"
-                  title={user.attributes.username}
+                  title={$nameOf(user.attributes)}
                 >
                   <img
                     src={user.attributes.profilePic?.data
                       ? user.attributes.profilePic.data.attributes.url
                       : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
-                    alt={user.attributes.username}
+                    alt={$nameOf(user.attributes)}
                   />
                 </button>
               {/each}

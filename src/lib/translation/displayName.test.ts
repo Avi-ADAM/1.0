@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { checkOwnName, displayName, NAME_FIELD, scriptsToAsk } from './displayName';
+import { checkOwnName, displayName, memberName, nameFieldsOf, namedUserOf, NAME_FIELD, scriptsToAsk } from './displayName';
 import type { TranslationHit } from './types';
 
 const hit = (over: Partial<TranslationHit> = {}): TranslationHit =>
@@ -87,5 +87,33 @@ describe('scriptsToAsk', () => {
 
     it('maps each script to its schema field', () => {
         expect(NAME_FIELD.latin).toBe('nameLatin');
+    });
+});
+
+describe('memberName / namedUserOf / nameFieldsOf (§18 S3)', () => {
+    const attrs = { username: 'ברוך בבאיוף', nameLatin: 'Baruch Babayof' };
+
+    it('reads every user shape the app passes around', () => {
+        expect(namedUserOf({ data: { id: '1', attributes: attrs } })).toBe(attrs);
+        expect(namedUserOf({ id: '1', attributes: attrs })).toBe(attrs);
+        expect(namedUserOf(attrs)).toBe(attrs);
+        expect(namedUserOf(null)).toBeNull();
+        expect(namedUserOf({ data: null })).toBeNull();
+    });
+
+    it("resolves in the reader's locale, raw for an unknown one", () => {
+        expect(memberName({ attributes: attrs }, 'en')).toBe('Baruch Babayof');
+        expect(memberName({ attributes: attrs }, 'es')).toBe('Baruch Babayof');
+        expect(memberName({ attributes: attrs }, 'he')).toBe('ברוך בבאיוף');
+        expect(memberName({ attributes: attrs }, 'ar')).toBe('ברוך בבאיוף');
+        expect(memberName({ attributes: attrs }, 'fr')).toBe('ברוך בבאיוף');
+        expect(memberName(undefined, 'en')).toBe('');
+    });
+
+    it('a flat shape built with nameFieldsOf still resolves', () => {
+        const flat = { id: '1', ...nameFieldsOf({ attributes: { ...attrs, nameArabic: '  ', nameCyrillic: null } }), username: attrs.username };
+        expect(flat).toEqual({ id: '1', nameLatin: 'Baruch Babayof', username: 'ברוך בבאיוף' });
+        expect(memberName(flat, 'en')).toBe('Baruch Babayof');
+        expect(nameFieldsOf(undefined)).toEqual({});
     });
 });

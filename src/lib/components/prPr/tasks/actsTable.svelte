@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * The rikma's task board.
    *
@@ -149,8 +150,8 @@
     const parts = [
       row.shem ?? '',
       String(row.des ?? '').replace(/<[^>]*>/g, ' '),
-      row.vali?.data?.attributes?.username ?? '',
-      ...(row.my?.data ?? []).map((u) => u?.attributes?.username ?? ''),
+      $nameOf(row.vali?.data?.attributes) || '',
+      ...(row.my?.data ?? []).map((u) => $nameOf(u?.attributes) || ''),
       ...(row.mesimabetahaliches?.data ?? []).map((m) => m?.attributes?.name ?? ''),
       row.pendm?.data?.attributes?.name ?? '',
       row.open_mission?.data?.attributes?.name ?? ''
@@ -201,8 +202,8 @@
     shem: (row) => (row.shem ?? '').toLowerCase(),
     hashivut: (row) => URGENCY_RANK[row.hashivut ?? 'white'] ?? 0,
     status: (row) => ACT_STATUSES.indexOf(getActStatus(row)),
-    vali: (row) => (row.vali?.data?.attributes?.username ?? '').toLowerCase(),
-    my: (row) => (row.my?.data?.[0]?.attributes?.username ?? '').toLowerCase(),
+    vali: (row) => ($nameOf(row.vali?.data?.attributes) || '').toLowerCase(),
+    my: (row) => ($nameOf(row.my?.data?.[0]?.attributes) || '').toLowerCase(),
     // Undated rows sort last in both directions rather than pretending to be
     // 1970 (ascending) or the far future (descending).
     date: (row) => (row.dateS ? new Date(row.dateS).getTime() : Number.NaN)
@@ -287,7 +288,7 @@
     if (!user) return null;
     return {
       id: user.id,
-      name: user.attributes?.username ?? '',
+      name: $nameOf(user.attributes) || '',
       pic: user.attributes?.profilePic?.data?.attributes?.url || AVATAR_FALLBACK
     };
   }
@@ -297,7 +298,7 @@
     if (!user) return null;
     return {
       id: user.id,
-      name: user.attributes?.username ?? '',
+      name: $nameOf(user.attributes) || '',
       pic: user.attributes?.profilePic?.data?.attributes?.url || AVATAR_FALLBACK
     };
   }

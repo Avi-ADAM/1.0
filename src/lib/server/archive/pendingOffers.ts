@@ -109,7 +109,7 @@ const SNAPSHOT_QUERIES: Record<OfferKind, (id: string) => string> = {
     name descrip noofhours perhour sqadualed dates
     project { data { id attributes { projectName restime } } }
     asks(filters: { archived: { eq: false } }, pagination: { limit: 100 }) { data { id attributes {
-      users_permissions_user { data { id attributes { username email lang noMail } } }
+      users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew email lang noMail } } }
       vots { what order zman users_permissions_user { data { id } } }
       negopendmissions(sort: "ordern:desc", pagination: { limit: 1 }) { data { attributes { ordern } } }
     } } }
@@ -119,7 +119,7 @@ const SNAPSHOT_QUERIES: Record<OfferKind, (id: string) => string> = {
     name descrip hm price sqadualed sqadualedf
     project { data { id attributes { projectName restime } } }
     askms(filters: { archived: { eq: false } }, pagination: { limit: 100 }) { data { id attributes {
-      users_permissions_user { data { id attributes { username email lang noMail } } }
+      users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew email lang noMail } } }
       vots { what order zman users_permissions_user { data { id } } }
       nego_mashes(sort: "ordern:desc", pagination: { limit: 1 }) { data { attributes { ordern } } }
     } } }

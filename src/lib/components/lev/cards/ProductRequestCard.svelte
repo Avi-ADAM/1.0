@@ -1,4 +1,5 @@
 ﻿<script lang="ts">
+  import { nameOf } from '$lib/translation/memberName';
   import { t, isRtl } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import { toast } from 'svelte-sonner';
@@ -215,14 +216,14 @@
       {#if buble.userSrc}
         <img
           src={buble.userSrc}
-          alt={buble.username}
+          alt={$nameOf(buble)}
           class="w-12 h-12 rounded-full object-cover border-2 border-barbi/20"
         />
       {:else}
         <div
           class="w-12 h-12 rounded-full bg-barbi/20 flex items-center justify-center text-barbi font-bold"
         >
-          {buble.username?.charAt(0)}
+          {$nameOf(buble)?.charAt(0)}
         </div>
       {/if}
       <div>
@@ -234,7 +235,7 @@
           onclick={(e) => e.stopPropagation()}
           class="font-bold text-gray-800 dark:text-gray-200 hover:text-barbi transition-colors"
         >
-          {buble.username}
+          {$nameOf(buble)}
         </a>
       </div>
     </div>

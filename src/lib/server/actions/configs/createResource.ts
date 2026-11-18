@@ -281,7 +281,7 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
             restime
             projectName
             profilePic { data { attributes { url } } }
-            user_1s { data { id attributes { username } } }
+            user_1s { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
           }
         }
       }

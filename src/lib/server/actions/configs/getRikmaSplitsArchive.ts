@@ -22,6 +22,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { nameFieldsOf } from '$lib/translation/displayName.js';
 
 interface Transfer {
   toId: string;
@@ -153,7 +154,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
         members.get(u.userId) ??
         {
           userId: u.userId,
-          username: u.username,
+          ...nameFieldsOf(u), username: u.username,
           pic: u.pic,
           total: 0,
           given: 0,

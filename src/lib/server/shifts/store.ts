@@ -954,7 +954,7 @@ export async function loadUserNames(exec: ShiftExec, ids: string[]): Promise<Rec
   if (want.length === 0) return {};
   const d = await run(
     exec,
-    `query ($ids: [ID]) { usersPermissionsUsers(filters: { id: { in: $ids } }, pagination: { limit: 100 }) { data { id attributes { username } } } }`,
+    `query ($ids: [ID]) { usersPermissionsUsers(filters: { id: { in: $ids } }, pagination: { limit: 100 }) { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } } }`,
     'loadUserNames',
     { ids: want }
   );

@@ -26,6 +26,7 @@ import { rtKey } from '$lib/realtime/scopes';
 import { readWishPricing, type WishPricing } from '$lib/server/wish/pricingTrack';
 import { pricingTracksEnabled } from '$lib/sheirut/pricingTracksFlag';
 import { buildWishPoolPanel, volumeOf, type WishPoolPanel } from '$lib/server/maagad/wishPool';
+import { memberName } from '$lib/translation/displayName';
 
 type PublishedNeed = { name: string; extractedKey: string | null };
 
@@ -42,10 +43,10 @@ function shortCode(id: string | number): string {
   return `R-${s.slice(-6)}`;
 }
 
-function nameOf(user: any): string {
+/** The member as the reader should read them (§18): their own spelling for the reader's script first. */
+function nameOf(user: any, readerLang?: string | null): string {
   if (!user) return 'משתמש/ת';
-  const a = user.attributes || user;
-  return a.username || 'משתמש/ת';
+  return memberName(user, readerLang) || 'משתמש/ת';
 }
 
 function initials(name: string): string {
@@ -58,6 +59,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
   depends(rtKey(`wish:${params.id}`));
   const uid = (locals as any)?.uid;
   const tok = (locals as any)?.tok;
+  const readerLang = (locals as any)?.lang as string | undefined;
 
   // Started first, awaited last: it runs beside the slow work below.
   const bellPending = loadBell(uid, fetch);
@@ -91,7 +93,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
     if (node) {
       const a = node.attributes || {};
       const owners = a.users_permissions_users?.data ?? [];
-      const ownerName = nameOf(owners[0]);
+      const ownerName = nameOf(owners[0], readerLang);
 
       wish = {
         id: node.id,
@@ -127,7 +129,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
           a.logo?.data?.attributes?.formats?.medium?.url ||
           a.logo?.data?.attributes?.url ||
           null,
-        owners: owners.map((u: any) => ({ id: u.id, name: nameOf(u) })),
+        owners: owners.map((u: any) => ({ id: u.id, name: nameOf(u, readerLang) })),
         ownerName,
         ownerAvatar: initials(ownerName),
         values: (a.vallues?.data ?? []).map((v: any) => ({ id: v.id, name: v.attributes?.valueName })),
@@ -191,7 +193,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
         const project = pa.project?.data;
         const firstProposer = proposerUsers[0];
         const proposerName = firstProposer
-          ? nameOf(firstProposer)
+          ? nameOf(firstProposer, readerLang)
           : (project?.attributes?.projectName || 'מציע/ה');
         return {
           id: p.id,
@@ -203,7 +205,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
           createdAt: pa.createdAt ?? null,
           proposerName,
           proposerAvatar: initials(proposerName),
-          proposerUsers: proposerUsers.map((u: any) => ({ id: u.id, name: nameOf(u) })),
+          proposerUsers: proposerUsers.map((u: any) => ({ id: u.id, name: nameOf(u, readerLang) })),
           proposerProject: project
             ? { id: project.id, name: project.attributes?.projectName }
             : null,

@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { isRtl } from '$lib/translations';
   import Chaticon from '../../../celim/chaticon.svelte';
   import { t } from '$lib/translations';
@@ -128,7 +129,7 @@
   /** Who proposed a counter, by the name the rikma knows them by. */
   function proposerName(userId) {
     const u = (user_1s ?? []).find((m) => String(m.id) === String(userId));
-    return u?.attributes?.username ?? '';
+    return $nameOf(u?.attributes) || '';
   }
 
 </script>

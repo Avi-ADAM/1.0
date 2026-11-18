@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * Connections (canvas "DesktopConnect"): the site that reports sales and
    * orders, and the rikma's support page with its donations. The panels are
@@ -23,7 +24,7 @@
   let base = $derived(data.projectBase ?? {});
   let users = $derived(base?.user_1s?.data ?? []);
   let members = $derived(
-    users.map((u: any) => ({ id: String(u.id), username: u.attributes?.username ?? '' }))
+    users.map((u: any) => ({ id: String(u.id), username: $nameOf(u.attributes) || '' }))
   );
   let products = $derived(
     (data.catalog?.products ?? [])

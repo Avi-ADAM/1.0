@@ -97,7 +97,7 @@ const BOOKING_FIELDS = `id attributes {
   ${SP_FIELDS}
   project { data { id attributes { projectName profilePic { data { attributes { url } } } } } }
   sheirut { data { id attributes { name } } }
-  consumer_user { data { id attributes { username } } }
+  consumer_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
 }`;
 
 export interface BookingInput {

@@ -45,7 +45,7 @@ const READ = `query ReleaseAssignedRead($id: ID!) {
     users_permissions_user { data { id } }
     sp { data { id } }
     vots { what order users_permissions_user { data { id } } }
-    project { data { id attributes { restime projectName user_1s { data { id attributes { username } } } } } }
+    project { data { id attributes { restime projectName user_1s { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } } } } }
     open_mashaabim { data { id attributes { name } } }
   } } }
 }`;

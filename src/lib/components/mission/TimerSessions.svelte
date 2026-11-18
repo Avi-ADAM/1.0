@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * TimerSessions — the mission's timer log, one row per actual sitting.
    *
@@ -179,7 +180,7 @@
                 {#if session.user}
                   <span class="ts-who">
                     <img src={avatarOf(session)} alt="" loading="lazy" />
-                    {session.user.username}
+                    {$nameOf(session.user)}
                   </span>
                 {/if}
 

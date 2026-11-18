@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * One open mission (or a mission proposal still awaiting a vote) as a card on
    * the "open for partners" board.
@@ -112,7 +113,7 @@
     stipendRate={Number(a.stipendRate) || 0}
     costShare={a.stipendCostShare ?? 1}
     mode={a.stipendMode || 'equity'}
-    funderName={a.stipendFunder?.data?.attributes?.username || ''}
+    funderName={$nameOf(a.stipendFunder?.data?.attributes) || ''}
     compact={true}
   />
 

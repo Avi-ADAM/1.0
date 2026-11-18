@@ -57,6 +57,33 @@ export interface ResolvedName {
     source: NameSource;
 }
 
+/** Pull the attributes out of any user shape the app passes around:
+ *  Strapi's `{ data: { attributes } }`, `{ attributes }`, or a flat object. */
+export function namedUserOf(u: unknown): NamedUser | null {
+    if (!u || typeof u !== 'object') return null;
+    const o = u as Record<string, any>;
+    if ('username' in o) return o as NamedUser;
+    if (o.attributes && typeof o.attributes === 'object') return o.attributes as NamedUser;
+    if (o.data !== undefined) return namedUserOf(o.data);
+    return o as NamedUser;
+}
+
+/**
+ * The four own-spelling fields of a user, for code that flattens a Strapi
+ * user into `{ username, … }` — spread it next to `username` so the flat
+ * shape still resolves through `displayName`. Absent fields are left out.
+ */
+export function nameFieldsOf(u: unknown): Partial<Pick<NamedUser, NameField>> {
+    const user = namedUserOf(u);
+    const out: Partial<Pick<NamedUser, NameField>> = {};
+    if (!user) return out;
+    for (const f of NAME_FIELDS) {
+        const v = user[f];
+        if (typeof v === 'string' && v.trim()) out[f] = v;
+    }
+    return out;
+}
+
 /** The script a string is written in, or `null` when no script holds it clearly. */
 export function nameScriptOf(s: string | null | undefined, threshold = 0.7): NameScript | null {
     const { script, share, letters } = detectScript(typeof s === 'string' ? s : '');
@@ -90,6 +117,21 @@ export function displayName(
     }
 
     return { text: username, source: 'raw' };
+}
+
+const LOCALES = new Set<string>(['he', 'en', 'ar', 'ru', 'es']);
+
+/**
+ * The plain string a reader in `readerLocale` should see, for any user shape.
+ * Server loaders (which know `locals.lang`) and the `$nameOf` store both use it.
+ * An unknown locale renders `username` as typed.
+ */
+export function memberName(u: unknown, readerLocale: string | null | undefined): string {
+    const user = namedUserOf(u);
+    if (!user) return '';
+    const loc = (readerLocale ?? '').slice(0, 2);
+    if (!LOCALES.has(loc)) return (user.username ?? '').trim();
+    return displayName(user, loc as Locale).text;
 }
 
 export type OwnNameCheck =

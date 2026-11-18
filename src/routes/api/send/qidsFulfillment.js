@@ -21,8 +21,8 @@ const STEP_FIELDS = `
   fields consentState exportAddress archived createdAt
   mesimabetahalich { data { id attributes { name } } }
   tafkidim { data { id attributes { roleDescription } } }
-  member { data { id attributes { username } } }
-  proposedBy { data { id attributes { username } } }
+  member { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
+  proposedBy { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
   consentedBy(pagination: { limit: 50 }) { data { id } }
   matanots(pagination: { limit: 50 }) { data { id attributes { name } } }
   product_variants(pagination: { limit: 50 }) { data { id } }
@@ -64,7 +64,7 @@ export const fulfillmentQids = {
     ) {
       data { id attributes {
         name finnished lifecycle
-        users_permissions_user { data { id attributes { username } } }
+        users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         tafkidims(pagination: { limit: 20 }) { data { id attributes { roleDescription } } }
       } }
     }
@@ -120,7 +120,7 @@ export const fulfillmentQids = {
     act(id: $id) { data { id attributes {
       shem des naasa dateF externalId source
       project { data { id } }
-      my { data { id attributes { username } } }
+      my { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
       tafkidims { data { id } }
       mesimabetahaliches { data { id } }
       order { data { id attributes { ref status displayNumber } } }
@@ -329,7 +329,7 @@ export const fulfillmentQids = {
       data { id attributes {
         fulfillmentStep { data { id } }
         timegrama { data { attributes { date done } } }
-        vots { what order why zman ide users_permissions_user { data { id attributes { username } } } }
+        vots { what order why zman ide users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } } }
       } }
     }
   }`,
@@ -371,7 +371,7 @@ export const fulfillmentQids = {
       data { id attributes {
         name unit kindOf recurring finnished pricePerUnit
         quantityDelivered quantityConsumed lowStockAt accounting
-        users_permissions_user { data { id attributes { username } } }
+        users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         matanot_recipe_resources(filters: { and: [
           { priceMode: { eq: "none" } }
           { or: [ { archived: { null: true } }, { archived: { eq: false } } ] }
@@ -394,7 +394,7 @@ export const fulfillmentQids = {
       data { id attributes {
         name unit kindOf recurring finnished lifecycle pricePerUnit
         quantityDelivered quantityConsumed lowStockAt accounting
-        users_permissions_user { data { id attributes { username } } }
+        users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         project { data { id } }
         rikmash { data { id } }
         maaps(pagination: { limit: 200 }) { data { id attributes { cycleIndex } } }

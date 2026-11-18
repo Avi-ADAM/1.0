@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * Recoveries in progress on the user's own account, seen from a device they
    * still hold — with the 24h protest ("This isn't me", plan §9 decision 1).
@@ -42,7 +43,7 @@
         <p>{$t('recovery.alerts.fingerprint')}: <b class="font-mono" dir="ltr">{r.fingerprint}</b></p>
         {#if r.threshold}
           <p>{$t('recovery.alerts.vouches', { count: r.vouchers.length, threshold: r.threshold })}
-            {#if r.vouchers.length}({r.vouchers.map((v) => v.username ?? v.id).join(', ')}){/if}</p>
+            {#if r.vouchers.length}({r.vouchers.map((v) => $nameOf(v) || v.id).join(', ')}){/if}</p>
         {/if}
         {#if r.readyAt}<p class="font-semibold">{$t('recovery.alerts.readyAt', { date: fmt(r.readyAt) })}</p>{/if}
         {#if r.protestedAt}<p class="text-surfaceMuted">{$t('recovery.alerts.protested', { date: fmt(r.protestedAt) })}</p>{/if}

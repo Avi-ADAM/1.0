@@ -1,5 +1,6 @@
 ﻿<!-- src/lib/components/prPr/kanban/KanbanBoard.svelte -->
 <script lang="ts">
+  import { nameOf } from '$lib/translation/memberName';
   import { useFormatMoney } from '$lib/money/context.svelte';
   import { t, isRtl } from '$lib/translations';
 
@@ -153,9 +154,9 @@
         kind: colKindMap[colId],
         colId,
         itemType: 'act' as const,
-        assignee: myUser?.username,
+        assignee: $nameOf(myUser),
         assigneePic: myUser?.profilePic?.data?.attributes?.url,
-        createdBy: attr.vali?.data?.attributes?.username,
+        createdBy: $nameOf(attr.vali?.data?.attributes),
         dateS: attr.dateS,
         dateF: attr.dateF,
         progress: attr.status ?? 0,

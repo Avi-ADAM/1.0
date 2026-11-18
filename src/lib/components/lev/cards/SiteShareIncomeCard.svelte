@@ -1,4 +1,5 @@
 ﻿<script lang="ts">
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * SiteShareIncomeCard — the platform-rikma RECEIVING side of a site-share
    * contribution (PLAN_SITE_SHARE_PER_MEMBER §10.2; SITE_SHARE_TRANSFER_SPEC §5).
@@ -196,18 +197,18 @@
               {#if u.profilePic}
                 <img
                   src={u.profilePic}
-                  alt={u.username}
+                  alt={$nameOf(u)}
                   class="w-8 h-8 rounded-full object-cover border border-yellow-300"
                 />
               {:else}
                 <div
                   class="w-8 h-8 rounded-full bg-yellow-200 dark:bg-yellow-800 flex items-center justify-center text-yellow-700 dark:text-yellow-300 font-bold text-xs"
                 >
-                  {u.username?.charAt(0)}
+                  {$nameOf(u)?.charAt(0)}
                 </div>
               {/if}
               <span class="text-sm font-semibold text-gray-800 dark:text-gray-200"
-                >{u.username}</span
+                >{$nameOf(u)}</span
               >
               {#if String(u.id) === String(buble.myid)}
                 <span
@@ -265,8 +266,8 @@
             halukaId={h.id}
             senderId={h.sender?.id ?? ''}
             receiverId={h.receiver?.id ?? ''}
-            senderName={h.sender?.username ?? ''}
-            receiverName={h.receiver?.username ?? ''}
+            senderName={$nameOf(h.sender) || ''}
+            receiverName={$nameOf(h.receiver) || ''}
             senderPic={h.sender?.profilePic}
             receiverPic={h.receiver?.profilePic}
             amount={h.amount}

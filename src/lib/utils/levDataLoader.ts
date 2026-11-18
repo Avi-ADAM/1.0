@@ -73,6 +73,7 @@ import {
 import { executeAction } from '$lib/client/actionClient';
 import { resolvePlatformIdentity } from '$lib/stores/platformStore';
 import { readLastRefresh, shouldRefreshSuggestions, writeLastRefresh } from './suggestionRefresh';
+import { nameFieldsOf } from '$lib/translation/displayName.js';
 
 // Single in-flight full load, keyed by user id — lets concurrent callers
 // (hub prefetch, lev page, focus-path background refresh) share one query 83.
@@ -330,7 +331,7 @@ export function populateStores(data: any, userId: string): void {
     // Extract and set user data
     const user: UserData = {
       id: userData.id,
-      username: userData.attributes.username || '',
+      ...nameFieldsOf(userData.attributes), username: userData.attributes.username || '',
       email: userData.attributes.email || '',
       profilePic: userData.attributes.profilePic?.data?.attributes?.url,
       lang: userData.attributes.lang || 'he',

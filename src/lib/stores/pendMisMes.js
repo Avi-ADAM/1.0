@@ -3,6 +3,7 @@ import { get, writable } from 'svelte/store';
 import { realtimeBus } from '$lib/realtime/bus.svelte';
 import { uPic } from '$lib/stores/uPic.js';
 import { t as translateStore } from '$lib/translations';
+import { nameFieldsOf } from '$lib/translation/displayName.js';
   const baseUrl = import.meta.env.VITE_URL
 
 const inFlightForumFetches = new Set();
@@ -384,7 +385,7 @@ export function forums(dat, myId, all = false) {
           sentByMe: String(msgUser?.id) === String(myId),
           timestamp: msgAttrs.when,
           messageId: msg.id,
-          username: msgUser?.attributes?.username || ''
+          ...nameFieldsOf(msgUser?.attributes), username: msgUser?.attributes?.username || ''
         };
       });
 

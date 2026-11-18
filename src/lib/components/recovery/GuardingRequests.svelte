@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * The guardian's inbox (T9b, decision 28.9.2026): being someone's guardian
    * is an obligation, so it counts only once you agree. Lists everyone who
@@ -13,7 +14,7 @@
   let message = $state('');
 
   async function answer(g: Guardianship, accept: boolean) {
-    if (!accept && !confirm($t('recovery.guarding.stepDownConfirm', { name: g.username ?? g.ownerId }))) return;
+    if (!accept && !confirm($t('recovery.guarding.stepDownConfirm', { name: $nameOf(g) || g.ownerId }))) return;
     busy = true;
     message = '';
     try {
@@ -32,7 +33,7 @@
     <p class="text-sm text-surfaceMuted">{$t('recovery.guarding.desc')}</p>
     <ul class="space-y-2">
       {#each guarding as g (g.ownerId)}
-        {@const name = g.username ?? $t('recovery.vouch.unknownUser')}
+        {@const name = $nameOf(g) || $t('recovery.vouch.unknownUser')}
         <li class="flex flex-wrap items-center gap-2 rounded-lg bg-surface2 p-3 text-sm">
           <span class="min-w-0 flex-1">
             {#if g.stance === 'accepted'}

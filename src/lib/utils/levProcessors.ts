@@ -32,6 +32,7 @@ import { normalizeSaveLinks } from '$lib/timers/saveLinks';
 import { readSaveFiles } from '$lib/timers/saveFiles';
 import { counterHistory, standingOrder, standingVotes, voterId } from '$lib/finiapruval/rounds';
 import { claimSessions } from '$lib/finiapruval/sessions';
+import { nameFieldsOf } from '$lib/translation/displayName.js';
 
 /** Translator callback (`$t` from `$lib/translations`), passed in by reactive stores so processors stay pure. */
 export type TranslateFn = (key: string, payload?: Record<string, any>) => string;
@@ -670,7 +671,7 @@ export function processFiapp(
       st: rt[2],
 
       uid: requesterId,
-      username: requesterInfo.username,
+      ...nameFieldsOf(requesterInfo), username: requesterInfo.username,
       srcUser: requesterInfo.src, // Used as src22 in old code? No, old code mapped it to 'src' of item?
 
       hearotMeyuchadot: mbData.hearotMeyuchadot,
@@ -1020,7 +1021,7 @@ export function processAsked(
       forumId: (ask.forums?.data && ask.forums.data.length > 0) ? ask.forums.data[0].id : null,
 
       // Restored Logic Fields
-      username: userAttrs.username,
+      ...nameFieldsOf(userAttrs), username: userAttrs.username,
       userSkills: applyLocalization(userAttrs.skills?.data ? userAttrs.skills : { data: [] }),
       userRole: applyLocalization(userAttrs.tafkidims?.data ? userAttrs.tafkidims : { data: [] }),
       userWorkway: applyLocalization(userAttrs.work_ways?.data ? userAttrs.work_ways : { data: [] }),
@@ -1148,7 +1149,7 @@ export function processAskedResources(
       // Fields
       askId: res.id,
       uid: res.uid,
-      username: res.username,
+      ...nameFieldsOf(res), username: res.username,
 
       // Resource specific
       price: res.price,
@@ -1822,7 +1823,7 @@ export function processWegets(
       // This MUST be after ...weget to overwrite the default src from extractor
       src: userInfo.src || '',
       uid: userInfo.uid,
-      username: userInfo.username,
+      ...nameFieldsOf(userInfo), username: userInfo.username,
 
       // Weget-specific fields from crMaap
       myp: weget.myp,
@@ -2020,7 +2021,7 @@ export function processWelcome(
       message: welcomeMsg.message,
       details: welcomeMsg.details, // Restored field
       pd: welcomeMsg.pd,           // Restored field
-      username: welcomeMsg.username, // Restored field
+      ...nameFieldsOf(welcomeMsg), username: welcomeMsg.username, // Restored field
 
       // Pass through all other fields from raw data
       ...welcomeMsg

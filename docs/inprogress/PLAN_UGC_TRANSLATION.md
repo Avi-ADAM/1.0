@@ -1380,6 +1380,22 @@ fields stay hidden, and a save sends them only when the read worked. The
 engine-row placeholder of §18.4 waits for S5, since no walker fills username
 rows yet. Nothing renders a name through `displayName` until S3.
 
+**S3 shipped as (2026-11-18), after the 1.0b deploy:** every GraphQL selection
+of `username` on a user (`qids.js` and its siblings, `forumStore`, the stipend /
+shifts / booking / archive server reads) also selects the four fields — never
+inside `me { … }`, whose type has none. Components render through the
+`$nameOf(user)` store (`src/lib/translation/memberName.ts`), which takes any
+user shape (`{data:{attributes}}`, `{attributes}`, flat) and resolves in the
+reader's `$locale`. Code that flattens a user into `{ username, … }` (the lev
+extractors/processors, process lifecycle, timer sessions, site-share / splits
+archives, support and gift loaders) spreads `nameFieldsOf(user)` next to
+`username`, so the flat shape still resolves. Server loaders that build names
+as strings call `memberName(user, locals.lang)` (concierge wish page). Left on
+`username` on purpose: places that use the name as a **key** (the mission /
+sale / resource pickers that match an option label back to a user), the
+member's own name (`/me`, hub, header), vault entries and GitHub logins.
+Mail / notifications / MCP stay S4. The grep guard of §18.3 is not built yet.
+
 S1–S4 cost nothing to run — no engine, no quota — and already fix the case
 that prompted this section (a member wanting their own name in English). S5 is
 the §7.4 surface proper.

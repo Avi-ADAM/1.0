@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { t } from '$lib/translations';
   const moachStore = getMoachStore();
   import { page } from '$app/state';
@@ -78,7 +79,7 @@
         <section id="participants" class="bg-white p-6 rounded-xl shadow-sm">
           <h2 class="text-lg font-bold mb-4 border-b pb-2">{$t('moach.vote.participants')}</h2>
           <div class="flex items-center gap-3">
-             <span class="font-medium">{vote.attributes.users_permissions_user?.data?.attributes?.username}</span>
+             <span class="font-medium">{$nameOf(vote.attributes.users_permissions_user?.data?.attributes)}</span>
           </div>
         </section>
 

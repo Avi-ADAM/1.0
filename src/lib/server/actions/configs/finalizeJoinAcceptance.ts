@@ -222,7 +222,7 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
 
   const adduserFragment = newnew
     ? `updateProject(id: "${projectId}", data: { user_1s: [${newMemberIds.map(id => `"${id}"`).join(',')}] }) {
-        data { attributes { user_1s { data { id attributes { email lang username } } } } }
+        data { attributes { user_1s { data { id attributes { email lang username nameLatin nameArabic nameCyrillic nameHebrew } } } } }
       }`
     : '';
 

@@ -1,4 +1,5 @@
 ﻿<script>
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * The rikma's main sales page (canvas "Main" / "DesktopOverview",
    * PLAN_SHOP_CUSTOMER_EXPERIENCE §7.3): how much is waiting to be split, the
@@ -269,7 +270,7 @@
     if (hs === 'open')
       return {
         cls: 'sh-chip-accent',
-        text: $t('project.misc.awaitingHolderConsent', { holderName: holderOf(sale)?.attributes?.username ?? '' })
+        text: $t('project.misc.awaitingHolderConsent', { holderName: $nameOf(holderOf(sale)) })
       };
     if (hs === 'timeout') return { cls: 'sh-chip-gold', text: $t('project.hamatanot.autoApproved') };
     if (hs === 'confirmed') return { cls: 'sh-chip-ok', text: $t('project.hamatanot.confirmed') };
@@ -387,7 +388,7 @@
   const salesN = (n) => (n === 1 ? $t('shop.sp.salesCountOne') : $t('shop.sp.salesCount', { count: n }));
   let picked = $derived(bmiData.find((p) => p.id === maid) ?? null);
   let myName = $derived(
-    uid ? (projectUsers.find((u) => String(u.id) === String(uid))?.attributes?.username ?? '') : ''
+    uid ? $nameOf(projectUsers.find((u) => String(u.id) === String(uid))) : ''
   );
 </script>
 
@@ -565,8 +566,8 @@
               <span class="sh-section-label">{$t('shop.sp.flowsTitle')}</span>
               {#each flows as f (f.uid)}
                 <div class="sp-flow">
-                  <span class="sp-av" aria-hidden="true">{initialOf(f.username)}</span>
-                  <span class="sp-flow-name">{f.username} <span class="sp-muted">· {f.p.toFixed(0)}%</span></span>
+                  <span class="sp-av" aria-hidden="true">{initialOf($nameOf(f))}</span>
+                  <span class="sp-flow-name">{$nameOf(f)} <span class="sp-muted">· {f.p.toFixed(0)}%</span></span>
                   {#if f.noten > 0.01}
                     <span class="sh-chip sh-chip-accent">{$t('shop.sp.give', { amount: fmtMoney(f.noten) })}</span>
                   {:else if f.meca > 0.01}
@@ -687,11 +688,11 @@
                   <strong class="sp-sale-amount"><Money amount={s.attributes.in} entry={s.attributes} /></strong>
                 </div>
                 <div class="sp-sale-meta">
-                  <span class="sp-av sp-av-sm" aria-hidden="true">{initialOf(holder?.attributes?.username)}</span>
+                  <span class="sp-av sp-av-sm" aria-hidden="true">{initialOf($nameOf(holder?.attributes))}</span>
                   <span class="sp-muted sp-sale-holder">
                     {mine
                       ? $t('shop.sp.moneyWithYou')
-                      : $t('shop.sp.moneyWith', { name: holder?.attributes?.username ?? '' })} · {formatSaleDate(s.attributes.date)}
+                      : $t('shop.sp.moneyWith', { name: $nameOf(holder?.attributes) || '' })} · {formatSaleDate(s.attributes.date)}
                   </span>
                 </div>
                 <div class="sp-sale-chips">

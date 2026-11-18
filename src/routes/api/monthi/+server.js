@@ -364,7 +364,7 @@ async function runRecurringResources(fetchFn, dry) {
       data { id attributes {
         name pricePerUnit start end cycleSize kindOf lifecycle archiveEffectiveFrom
         project { data { id attributes { projectName restime } } }
-        users_permissions_user { data { id attributes { username email lang noMail } } }
+        users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew email lang noMail } } }
         maaps(pagination: { limit: 500 }) { data { id attributes { cycleIndex cycleStart cycleEnd archived } } }
       } }
     }

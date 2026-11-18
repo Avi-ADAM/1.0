@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * Focused, deep-linkable view of a single vote. Supports four kinds:
    *   - pmash → pending resource proposal   (PendingMa / pmas)
@@ -447,7 +448,7 @@
         users={buble.users}
         askId={buble.askId}
         projectName={buble.projectName}
-        useraplyname={buble.username}
+        useraplyname={$nameOf(buble)}
         userId={buble.uid}
         missionDetails={buble.missionDetails}
         src={buble.src}
@@ -503,7 +504,7 @@
         users={buble.users}
         askId={buble.askId}
         projectName={buble.projectName}
-        useraplyname={buble.username}
+        useraplyname={$nameOf(buble)}
         userId={buble.uid}
         missionDetails={buble.descrip}
         src={buble.src}
@@ -599,7 +600,7 @@
         users={buble.users}
         askId={buble.askId}
         projectName={buble.projectName}
-        useraplyname={buble.username}
+        useraplyname={$nameOf(buble)}
         userId={buble.uid}
         missionDetails={buble.descrip}
         src={buble.src}

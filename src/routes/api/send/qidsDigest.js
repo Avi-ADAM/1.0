@@ -57,7 +57,7 @@ const WORK = (v, contact) => `
     data {
       id
       attributes {
-        username
+        username nameLatin nameArabic nameCyrillic nameHebrew
         ${contact ? 'email lang telegramId noMail blocked machshirs { data { id } }' : ''}
         mesimabetahaliches(
           filters: { and: [ { forappruval: { eq: false }, finnished: { eq: false } }, ${NOT_ARCHIVED} ] }

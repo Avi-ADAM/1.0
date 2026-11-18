@@ -8,6 +8,7 @@
  */
 
 import { getProjectData } from '$lib/stores/projectStore.js';
+import { nameFieldsOf } from '$lib/translation/displayName.js';
 export { getProjectData };
 
 /**
@@ -160,7 +161,7 @@ export function getProjectMembers(projectId) {
   
   return users.map(user => ({
     uid: user.id,
-    username: user.attributes?.username || '',
+    ...nameFieldsOf(user.attributes), username: user.attributes?.username || '',
     src: getProjectData(projectId, 'upic', user.id)
   }));
 }

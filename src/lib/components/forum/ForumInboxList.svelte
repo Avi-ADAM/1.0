@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { nameOf } from '$lib/translation/memberName';
   import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
 
@@ -119,7 +120,7 @@
           <span class="mt-1 block truncate text-xs text-pink-100/65">
             {#if forum.lastMessage}
               <strong class="text-pink-100/90"
-                >{forum.lastMessage.username || $t('common.forumInbox.system')}:</strong
+                >{$nameOf(forum.lastMessage) || $t('common.forumInbox.system')}:</strong
               >
               {forum.lastMessage.message}
             {:else}

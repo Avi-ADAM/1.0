@@ -2,6 +2,7 @@ import { sendToSer } from '$lib/send/sendToSer.js';
 import { computeCoverage } from '$lib/revenue/computeCoverage';
 import { readRikmaIdentity } from '$lib/server/rikmaPublic/loadRikmaPage.js';
 import { rtKey } from '$lib/realtime/scopes.js';
+import { nameFieldsOf } from '$lib/translation/displayName.js';
 
 /**
  * Public support / home page (PLAN_VOLUNTEER_RIKMA §3).
@@ -127,7 +128,7 @@ export const load = async ({ locals, params, fetch, depends }) => {
   // The member list, trimmed to what the donation dialog needs (id + name).
   const members = (attrs.user_1s?.data ?? []).map((m) => ({
     id: String(m.id),
-    username: m.attributes?.username ?? ''
+    ...nameFieldsOf(m.attributes), username: m.attributes?.username ?? ''
   }));
 
   return {

@@ -1,4 +1,5 @@
 ﻿<script>
+  import { nameOf } from '$lib/translation/memberName';
   import { useFormatMoney } from '$lib/money/context.svelte';
   import { locale, isRtl, t } from '$lib/translations';
   /**
@@ -79,7 +80,7 @@
               <li class="ssa-row">
                 <span class="ssa-who">
                   {#if r.pic}<img src={r.pic} alt="" class="ssa-pic" />{/if}
-                  <span>{r.username || $t('project.siteShareArchive.anon')}</span>
+                  <span>{$nameOf(r) || $t('project.siteShareArchive.anon')}</span>
                 </span>
                 <span class="ssa-amts">
                   <b>{fmt(r.received)}</b>
@@ -120,7 +121,7 @@
             <li class="ssa-row">
               <span class="ssa-who">
                 {#if m.pic}<img src={m.pic} alt="" class="ssa-pic" />{/if}
-                <span>{m.username || $t('project.siteShareArchive.anon')}</span>
+                <span>{$nameOf(m) || $t('project.siteShareArchive.anon')}</span>
               </span>
               <span class="ssa-amts">
                 <b>{fmt(m.received)}</b>

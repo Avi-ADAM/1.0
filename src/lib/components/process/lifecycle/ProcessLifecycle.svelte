@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * ProcessLifecycle — the detailed, vertical life-story of one mission or
    * resource chain: initial decision (votes + negotiation + chat), the open
@@ -174,11 +175,11 @@
                       <img
                         class="pl-avatar"
                         src={mediaUrl(askUser.attributes.profilePic.data.attributes.url)}
-                        alt={askUser.attributes.username}
+                        alt={$nameOf(askUser.attributes)}
                         loading="lazy"
                       />
                     {/if}
-                    <span class="pl-card-name">{askUser?.attributes?.username ?? `#${ask.id}`}</span>
+                    <span class="pl-card-name">{$nameOf(askUser?.attributes) || `#${ask.id}`}</span>
                     <span class="pl-badge {ask.attributes?.archived ? 'pl-badge--grey' : 'pl-badge--blue'}">
                       {ask.attributes?.archived ? $t('moach.lifecycle.resolved') : $t('moach.lifecycle.open')}
                     </span>
@@ -224,9 +225,9 @@
           {#if bUser}
             <span class="pl-fact pl-fact--user">
               {#if bUser.attributes?.profilePic?.data?.attributes?.url}
-                <img class="pl-avatar" src={mediaUrl(bUser.attributes.profilePic.data.attributes.url)} alt={bUser.attributes.username} loading="lazy" />
+                <img class="pl-avatar" src={mediaUrl(bUser.attributes.profilePic.data.attributes.url)} alt={$nameOf(bUser.attributes)} loading="lazy" />
               {/if}
-              {bUser.attributes?.username}
+              {$nameOf(bUser.attributes)}
             </span>
           {/if}
           <span class="pl-fact">
@@ -244,8 +245,8 @@
                 {@const actAttrs = act.attributes ?? {}}
                 <li class="pl-act">
                   <a class="pl-act-name" href={`${base}/object/act/${act.id}`}>{actAttrs.shem ?? `#${act.id}`}</a>
-                  {#if actAttrs.my?.data?.attributes?.username}
-                    <span class="pl-act-user">{$t('moach.lifecycle.by')} {actAttrs.my.data.attributes.username}</span>
+                  {#if $nameOf(actAttrs.my?.data?.attributes)}
+                    <span class="pl-act-user">{$t('moach.lifecycle.by')} {$nameOf(actAttrs.my.data.attributes)}</span>
                   {/if}
                   {#if actAttrs.dateF}
                     <span class="pl-act-date">{formatDate(actAttrs.dateF)}</span>
@@ -443,9 +444,9 @@
             <div class="pl-card">
               <div class="pl-card-head">
                 {#if aUser?.attributes?.profilePic?.data?.attributes?.url}
-                  <img class="pl-avatar" src={mediaUrl(aUser.attributes.profilePic.data.attributes.url)} alt={aUser.attributes.username} loading="lazy" />
+                  <img class="pl-avatar" src={mediaUrl(aUser.attributes.profilePic.data.attributes.url)} alt={$nameOf(aUser.attributes)} loading="lazy" />
                 {/if}
-                <span class="pl-card-name">{aUser?.attributes?.username ?? `#${askm.id}`}</span>
+                <span class="pl-card-name">{$nameOf(aUser?.attributes) || `#${askm.id}`}</span>
                 <span class="pl-badge {aAttrs.archived ? 'pl-badge--grey' : 'pl-badge--blue'}">
                   {aAttrs.archived ? $t('moach.lifecycle.resolved') : $t('moach.lifecycle.open')}
                 </span>

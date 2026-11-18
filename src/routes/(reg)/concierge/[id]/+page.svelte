@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import Money from '$lib/components/money/Money.svelte';
   import '$lib/styles/concierge.css';
   import { goto, invalidateAll } from '$app/navigation';
@@ -577,7 +578,7 @@
           params: {
             ratsonId: wishId,
             targetUserId: p.id,
-            name: spec?.name || p.username || $t('concierge.wp.kind_mission'),
+            name: spec?.name || $nameOf(p) || $t('concierge.wp.kind_mission'),
             hours: spec?.hours ?? null,
             ratePerHour: spec?.ratePerHour ?? null,
             descrip: spec?.descrip || '',
@@ -1020,7 +1021,7 @@
     } else {
       const targets = peopleForNeed(row.need)
         .filter((p) => p.id)
-        .map((p) => ({ userId: p.id, label: p.username || $t('concierge.wp.provider') }));
+        .map((p) => ({ userId: p.id, label: $nameOf(p) || $t('concierge.wp.provider') }));
       if (!targets.length) return;
       inviteAllTarget = { isResource: false, targets, needName: row.need.rawName };
     }
@@ -2254,11 +2255,11 @@
                         {@const k = `p${p.id}`}
                         <div class="scard">
                           <div class="disc disc-sm">
-                            {(p.username || '··').slice(0, 2)}
+                            {($nameOf(p) || '··').slice(0, 2)}
                           </div>
                           <div style="flex:1;min-width:0">
                             <div class="pname" style="font-size:14px">
-                              {p.username || $t('concierge.wp.member')}
+                              {$nameOf(p) || $t('concierge.wp.member')}
                             </div>
                             <div class="sug-skills">
                               {#each (p.matchedSkills?.length ? p.matchedSkills : p.skills).slice(0, 3) as s (s)}<span
@@ -2694,11 +2695,11 @@
                     {@const k = `p${p.id}`}
                     <div style="display:flex;gap:10px;align-items:center">
                       <div class="disc disc-sm">
-                        {(p.username || '··').slice(0, 2)}
+                        {($nameOf(p) || '··').slice(0, 2)}
                       </div>
                       <div style="flex:1;min-width:0">
                         <div class="pname" style="font-size:14px">
-                          {p.username || $t('concierge.wp.member')}
+                          {$nameOf(p) || $t('concierge.wp.member')}
                         </div>
                         <div class="sug-skills">
                           {#each (p.matchedSkills?.length ? p.matchedSkills : p.skills).slice(0, 3) as s (s)}<span
@@ -3282,7 +3283,7 @@
   <div class="spec-overlay" role="dialog" aria-modal="true">
     <div class="spec-card">
       <div class="spec-head">
-        <span>{$t('concierge.wp.mission_offer_to', { name: specForPerson.username || $t('concierge.wp.provider') })}</span>
+        <span>{$t('concierge.wp.mission_offer_to', { name: $nameOf(specForPerson) || $t('concierge.wp.provider') })}</span>
         <button
           class="spec-x"
           onclick={() => (specForPerson = null)}

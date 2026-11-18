@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * Choose and sign the guardian set (T9b). Guardians may be ANY user
    * (plan §9, decision 2): rikma partners are offered first, anyone else is
@@ -49,18 +50,18 @@
       for (const p of projects) {
         for (const u of p?.attributes?.user_1s?.data ?? []) {
           const id = String(u.id);
-          if (id !== String(uid) && !seen.has(id)) seen.set(id, u.attributes?.username ?? id);
+          if (id !== String(uid) && !seen.has(id)) seen.set(id, $nameOf(u) || id);
         }
       }
       partners = [...seen].map(([id, username]) => ({ id, username }))
-        .sort((a, b) => a.username.localeCompare(b.username));
+        .sort((a, b) => $nameOf(a).localeCompare($nameOf(b)));
     } catch {
       partners = [];
     }
   });
 
   function startEditing() {
-    chosen = (current?.guardians ?? []).map((g) => ({ id: g.id, username: g.username ?? g.id }));
+    chosen = (current?.guardians ?? []).map((g) => ({ id: g.id, username: $nameOf(g) || g.id }));
     threshold = current?.threshold ?? 2;
     editing = true;
     message = '';
@@ -85,7 +86,7 @@
         lookupMiss = true;
         return;
       }
-      const p = { id: String(u.id), username: u.attributes?.username ?? q };
+      const p = { id: String(u.id), username: $nameOf(u.attributes) || q };
       if (!chosen.some((c) => c.id === p.id)) toggle(p);
       lookup = '';
     } catch {
@@ -122,7 +123,7 @@
             ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200'
             : 'bg-surface2 text-surfaceMuted'}"
         >
-          {g.accepted ? '✓' : '…'} {g.username ?? g.id}
+          {g.accepted ? '✓' : '…'} {$nameOf(g) || g.id}
           <span class="text-xs opacity-80">· {g.accepted ? $t('recovery.set.agreed') : $t('recovery.set.waitingConsent')}</span>
         </li>
       {/each}
@@ -170,7 +171,7 @@
                 : 'border-zinc-300 dark:border-zinc-600'}"
               aria-pressed={on}
               onclick={() => toggle(p)}
-            >{on ? '✓ ' : ''}{p.username}</button>
+            >{on ? '✓ ' : ''}{$nameOf(p)}</button>
           {/each}
         </div>
       {/if}
@@ -196,7 +197,7 @@
         <ul class="flex flex-wrap gap-2">
           {#each chosen as c (c.id)}
             <li class="flex items-center gap-1 rounded-full bg-surface2 px-3 py-1 text-sm">
-              {c.username}
+              {$nameOf(c)}
               <button
                 type="button"
                 class="text-surfaceMuted hover:text-rose-600"

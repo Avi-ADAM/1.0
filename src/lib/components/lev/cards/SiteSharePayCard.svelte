@@ -1,4 +1,5 @@
 ﻿<script>
+  import { nameOf } from '$lib/translation/memberName';
   import { useFormatMoney } from '$lib/money/context.svelte';
   import { t, isRtl } from '$lib/translations';
   /**
@@ -104,7 +105,7 @@
         const vol = selectedVol;
         buble.halukaId = String(out.halukaId);
         buble.receiver = vol
-          ? { id: String(vol.id), username: vol.username, profilePic: vol.profilePic }
+          ? { id: String(vol.id), username: $nameOf(vol), profilePic: vol.profilePic }
           : { id: String(selected), username: '', profilePic: null };
         buble.transferSenderconf = false;
         buble.transferConfirmed = false;
@@ -189,12 +190,12 @@
                 {#if v.profilePic}
                   <img
                     src={v.profilePic}
-                    alt={v.username}
+                    alt={$nameOf(v)}
                     class="w-6 h-6 rounded-full object-cover"
                   />
                 {/if}
                 <span class="text-sm text-gray-800 dark:text-gray-200"
-                  >{v.username || '?'}</span
+                  >{$nameOf(v) || '?'}</span
                 >
               </label>
             {/each}
@@ -208,8 +209,8 @@
         halukaId={buble.halukaId ? String(buble.halukaId) : ''}
         senderId={myId}
         receiverId={String(receiver?.id ?? '')}
-        senderName={$userStore?.username ?? ''}
-        receiverName={receiver?.username ?? ''}
+        senderName={$nameOf($userStore) || ''}
+        receiverName={$nameOf(receiver) || ''}
         senderPic={$userStore?.profilePic ?? ''}
         receiverPic={receiver?.profilePic ?? ''}
         amount={buble.amount}

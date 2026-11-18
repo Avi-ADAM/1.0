@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * The rikma's value as a pie of its partners' faces, with the legend that
    * says it in words: every slice has a coloured rim and a hairline gap, and
@@ -155,7 +156,7 @@
     </svg>
     <figcaption class="sp-caption" aria-live="polite">
       {#if activeMember}
-        <b>{activeMember.username}</b>
+        <b>{$nameOf(activeMember)}</b>
         <span class="sp-cap-p" style="color: {activeMember.color}">{pct(activeMember.p)}%</span>
         <span class="sp-cap-v">{fmt(activeMember.total)}</span>
       {:else if active === OTHERS}
@@ -192,7 +193,7 @@
           </span>
           <span class="sp-body">
             <span class="sp-line">
-              <span class="sp-name">{m.username}</span>
+              <span class="sp-name">{$nameOf(m)}</span>
               {#if none}
                 <span class="sp-zero">{$t('moach.split.noShareYet')}</span>
               {:else}

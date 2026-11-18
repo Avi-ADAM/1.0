@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { isRtl, locale, t } from '$lib/translations';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { Head } from 'svead';
@@ -248,7 +249,7 @@
               {#if data.personalSeller.picUrl}
                 <img
                   src={data.personalSeller.picUrl}
-                  alt={data.personalSeller.username}
+                  alt={$nameOf(data.personalSeller)}
                   class="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-white/30 shadow-md object-cover flex-shrink-0"
                 />
               {/if}
@@ -257,7 +258,7 @@
                   >{$t('pages.gift.gift')}</span
                 >
                 <h1 class="text-xl sm:text-3xl font-extrabold text-[color:var(--ramp-ink,#16131b)] leading-tight">
-                  {data.personalSeller.username}
+                  {$nameOf(data.personalSeller)}
                 </h1>
                 <span
                   class="mt-1 self-start text-xs font-bold bg-black/10 dark:bg-white/10 border border-black/20 dark:border-white/20 text-[color:var(--ramp-ink,#16131b)] rounded-full px-2.5 py-0.5"
@@ -567,7 +568,7 @@
               <AskAboutProduct
                 productId={String(data.mId)}
                 productName={data.alld.name ?? ''}
-                rikmaName={data.personalSeller?.username ?? data.alld.projectcreates?.data?.[0]?.attributes?.projectName ?? ''}
+                rikmaName={$nameOf(data.personalSeller) || data.alld.projectcreates?.data?.[0]?.attributes?.projectName ?? ''}
                 lang={$lang || 'he'}
                 signedIn={!!data.tok}
               />

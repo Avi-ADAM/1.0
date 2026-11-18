@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   // The rikma's API page (PLAN_EXTERNAL_TASKS_API, Phase 2).
   //
   // Three jobs, in this order:
@@ -874,7 +875,7 @@ document.getElementById('lead-form').addEventListener('submit', async (e) => {
                   </button>
                 </td>
                 <td>
-                  {u.attributes?.username ?? `#${u.id}`}
+                  {$nameOf(u.attributes) || `#${u.id}`}
                   {String(u.id) === currentUserId ? ` (${$t('rikmaApi.you')})` : ''}
                 </td>
               </tr>
@@ -917,7 +918,7 @@ document.getElementById('lead-form').addEventListener('submit', async (e) => {
           <span>{$t('rikmaApi.member')}</span>
           <select bind:value={selectedUserId}>
             {#each members as u (u.id)}
-              <option value={String(u.id)}>{u.attributes?.username ?? `#${u.id}`}</option>
+              <option value={String(u.id)}>{$nameOf(u.attributes) || `#${u.id}`}</option>
             {/each}
           </select>
         </label>

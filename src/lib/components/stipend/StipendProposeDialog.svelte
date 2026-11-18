@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { useFormatMoney } from '$lib/money/context.svelte';
   /**
    * The dialog behind every "מלגת קיום" button (docs/done/PLAN_STIPEND.md §8).
@@ -446,7 +447,7 @@
             {#each missionOptions as m (missionKey(m))}
               <option value={missionKey(m)}>
                 {m.kind === 'open' ? `🔓 ${m.name}` : m.name}{m.username
-                  ? ` · ${m.username}`
+                  ? ` · ${$nameOf(m)}`
                   : ''}{m.perhour ? ` · ${fmtMoney(m.perhour)}/${$t('stipend.card.hour')}` : ''}
               </option>
             {/each}
@@ -481,7 +482,7 @@
               <span class={MUTED}>{$t('stipend.propose.openMissionExplain')}</span>
             {:else}
               <p class="text-sm font-bold text-gray-900 dark:text-white">
-                {chosenMissionRow.username || $t('stipend.propose.noRecipientYet')}
+                {$nameOf(chosenMissionRow) || $t('stipend.propose.noRecipientYet')}
               </p>
               <span class={MUTED}>{$t('stipend.propose.recipientDerived')}</span>
             {/if}
@@ -498,7 +499,7 @@
             </option>
             {#each memberOptions as m (m.id)}
               {#if m.id !== chosenRecipient}
-                <option value={m.id}>{m.username}</option>
+                <option value={m.id}>{$nameOf(m)}</option>
               {/if}
             {/each}
           </select>

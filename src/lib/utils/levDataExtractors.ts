@@ -33,6 +33,7 @@ import { buildStipendDecisionView } from '$lib/stipend/decisionView.js';
 import { buildPromoDecisionView } from '$lib/shop/promoDecisionView';
 import { calculateScore } from './suggestionMatchers';
 import { isStockReceiptMaap, receiptPriceOf } from '$lib/fulfillment/stock';
+import { nameFieldsOf } from '$lib/translation/displayName.js';
 
 /**
  * Extract pending missions (pendms) from GraphQL user data
@@ -795,7 +796,7 @@ export function extractWegets(userData: any): ResourceRequestData[] {
           userId:
             maap.attributes.sp?.data?.attributes?.users_permissions_user?.data?.id ||
             mashabAttrs?.users_permissions_user?.data?.id,
-          username: maap.attributes.sp?.data?.attributes?.users_permissions_user?.data?.attributes?.username,
+          ...nameFieldsOf(maap.attributes.sp?.data?.attributes?.users_permissions_user?.data?.attributes), username: maap.attributes.sp?.data?.attributes?.users_permissions_user?.data?.attributes?.username,
           myp: maap.attributes.sp?.data?.attributes?.myp,
           myid: userData.id,
           // Recurring cycle fields (only present on recurring cycle Maaps)
@@ -975,7 +976,7 @@ export function extractWelcome(userData: any): WelcomeData[] {
       // Additional fields - some might come from GraphQL, some from processor
       details: projectData?.publicDescription || '',
       pd: projectData?.descripFor || '',
-      username: userData?.attributes?.username || '',
+      ...nameFieldsOf(userData?.attributes), username: userData?.attributes?.username || '',
       clicked: welcom.attributes.clicked || false,
       // Note: projectName and src will be populated by processor using createProjectInfo
       // We don't set them here since the nested data might not be reliable
@@ -1977,7 +1978,7 @@ export function extractProductRequests(userData: any): ProductRequestData[] {
 
         // Requester
         userId: requester?.id || '',
-        username: requester?.attributes?.username || '',
+        ...nameFieldsOf(requester?.attributes), username: requester?.attributes?.username || '',
         userSrc: requester?.attributes?.profilePic?.data?.attributes?.url,
 
         // Details
@@ -2040,18 +2041,18 @@ export function mapSaleData(sheirut: any, projectId: string, userData: any, mode
   const iCanGetMonay = Array.isArray(iCanGetMonayData)
     ? iCanGetMonayData.map((u: any) => ({
         id: u.id,
-        username: u.attributes?.username || '',
+        ...nameFieldsOf(u.attributes), username: u.attributes?.username || '',
         profilePic: u.attributes?.profilePic?.data?.attributes?.url
       }))
     : iCanGetMonayData
-      ? [{ id: iCanGetMonayData.id, username: iCanGetMonayData.attributes?.username || '', profilePic: iCanGetMonayData.attributes?.profilePic?.data?.attributes?.url }]
+      ? [{ id: iCanGetMonayData.id, ...nameFieldsOf(iCanGetMonayData.attributes), username: iCanGetMonayData.attributes?.username || '', profilePic: iCanGetMonayData.attributes?.profilePic?.data?.attributes?.url }]
       : [];
 
   // Extract iTransferedTo user (from sheirut field, fallback)
   const iTransferedToUser = attrs.iTransferedTo?.data;
   const iTransferedToFromSheirut = iTransferedToUser ? {
     id: iTransferedToUser.id,
-    username: iTransferedToUser.attributes?.username || '',
+    ...nameFieldsOf(iTransferedToUser.attributes), username: iTransferedToUser.attributes?.username || '',
     profilePic: iTransferedToUser.attributes?.profilePic?.data?.attributes?.url
   } : undefined;
 
@@ -2066,7 +2067,7 @@ export function mapSaleData(sheirut: any, projectId: string, userData: any, mode
   const iTransferedTo = halukaReceiverData
     ? {
         id: halukaReceiverData.id,
-        username: halukaReceiverData.attributes?.username || '',
+        ...nameFieldsOf(halukaReceiverData.attributes), username: halukaReceiverData.attributes?.username || '',
         profilePic: halukaReceiverData.attributes?.profilePic?.data?.attributes?.url
       }
     : iTransferedToFromSheirut;
@@ -2088,14 +2089,14 @@ export function mapSaleData(sheirut: any, projectId: string, userData: any, mode
       sender: send
         ? {
             id: String(send.id),
-            username: send.attributes?.username || '',
+            ...nameFieldsOf(send.attributes), username: send.attributes?.username || '',
             profilePic: send.attributes?.profilePic?.data?.attributes?.url
           }
         : null,
       receiver: recv
         ? {
             id: String(recv.id),
-            username: recv.attributes?.username || '',
+            ...nameFieldsOf(recv.attributes), username: recv.attributes?.username || '',
             profilePic: recv.attributes?.profilePic?.data?.attributes?.url
           }
         : null
@@ -2117,7 +2118,7 @@ export function mapSaleData(sheirut: any, projectId: string, userData: any, mode
     content: m.attributes?.content,
     createdAt: m.attributes?.createdAt,
     userId: m.attributes?.users_permissions_user?.data?.id,
-    username: m.attributes?.users_permissions_user?.data?.attributes?.username,
+    ...nameFieldsOf(m.attributes?.users_permissions_user?.data?.attributes), username: m.attributes?.users_permissions_user?.data?.attributes?.username,
     userPic: m.attributes?.users_permissions_user?.data?.attributes?.profilePic?.data?.attributes?.url
   })) || [];
 
@@ -2133,11 +2134,11 @@ export function mapSaleData(sheirut: any, projectId: string, userData: any, mode
     projectSrc: projectSrc,
     members: projectInfo?.attributes?.user_1s?.data?.map((u: any) => ({
       id: u.id,
-      username: u.attributes?.username,
+      ...nameFieldsOf(u.attributes), username: u.attributes?.username,
       profilePic: u.attributes?.profilePic?.data?.attributes?.url
     })) || userData.attributes?.projects_1s?.data?.find((p: any) => p.id === projectId)?.attributes?.user_1s?.data?.map((u: any) => ({
       id: u.id,
-      username: u.attributes?.username,
+      ...nameFieldsOf(u.attributes), username: u.attributes?.username,
       profilePic: u.attributes?.profilePic?.data?.attributes?.url
     })) || [],
 

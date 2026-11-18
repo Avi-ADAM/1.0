@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * TimersPanel — the execution-time detail of a mesimabetahalich:
    *  · the monthly hours ledger (MonthlyHours — plan vs. actual per month, with
@@ -90,15 +91,15 @@
                   <img
                     class="tp-avatar"
                     src={mediaUrl(timerUser.attributes.profilePic.data.attributes.url)}
-                    alt={timerUser.attributes.username}
+                    alt={$nameOf(timerUser.attributes)}
                     loading="lazy"
                   />
                 {:else}
                   <span class="tp-initials" aria-hidden="true">
-                    {timerUser?.attributes?.username?.[0]?.toUpperCase() ?? '?'}
+                    {$nameOf(timerUser?.attributes)?.[0]?.toUpperCase() ?? '?'}
                   </span>
                 {/if}
-                <span class="tp-timer-user">{timerUser?.attributes?.username ?? ''}</span>
+                <span class="tp-timer-user">{$nameOf(timerUser?.attributes) || ''}</span>
                 <span class="tp-timer-date">{dayLabel(entry.from)}</span>
                 <!-- this timer's hours *in this month*, not its lifetime total -->
                 <span class="tp-timer-hours">

@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * Per-object page — a standalone page for every lifecycle entity linked to
    * the rikma (pendm / openMission / ask / betahalich / act / finiapruval /
@@ -127,8 +128,8 @@
       add($t('moach.objectDetail.finish'), formatDate(attrs.finish));
     }
     if (type === 'act') {
-      add($t('moach.objectDetail.by'), attrs.my?.data?.attributes?.username);
-      add($t('moach.objectDetail.validator'), attrs.vali?.data?.attributes?.username);
+      add($t('moach.objectDetail.by'), $nameOf(attrs.my?.data?.attributes));
+      add($t('moach.objectDetail.validator'), $nameOf(attrs.vali?.data?.attributes));
     }
     add($t('moach.objectDetail.deadline'), attrs.timegrama?.data?.attributes?.date ? formatDate(attrs.timegrama.data.attributes.date) : null);
     if (type === 'sale') {
@@ -220,9 +221,9 @@
       {#if owner}
         <span class="op-owner">
           {#if owner.attributes?.profilePic?.data?.attributes?.url}
-            <img class="op-avatar" src={mediaUrl(owner.attributes.profilePic.data.attributes.url)} alt={owner.attributes.username} loading="lazy" />
+            <img class="op-avatar" src={mediaUrl(owner.attributes.profilePic.data.attributes.url)} alt={$nameOf(owner.attributes)} loading="lazy" />
           {/if}
-          {owner.attributes?.username}
+          {$nameOf(owner.attributes)}
         </span>
       {/if}
     </header>

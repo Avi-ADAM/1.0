@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * SaleLifecycle — the life-story of a product/sale chain: the product
    * (matanot), its recipe (the missions and resources it is made of — a
@@ -129,8 +130,8 @@
                   {#if attrs.hoursPerUnit != null}
                     <span class="pl-fact">{attrs.hoursPerUnit} {$t('moach.saleLife.hours')} {$t('moach.saleLife.perUnit')}</span>
                   {/if}
-                  {#if attrs.assignedMember?.data?.attributes?.username}
-                    <span class="pl-fact">{$t('moach.saleLife.by')}: {attrs.assignedMember.data.attributes.username}</span>
+                  {#if $nameOf(attrs.assignedMember?.data?.attributes)}
+                    <span class="pl-fact">{$t('moach.saleLife.by')}: {$nameOf(attrs.assignedMember.data.attributes)}</span>
                   {/if}
                   <span class="pl-card-links">
                     {#if ref}
@@ -189,9 +190,9 @@
               {#if holder}
                 <span class="pl-fact pl-fact--user">
                   {#if holder.attributes?.profilePic?.data?.attributes?.url}
-                    <img class="pl-avatar" src={mediaUrl(holder.attributes.profilePic.data.attributes.url)} alt={holder.attributes.username} loading="lazy" />
+                    <img class="pl-avatar" src={mediaUrl(holder.attributes.profilePic.data.attributes.url)} alt={$nameOf(holder.attributes)} loading="lazy" />
                   {/if}
-                  {$t('moach.saleLife.holder')}: {holder.attributes?.username}
+                  {$t('moach.saleLife.holder')}: {$nameOf(holder.attributes)}
                 </span>
               {/if}
               <span class="pl-badge {badge.cls}">{badge.text}</span>

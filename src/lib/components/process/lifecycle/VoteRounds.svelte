@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * VoteRounds — renders a votes/negotiation component array
    * (ComponentProjectsVots or ComponentProjectsPendmnego) grouped into rounds
@@ -39,11 +40,11 @@
           {#each round.votes as vote (vote.id)}
             <li class="vr-vote">
               {#if vote.profilePicUrl}
-                <img class="vr-avatar" src={mediaUrl(vote.profilePicUrl)} alt={vote.username} loading="lazy" />
+                <img class="vr-avatar" src={mediaUrl(vote.profilePicUrl)} alt={$nameOf(vote)} loading="lazy" />
               {:else}
-                <span class="vr-initials" aria-hidden="true">{vote.username?.[0]?.toUpperCase() ?? '?'}</span>
+                <span class="vr-initials" aria-hidden="true">{$nameOf(vote)?.[0]?.toUpperCase() ?? '?'}</span>
               {/if}
-              <span class="vr-name">{vote.username || `#${vote.userId}`}</span>
+              <span class="vr-name">{$nameOf(vote) || `#${vote.userId}`}</span>
               {#if vote.what === true}
                 <span class="vr-what vr-what--yes">✓ {$t('moach.voteRounds.approved')}</span>
               {:else if vote.what === false}

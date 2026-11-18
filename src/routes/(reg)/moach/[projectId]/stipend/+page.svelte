@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { useFormatMoney } from '$lib/money/context.svelte';
   import Money from '$lib/components/money/Money.svelte';
   /**
@@ -435,7 +436,7 @@
           {#each overview.perMember as m (m.userId)}
             <li class="row {WELL}">
               <div class="grow">
-                <p class={TITLE}>{m.username}</p>
+                <p class={TITLE}>{$nameOf(m)}</p>
                 <p class={MUTED}>
                   {#if m.funded > 0}{$t('stipend.tab.funded', { count: money(m.funded) })}{/if}
                   {#if m.received > 0}
@@ -459,7 +460,7 @@
       <ul class="list">
         {#each members as m (m.id)}
           <li class="row {WELL}">
-            <span class="grow font-medium {BODY}">{m.username}</span>
+            <span class="grow font-medium {BODY}">{$nameOf(m)}</span>
             {#if String(m.id) !== myId}
               <StipendButton
                 intent="offer"
@@ -472,7 +473,7 @@
                 {policy}
                 defaultRate={overview.defaultRate}
                 defaultCostShare={overview.defaultCostShare}
-                label={$t('stipend.tab.offerTo', { name: m.username })}
+                label={$t('stipend.tab.offerTo', { name: $nameOf(m) })}
                 className={BTN_SMALL}
                 onDone={load}
               />

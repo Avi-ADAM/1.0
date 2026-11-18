@@ -11,6 +11,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { nameFieldsOf } from '$lib/translation/displayName.js';
 
 const handler: ActionExecutionHandler = async (_params, context, { strapi }) => {
   const userId = String(context.userId);
@@ -43,7 +44,7 @@ const handler: ActionExecutionHandler = async (_params, context, { strapi }) => 
     const sheirut = a.sheirut?.data ?? null;
     const volunteers = (sheirut?.attributes?.iCanGetMonay?.data ?? []).map((u: any) => ({
       id: String(u.id),
-      username: u.attributes?.username ?? '',
+      ...nameFieldsOf(u.attributes), username: u.attributes?.username ?? '',
       profilePic: u.attributes?.profilePic?.data?.attributes?.url ?? null,
     }));
 
@@ -54,7 +55,7 @@ const handler: ActionExecutionHandler = async (_params, context, { strapi }) => 
     const receiver = recNode
       ? {
           id: String(recNode.id),
-          username: recNode.attributes?.username ?? '',
+          ...nameFieldsOf(recNode.attributes), username: recNode.attributes?.username ?? '',
           profilePic: recNode.attributes?.profilePic?.data?.attributes?.url ?? null,
         }
       : null;

@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { t } from '$lib/translations';
   import { get } from 'svelte/store';
   import pic from './../../celim/pic.js';
@@ -168,9 +169,9 @@
     for (let user of ulist) {
       if (user.x > 0 && !existingUserIds.includes(user.uid)) {
         const addedText = get(t)('mission.whowhat.addedToSplit');
-        changes.push(`${user.username} ${addedText}`);
+        changes.push(`${$nameOf(user)} ${addedText}`);
         changesForDisplay.push({
-          label: `${user.username}:`,
+          label: `${$nameOf(user)}:`,
           oldValue: '0',
           newValue: user.x.toFixed(2)
         });
@@ -189,10 +190,10 @@
         Math.abs(existingUser.amount - currentUser.x) > 0.01
       ) {
         changes.push(
-          `${currentUser.username}: ${existingUser.amount.toFixed(2)} → ${currentUser.x.toFixed(2)}`
+          `${$nameOf(currentUser)}: ${existingUser.amount.toFixed(2)} → ${currentUser.x.toFixed(2)}`
         );
         changesForDisplay.push({
-          label: `${currentUser.username}:`,
+          label: `${$nameOf(currentUser)}:`,
           oldValue: existingUser.amount.toFixed(2),
           newValue: currentUser.x.toFixed(2)
         });
@@ -1030,10 +1031,10 @@
         ihave: userIhave,
         total: userTotal,
         uid: userId,
-        username: users[i].attributes.username,
+        username: $nameOf(users[i].attributes),
         src: src22,
         p: userPercentage,
-        un: users[i].username,
+        un: $nameOf(users[i]),
         s: userPercentage,
         s2: 100,
         d: pmcounter,
@@ -1138,7 +1139,7 @@
     console.log(
       'Transfer calculation results:',
       ulist.map((u) => ({
-        name: u.username,
+        name: $nameOf(u),
         shouldGet: u.x.toFixed(2),
         has: u.ihave.toFixed(2),
         needsToGive: u.noten.toFixed(2),
@@ -1241,9 +1242,9 @@
           {#each ulist as data (data.uid)}
             <article class="sh-card-2 ww-card" class:ww-card-give={revach > 0 && data.noten > 0.01}>
               <div class="ww-card-head">
-                <span class="ww-av" aria-hidden="true">{initialOf(data.username)}</span>
+                <span class="ww-av" aria-hidden="true">{initialOf($nameOf(data))}</span>
                 <div class="ww-id">
-                  <strong>{data.username}</strong>
+                  <strong>{$nameOf(data)}</strong>
                   <span class="ww-muted">{data.p.toFixed(1)}% {$t('mission.whowhat.percentageInRikma')}</span>
                 </div>
                 {#if revach > 0 && data.noten > 0.01}
@@ -1261,7 +1262,7 @@
               <dl class="ww-rows">
                 <dt>{$t('mission.whowhat.profitShare')}</dt>
                 <dd class="ww-share"><bdi>{fmtMoney(revach > 0 ? data.x : 0)}</bdi></dd>
-                <dt>{$t('shop.sp.ww.held', { name: data.username })}</dt>
+                <dt>{$t('shop.sp.ww.held', { name: $nameOf(data) })}</dt>
                 <dd class="ww-hold"><bdi>{fmtMoney(data.ihave || 0)}</bdi></dd>
               </dl>
               {#if data.le && data.le.length > 0}
@@ -1308,7 +1309,7 @@
                 <th scope="col"><span class="ww-sr">{$t('mission.whowhat.name')}</span></th>
                 {#each ulist as data (data.uid)}
                   <th scope="col">
-                    <span class="ww-th"><span class="ww-av ww-av-sm" aria-hidden="true">{initialOf(data.username)}</span>{data.username}</span>
+                    <span class="ww-th"><span class="ww-av ww-av-sm" aria-hidden="true">{initialOf($nameOf(data))}</span>{$nameOf(data)}</span>
                   </th>
                 {/each}
                 {#if showPlatformCol}<th scope="col" class="ww-gold">1💗1</th>{/if}
@@ -1375,7 +1376,7 @@
             {#each includedSales as s (s.id)}
               <li class="sh-chip sh-chip-plain">
                 {saleName(s)} <bdi>{fmtMoney(s.attributes.in)}</bdi>
-                <span class="ww-muted">· {s.attributes.users_permissions_user?.data?.attributes?.username ?? ''}</span>
+                <span class="ww-muted">· {$nameOf(s.attributes.users_permissions_user?.data?.attributes) || ''}</span>
               </li>
             {/each}
           </ul>
@@ -1407,8 +1408,8 @@
           {#each ulist as u (u.uid)}
             {@const v = voteOf(u.uid)}
             <li>
-              <span class="ww-av ww-av-sm" aria-hidden="true">{initialOf(u.username)}</span>
-              <span class="ww-grow">{u.username}</span>
+              <span class="ww-av ww-av-sm" aria-hidden="true">{initialOf($nameOf(u))}</span>
+              <span class="ww-grow">{$nameOf(u)}</span>
               <span class="sh-chip {v === 'yes' ? 'sh-chip-ok' : v === 'no' ? 'sh-chip-accent' : 'sh-chip-muted'}">
                 {v === 'yes'
                   ? $t('mission.whowhat.inFavor')

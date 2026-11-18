@@ -1,4 +1,5 @@
 ﻿<script>
+  import { nameOf } from '$lib/translation/memberName';
   import { isRtl, t } from '$lib/translations';
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang';
@@ -60,7 +61,7 @@
             <h2 class="card-title">{a.missionName}</h2>
             {#if a.users_permissions_user?.data}
               <span class="done-by-pill">
-                ✓ {a.users_permissions_user.data.attributes.username}
+                ✓ {$nameOf(a.users_permissions_user.data.attributes)}
               </span>
             {/if}
           </div>

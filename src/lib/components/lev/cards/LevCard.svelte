@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * LevCard — renders exactly one heart item, whatever its `ani` is.
    *
@@ -409,7 +410,7 @@
       askId={buble.askId}
       myp={buble.myp}
       projectName={buble.projectName}
-      useraplyname={buble.username}
+      useraplyname={$nameOf(buble)}
       userId={buble.uid}
       myid={buble.myid}
       isRecurringCycle={buble.isRecurringCycle}
@@ -474,7 +475,7 @@
       users={buble.users}
       askId={buble.askId}
       projectName={buble.projectName}
-      useraplyname={buble.username}
+      useraplyname={$nameOf(buble)}
       userId={buble.uid}
       missionDetails={buble.descrip}
       src={buble.src}
@@ -511,7 +512,7 @@
       onHover={hover}
       coinlapach={buble.coinlapach}
       onCoinLapach={delo}
-      username={buble.username}
+      username={$nameOf(buble)}
       projectName={buble.projectName}
       projectId={buble.projectId}
       partnershipDetails={buble.details}
@@ -547,7 +548,7 @@
       users={buble.users}
       askId={buble.askId}
       projectName={buble.projectName}
-      useraplyname={buble.username}
+      useraplyname={$nameOf(buble)}
       userId={buble.uid}
       missionDetails={buble.missionDetails}
       src={buble.src}
@@ -602,7 +603,7 @@
       users={buble.users}
       askId={buble.askId}
       projectName={buble.projectName}
-      useraplyname={buble.username}
+      useraplyname={$nameOf(buble)}
       userId={buble.uid}
       missionDetails={buble.descrip}
       src={buble.src}

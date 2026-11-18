@@ -1,4 +1,5 @@
 ﻿<script>
+  import { nameOf } from '$lib/translation/memberName';
   import { useFormatMoney } from '$lib/money/context.svelte';
   import { locale, isRtl, t } from '$lib/translations';
   /**
@@ -83,7 +84,7 @@
           <li class="sa-row">
             <span class="sa-who">
               {#if m.pic}<img src={m.pic} alt="" class="sa-pic" />{/if}
-              <span>{m.username || $t('project.splitsArchive.anon')}</span>
+              <span>{$nameOf(m) || $t('project.splitsArchive.anon')}</span>
             </span>
             <span class="sa-amts">
               <b>{fmt(m.total)}</b>
@@ -127,7 +128,7 @@
                     <div class="sa-alloc-head">
                       <span class="sa-who">
                         {#if a.pic}<img src={a.pic} alt="" class="sa-pic" />{/if}
-                        <span>{a.username || $t('project.splitsArchive.anon')}</span>
+                        <span>{$nameOf(a) || $t('project.splitsArchive.anon')}</span>
                         {#if a.isNoten}<span class="sa-tag">{$t('project.splitsArchive.giver')}</span>
                         {:else if a.isMekabel}<span class="sa-tag get">{$t('project.splitsArchive.receiver')}</span>{/if}
                       </span>

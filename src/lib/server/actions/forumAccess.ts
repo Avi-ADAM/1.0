@@ -1,4 +1,5 @@
 import type { ActionContext, AuthorizationResult } from './types.js';
+import { nameFieldsOf } from '$lib/translation/displayName.js';
 
 type StrapiLike = {
   execute(
@@ -239,7 +240,7 @@ function messageView(message: any, userId: string): ForumMessageView {
   return {
     id: String(message?.id || `message-${attrs.when || Date.now()}`),
     message: attrs.content || '',
-    username: user?.attributes?.username || '',
+    ...nameFieldsOf(user?.attributes), username: user?.attributes?.username || '',
     pic: profilePic(user) || DEFAULT_PIC,
     timestamp: attrs.when || null,
     sentByMe: String(user?.id) === String(userId),

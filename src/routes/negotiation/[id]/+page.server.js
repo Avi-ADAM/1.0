@@ -3,6 +3,7 @@
 // site (consensus.1lev1.com, reached through $lib/func/negoBridge.js); see the
 // note at the top of +page.svelte.
 import { sendToSer } from '$lib/send/sendToSer.js';
+import { nameFieldsOf } from '$lib/translation/displayName.js';
 
 export async function load({ params, fetch }) {
     const id = params.id;
@@ -90,7 +91,7 @@ export async function load({ params, fetch }) {
             })) || [],
             participants: attrs.participants?.data?.map(p => ({
               id: p.id,
-              username: p.attributes.username,
+              ...nameFieldsOf(p.attributes), username: p.attributes.username,
               email: p.attributes.email,
               joinedAt: p.attributes.joinedAt
             })) || []

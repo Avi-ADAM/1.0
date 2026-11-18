@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * A member's public profile — the outside view of what `/me` shows its owner.
    *
@@ -179,7 +180,7 @@
 </script>
 
 <svelte:head>
-  <title>{$t('common.misc.userProfileTitle', { name: user ? user.username : $t('common.misc.profile') })}</title>
+  <title>{$t('common.misc.userProfileTitle', { name: user ? $nameOf(user) : $t('common.misc.profile') })}</title>
 </svelte:head>
 <svelte:window bind:innerWidth={vw} bind:innerHeight={vh} />
 
@@ -224,7 +225,7 @@
   {#if user}
     <!-- Outside the badge: its foreignObjects would clip the share dropdown. -->
     <div class="share-fab">
-      <ShareLink path={`/user/${data.userId}`} title={user.username} desc={$t('ui.share.user')} align="start" size={22} />
+      <ShareLink path={`/user/${data.userId}`} title={$nameOf(user)} desc={$t('ui.share.user')} align="start" size={22} />
     </div>
   {/if}
 
@@ -249,9 +250,9 @@
           ? `left:${ring.center.x - ring.center.size / 2}px;top:${ring.center.y - ring.center.size / 2}px;width:${ring.center.size}px`
           : null}
       >
-        <img class="u-photo" src={avatar} alt={user.username} />
+        <img class="u-photo" src={avatar} alt={$nameOf(user)} />
         <div class="u-caption">
-          <h1 class="u-name" dir="auto">{user.username}</h1>
+          <h1 class="u-name" dir="auto">{$nameOf(user)}</h1>
           {#if user.bio}
             <p class="u-bio" dir="auto">{user.bio}</p>
           {:else if orbs.length === 0}

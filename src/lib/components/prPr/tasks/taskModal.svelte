@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { t, locale, isRtl } from '$lib/translations';
 
   /**
@@ -266,13 +267,13 @@
               <div class="flex items-center gap-3">
                 <img
                   src={avatarUrl(creator)}
-                  alt={creator.username}
+                  alt={$nameOf(creator)}
                   class="w-9 h-9 rounded-full object-cover border-2 border-amber-300"
                 />
                 <span
                   class="font-semibold text-zinc-800 dark:text-zinc-100 text-sm"
                 >
-                  {creator.username}
+                  {$nameOf(creator)}
                 </span>
               </div>
             {:else if creatorId}
@@ -298,14 +299,14 @@
               <div class="flex items-center gap-3">
                 <img
                   src={avatarUrl(assignee)}
-                  alt={assignee.username}
+                  alt={$nameOf(assignee)}
                   class="w-9 h-9 rounded-full object-cover border-2 border-blue-300"
                 />
                 <div>
                   <p
                     class="font-semibold text-zinc-800 dark:text-zinc-100 text-sm"
                   >
-                    {assignee.username}
+                    {$nameOf(assignee)}
                   </p>
                   <!-- acceptance chip -->
                   {#if act.myIshur}

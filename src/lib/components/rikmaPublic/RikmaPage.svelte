@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { t } from '$lib/translations';
   import Header from '$lib/components/header/header.svelte';
   import { goto } from '$app/navigation';
@@ -236,7 +237,7 @@
           <button
             onclick={() => us(user.id)}
             class="relative transition-transform hover:-translate-y-1 group"
-            title={user.attributes.username}
+            title={$nameOf(user.attributes)}
           >
             <div
               class="w-12 h-12 rounded-full border-2 border-gold p-0.5 bg-black/50 overflow-hidden shadow-md group-hover:shadow-gold/50"
@@ -246,7 +247,7 @@
                 src={user.attributes.profilePic.data
                   ? user.attributes.profilePic.data.attributes.url
                   : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
-                alt={user.attributes.username}
+                alt={$nameOf(user.attributes)}
               />
             </div>
           </button>

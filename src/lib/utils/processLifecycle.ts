@@ -7,6 +7,7 @@
  */
 
 import { hoursByMonth, monthKeyOf, segmentsFromTimers } from '$lib/recurring/missionMonths.js';
+import { nameFieldsOf } from '$lib/translation/displayName.js';
 
 export interface NormalizedVote {
   id: string;
@@ -69,7 +70,7 @@ export function normalizeVotes(vots: any[] | null | undefined): NormalizedVote[]
       zman: vote?.zman ?? null,
       order: Number(vote?.order ?? 0) || 0,
       userId: String(user?.id ?? ''),
-      username: user?.attributes?.username ?? '',
+      ...nameFieldsOf(user?.attributes), username: user?.attributes?.username ?? '',
       profilePicUrl: user?.attributes?.profilePic?.data?.attributes?.url ?? null
     };
   });

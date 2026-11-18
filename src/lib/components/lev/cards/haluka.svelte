@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { isRtl, t } from '$lib/translations';
   import Chaticon from '../../../celim/chaticon.svelte';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
@@ -120,8 +121,8 @@
       if (!user) continue;
       const uid = String(user.id ?? user);
       const username =
-        user.attributes?.username ||
-        user.username ||
+        $nameOf(user.attributes) ||
+        $nameOf(user) ||
         getProjectData(projectId, 'un', uid) ||
         'Unknown';
       rows.set(uid, {
@@ -151,7 +152,7 @@
       if (giver) {
         giver.noten += amount;
         giver.le.push({
-          le: receiver?.username || getProjectData(projectId, 'un', toId) || '—',
+          le: $nameOf(receiver) || getProjectData(projectId, 'un', toId) || '—',
           leid: toId,
           cama: amount
         });
@@ -260,7 +261,7 @@
         return {
           uid,
           username:
-            member?.username || getProjectData(projectId, 'un', uid) || uid,
+            $nameOf(member) || getProjectData(projectId, 'un', uid) || uid,
           value: Number(value)
         };
       })
@@ -275,7 +276,7 @@
       projectName,
       rows: ulist.map((u) => ({
         uid: u.uid,
-        username: u.username,
+        username: $nameOf(u),
         fair: u.x,
         actual: u.ihave
       }))
@@ -464,7 +465,7 @@
                 class="rounded-lg bg-white dark:bg-gray-800 border border-emerald-200 dark:border-emerald-800 px-2 py-1 text-xs"
               >
                 <span class="font-semibold text-barbi dark:text-pink-400"
-                  >{row.username}</span
+                  >{$nameOf(row)}</span
                 >
                 <span class="text-gray-500 dark:text-gray-400">
                   · {$t('lev.haluka.bridge.resolvedShare')}:
@@ -503,7 +504,7 @@
               <div
                 class="font-bold text-barbi dark:text-pink-400 text-base mb-2"
               >
-                {user.username}
+                {$nameOf(user)}
               </div>
               <div class="grid grid-cols-2 gap-2 text-xs">
                 <div
@@ -650,7 +651,7 @@
                 >
                   <td
                     class="p-3 font-bold text-barbi dark:text-pink-400 border-r border-gray-200 dark:border-gray-700"
-                    >{user.username}</td
+                    >{$nameOf(user)}</td
                   >
                   <td class="p-3 font-mono text-gray-800 dark:text-gray-200"
                     >{user.x.toFixed(2)}</td

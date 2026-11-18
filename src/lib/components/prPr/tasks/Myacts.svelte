@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { toast } from 'svelte-sonner';
   import { updateTask } from '$lib/client/actionClient';
   import { t, isRtl} from '$lib/translations';
@@ -501,19 +502,19 @@
           {#if vali.profilePic?.data?.attributes?.url}
             <img
               src={vali.profilePic.data.attributes.url}
-              alt={vali.username}
+              alt={$nameOf(vali)}
               class="w-5 h-5 rounded-full object-cover ring-1 ring-amber-400/30"
             />
           {:else}
             <div
               class="w-5 h-5 rounded-full bg-gradient-to-br from-amber-400 to-rose-500 flex items-center justify-center text-[9px] font-bold text-black"
             >
-              {(vali.username ?? '?')[0].toUpperCase()}
+              {($nameOf(vali) || '?')[0].toUpperCase()}
             </div>
           {/if}
           <span class="text-[11px] text-slate-400">
             {$t('tasks.assignedBy')}:
-            <span class="text-slate-300">{vali.username}</span>
+            <span class="text-slate-300">{$nameOf(vali)}</span>
           </span>
           <!-- Validator approved indicator -->
           {#if act.valiIshur}

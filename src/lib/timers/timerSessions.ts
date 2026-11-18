@@ -22,6 +22,7 @@
 import { segmentsFromTimers } from '$lib/recurring/missionMonths.js';
 import { normalizeSaveLinks } from './saveLinks.js';
 import { readSaveFiles, type SaveFile } from './saveFiles.js';
+import { nameFieldsOf } from '$lib/translation/displayName.js';
 
 const HOUR_MS = 3_600_000;
 
@@ -113,7 +114,7 @@ function userOf(attrs: any): SessionUser | null {
   if (!data) return null;
   return {
     id: String(data.id ?? ''),
-    username: data.attributes?.username ?? '',
+    ...nameFieldsOf(data.attributes), username: data.attributes?.username ?? '',
     avatar: data.attributes?.profilePic?.data?.attributes?.url ?? ''
   };
 }

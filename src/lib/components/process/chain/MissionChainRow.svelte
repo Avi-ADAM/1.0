@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import ChainNode from './ChainNode.svelte';
   import ChainConnector from './ChainConnector.svelte';
   import AsksNode from './AsksNode.svelte';
@@ -39,7 +40,7 @@
     if (!userData) return null;
     const attrs = userData.attributes ?? {};
     return {
-      username: attrs.username ?? '',
+      username: $nameOf(attrs) || '',
       profilePicUrl: attrs.profilePic?.data?.attributes?.url ?? null
     };
   });
@@ -69,10 +70,9 @@
         ask?.attributes?.users_permissions_user?.data?.id ?? ''
       );
       const directUsername =
-        ask?.attributes?.users_permissions_user?.data?.attributes?.username;
+        $nameOf(ask?.attributes?.users_permissions_user?.data?.attributes);
       const lookedUp = userId
-        ? projectUsers.find((u) => String(u.id) === userId)?.attributes
-            ?.username
+        ? $nameOf(projectUsers.find((u) => String(u.id) === userId)) || undefined
         : undefined;
       return {
         userId,

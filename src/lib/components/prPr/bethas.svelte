@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import Money from '$lib/components/money/Money.svelte';
   /**
    * The rikma's in-progress board — every mission someone is actually working
@@ -122,7 +123,7 @@
       a.name,
       htmlExcerpt(a.descrip, 2000),
       htmlExcerpt(a.hearotMeyuchadot, 1000),
-      a.users_permissions_user?.data?.attributes?.username,
+      $nameOf(a.users_permissions_user?.data?.attributes),
       ...(a.tafkidims?.data ?? []).map(roleName),
       ...(a.acts?.data ?? []).map((x) => x.attributes?.shem)
     ]
@@ -511,7 +512,7 @@
               <span class="pb-owner">
                 <img src={avatarOf(m)} alt="" loading="lazy" />
                 <span class="pb-owner-name"
-                  >{m.attributes?.users_permissions_user?.data?.attributes?.username ?? '—'}</span
+                  >{$nameOf(m.attributes?.users_permissions_user?.data?.attributes) || '—'}</span
                 >
               </span>
             </div>
@@ -666,7 +667,7 @@
                 status={statusOf(m)}
                 pendingApproval={isPending(m)}
                 isMine={mine}
-                ownerName={m.attributes?.users_permissions_user?.data?.attributes?.username}
+                ownerName={$nameOf(m.attributes?.users_permissions_user?.data?.attributes)}
                 ownerId={m.attributes?.users_permissions_user?.data?.id}
                 showArchiveActions={true}
                 accruedHours={m.attributes?.howmanyhoursalready}

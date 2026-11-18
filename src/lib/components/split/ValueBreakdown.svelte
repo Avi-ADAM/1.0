@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * Where each partner's value came from: completed missions, received
    * resources and stipend funding, one readable row each. Selecting a partner
@@ -63,7 +64,7 @@
           hours: Number(a.noofhours) || 0,
           rate: Number(a.perhour) || 0,
           when: a.finish || a.createdAt,
-          member: who(uid) ?? { username: a.users_permissions_user?.data?.attributes?.username ?? '', color: GREY },
+          member: who(uid) ?? { username: $nameOf(a.users_permissions_user?.data?.attributes) || '', color: GREY },
           notes: [a.descrip, a.why, a.hearotMeyuchadot].filter(Boolean)
         };
       })
@@ -82,7 +83,7 @@
         kind: KIND[a.kindOf] ?? null,
         qty: a.kindOf === 'perUnit' ? Number(a.hm) || 0 : 0,
         price: Number(a.price ?? a.agprice) || 0,
-        member: who(uid) ?? { username: a.users_permissions_user?.data?.attributes?.username ?? '', color: GREY },
+        member: who(uid) ?? { username: $nameOf(a.users_permissions_user?.data?.attributes) || '', color: GREY },
         notes: [a.spnot].filter(Boolean)
       };
     })
@@ -97,8 +98,8 @@
         id: s.id,
         fid,
         rid,
-        funder: who(fid) ?? { username: a.funder?.data?.attributes?.username ?? '', color: GREY },
-        recipient: who(rid) ?? { username: a.recipient?.data?.attributes?.username ?? '', color: GREY },
+        funder: who(fid) ?? { username: $nameOf(a.funder?.data?.attributes) || '', color: GREY },
+        recipient: who(rid) ?? { username: $nameOf(a.recipient?.data?.attributes) || '', color: GREY },
         credit: Number(a.equityCredit) || 0,
         debit: Number(a.equityDebit) || 0,
         from: a.cycleStart,
@@ -150,7 +151,7 @@
             aria-pressed={selected === m.uid}
             onclick={() => (selected = selected === m.uid ? null : m.uid)}
           >
-            <span class="vb-dot"></span>{m.username}
+            <span class="vb-dot"></span>{$nameOf(m)}
           </button>
         {/each}
       </div>
@@ -168,7 +169,7 @@
             <div class="vb-main">
               <span class="vb-name">{m.name}</span>
               <span class="vb-meta">
-                <span class="vb-who"><span class="vb-dot"></span>{m.member.username}</span>
+                <span class="vb-who"><span class="vb-dot"></span>{$nameOf(m.member)}</span>
                 {#if m.hours > 0}
                   <span>{$t('moach.split.hoursRate', { hours: num(m.hours), rate: fmt(m.rate) })}</span>
                 {/if}
@@ -195,7 +196,7 @@
             <div class="vb-main">
               <span class="vb-name">{r.name}</span>
               <span class="vb-meta">
-                <span class="vb-who"><span class="vb-dot"></span>{r.member.username}</span>
+                <span class="vb-who"><span class="vb-dot"></span>{$nameOf(r.member)}</span>
                 {#if r.kind}<span>{r.kind}</span>{/if}
                 {#if r.qty > 0}
                   <span>{$t('moach.split.qtyPrice', { qty: num(r.qty), price: fmt(r.price) })}</span>
@@ -221,9 +222,9 @@
           <li class="vb-item" style="--c: {s.funder.color}">
             <div class="vb-main">
               <span class="vb-name">
-                <span class="vb-who"><span class="vb-dot"></span>{s.funder.username}</span>
+                <span class="vb-who"><span class="vb-dot"></span>{$nameOf(s.funder)}</span>
                 <span aria-hidden="true">→</span>
-                <span class="vb-who" style="--c: {s.recipient.color}"><span class="vb-dot"></span>{s.recipient.username}</span>
+                <span class="vb-who" style="--c: {s.recipient.color}"><span class="vb-dot"></span>{$nameOf(s.recipient)}</span>
               </span>
               {#if date(s.from)}
                 <span class="vb-meta"><span>{date(s.from)} – {date(s.to)}</span></span>

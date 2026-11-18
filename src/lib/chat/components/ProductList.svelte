@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { nameOf } from '$lib/translation/memberName';
   import Money from '$lib/components/money/Money.svelte';
   import SaleComponent from '$lib/components/sales/SaleComponent.svelte';
   import { lang } from '$lib/stores/lang.js';
@@ -33,7 +34,7 @@
   function getDefaultHolder(product: (typeof products)[0]): string {
     if (!userId) return '';
     const self = product.projectUsers.find((u) => String(u.id) === String(userId));
-    return self?.attributes?.username ?? '';
+    return $nameOf(self?.attributes) || '';
   }
 
   function handleStart() {

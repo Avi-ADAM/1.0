@@ -9,6 +9,7 @@
 
 import { rikmaCurrency } from '$lib/money/resolve.js';
 import { gqlStr, run, type Exec } from '$lib/server/archive/gql.js';
+import { nameFieldsOf } from '$lib/translation/displayName.js';
 import type {
   StipendMode,
   StipendPolicy,
@@ -84,7 +85,7 @@ export async function fetchProjectStipendMissions(
       }, pagination: { limit: 200 }, sort: "createdAt:desc") {
         data { id attributes {
           name descrip perhour hoursassinged howmanyhoursalready iskvua start dates
-          users_permissions_user { data { id attributes { username } } }
+          users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         } }
       }
       openMissions(filters: {
@@ -113,7 +114,7 @@ export async function fetchProjectStipendMissions(
       start: a.start ?? null,
       end: a.dates ?? null,
       userId: user?.id ? String(user.id) : null,
-      username: user?.attributes?.username ?? null,
+      ...nameFieldsOf(user?.attributes), username: user?.attributes?.username ?? null,
       stipendRate: null
     };
   });
@@ -164,7 +165,7 @@ export async function fetchProjectContext(
     exec,
     `{ project(id: ${gqlStr(projectId)}) { data { id attributes {
       projectName restime stipendPolicy stipendDefaultCostShare stipendDefaultRate currencyCode
-      user_1s { data { id attributes { username } } }
+      user_1s { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
     } } } }`,
     'project'
   );
@@ -297,8 +298,8 @@ const PLEDGE_FIELDS = `
   lastSettledAt
   project { data { id attributes { projectName } } }
   stipend_program { data { id } }
-  funder { data { id attributes { username } } }
-  recipient { data { id attributes { username } } }
+  funder { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
+  recipient { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
   mashabetahalich { data { id } }
   mesimabetahaliches { data { id attributes { name } } }
   open_missions { data { id attributes { name } } }
@@ -561,8 +562,8 @@ const PAYMENT_FIELDS = `
   project { data { id } }
   stipend_pledge { data { id } }
   stipend_program { data { id } }
-  funder { data { id attributes { username } } }
-  recipient { data { id attributes { username } } }
+  funder { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
+  recipient { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
   haluka { data { id } }
   timegrama { data { id } }`;
 

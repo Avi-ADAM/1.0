@@ -177,8 +177,8 @@ async function fetchProgramPledges(exec: Exec, programId: string): Promise<Stipe
         lastSettledAt
         project { data { id attributes { projectName } } }
         stipend_program { data { id } }
-        funder { data { id attributes { username } } }
-        recipient { data { id attributes { username } } }
+        funder { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
+        recipient { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         mashabetahalich { data { id } }
         mesimabetahaliches { data { id attributes { name } } }
         open_missions { data { id attributes { name } } }

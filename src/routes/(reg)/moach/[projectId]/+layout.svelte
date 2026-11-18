@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { isRtl, t } from '$lib/translations';
   import { page, navigating } from '$app/state';
   import { goto, invalidate } from '$app/navigation';
@@ -487,7 +488,7 @@
                 class="relative transition-all duration-300 {hasActiveTimer
                   ? 'scale-110'
                   : ''}"
-                title={`${user.attributes.username}${hasActiveTimer ? ' ' + $t('moach.layout.activeNow') : ''}${isViewing ? ' · ' + $t('moach.presence.viewing') : ''}`}
+                title={`${$nameOf(user.attributes)}${hasActiveTimer ? ' ' + $t('moach.layout.activeNow') : ''}${isViewing ? ' · ' + $t('moach.presence.viewing') : ''}`}
               >
                 <img
                   class="inline-block h-10 w-10 rounded-full ring-2 transition-all duration-300 {hasActiveTimer
@@ -495,7 +496,7 @@
                     : 'ring-gold'}"
                   src={getImageUrl(user.attributes.profilePic?.data?.attributes?.url) ||
                     'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
-                  alt={user.attributes.username}
+                  alt={$nameOf(user.attributes)}
                 />
                 {#if isViewing}
                   <!-- Viewing now (presence) — deliberately not green: green is a running timer. -->

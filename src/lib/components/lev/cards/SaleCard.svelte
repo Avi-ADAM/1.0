@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { nameOf } from '$lib/translation/memberName';
   import { lang } from '$lib/stores/lang.js';
   import { t, isRtl} from '$lib/translations';
   import { toast } from 'svelte-sonner';
@@ -200,7 +201,7 @@
     const sellers = (buble.members || []).map((m: any) => ({
       id: m.id,
       attributes: {
-        username: m.username,
+        username: $nameOf(m),
         profilePic: { data: { attributes: { url: m.profilePic || null } } }
       }
     }));
@@ -517,19 +518,19 @@
               {#if u.profilePic}
                 <img
                   src={u.profilePic}
-                  alt={u.username}
+                  alt={$nameOf(u)}
                   class="w-8 h-8 rounded-full object-cover border border-yellow-300"
                 />
               {:else}
                 <div
                   class="w-8 h-8 rounded-full bg-yellow-200 dark:bg-yellow-800 flex items-center justify-center text-yellow-700 dark:text-yellow-300 font-bold text-xs"
                 >
-                  {u.username?.charAt(0)}
+                  {$nameOf(u)?.charAt(0)}
                 </div>
               {/if}
               <span
                 class="text-sm font-semibold text-gray-800 dark:text-gray-200"
-                >{u.username}</span
+                >{$nameOf(u)}</span
               >
               {#if String(u.id) === String(buble.myid)}
                 <span
@@ -568,7 +569,7 @@
         senderId={String(buble.customerId)}
         receiverId={String(buble.iTransferedTo?.id ?? '')}
         senderName={buble.customerName ?? ''}
-        receiverName={buble.iTransferedTo?.username ?? ''}
+        receiverName={$nameOf(buble.iTransferedTo) || ''}
         senderPic={buble.customerSrc}
         receiverPic={buble.iTransferedTo?.profilePic}
         amount={buble.total ?? buble.price}

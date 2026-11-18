@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * The new device's side of T9b: open a request, read the code and the
    * fingerprint to each guardian, watch the vouches arrive, wait out the 24h
@@ -79,7 +80,7 @@
         <p class="font-mono text-2xl tracking-widest" dir="ltr">{request.fingerprint}</p>
         <p class="text-xs text-surfaceMuted">{$t('recovery.recover.readTo')}</p>
         <p class="text-xs">
-          {$t('recovery.recover.guardians')}: {request.guardians.map((g) => g.username ?? g.id).join(', ')}
+          {$t('recovery.recover.guardians')}: {request.guardians.map((g) => $nameOf(g) || g.id).join(', ')}
         </p>
       </div>
     {:else}

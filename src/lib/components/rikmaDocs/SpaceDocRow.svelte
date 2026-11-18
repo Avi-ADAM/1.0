@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * One entry of the rikma's shared library, with its inline edit
    * (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md §5).
@@ -149,7 +150,7 @@
       <p class="meta">
         <span class="kind-label">{$t(`rikmaDocs.kinds.${doc.kind}`)}</span>
         {#if sizeLabel}<span>{sizeLabel}</span>{/if}
-        {#if doc.uploadedBy?.username}<span>{doc.uploadedBy.username}</span>{/if}
+        {#if $nameOf(doc.uploadedBy)}<span>{$nameOf(doc.uploadedBy)}</span>{/if}
         {#if dateLabel}<span>{dateLabel}</span>{/if}
         {#if doc.privateFile}<span class="private">🔒 {$t('rikmaDocs.row.private')}</span>{/if}
         {#if source}<span class="source source-{source}">{$t(`rikmaDocs.p2p.source.${source}`)}</span>{/if}

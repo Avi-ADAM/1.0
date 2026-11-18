@@ -1,3 +1,4 @@
+import { nameFieldsOf } from '$lib/translation/displayName.js';
 /**
  * Each partner's share of the rikma's value — the `buildBase()` step of
  * `prPr/whowhat.svelte`, the arithmetic every split runs on.
@@ -79,7 +80,7 @@ export function memberShares(input: {
   const rows = users.map((u) => {
     const total = dictid[u.id] || 0;
     const p = net > 0 ? (100 * total) / net : 0;
-    return { uid: u.id, username: u.attributes.username, total, p };
+    return { uid: u.id, ...nameFieldsOf(u.attributes), username: u.attributes.username, total, p };
   });
   const membersTotal = rows.reduce((t, r) => t + r.total, 0);
   const others = net > 0 ? Math.max(0, net - membersTotal) : 0;

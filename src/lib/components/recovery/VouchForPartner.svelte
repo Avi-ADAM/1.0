@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * The guardian's side of T9b: type the code the user reads over the phone,
    * compare the fingerprint (computed HERE from the keys the vouch will name),
@@ -68,7 +69,7 @@
 
   {#if request}
     <div class="space-y-2 rounded-lg bg-surface2 p-3 text-sm">
-      <p class="font-semibold">{$t('recovery.vouch.who', { name: request.username ?? $t('recovery.vouch.unknownUser') })}</p>
+      <p class="font-semibold">{$t('recovery.vouch.who', { name: $nameOf(request) || $t('recovery.vouch.unknownUser') })}</p>
       <p>{$t('recovery.vouch.already', { count: request.vouchers.length, threshold: request.threshold })}</p>
       {#if request.protestedAt}
         <p class="rounded bg-amber-100 p-2 text-amber-900 dark:bg-amber-900/40 dark:text-amber-100">{$t('recovery.vouch.protestedWarn')}</p>

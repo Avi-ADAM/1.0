@@ -1,4 +1,5 @@
 ﻿<script lang="ts">
+  import { nameOf } from '$lib/translation/memberName';
   import { isRtl, t } from '$lib/translations';
   import { page } from '$app/state';
   import { afterNavigate } from '$app/navigation';
@@ -53,7 +54,7 @@
         forum.projectName,
         forum.kind,
         forum.lastMessage?.message,
-        forum.lastMessage?.username
+        $nameOf(forum.lastMessage)
       ]
         .filter(Boolean)
         .join(' ')
@@ -69,7 +70,7 @@
       {
         id: `last-${forum.id}`,
         message: forum.lastMessage.message,
-        username: forum.lastMessage.username,
+        username: $nameOf(forum.lastMessage),
         pic: forum.projectPic || '/favicon.ico',
         timestamp: forum.lastMessage.timestamp,
         sentByMe: false,

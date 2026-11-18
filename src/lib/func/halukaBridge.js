@@ -7,6 +7,7 @@
 // approval channel.
 
 import { openNegoBridge } from './negoBridge.js';
+import { nameFieldsOf } from '$lib/translation/displayName.js';
 
 /**
  * Compute the per-member fair vs. actual amounts from the two sources the
@@ -48,7 +49,7 @@ export function halukaMemberRows(hervach, halukot, usernameFor = () => null) {
 
   return Array.from(rows.values()).map((r) => ({
     uid: r.uid,
-    username: r.username,
+    ...nameFieldsOf(r), username: r.username,
     fair: r.fair,
     actual: r.fair + r.given - r.received
   }));

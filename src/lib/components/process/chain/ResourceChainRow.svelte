@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import ChainNode from './ChainNode.svelte';
   import ChainConnector from './ChainConnector.svelte';
   import { t } from '$lib/translations';
@@ -196,7 +197,7 @@
                 {:else}
                   {#each chain.askms as askm (askm.id)}
                     <div class="askm-item" role="listitem">
-                      <span class="askm-name">{askm.attributes?.users_permissions_user?.data?.attributes?.username ?? askm.id}</span>
+                      <span class="askm-name">{$nameOf(askm.attributes?.users_permissions_user?.data?.attributes) || askm.id}</span>
                     </div>
                   {/each}
                 {/if}

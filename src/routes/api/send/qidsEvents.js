@@ -18,7 +18,7 @@ const EVENT_FIELDS = `
   project { data { id attributes { projectName slug restime } } }
   decision { data { id } }
   cover { data { id attributes { url } } }
-  hosts { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+  hosts { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
   agenda { minutes title desc }
   faq { q a }
   ${SESSION}

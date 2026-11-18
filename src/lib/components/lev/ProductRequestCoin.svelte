@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { nameOf } from '$lib/translation/memberName';
   import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
 
@@ -20,14 +21,14 @@
     {#if buble.userSrc}
       <img
         src={buble.userSrc}
-        alt={buble.username}
+        alt={$nameOf(buble)}
         class="w-full h-full object-cover"
       />
     {:else}
       <div
         class="w-full h-full bg-gradient-to-br from-barbi/20 to-mpink/20 flex items-center justify-center text-barbi text-xl font-black"
       >
-        {buble.username?.charAt(0)}
+        {$nameOf(buble)?.charAt(0)}
       </div>
     {/if}
 

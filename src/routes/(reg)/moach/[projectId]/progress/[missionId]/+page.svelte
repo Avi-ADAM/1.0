@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * One in-progress mission — its home inside the rikma.
    *
@@ -206,7 +207,7 @@
         />
         <span>
           <small>{$t('mission.bethas.by')}</small>
-          {attrs.users_permissions_user?.data?.attributes?.username ?? '—'}
+          {$nameOf(attrs.users_permissions_user?.data?.attributes) || '—'}
         </span>
       </div>
     </header>
@@ -276,7 +277,7 @@
           stipendRate={Number(attrs.stipendRate) || 0}
           costShare={attrs.stipendCostShare != null ? Number(attrs.stipendCostShare) : 1}
           mode={attrs.stipendMode || 'equity'}
-          funderName={attrs.stipendFunder?.data?.attributes?.username ?? ''}
+          funderName={$nameOf(attrs.stipendFunder?.data?.attributes) || ''}
           monthly={!!attrs.iskvua}
         />
       </section>
@@ -291,7 +292,7 @@
         {status}
         {pendingApproval}
         isMine={mine}
-        ownerName={attrs.users_permissions_user?.data?.attributes?.username}
+        ownerName={$nameOf(attrs.users_permissions_user?.data?.attributes)}
         {ownerId}
         showArchiveActions={true}
         accruedHours={attrs.howmanyhoursalready}
@@ -331,9 +332,9 @@
                 <li class="mp-act" class:done={act.attributes?.naasa}>
                   <div class="mp-act-head">
                     <span class="mp-act-name">{act.attributes?.shem}</span>
-                    {#if act.attributes?.my?.data?.attributes?.username}
+                    {#if $nameOf(act.attributes?.my?.data?.attributes)}
                       <span class="mp-act-who"
-                        >{act.attributes.my.data.attributes.username}</span
+                        >{$nameOf(act.attributes.my.data.attributes)}</span
                       >
                     {/if}
                   </div>

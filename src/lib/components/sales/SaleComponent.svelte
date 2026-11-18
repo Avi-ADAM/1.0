@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import 'dayjs/locale/he.js';
   import dayjs from 'dayjs';
   import { Datepicker } from 'svelte-calendar';
@@ -327,8 +328,8 @@
             noSelectedE = false;
           }}
         >
-          <span class="rs-av" aria-hidden="true">{initialOf(u.attributes.username)}</span>
-          <span class="rs-radio-name">{meId != null && String(u.id) === String(meId) ? $t('sales.shopSkin.me') : u.attributes.username}</span>
+          <span class="rs-av" aria-hidden="true">{initialOf($nameOf(u.attributes))}</span>
+          <span class="rs-radio-name">{meId != null && String(u.id) === String(meId) ? $t('sales.shopSkin.me') : $nameOf(u)}</span>
         </button>
       {/each}
     </div>

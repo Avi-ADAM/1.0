@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { t } from '$lib/translations';
   const moachStore = getMoachStore();
   import { page } from '$app/state';
@@ -80,7 +81,7 @@
           <div class="space-y-3">
             {#each split.attributes.halukas?.data || [] as haluka}
               <div class="flex justify-between p-3 bg-gray-50 rounded">
-                <span>{haluka.attributes.userrecive?.data?.attributes?.username}</span>
+                <span>{$nameOf(haluka.attributes.userrecive?.data?.attributes)}</span>
                 <span class="font-bold">{haluka.attributes.amount}</span>
               </div>
             {/each}

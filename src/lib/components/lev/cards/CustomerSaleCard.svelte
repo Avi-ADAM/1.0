@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { nameOf } from '$lib/translation/memberName';
   import { isRtl, t } from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import RichText from '$lib/celim/ui/richText.svelte';
@@ -159,7 +160,7 @@
     const sellers = (buble.members || []).map((m: any) => ({
       id: m.id,
       attributes: {
-        username: m.username,
+        username: $nameOf(m),
         profilePic: { data: { attributes: { url: m.profilePic || null } } }
       }
     }));

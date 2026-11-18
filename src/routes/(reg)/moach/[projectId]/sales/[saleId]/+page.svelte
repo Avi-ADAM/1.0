@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { t } from '$lib/translations';
   const moachStore = getMoachStore();
   import { page } from '$app/state';
@@ -36,7 +37,7 @@
   // predating this feature — shown unverified but still counted (grandfathered).
   function holderLabel(s) {
     const hs = s?.attributes?.holderStatus;
-    const holderName = s?.attributes?.users_permissions_user?.data?.attributes?.username ?? '';
+    const holderName = $nameOf(s?.attributes?.users_permissions_user?.data?.attributes) || '';
     if (hs === 'self') return $t('moach.sale.holderSelf');
     if (hs === 'open') return $t('moach.sale.holderOpen', { name: holderName });
     if (hs === 'confirmed') {

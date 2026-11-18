@@ -1,4 +1,5 @@
 <script>
+ import { nameOf } from '$lib/translation/memberName';
  import { lang } from '$lib/stores/lang.js'
  import { t } from '$lib/translations';
   import { onMount } from 'svelte';
@@ -212,7 +213,7 @@ let viewBox="460 0 1000 1080"//1450
         <div class="flexi">
            <div class="q">
             {#if load == true}
-<h3 >{user.username}</h3>
+<h3 >{$nameOf(user)}</h3>
 {/if}
 </div></div>
  <div class="flex flex-row items-center justify-center">

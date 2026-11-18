@@ -231,7 +231,7 @@ export const assistantQids = {
   // and only the fields the "new suggestion" email needs.
   '370findUserForInvite': `query FindUserForInvite($email: String!) {
     usersPermissionsUsers(filters: { email: { eq: $email } }, pagination: { limit: 1 }) {
-      data { id attributes { username email lang noMail } }
+      data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew email lang noMail } }
     }
   }`
 };

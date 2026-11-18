@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * The rikma's shifts (docs/inprogress/PLAN_SHIFTS.md §9.3): the roster of a cycle, and
    * the member's own availability for it. Replaces the old demo calendar.
@@ -19,7 +20,7 @@
   const uid = $derived(String(page.data.uid ?? ''));
   const names = $derived(
     Object.fromEntries(
-      (page.data.projectBase?.user_1s?.data ?? []).map((u: any) => [String(u.id), u.attributes?.username ?? ''])
+      (page.data.projectBase?.user_1s?.data ?? []).map((u: any) => [String(u.id), $nameOf(u.attributes) || ''])
     ) as Record<string, string>
   );
 

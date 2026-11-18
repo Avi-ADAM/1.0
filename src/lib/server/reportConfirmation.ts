@@ -35,7 +35,7 @@ export interface ConfirmationTarget {
 
 const ACCOUNT_QUERY = `query ReportReplyTo($uid: ID!) {
   usersPermissionsUser(id: $uid) {
-    data { attributes { email username blocked } }
+    data { attributes { email username nameLatin nameArabic nameCyrillic nameHebrew blocked } }
   }
 }`;
 

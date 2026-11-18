@@ -114,7 +114,7 @@ export async function withAssignees(exec: Exec, projectId: string, terms: BomTer
   if (!terms.some((t) => t.kind === 'add' && t.assignedMemberId)) return terms;
   const data = await run(
     exec,
-    `{ project(id: ${gqlStr(projectId)}) { data { attributes { user_1s(pagination: { limit: 500 }) { data { id attributes { username } } } } } } }`,
+    `{ project(id: ${gqlStr(projectId)}) { data { attributes { user_1s(pagination: { limit: 500 }) { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } } } } } }`,
     'bom:members'
   );
   const names = new Map<string, string>(

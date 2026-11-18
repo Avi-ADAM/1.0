@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
   import { sendToSer } from '$lib/send/sendToSer.js';
@@ -88,7 +89,7 @@
     return (
       askm?.attributes?.pmash?.data?.attributes?.name ||
       askm?.attributes?.open_mashaabim?.data?.attributes?.name ||
-      askm?.attributes?.users_permissions_user?.data?.attributes?.username ||
+      $nameOf(askm?.attributes?.users_permissions_user?.data?.attributes) ||
       '—'
     );
   }
@@ -99,7 +100,7 @@
   let finiList = $derived(votesData?.finiapruvals?.data ?? []);
   function finiName(fini) {
     const a = fini?.attributes ?? {};
-    const who = a.users_permissions_user?.data?.attributes?.username;
+    const who = $nameOf(a.users_permissions_user?.data?.attributes);
     // A timer save / a month's hours ride the same model — say which it is.
     const what = isHoursApproval(a) ? $trans('moach.votes.hoursApproval') : null;
     return [a.missname || '—', who, what].filter(Boolean).join(' · ');

@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * The other answers of a member a resource was offered to, beside bringing it
    * (docs/inprogress/PLAN_RESOURCE_ASSIGNMENT.md): refine the terms (a candidate
@@ -110,7 +111,7 @@
         >
           <option value="" disabled>{$t('lev.assignedOptions.pickMember')}</option>
           {#each others as m (m.id)}
-            <option value={String(m.id)}>{m.attributes?.username ?? m.id}</option>
+            <option value={String(m.id)}>{$nameOf(m.attributes) || m.id}</option>
           {/each}
         </select>
         <span class="text-xs text-gray-500 dark:text-gray-400">{$t('lev.assignedOptions.reassignNote')}</span>

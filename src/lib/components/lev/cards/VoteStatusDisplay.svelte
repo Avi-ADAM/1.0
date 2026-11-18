@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { nameOf } from '$lib/translation/memberName';
   import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
   import { fade } from 'svelte/transition';
@@ -24,7 +25,7 @@
   let voteStatus = $derived(
     members.map((member) => {
       const memberId = member.id;
-      const memberName = member.attributes?.username || 'User';
+      const memberName = $nameOf(member.attributes) || 'User';
       const memberPic =
         member.attributes?.profilePic?.data?.attributes?.url || null;
 

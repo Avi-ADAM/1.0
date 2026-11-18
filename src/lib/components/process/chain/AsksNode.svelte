@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { t } from '$lib/translations';
 
   let {
@@ -46,12 +47,12 @@
       {:else}
         {#each asks as ask (ask.userId)}
           <div class="ask-item" role="listitem">
-            <span class="ask-name">{ask.username}</span>
+            <span class="ask-name">{$nameOf(ask)}</span>
             {#if ask.forumId}
               <button
                 type="button"
                 class="ask-forum-btn"
-                aria-label="{$t('moach.asksNode.openForum')}: {ask.username}"
+                aria-label="{$t('moach.asksNode.openForum')}: {$nameOf(ask)}"
                 onclick={(e) => {
                   e.stopPropagation();
                   e.currentTarget.dispatchEvent(

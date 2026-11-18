@@ -7,6 +7,7 @@ import { normalizeRestime } from '$lib/wish/restime.js';
 import { readWishPricing, type WishPricing } from '$lib/server/wish/pricingTrack';
 import { pricingTracksEnabled } from '$lib/sheirut/pricingTracksFlag';
 import type { PricingTrack } from '$lib/sheirut/pricingTrack';
+import { nameFieldsOf } from '$lib/translation/displayName.js';
 
 export interface PendingRequestData {
   id: string;
@@ -388,7 +389,7 @@ export async function fetchDealsForUser(
     incomingWishes,
     weaves,
     userId,
-    username: userData.attributes?.username || '',
+    ...nameFieldsOf(userData.attributes), username: userData.attributes?.username || '',
     profilePic: userData.attributes?.profilePic?.data?.attributes?.url || ''
   };
 }

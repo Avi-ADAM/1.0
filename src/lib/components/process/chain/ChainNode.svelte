@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { t } from '$lib/translations';
 
   let {
@@ -37,13 +38,13 @@
   {#if user}
     <div class="cn-user">
       {#if user.profilePicUrl}
-        <img src={user.profilePicUrl} alt={user.username} class="cn-avatar" loading="lazy" />
+        <img src={user.profilePicUrl} alt={$nameOf(user)} class="cn-avatar" loading="lazy" />
       {:else}
         <span class="cn-initials" aria-hidden="true">
-          {user.username?.[0]?.toUpperCase() ?? '?'}
+          {$nameOf(user)?.[0]?.toUpperCase() ?? '?'}
         </span>
       {/if}
-      <span class="cn-username">{user.username}</span>
+      <span class="cn-username">{$nameOf(user)}</span>
     </div>
   {/if}
 

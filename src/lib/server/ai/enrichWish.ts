@@ -38,6 +38,7 @@ import {
   type WishPlace
 } from '../concierge/localMatch';
 import type { WishExtraction } from './extractWish';
+import { nameFieldsOf } from '$lib/translation/displayName.js';
 
 type FetchFn = typeof globalThis.fetch;
 
@@ -297,7 +298,7 @@ export async function enrichWish(
       if (!person) {
         person = {
           id,
-          username: a.username ?? '',
+          ...nameFieldsOf(a), username: a.username ?? '',
           avatar:
             a.profilePic?.data?.attributes?.url ??
             a.profilePic?.data?.attributes?.formats?.thumbnail?.url ??
@@ -333,7 +334,7 @@ export async function enrichWish(
         if (!person) {
           person = {
             id,
-            username: a.username ?? '',
+            ...nameFieldsOf(a), username: a.username ?? '',
             avatar:
               a.profilePic?.data?.attributes?.url ??
               a.profilePic?.data?.attributes?.formats?.thumbnail?.url ??
@@ -392,7 +393,7 @@ export async function enrichWish(
       const ua = u.attributes ?? {};
       merged.set(id, {
         id,
-        username: ua.username ?? '',
+        ...nameFieldsOf(ua), username: ua.username ?? '',
         avatar:
           ua.profilePic?.data?.attributes?.url ??
           ua.profilePic?.data?.attributes?.formats?.thumbnail?.url ??

@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { useFormatMoney } from '$lib/money/context.svelte';
   /**
    * "The cycle closed: 42 hours × ₪50 = ₪2,100 — pay" (PLAN_STIPEND §6, §8).
@@ -90,7 +91,7 @@
               projectName: buble.projectName ?? '',
               side: 'funder',
               funderId: $userStore?.id ? String($userStore.id) : null,
-              funderName: $userStore?.username ?? '',
+              funderName: $nameOf($userStore) || '',
               funderPic: $userStore?.profilePic ?? null,
               recipientId: buble.recipientId ?? null,
               recipientName: buble.recipientName ?? '',

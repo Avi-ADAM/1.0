@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * "If we split this much, who gets what" at today's shares. Only a
    * calculation — the actual split is opened from the sales page.
@@ -43,7 +44,7 @@
           <span class="sc-ava" class:initial={!m.photo}>
             {#if m.photo}<img src={m.photo} alt="" loading="lazy" />{:else}{m.initial}{/if}
           </span>
-          <span class="sc-name">{m.username}</span>
+          <span class="sc-name">{$nameOf(m)}</span>
           <span class="sc-p">{m.p.toFixed(2)}%</span>
           <b class="sc-amt">{fmt((m.p / 100) * Number(amount))}</b>
         </li>

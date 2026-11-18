@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { t } from '$lib/translations';
   import { page } from '$app/state';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
@@ -82,7 +83,7 @@
         <section id="participants" class="bg-white p-6 rounded-xl shadow-sm">
           <h2 class="text-lg font-bold mb-4 border-b pb-2">{$t('moach.acts.assignee')}</h2>
           <div class="flex items-center gap-3">
-             <span class="font-medium">{act.attributes.my?.data?.attributes?.username || 'Unassigned'}</span>
+             <span class="font-medium">{$nameOf(act.attributes.my?.data?.attributes) || 'Unassigned'}</span>
           </div>
         </section>
 

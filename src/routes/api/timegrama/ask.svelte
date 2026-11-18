@@ -27,7 +27,7 @@
     archived
     vots{what order users_permissions_user {data {id}}}
     project{data{id attributes{ user_1s{data{id}}}}}
-    users_permissions_user{data{id attributes{username}}}
+    users_permissions_user{data{id attributes{username nameLatin nameArabic nameCyrillic nameHebrew}}}
     open_mission{data{id attributes{name isRishon rishon{data{id}}}}}
     negopendmissions(sort: "ordern:desc"){data{attributes{
       ordern proposedBy name descrip hearotMeyuchadot noofhours perhour date dates

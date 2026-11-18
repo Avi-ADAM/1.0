@@ -263,7 +263,7 @@ export class SalesService {
                 users_permissions_user {
                   data {
                     id
-                    attributes { username }
+                    attributes { username nameLatin nameArabic nameCyrillic nameHebrew }
                   }
                 }
               }
@@ -598,7 +598,7 @@ export class SalesService {
                         data {
                           id
                           attributes {
-                            username
+                            username nameLatin nameArabic nameCyrillic nameHebrew
                           }
                         }
                       }
@@ -743,7 +743,7 @@ export class SalesService {
                   data {
                     id
                     attributes {
-                      username
+                      username nameLatin nameArabic nameCyrillic nameHebrew
                     }
                   }
                 }

@@ -66,7 +66,7 @@ const API_PRODUCT_ATTRS = `
         pic { data { attributes { url alternativeText formats } } }
         categories { data { id attributes { name } } }
         currency { data { id attributes { code name } } }
-        owner_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+        owner_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
         projectcreates { data { id attributes {
           projectName slug currencyCode
           location { lat lng radius location_hint location_mode }
@@ -140,7 +140,7 @@ const ARCH_DECISION_FIELDS = `
                     archSource
                     archWhy
                     archEndsMembership
-                    archMember { data { id attributes { username } } }
+                    archMember { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
                     negoarch {
                       ordern
                       mode
@@ -160,7 +160,7 @@ const ARCH_DECISION_FIELDS = `
                       shiftsMax
                       howMany
                       bom
-                      proposedBy { data { id attributes { username } } }
+                      proposedBy { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
                       transferTo { data { id attributes { name } } }
                     }
                     archOpenMission {
@@ -171,7 +171,7 @@ const ARCH_DECISION_FIELDS = `
                         name descrip howmanyhoursalready hoursassinged perhour start dates
                         shiftsMin shiftsMax
                         users_permissions_user { data { id attributes {
-                          username profilePic { data { attributes { url formats } } }
+                          username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } }
                         } } }
                       } }
                     }
@@ -182,7 +182,7 @@ const ARCH_DECISION_FIELDS = `
                       data { id attributes {
                         name descrip quantityAssigned pricePerUnit kindOf recurring start end
                         users_permissions_user { data { id attributes {
-                          username profilePic { data { attributes { url formats } } }
+                          username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } }
                         } } }
                       } }
                     }
@@ -212,7 +212,7 @@ const PROMO_DECISION_FIELDS = `
                     newPromoPolicy
                     negopromo {
                       ordern mode why zman kind name scope rule startsAt endsAt capUnits capOrders perOrderMax
-                      proposedBy { data { id attributes { username } } }
+                      proposedBy { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
                     }
                     promotion { data { id attributes {
                       status
@@ -237,13 +237,13 @@ const STIPEND_DECISION_FIELDS = `
                       start
                       end
                       cycleSize
-                      proposedBy { data { id attributes { username } } }
+                      proposedBy { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
                     }
                     stipFunder {
-                      data { id attributes { username profilePic { data { attributes { url } } } } }
+                      data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } }
                     }
                     stipRecipient {
-                      data { id attributes { username profilePic { data { attributes { url } } } } }
+                      data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } }
                     }
                     stipendProgram { data { id attributes { name totalCap monthlyCap spent status seekingFunder } } }
                     stipendPledge {
@@ -260,7 +260,7 @@ const STIPEND_DECISION_FIELDS = `
                               id
                               attributes {
                                 name descrip hoursassinged howmanyhoursalready perhour iskvua
-                                users_permissions_user { data { id attributes { username } } }
+                                users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
                               }
                             }
                           }
@@ -478,7 +478,7 @@ const qids_base = {
               telegramId
               lang 
               email
-              username
+              username nameLatin nameArabic nameCyrillic nameHebrew
               noMail
               machshirs{data{id attributes{jsoni}}}
             }
@@ -606,7 +606,7 @@ const qids_base = {
           data{
             id
             attributes{
-              username
+              username nameLatin nameArabic nameCyrillic nameHebrew
               telegramId
               lang 
             }
@@ -619,7 +619,7 @@ const qids_base = {
           data{
             id
             attributes{
-              username
+              username nameLatin nameArabic nameCyrillic nameHebrew
               telegramId
               lang 
               mesimabetahaliches(filters:{ and: [ { finnished:{ne: true },forappruval: { ne: true } }, ${NOT_ARCHIVED} ] }) {data{id
@@ -686,7 +686,7 @@ const qids_base = {
     data{
       id
       attributes{
-        username
+        username nameLatin nameArabic nameCyrillic nameHebrew
         lang 
       }
     }
@@ -703,7 +703,7 @@ const qids_base = {
     data {
       id
       attributes {
-        username
+        username nameLatin nameArabic nameCyrillic nameHebrew
         projects_1s {
           data {
             id
@@ -712,7 +712,7 @@ const qids_base = {
               user_1s {
                 data {
                   id
-                  attributes { username }
+                  attributes { username nameLatin nameArabic nameCyrillic nameHebrew }
                 }
               }
             }
@@ -733,7 +733,7 @@ const qids_base = {
   ) {
     data {
       id
-      attributes { username }
+      attributes { username nameLatin nameArabic nameCyrillic nameHebrew }
     }
   }
 }`,
@@ -788,7 +788,7 @@ const qids_base = {
             data {
               id
               attributes {
-                username
+                username nameLatin nameArabic nameCyrillic nameHebrew
               }
             }
           }
@@ -810,7 +810,7 @@ const qids_base = {
                         data {
                           id
                           attributes {
-                            username
+                            username nameLatin nameArabic nameCyrillic nameHebrew
                             profilePic { data { attributes { url } } }
                           }
                         }
@@ -834,7 +834,7 @@ const qids_base = {
               lang 
               email
               noMail
-              username
+              username nameLatin nameArabic nameCyrillic nameHebrew
               machshirs{data{id attributes{jsoni}}}
             }
           }
@@ -862,7 +862,7 @@ const qids_base = {
         attributes {
           missname archived createdAt month noofhours perhour why iskvua isTimerSave
           vots { id what why order zman users_permissions_user { data { id } } }
-          users_permissions_user { data { id attributes { username } } }
+          users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
           project { data { id attributes { projectName } } }
           mesimabetahalich { data { id } }
           timegrama { data { id attributes { date done } } }
@@ -1217,7 +1217,7 @@ const qids_base = {
             creator {
               data {
                 attributes {
-                  username
+                  username nameLatin nameArabic nameCyrillic nameHebrew
                   email
                 }
               }
@@ -1233,7 +1233,7 @@ const qids_base = {
                     data {
                       id
                       attributes {
-                        username
+                        username nameLatin nameArabic nameCyrillic nameHebrew
                         email
                       }
                     }
@@ -1259,7 +1259,7 @@ const qids_base = {
               data {
                 id
                 attributes {
-                  username
+                  username nameLatin nameArabic nameCyrillic nameHebrew
                   email
                 }
               }
@@ -1467,7 +1467,7 @@ const qids_base = {
             sourceId
             sourceMeta
             cuntries { data { id attributes { name } } }
-            creator { data { attributes { username email } } }
+            creator { data { attributes { username nameLatin nameArabic nameCyrillic nameHebrew email } } }
             positions {
               data {
                 id
@@ -1490,7 +1490,7 @@ const qids_base = {
                 }
               }
             }
-            participants { data { id attributes { username email } } }
+            participants { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew email } } }
           }
         }
       }
@@ -1526,7 +1526,7 @@ const qids_base = {
             sourceId
             sourceMeta
             cuntries { data { id attributes { name } } }
-            creator { data { attributes { username email } } }
+            creator { data { attributes { username nameLatin nameArabic nameCyrillic nameHebrew email } } }
             positions {
               data {
                 id
@@ -1549,7 +1549,7 @@ const qids_base = {
                 }
               }
             }
-            participants { data { id attributes { username email } } }
+            participants { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew email } } }
           }
         }
       }
@@ -1985,7 +1985,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
               id
               attributes {
                 projectName
-                user_1s { data { id attributes { username } } }
+                user_1s { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
                 restime
                 timeToP
                 profilePic { data { attributes { url } } }
@@ -2020,7 +2020,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       data {
         attributes {
           projectName
-          user_1s { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          user_1s { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
           linkToWebsite
           restime
           matanotofs{data{id attributes{name price }}}
@@ -2107,7 +2107,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           stipendRate
           stipendCostShare
           stipendMode
-          stipendFunder { data { id attributes { username } } }
+          stipendFunder { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
           # "2 of 4 joined" for the candidate deciding whether to apply
           # (PLAN_SHIFTS §2.6). Seat state only — no user relation, because
           # a guest reads this page with the service token.
@@ -2151,7 +2151,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           discordlink
           githublink
           bio
-          username
+          username nameLatin nameArabic nameCyrillic nameHebrew
           finnished_missions { data { attributes { missionName } } }
           profilePic { data { attributes { url formats } } }
           projects_1s { data { id attributes { projectName } } }
@@ -2404,7 +2404,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         attributes {
           total
           price
-          iCanGetMonay { data { id attributes { username } } }
+          iCanGetMonay { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         }
       }
     }
@@ -2461,7 +2461,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
             confirmed
             amount
             forum { data { id } }
-            userrecive { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            userrecive { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
           } } }
           tosplit {
             data { id attributes {
@@ -2471,7 +2471,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           sheirut {
             data { id attributes {
               total
-              iCanGetMonay { data { id attributes { username profilePic { data { attributes { url } } } } } }
+              iCanGetMonay { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
             } }
           }
         }
@@ -2495,12 +2495,12 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         id
         attributes {
           amount
-          users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
           haluka { data { id attributes {
             senderconf
             confirmed
             amount
-            userrecive { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            userrecive { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
           } } }
         }
       }
@@ -2524,12 +2524,12 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         attributes {
           amount
           project { data { id attributes { projectName profilePic { data { attributes { url } } } } } }
-          users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
           haluka { data { id attributes {
             senderconf
             confirmed
             amount
-            userrecive { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            userrecive { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
           } } }
         }
       }
@@ -2557,7 +2557,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   amount
                   noten
                   mekabel
-                  users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+                  users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
                 }
                 halukas {
                   data {
@@ -2566,8 +2566,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                       amount
                       confirmed
                       senderconf
-                      usersend { data { id attributes { username profilePic { data { attributes { url } } } } } }
-                      userrecive { data { id attributes { username profilePic { data { attributes { url } } } } } }
+                      usersend { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
+                      userrecive { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
                     }
                   }
                 }
@@ -2980,7 +2980,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
             data {
               id
               attributes {
-                username
+                username nameLatin nameArabic nameCyrillic nameHebrew
                 profilePic { data { attributes { url } } }
               }
             }
@@ -3171,7 +3171,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
             data {
               id
               attributes {
-                username
+                username nameLatin nameArabic nameCyrillic nameHebrew
                 profilePic {
                   data {
                     attributes {
@@ -3605,7 +3605,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         attributes {
           chatre {
             freetext
-            send { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            send { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
             when
             seen
           }
@@ -3757,7 +3757,7 @@ ${PROMO_DECISION_FIELDS}
                 pgishausers {
                   data {
                     attributes {
-                       users_permissions_user { data { attributes { username profilePic { data { attributes { url } } } } } }
+                       users_permissions_user { data { attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
                     }
                   }
                 }
@@ -3794,7 +3794,7 @@ ${PROMO_DECISION_FIELDS}
                   data {
                     id
                     attributes {
-                      username
+                      username nameLatin nameArabic nameCyrillic nameHebrew
                       email
                       lang
                       telegramId
@@ -3875,7 +3875,7 @@ ${PROMO_DECISION_FIELDS}
                         data {
                           id
                           attributes {
-                            username
+                            username nameLatin nameArabic nameCyrillic nameHebrew
                             profilePic { data { attributes { url } } }
                           }
                         }
@@ -3886,7 +3886,7 @@ ${PROMO_DECISION_FIELDS}
               }
             } 
           }
-          startedBy { data { id attributes { username } } }
+          startedBy { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
           pgishauserpends(filters: { archived: { ne: true } }) {
             data {
               id
@@ -3896,7 +3896,7 @@ ${PROMO_DECISION_FIELDS}
                   data {
                     id
                     attributes {
-                      username
+                      username nameLatin nameArabic nameCyrillic nameHebrew
                       email
                       profilePic { data { attributes { url } } }
                     }
@@ -3914,7 +3914,7 @@ ${PROMO_DECISION_FIELDS}
                   data {
                     id
                     attributes {
-                      username
+                      username nameLatin nameArabic nameCyrillic nameHebrew
                       email
                       lang
                       telegramId
@@ -3979,7 +3979,7 @@ ${PROMO_DECISION_FIELDS}
           isLive
           videoLink
           startRequestedAt
-          startRequestedBy { data { id attributes { username } } }
+          startRequestedBy { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
           forum { data { id } }
           pgishausers {
             data {
@@ -3991,7 +3991,7 @@ ${PROMO_DECISION_FIELDS}
                   data {
                     id
                     attributes {
-                      username
+                      username nameLatin nameArabic nameCyrillic nameHebrew
                       email
                       lang
                       telegramId
@@ -4042,7 +4042,7 @@ ${PROMO_DECISION_FIELDS}
     usersPermissionsUsers(filters: { id: { in: $ids } }, pagination: { limit: 50 }) {
       data {
         id
-        attributes { username }
+        attributes { username nameLatin nameArabic nameCyrillic nameHebrew }
       }
     }
   }`,
@@ -4055,7 +4055,7 @@ ${PROMO_DECISION_FIELDS}
         id
         attributes {
           projectName
-          user_1s { data { id attributes { username } } }
+          user_1s { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
           mesimabetahaliches(
             filters: { and: [ { or: [ { finnished: { null: true } }, { finnished: { eq: false } } ] }, ${NOT_ARCHIVED} ] }
             pagination: { limit: 200 }
@@ -4064,7 +4064,7 @@ ${PROMO_DECISION_FIELDS}
               id
               attributes {
                 name
-                users_permissions_user { data { id attributes { username } } }
+                users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
                 tafkidims { data { id attributes { roleDescription } } }
               }
             }
@@ -4191,7 +4191,7 @@ ${PROMO_DECISION_FIELDS}
           currencyCode
           projectName
           profilePic { data { attributes { url } } }
-          user_1s { data { id attributes { username } } }
+          user_1s { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         }
       }
     }
@@ -4216,7 +4216,7 @@ ${PROMO_DECISION_FIELDS}
         id
         attributes {
           projectName
-          user_1s { data { id attributes { username } } }
+          user_1s { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
           tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
         }
       }
@@ -4300,7 +4300,7 @@ ${PROMO_DECISION_FIELDS}
                       data {
                         id
                         attributes {
-                          username
+                          username nameLatin nameArabic nameCyrillic nameHebrew
                           profilePic { data { attributes { url formats } } }
                         }
                       }
@@ -4400,7 +4400,7 @@ ${PROMO_DECISION_FIELDS}
                   data {
                     id
                     attributes {
-                      username
+                      username nameLatin nameArabic nameCyrillic nameHebrew
                       profilePic {
                         data {
                           attributes {
@@ -4427,7 +4427,7 @@ ${PROMO_DECISION_FIELDS}
                             data {
                               id
                               attributes {
-                                username
+                                username nameLatin nameArabic nameCyrillic nameHebrew
                                 profilePic {
                                   data {
                                     attributes {
@@ -4541,7 +4541,7 @@ ${PROMO_DECISION_FIELDS}
                   id
                   attributes {
                     haskama
-                    username
+                    username nameLatin nameArabic nameCyrillic nameHebrew
                     profilePic {
                       data {
                         attributes {
@@ -4622,7 +4622,7 @@ ${PROMO_DECISION_FIELDS}
                     shem
                     myIshur
                     link
-                    vali{data{id attributes{ username profilePic {data{attributes{ url }}}}}}
+                    vali{data{id attributes{ username nameLatin nameArabic nameCyrillic nameHebrew profilePic {data{attributes{ url }}}}}}
                     hashivut
                     valiIshur
                     des
@@ -4657,7 +4657,7 @@ ${PROMO_DECISION_FIELDS}
             id
           }
         }
-        username
+        username nameLatin nameArabic nameCyrillic nameHebrew
         hervachti
         profilePic {
           data {
@@ -4698,7 +4698,7 @@ ${PROMO_DECISION_FIELDS}
                 data {
                   id
                   attributes {
-                    username
+                    username nameLatin nameArabic nameCyrillic nameHebrew
                     haskamaz
                     haskamac
                     email
@@ -4764,7 +4764,7 @@ ${PROMO_DECISION_FIELDS}
                       data {
                         id
                         attributes {
-                          username
+                          username nameLatin nameArabic nameCyrillic nameHebrew
                           profilePic {
                             data {
                               attributes {
@@ -4780,7 +4780,7 @@ ${PROMO_DECISION_FIELDS}
                       data {
                         id
                         attributes {
-                          username
+                          username nameLatin nameArabic nameCyrillic nameHebrew
                           profilePic {
                             data {
                               attributes {
@@ -4796,7 +4796,7 @@ ${PROMO_DECISION_FIELDS}
                       data {
                         id
                         attributes {
-                          username
+                          username nameLatin nameArabic nameCyrillic nameHebrew
                           profilePic {
                             data {
                               attributes {
@@ -4842,7 +4842,7 @@ ${PROMO_DECISION_FIELDS}
                                   data {
                                     id
                                     attributes {
-                                      username
+                                      username nameLatin nameArabic nameCyrillic nameHebrew
                                       profilePic {
                                         data {
                                           attributes {
@@ -4873,7 +4873,7 @@ ${PROMO_DECISION_FIELDS}
                             data {
                               id
                               attributes {
-                                username
+                                username nameLatin nameArabic nameCyrillic nameHebrew
                                 profilePic { data { attributes { url formats } } }
                               }
                             }
@@ -4882,7 +4882,7 @@ ${PROMO_DECISION_FIELDS}
                             data {
                               id
                               attributes {
-                                username
+                                username nameLatin nameArabic nameCyrillic nameHebrew
                                 profilePic { data { attributes { url formats } } }
                               }
                             }
@@ -4917,7 +4917,7 @@ ${PROMO_DECISION_FIELDS}
                       data {
                         id
                         attributes {
-                          username
+                          username nameLatin nameArabic nameCyrillic nameHebrew
                           profilePic {
                             data {
                               attributes {
@@ -5030,8 +5030,8 @@ ${PROMO_DECISION_FIELDS}
                           finishDate
                           note
                           holderStatus
-                          reporter { data { id attributes { username } } }
-                          users_permissions_user { data { id attributes { username } } }
+                          reporter { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
+                          users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
                           matanot { data { id attributes { name quant } } }
                         }
                       }
@@ -5210,7 +5210,7 @@ ${PROMO_DECISION_FIELDS}
                             data {
                               id
                               attributes {
-                                username
+                                username nameLatin nameArabic nameCyrillic nameHebrew
                                 profilePic {
                                   data {
                                     attributes {
@@ -5373,7 +5373,7 @@ ${PROMO_DECISION_FIELDS}
                                   data {
                                     id
                                     attributes {
-                                      username
+                                      username nameLatin nameArabic nameCyrillic nameHebrew
                                       profilePic {
                                         data {
                                           attributes {
@@ -5424,7 +5424,7 @@ ${PROMO_DECISION_FIELDS}
                       data {
                         id
                         attributes {
-                          username
+                          username nameLatin nameArabic nameCyrillic nameHebrew
                         }
                       }
                     }
@@ -5507,7 +5507,7 @@ ${PROMO_DECISION_FIELDS}
                       data {
                         id
                         attributes {
-                          username
+                          username nameLatin nameArabic nameCyrillic nameHebrew
                           profilePic {
                             data {
                               attributes {
@@ -5574,7 +5574,7 @@ ${PROMO_DECISION_FIELDS}
                             data {
                               id
                               attributes {
-                                username
+                                username nameLatin nameArabic nameCyrillic nameHebrew
                                 profilePic {
                                   data {
                                     attributes {
@@ -5663,7 +5663,7 @@ ${PROMO_DECISION_FIELDS}
                                   data {
                                     id
                                     attributes {
-                                      username
+                                      username nameLatin nameArabic nameCyrillic nameHebrew
                                       profilePic {
                                         data {
                                           attributes {
@@ -5723,7 +5723,7 @@ ${PROMO_DECISION_FIELDS}
                                   data {
                                     id
                                     attributes {
-                                      username
+                                      username nameLatin nameArabic nameCyrillic nameHebrew
                                     }
                                   }
                                 }
@@ -5860,7 +5860,7 @@ ${PROMO_DECISION_FIELDS}
                       data {
                         id
                         attributes {
-                          username
+                          username nameLatin nameArabic nameCyrillic nameHebrew
                           skills {
                             data {
                               id
@@ -6071,7 +6071,7 @@ ${PROMO_DECISION_FIELDS}
                             data {
                               id
                               attributes {
-                                username
+                                username nameLatin nameArabic nameCyrillic nameHebrew
                               }
                             }
                           }
@@ -6258,7 +6258,7 @@ ${PROMO_DECISION_FIELDS}
                       data {
                         id
                         attributes {
-                          username
+                          username nameLatin nameArabic nameCyrillic nameHebrew
                           profilePic {
                             data {
                               attributes {
@@ -6316,7 +6316,7 @@ ${PROMO_DECISION_FIELDS}
                 data {
                   id
                   attributes {
-                    username
+                    username nameLatin nameArabic nameCyrillic nameHebrew
                     profilePic {
                       data {
                         attributes {
@@ -6332,7 +6332,7 @@ ${PROMO_DECISION_FIELDS}
                 data {
                   id
                   attributes {
-                    username
+                    username nameLatin nameArabic nameCyrillic nameHebrew
                     profilePic {
                       data {
                         attributes {
@@ -6348,7 +6348,7 @@ ${PROMO_DECISION_FIELDS}
                 data {
                   id
                   attributes {
-                    username
+                    username nameLatin nameArabic nameCyrillic nameHebrew
                     profilePic {
                       data {
                         attributes {
@@ -6394,7 +6394,7 @@ ${PROMO_DECISION_FIELDS}
                             data {
                               id
                               attributes {
-                                username
+                                username nameLatin nameArabic nameCyrillic nameHebrew
                                 profilePic {
                                   data {
                                     attributes {
@@ -6425,7 +6425,7 @@ ${PROMO_DECISION_FIELDS}
                       data {
                         id
                         attributes {
-                          username
+                          username nameLatin nameArabic nameCyrillic nameHebrew
                           profilePic { data { attributes { url formats } } }
                         }
                       }
@@ -6620,7 +6620,7 @@ ${PROMO_DECISION_FIELDS}
                     link
                     hashivut
                     valiIshur
-                    vali{data{id attributes{ username profilePic {data{attributes{ url }}}}}}
+                    vali{data{id attributes{ username nameLatin nameArabic nameCyrillic nameHebrew profilePic {data{attributes{ url }}}}}}
                     des
                     dateF
                     dateS
@@ -6825,7 +6825,7 @@ ${PROMO_DECISION_FIELDS}
                         data {
                           id
                           attributes {
-                            username
+                            username nameLatin nameArabic nameCyrillic nameHebrew
                             profilePic {
                               data {
                                 attributes {
@@ -6861,7 +6861,7 @@ ${PROMO_DECISION_FIELDS}
                     data {
                       id
                       attributes {
-                        username
+                        username nameLatin nameArabic nameCyrillic nameHebrew
                       }
                     }
                   }
@@ -6889,7 +6889,7 @@ ${PROMO_DECISION_FIELDS}
                     data {
                       id
                       attributes {
-                        username
+                        username nameLatin nameArabic nameCyrillic nameHebrew
                       }
                     }
                   }
@@ -6918,7 +6918,7 @@ ${PROMO_DECISION_FIELDS}
                         data {
                           id
                           attributes {
-                            username
+                            username nameLatin nameArabic nameCyrillic nameHebrew
                           }
                         }
                       }
@@ -6956,7 +6956,7 @@ ${PROMO_DECISION_FIELDS}
                         data {
                           id
                           attributes {
-                            username
+                            username nameLatin nameArabic nameCyrillic nameHebrew
                           }
                         }
                       }
@@ -7012,7 +7012,7 @@ ${PROMO_DECISION_FIELDS}
                   data {
                     id
                     attributes {
-                      username
+                      username nameLatin nameArabic nameCyrillic nameHebrew
                     }
                   }
                 }
@@ -7194,7 +7194,7 @@ ${PROMO_DECISION_FIELDS}
           totalHoursSaved
           iskvua
           hoursassinged
-          users_permissions_user { data { id attributes { username } } }
+          users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
           mission { data { id } }
           project {
             data {
@@ -7452,7 +7452,7 @@ ${PROMO_DECISION_FIELDS}
       data {
         id
         attributes {
-          username
+          username nameLatin nameArabic nameCyrillic nameHebrew
           profilePic { data { attributes { url formats } } }
           sheiruts {
             data {
@@ -7466,13 +7466,13 @@ ${PROMO_DECISION_FIELDS}
                   data { id attributes { what order why users_permissions_user { data { id } } } }
                 }
                 iCanGetMonay {
-                  data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                  data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
                 }
                 iTransferedTo {
-                  data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                  data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
                 }
                 users_permissions_users {
-                  data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                  data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
                 }
                 matanot {
                   data { id attributes { name desc price quant kindOf pic { data { attributes { url formats } } } } }
@@ -7487,7 +7487,7 @@ ${PROMO_DECISION_FIELDS}
                           attributes {
                             content createdAt
                             users_permissions_user {
-                              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                              data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
                             }
                           }
                         }
@@ -7502,7 +7502,7 @@ ${PROMO_DECISION_FIELDS}
                       senderconf confirmed amount
                       forum { data { id } }
                       usersend { data { id } }
-                      userrecive { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                      userrecive { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
                     }
                   }
                 }
@@ -7513,7 +7513,7 @@ ${PROMO_DECISION_FIELDS}
                       projectName
                       profilePic { data { attributes { url formats } } }
                       user_1s {
-                        data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                        data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
                       }
                     }
                   }
@@ -7572,7 +7572,7 @@ ${PROMO_DECISION_FIELDS}
                 projectName
                 profilePic { data { attributes { url formats } } }
                 user_1s {
-                  data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                  data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
                 }
                 sheiruts {
                   data {
@@ -7586,13 +7586,13 @@ ${PROMO_DECISION_FIELDS}
                         data { id attributes { what order why users_permissions_user { data { id } } } }
                       }
                       iCanGetMonay {
-                        data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                        data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
                       }
                       iTransferedTo {
-                        data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                        data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
                       }
                       users_permissions_users {
-                        data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                        data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
                       }
                       matanot {
                         data { id attributes { name desc price quant kindOf pic { data { attributes { url formats } } } } }
@@ -7607,7 +7607,7 @@ ${PROMO_DECISION_FIELDS}
                                 attributes {
                                   content createdAt
                                   users_permissions_user {
-                                    data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                                    data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
                                   }
                                 }
                               }
@@ -7622,7 +7622,7 @@ ${PROMO_DECISION_FIELDS}
                             senderconf confirmed amount
                             forum { data { id } }
                             usersend { data { id } }
-                            userrecive { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                            userrecive { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
                           }
                         }
                       }
@@ -7668,7 +7668,7 @@ ${PROMO_DECISION_FIELDS}
                         }
                       }
                       users_permissions_user {
-                        data { id attributes { username profilePic { data { attributes { url } } } } }
+                        data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } }
                       }
                     }
                   }
@@ -7708,13 +7708,13 @@ ${PROMO_DECISION_FIELDS}
             data { id attributes { what order why users_permissions_user { data { id } } } }
           }
           iCanGetMonay {
-            data { id attributes { username profilePic { data { attributes { url formats } } } } }
+            data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
           }
           iTransferedTo {
-            data { id attributes { username profilePic { data { attributes { url formats } } } } }
+            data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
           }
           users_permissions_users {
-            data { id attributes { username profilePic { data { attributes { url formats } } } } }
+            data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
           }
           matanot {
             data { id attributes { name desc price quant kindOf pic { data { attributes { url formats } } } } }
@@ -7729,7 +7729,7 @@ ${PROMO_DECISION_FIELDS}
                     attributes {
                       content createdAt
                       users_permissions_user {
-                        data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                        data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
                       }
                     }
                   }
@@ -7744,7 +7744,7 @@ ${PROMO_DECISION_FIELDS}
                 senderconf confirmed amount
                 forum { data { id } }
                 usersend { data { id } }
-                userrecive { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                userrecive { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
               }
             }
           }
@@ -7755,7 +7755,7 @@ ${PROMO_DECISION_FIELDS}
                 projectName
                 profilePic { data { attributes { url formats } } }
                 user_1s {
-                  data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                  data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
                 }
               }
             }
@@ -8179,7 +8179,7 @@ ${PROMO_DECISION_FIELDS}
           last_matched_at
           logo { data { id attributes { url formats } } }
           users_permissions_users {
-            data { id attributes { username } }
+            data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } }
           }
           vallues { data { id attributes { valueName } } }
           categories { data { id attributes { name } } }
@@ -8209,7 +8209,7 @@ ${PROMO_DECISION_FIELDS}
           terms_digest
           location { lat lng radius location_hint }
           # A direct offer: who wrote it for her, and when she took it (PLAN_DIRECT_OFFER).
-          offered_by { data { id attributes { username } } }
+          offered_by { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
           claimed_at
           chat_forum { data { id } }
           process { data { id } }
@@ -8232,7 +8232,7 @@ ${PROMO_DECISION_FIELDS}
           auto_generated
           createdAt
           proposer_users {
-            data { id attributes { username } }
+            data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } }
           }
           project { data { id attributes { projectName } } }
           matanot { data { id attributes { name } } }
@@ -8576,7 +8576,7 @@ ${PROMO_DECISION_FIELDS}
           status_ratson
           createdAt
           users_permissions_users {
-            data { id attributes { username } }
+            data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } }
           }
           vallues { data { id attributes { valueName } } }
           categories { data { id attributes { name } } }
@@ -8645,7 +8645,7 @@ ${PROMO_DECISION_FIELDS}
                   data {
                     id
                     attributes {
-                      username
+                      username nameLatin nameArabic nameCyrillic nameHebrew
                       profilePic { data { attributes { url } } }
                     }
                   }
@@ -9100,7 +9100,7 @@ ${PROMO_DECISION_FIELDS}
                       ratePerHour
                       mode
                       notes
-                      assignedMember { data { id attributes { username } } }
+                      assignedMember { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
                       pendm { data { id attributes { name rishon { data { id } } } } }
                       mesimabetahalich { data { id } }
                     }
@@ -9114,7 +9114,7 @@ ${PROMO_DECISION_FIELDS}
                       pricePerUnit priceMode
                       mode
                       notes
-                      assignedMember { data { id attributes { username } } }
+                      assignedMember { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
                       pmash { data { id attributes { name } } }
                     }
                   }
@@ -9136,7 +9136,7 @@ ${PROMO_DECISION_FIELDS}
                       perhour
                       finnished
                       lifecycle
-                      users_permissions_user { data { id attributes { username } } }
+                      users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
                       finnished_missions(pagination: { limit: -1 }) { data { id attributes { noofhours total } } }
                     }
                   }
@@ -9216,12 +9216,12 @@ ${PROMO_DECISION_FIELDS}
   '473dealReceipt': `query DealReceipt($id: ID!) {
     sheirut(id: $id) { data { id attributes {
       productExepted
-      users_permissions_users { data { id attributes { username } } }
+      users_permissions_users { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
       project { data { id attributes { restime user_1s { data { id } } } } }
       receipt_decisions(filters: { kind: { eq: "dealReceipt" } }, sort: ["id:desc"], pagination: { limit: 1 }) {
         data { id attributes {
           archived
-          vots { what why order zman ide users_permissions_user { data { id attributes { username } } } }
+          vots { what why order zman ide users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } } }
           timegrama { data { id attributes { date done } } }
         } }
       }
@@ -9280,7 +9280,7 @@ ${PROMO_DECISION_FIELDS}
           archWhy
           archMesimabetahalich { data { id } }
           vots { what order zman users_permissions_user { data { id } } }
-          negoarch { ordern mode why zman hm price proposedBy { data { id attributes { username } } } }
+          negoarch { ordern mode why zman hm price proposedBy { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } } }
           timegrama { data { id attributes { date done } } }
           projects { data { id attributes { user_1s { data { id } } } } }
         }
@@ -9723,14 +9723,14 @@ ${PROMO_DECISION_FIELDS}
   '417dealOpenOffers': `query DealOpenOffers($id: ID!) {
     sheirut(id: $id) { data { id attributes {
       users_permissions_users { data { id } }
-      project { data { id attributes { user_1s { data { id attributes { username } } } } } }
+      project { data { id attributes { user_1s { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } } } } }
       matanot { data { id attributes {
         matanot_recipe_missions(pagination: { limit: 100 }) { data { id attributes {
           assignedMember { data { id } }
           pendm { data { id attributes { open_mission { data { id attributes {
             name noofhours perhour archived
             asks(filters: { archived: { eq: false } }) { data { id attributes {
-              users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+              users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
               vots { what order users_permissions_user { data { id } } }
               negopendmissions(sort: "ordern:desc") { data { attributes { ordern proposedBy noofhours perhour } } }
             } } }
@@ -9741,7 +9741,7 @@ ${PROMO_DECISION_FIELDS}
           pmash { data { id attributes { open_mashaabim { data { id attributes {
             name hm price archived
             askms(filters: { archived: { eq: false } }) { data { id attributes {
-              users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+              users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
               vots { what order users_permissions_user { data { id } } }
               nego_mashes(sort: "ordern:desc") { data { attributes { ordern proposedBy hm price } } }
             } } }
@@ -9770,7 +9770,7 @@ ${PROMO_DECISION_FIELDS}
       pagination: { limit: 30 }
     ) { data { id attributes {
       saveText totalHours updatedAt
-      users_permissions_user { data { id attributes { username } } }
+      users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
       mesimabetahalich { data { id attributes { name } } }
     } } }
   }`,
@@ -9790,7 +9790,7 @@ ${PROMO_DECISION_FIELDS}
       pagination: { limit: 100 }
     ) { data { id attributes {
       kind status_proposal total_price createdAt
-      proposer_users { data { id attributes { username } } }
+      proposer_users { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
       project { data { id attributes { projectName } } }
       matanot { data { id attributes { name } } }
       open_mission { data { id attributes { name } } }
@@ -9799,7 +9799,7 @@ ${PROMO_DECISION_FIELDS}
       ratson_willingness_entry { id user { data { id } } agree note submittedAt willingHours willingAmount termsDigest }
       ratson { data { id attributes {
         name status_ratson terms_digest
-        users_permissions_users { data { id attributes { username } } }
+        users_permissions_users { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         extracted_missions { id name }
         extracted_resources { id name }
       } } }
@@ -9813,7 +9813,7 @@ ${PROMO_DECISION_FIELDS}
       pagination: { limit: 100 }
     ) { data { id attributes {
       kind status_proposal total_price createdAt
-      proposer_users { data { id attributes { username } } }
+      proposer_users { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
       project { data { id attributes { projectName } } }
       matanot { data { id attributes { name } } }
       open_mission { data { id attributes { name } } }
@@ -9822,7 +9822,7 @@ ${PROMO_DECISION_FIELDS}
       ratson_willingness_entry { id user { data { id } } agree note submittedAt willingHours willingAmount termsDigest }
       ratson { data { id attributes {
         name status_ratson terms_digest
-        users_permissions_users { data { id attributes { username } } }
+        users_permissions_users { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         extracted_missions { id name }
         extracted_resources { id name }
       } } }
@@ -9890,7 +9890,7 @@ ${PROMO_DECISION_FIELDS}
       name desc longDes startDate finnishDate isOnline lat lng radius location_hint
       status_ratson fulfilled terms_digest createdAt
       offer_recipient_hint offer_email_lock offer_link_at offer_expires_at claimed_at
-      offered_by { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+      offered_by { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
       offered_by_project { data { id attributes { projectName } } }
       users_permissions_users { data { id } }
       extracted_missions { id name hoursEst importance notes }
@@ -9925,7 +9925,7 @@ ${PROMO_DECISION_FIELDS}
       pagination: { limit: 60 }
     ) { data { id attributes {
       name status_ratson fulfilled createdAt claimed_at offer_link_at offer_recipient_hint
-      users_permissions_users { data { id attributes { username } } }
+      users_permissions_users { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
     } } }
   }`,
   // The email of an account, by the id from the signed JWT — to check an offer's
@@ -9946,8 +9946,8 @@ ${PROMO_DECISION_FIELDS}
           project { data { id } }
           halukas(pagination: { limit: -1 }) { data { id attributes {
             amount confirmed senderconf
-            usersend { data { id attributes { username } } }
-            userrecive { data { id attributes { username } } }
+            usersend { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
+            userrecive { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
             forum { data { id } }
           } } }
         } } }
@@ -10105,7 +10105,7 @@ ${PROMO_DECISION_FIELDS}
   'lapsedAskForRevival': `query LapsedAskForRevival($id: ID!) {
     ask(id: $id) { data { id attributes {
       archived lapsedAt
-      users_permissions_user { data { id attributes { username } } }
+      users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
       project { data { id attributes { restime projectName user_1s { data { id } } } } }
       open_mission { data { id attributes {
         name archived isRishon
@@ -10123,7 +10123,7 @@ ${PROMO_DECISION_FIELDS}
   'askForWithdrawal': `query AskForWithdrawal($id: ID!) {
     ask(id: $id) { data { id attributes {
       archived lapsedAt
-      users_permissions_user { data { id attributes { username } } }
+      users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
       project { data { id attributes { projectName } } }
       open_mission { data { id attributes { name archived isRishon } } }
     } } }
@@ -10131,7 +10131,7 @@ ${PROMO_DECISION_FIELDS}
   'askmForWithdrawal': `query AskmForWithdrawal($id: ID!) {
     askm(id: $id) { data { id attributes {
       archived isSelfProposal
-      users_permissions_user { data { id attributes { username } } }
+      users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
       project { data { id attributes { projectName } } }
       open_mashaabim { data { id attributes { name } } }
       pmash { data { id } }
@@ -10164,7 +10164,7 @@ ${PROMO_DECISION_FIELDS}
       pagination: { limit: 20 }
     ) { data { id attributes {
       lapsedAt
-      users_permissions_user { data { id attributes { username } } }
+      users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
       open_mission { data { id attributes {
         name isRishon
         asks(filters: { or: [{ archived: { null: true } }, { archived: { eq: false } }] }) { data { id } }
@@ -10203,7 +10203,7 @@ export const moachQids = {
         name descrip pricePerUnit start end cycleSize kindOf recurring status_mashab
         finnished quantityDelivered
         project { data { id attributes { user_1s { data { id } } } } }
-        users_permissions_user { data { id attributes { username email lang noMail } } }
+        users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew email lang noMail } } }
         maaps { data { id attributes { cycleIndex cycleStart cycleEnd archived } } }
         rikmash { data { id } }
       } }
@@ -10218,7 +10218,7 @@ export const moachQids = {
       data { id attributes {
         name pricePerUnit start end cycleSize kindOf
         project { data { id attributes { projectName user_1s { data { id } } } } }
-        users_permissions_user { data { id attributes { username email lang noMail } } }
+        users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew email lang noMail } } }
         maaps(pagination: { limit: 500 }) { data { id attributes { cycleIndex cycleStart cycleEnd archived } } }
         rikmash { data { id } }
       } }
@@ -10353,14 +10353,14 @@ export const moachQids = {
           descripFor
           publicDescription
           profilePic { data { attributes { url formats } } }
-          user_1s { data { id attributes { email username lang profilePic { data { attributes { url formats } } } } } }
+          user_1s { data { id attributes { email username nameLatin nameArabic nameCyrillic nameHebrew lang profilePic { data { attributes { url formats } } } } } }
           supportPage
           restime githublink fblink discordlink drivelink twiterlink watsapplink linkToWebsite
           codeLicense codeLicenseOpenYears codeLicenseSince
           vallues { data { id attributes { valueName localizations { data { attributes { valueName } } } } } }
           acts{data{id attributes{shem hashivut isAssigned open_mission{data{id attributes {name}}} pendm{data{id attributes{name}}}
-                 dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}}
-                 des dateF vali{data{id attributes{ username profilePic {data{attributes{ url }}}}}}
+                 dateS naasa my{data{ id attributes{ username nameLatin nameArabic nameCyrillic nameHebrew profilePic {data{attributes{ url }}}}}}
+                 des dateF vali{data{id attributes{ username nameLatin nameArabic nameCyrillic nameHebrew profilePic {data{attributes{ url }}}}}}
                  myIshur valiIshur status mesimabetahaliches{data{id
                   attributes{name forums{data{id}}}}}}}}
           sheiruts{data{ id attributes{name descrip equaliSplited oneTime isApruved}}}
@@ -10377,14 +10377,14 @@ export const moachQids = {
           descripFor
           publicDescription
           profilePic { data { attributes { url formats } } }
-          user_1s { data { id attributes { email username lang profilePic { data { attributes { url formats } } } } } }
+          user_1s { data { id attributes { email username nameLatin nameArabic nameCyrillic nameHebrew lang profilePic { data { attributes { url formats } } } } } }
           supportPage currencyCode
           restime githublink fblink discordlink drivelink twiterlink watsapplink linkToWebsite
           codeLicense codeLicenseOpenYears codeLicenseSince
           vallues { data { id attributes { valueName localizations { data { attributes { locale valueName } } } } } }
           acts{data{id attributes{shem hashivut isAssigned open_mission{data{id attributes {name}}} pendm{data{id attributes{name}}}
-                 dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}}
-                 des dateF vali{data{id attributes{ username profilePic {data{attributes{ url }}}}}}
+                 dateS naasa my{data{ id attributes{ username nameLatin nameArabic nameCyrillic nameHebrew profilePic {data{attributes{ url }}}}}}
+                 des dateF vali{data{id attributes{ username nameLatin nameArabic nameCyrillic nameHebrew profilePic {data{attributes{ url }}}}}}
                  myIshur valiIshur status mesimabetahaliches{data{id
                   attributes{name forums{data{id}}}}}
                  tafkidims{data{id attributes{roleDescription localizations{data{attributes{roleDescription}}}}}}
@@ -10407,14 +10407,14 @@ export const moachQids = {
             data { id attributes { name noofhours perhour sqadualed privatlinks publicklinks
               rishon { data { id } } mission { data { id } } acts { data { id attributes { shem dateS } } } createdAt
               asks { data { id attributes { archived
-                users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+                users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
                 forums { data { id } }
               } } }
             } }
           }
           extraPendm: pendms(filters: { id: { in: $pmIds } }) {
             data { id attributes { name createdAt dates noofhours perhour mission { data { id } }
-              users { what why id users_permissions_user { data { id attributes { username } } } }
+              users { what why id users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } } }
             } }
           }
         }
@@ -10435,7 +10435,7 @@ export const moachQids = {
             pendm { data { id } }
             open_mission { data { id } }
             mesimabetahaliches { data { id } }
-            my { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            my { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
             vali { data { id } }
           } } }
           mesimabetahaliches(filters: { and: [ { finnished: { eq: false } }, ${NOT_ARCHIVED} ] }) { data {
@@ -10444,7 +10444,7 @@ export const moachQids = {
               open_missions { data { id } }
               forums { data { id } }
               finiapruvals { data { id attributes { missname archived } } }
-              users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+              users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
               acts { data { id attributes { shem dateS naasa myIshur valiIshur status } } }
             }
           } }
@@ -10453,7 +10453,7 @@ export const moachQids = {
               name descrip noofhours perhour sqadualed createdAt
               pendm { data { id } }
               asks { data { id attributes {
-                users_permissions_user { data { id attributes { username } } }
+                users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
                 forums { data { id } }
               } } }
               tafkidims { data { id attributes { roleDescription localizations @include(if: $withLoc) { data { attributes { roleDescription } } } } } }
@@ -10476,7 +10476,7 @@ export const moachQids = {
             id attributes {
               name kindOf hm descrip price easy spnot sqadualed sqadualedf
               pmash { data { id attributes { name } } }
-              askms { data { id attributes { users_permissions_user { data { id attributes { username } } } } } }
+              askms { data { id attributes { users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } } } } }
               maap { data { id attributes { name archived } } }
               rikmashes { data { id attributes { name kindOf total hm price } } }
             }
@@ -10505,32 +10505,32 @@ export const moachQids = {
           restime
           acts { data { id attributes {
             shem des link hashivut naasa myIshur valiIshur status dateS dateF createdAt
-            my { data { id attributes { username profilePic { data { attributes { url } } } } } }
-            vali { data { id attributes { username } } }
+            my { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
+            vali { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
             pendm { data { id } }
             open_mission { data { id } }
             mesimabetahaliches { data { id } }
           } } }
           pendms { data { id attributes {
             name descrip hearotMeyuchadot noofhours perhour dates sqadualed iskvua archived createdAt
-            rishon { data { id attributes { username } } }
+            rishon { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
             mission { data { id } }
             open_mission { data { id } }
             timegrama { data { id attributes { date done } } }
             forums { data { id } }
             tafkidims { data { id attributes { roleDescription } } }
-            users { id what why order zman users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } } }
+            users { id what why order zman users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } } }
           } } }
           open_missions { data { id attributes {
             name descrip hearotMeyuchadot noofhours perhour sqadualed archived createdAt
             pendm { data { id } }
-            rishon { data { id attributes { username } } }
+            rishon { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
             partofs { data { id } }
             tafkidims { data { id attributes { roleDescription } } }
             asks { data { id attributes {
               archived createdAt
-              users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
-              vots { id what why order zman users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } } }
+              users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
+              vots { id what why order zman users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } } }
               forums { data { id } }
               timegrama { data { id attributes { date done } } }
             } } }
@@ -10542,31 +10542,31 @@ export const moachQids = {
             forums { data { id } }
             partofs { data { id } }
             open_missions { data { id } }
-            users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
             finiapruvals { data { id attributes {
               missname archived createdAt month noofhours why isTimerSave
-              vots { id what why order zman users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } } }
-              users_permissions_user { data { id attributes { username } } }
+              vots { id what why order zman users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } } }
+              users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
               timegrama { data { id attributes { date done } } }
             } } }
             timers { data { id attributes {
               start finnish totalHours isActive saved appruved saveText saveLinks
               saveFiles { data { id attributes { url name mime size } } }
               timers { start stop }
-              users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+              users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
               acts { data { id attributes { shem } } }
             } } }
           } } }
           finnished_missions { data { id attributes {
             missionName descrip hearotMeyuchadot why start finish month total noofhours perhour createdAt
             mesimabetahalich { data { id } }
-            users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
           } } }
           sales { data { id attributes {
             in date pending splited holderStatus isDonation isSiteShareIncome note source createdAt startDate finishDate
             matanot { data { id attributes { name } } }
-            users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
-            reporter { data { id attributes { username } } }
+            users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
+            reporter { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
             tosplits { data { id attributes { finished } } }
           } } }
           matanotofs { data { id attributes {
@@ -10576,12 +10576,12 @@ export const moachQids = {
               mode notes hoursPerUnit ratePerHour unitsPerProduct
               pendm { data { id attributes { name } } }
               mesimabetahalich { data { id attributes { name } } }
-              assignedMember { data { id attributes { username } } }
+              assignedMember { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
             } } }
             matanot_recipe_resources { data { id attributes {
               mode notes kindOf pricePerUnit priceMode quantityPerUnit
               pmash { data { id attributes { name } } }
-              assignedMember { data { id attributes { username } } }
+              assignedMember { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
             } } }
           } } }
           open_mashaabims { data { id attributes {
@@ -10591,25 +10591,25 @@ export const moachQids = {
               name descrip spnot kindOf hm price easy archived createdAt
               forums { data { id } }
               timegrama { data { id attributes { date done } } }
-              users { id what why order zman users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } } }
+              users { id what why order zman users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } } }
             } } }
             askms { data { id attributes {
               archived createdAt isSelfProposal
-              users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
-              sp { data { id attributes { users_permissions_user { data { id attributes { username } } } } } }
-              vots { id what why order zman users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } } }
+              users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
+              sp { data { id attributes { users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } } } } }
+              vots { id what why order zman users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } } }
               forum { data { id } }
               timegrama { data { id attributes { date done } } }
             } } }
             maap { data { id attributes {
               name archived createdAt quantityDelivered unit
-              vots { id what why order zman users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } } }
+              vots { id what why order zman users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } } }
               forum { data { id } }
               timegrama { data { id attributes { date done } } }
             } } }
             rikmashes { data { id attributes {
               name kindOf total hm price agprice spnot summary createdAt quantityDelivered
-              users_permissions_user { data { id attributes { username } } }
+              users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
             } } }
           } } }
         }
@@ -10663,7 +10663,7 @@ export const moachQids = {
           saveFiles { data { id attributes { url name mime size } } }
           createdAt
           timers { start stop }
-          users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
           acts { data { id attributes { shem } } }
         }
       }
@@ -10681,7 +10681,7 @@ export const moachQids = {
                 name hearotMeyuchadot descrip noofhours perhour sqadualed
                 howMeny
                 stipendRate stipendCostShare stipendMode
-                stipendFunder { data { id attributes { username } } }
+                stipendFunder { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
                 privatlinks publicklinks acts { data { id attributes { shem dateS } } }
                 tafkidims { data { id attributes { roleDescription } } }
                 skills { data { id attributes { skillName } } }
@@ -10694,7 +10694,7 @@ export const moachQids = {
                 # rule lives in src/lib/missions/headcount.ts, so the card and
                 # the finalizer cannot answer it differently.
                 mesimabetahaliches { data { id attributes { lifecycle finnished } } }
-                asks { data { id attributes { archived users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } } forums { data { id } } } } }
+                asks { data { id attributes { archived users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } } forums { data { id } } } } }
                 createdAt
               }
             }
@@ -10707,7 +10707,7 @@ export const moachQids = {
                 hearotMeyuchadot descrip admaticedai privatlinks publicklinks
                 shiftsMin shiftsMax
                 stipendRate stipendCostShare stipendMode
-                stipendFunder { data { id attributes { username } } }
+                stipendFunder { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
                 monter { monthStart hours isDone hoursDone }
                 forums { data { id } }
                 open_missions { data { id attributes { isshift } } }
@@ -10715,11 +10715,11 @@ export const moachQids = {
                 tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
                 acts { data { id attributes {
                   shem dateS hashivut naasa des dateF myIshur valiIshur status
-                  my { data { id attributes { username profilePic { data { attributes { url } } } } } }
+                  my { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
                   vali { data { id } }
                   mesimabetahaliches { data { id } }
                 } } }
-                users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+                users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
               }
             }
           }
@@ -10812,7 +10812,7 @@ export const moachQids = {
               attributes {
                 in date pending splited holderStatus confirmedBy note tosplits { data { id } }
                 matanot { data { id attributes { name } } }
-                users_permissions_user { data { id attributes { username } } }
+                users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
               }
             }
           }
@@ -10829,7 +10829,7 @@ export const moachQids = {
               id
               attributes {
                 name kindOf total hm price agprice sp { data { id } } spnot
-                users_permissions_user { data { id attributes { username } } }
+                users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
               }
             }
           }
@@ -10839,7 +10839,7 @@ export const moachQids = {
               attributes {
                 missionName start finish createdAt why total descrip hearotMeyuchadot noofhours perhour
                 mesimabetahalich { data { id attributes { createdAt } } }
-                users_permissions_user { data { id attributes { username } } }
+                users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
               }
             }
           }
@@ -10852,8 +10852,8 @@ export const moachQids = {
               attributes {
                 amount hours stipendRate equityCredit equityDebit mode costShare
                 equityMultiplier cycleStart cycleEnd
-                funder { data { id attributes { username } } }
-                recipient { data { id attributes { username } } }
+                funder { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
+                recipient { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
               }
             }
           }
@@ -10947,14 +10947,14 @@ export const moachQids = {
       data {
         attributes {
           tosplits(filters: { finished: { eq: false } }) {
-            data { id attributes { name vots { what why users_permissions_user { data { id attributes { username } } } } } }
+            data { id attributes { name vots { what why users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } } } } }
           }
           decisions(filters: { archived: { eq: false } }) {
             data { id attributes { kind newname decisionName vots { what users_permissions_user { data { id } } } } }
           }
           # Finish approvals (and hours approvals, isTimerSave): every member signs.
           finiapruvals(filters: { archived: { eq: false } }) {
-            data { id attributes { missname noofhours isTimerSave iskvua month timer { data { id } } vots { what order users_permissions_user { data { id } } } users_permissions_user { data { id attributes { username } } } } }
+            data { id attributes { missname noofhours isTimerSave iskvua month timer { data { id } } vots { what order users_permissions_user { data { id } } } users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } } } }
           }
           # A mission offered to one named member (isRishon) is created archived so
           # nobody else can take it — but its ask is still a vote of the rikma.
@@ -10964,7 +10964,7 @@ export const moachQids = {
               attributes {
                 name
                 asks(filters: { archived: { eq: false } }) {
-                  data { id attributes { vots { what why users_permissions_user { data { id attributes { username } } } } } }
+                  data { id attributes { vots { what why users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } } } } }
                 }
               }
             }
@@ -10976,8 +10976,8 @@ export const moachQids = {
                 vots { what why users_permissions_user { data { id } } }
                 pmash { data { attributes { name } } }
                 open_mashaabim { data { attributes { name } } }
-                users_permissions_user { data { id attributes { username } } }
-                sp { data { attributes { users_permissions_user { data { attributes { username } } } } } }
+                users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
+                sp { data { attributes { users_permissions_user { data { attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } } } } }
               }
             }
           }
@@ -11041,7 +11041,7 @@ export const moachQids = {
             data { id attributes {
               name hearotMeyuchadot descrip createdAt ordern proposedBy noofhours perhour isOriginal date dates isMonth howMany
               location { location_mode lat lng radius location_hint }
-              users_permissions_user { data { id attributes { username } } }
+              users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
               skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
               tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
               work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
@@ -11095,7 +11095,7 @@ export const moachQids = {
           }
           createdAt
           chat { why id ide what zman users_permissions_user { data { id } } }
-          forums { data { id attributes { messages(pagination: { limit: 100 }) { data { id attributes { content createdAt users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } } } } } } } }
+          forums { data { id attributes { messages(pagination: { limit: 100 }) { data { id attributes { content createdAt users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } } } } } } } }
           open_mission {
             data { id attributes {
               acts { data { id attributes { shem link des dateF dateS } } }
@@ -11103,7 +11103,7 @@ export const moachQids = {
               negopendmissions(sort: "ordern:desc") {
                 data { id attributes {
                   name hearotMeyuchadot descrip createdAt ordern proposedBy noofhours perhour isOriginal date dates isMonth
-                  users_permissions_user { data { id attributes { username } } }
+                  users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
                   skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
                   tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
                   work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
@@ -11120,7 +11120,7 @@ export const moachQids = {
           }
           users_permissions_user {
             data { id attributes {
-              username
+              username nameLatin nameArabic nameCyrillic nameHebrew
               skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
               work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
               tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
@@ -11151,10 +11151,10 @@ export const moachQids = {
           }
           createdAt
           chat { why ide what zman id users_permissions_user { data { id } } }
-          users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+          users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
           open_mashaabim { data { id attributes { price descrip spnot kindOf sqadualedf sqadualed linkto createdAt hm name easy recurring cycleSize backfill mashaabim { data { id } } } } }
           pmash { data { id attributes { name descrip spnot price easy hm kindOf sqadualed sqadualedf recurring cycleSize backfill } } }
-          sp { data { id attributes { name descrip price myp spnot users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } } } } }
+          sp { data { id attributes { name descrip price myp spnot users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } } } } }
         }
       }
     }
@@ -11172,7 +11172,7 @@ export const moachQids = {
           createdAt
           vots { what why ide order users_permissions_user { data { id } } }
           hervachti {
-            users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
             amount
             mekabel
             noten
@@ -11184,8 +11184,8 @@ export const moachQids = {
                 amount
                 senderconf
                 confirmed
-                usersend { data { id attributes { username } } }
-                userrecive { data { id attributes { username } } }
+                usersend { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
+                userrecive { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
               }
             }
           }
@@ -11272,7 +11272,7 @@ export const moachQids = {
           pagination: { limit: 50 }
         ) { data { id attributes {
           createdAt
-          users_permissions_user { data { id attributes { username } } }
+          users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
           timegrama { data { attributes { date done } } }
           vots { what order users_permissions_user { data { id } } }
           open_mission { data { id attributes { name noofhours perhour } } }
@@ -11310,7 +11310,7 @@ export const moachQids = {
     }
     ask(id: $id) @include(if: $isAsk) {
       data { id attributes {
-        users_permissions_user { data { id attributes { username } } }
+        users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         timegrama { data { attributes { date } } }
         open_mission { data { attributes { name noofhours perhour } } }
         negopendmissions(sort: "ordern:desc", pagination: { limit: 1 }) { data { attributes { name noofhours perhour } } }
@@ -11318,7 +11318,7 @@ export const moachQids = {
     }
     askm(id: $id) @include(if: $isAskm) {
       data { id attributes {
-        users_permissions_user { data { id attributes { username } } }
+        users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         timegrama { data { attributes { date } } }
         open_mashaabim { data { attributes { name hm price easy } } }
         pmash { data { attributes { name hm price easy } } }
@@ -11330,7 +11330,7 @@ export const moachQids = {
       data { id attributes {
         missname noofhours perhour isTimerSave iskvua month
         timer { data { id } }
-        users_permissions_user { data { id attributes { username } } }
+        users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         timegrama { data { attributes { date } } }
         mesimabetahalich { data { attributes { name perhour } } }
       } }
@@ -11356,7 +11356,7 @@ export const moachQids = {
       data { id attributes {
         name quantityDelivered
         timegrama { data { attributes { date } } }
-        mashabetahalich { data { attributes { name users_permissions_user { data { id attributes { username } } } } } }
+        mashabetahalich { data { attributes { name users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } } } } }
         pmash { data { attributes { name } } }
       } }
     }
@@ -11376,14 +11376,14 @@ export const moachQids = {
           shiftsMin shiftsMax
           open_missions { data { id attributes { isshift } } }
           stipendRate stipendCostShare stipendMode
-          stipendFunder { data { id attributes { username } } }
+          stipendFunder { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
           monter { monthStart hours isDone hoursDone }
-          users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
           project { data { id attributes { projectName profilePic { data { attributes { url } } } } } }
           tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
           forums { data { id } }
           acts { data { id attributes { shem des naasa status myIshur valiIshur dateS dateF
-            my { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            my { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
           } } }
           finiapruvals { data { id attributes { missname archived isTimerSave iskvua month timer { data { id } } } } }
         }
@@ -11397,7 +11397,7 @@ export const moachQids = {
         id
         attributes {
           what why order createdAt
-          users_permissions_user { data { id attributes { username } } }
+          users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         }
       }
     }
@@ -11408,8 +11408,8 @@ export const moachQids = {
         id
         attributes {
           shem des status naasa dateS dateF link
-          my { data { id attributes { username } } }
-          vali { data { id attributes { username } } }
+          my { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
+          vali { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
           # Ownership check for linkActToMission: the caller names the project
           # they claim membership of, and this is what proves the act is in it.
           project { data { id } }
@@ -11628,7 +11628,7 @@ export const moachQids = {
               data {
                 id
                 attributes {
-                  username
+                  username nameLatin nameArabic nameCyrillic nameHebrew
                   profilePic { data { attributes { url formats } } }
                 }
               }
@@ -11643,7 +11643,7 @@ export const moachQids = {
           attributes {
             name
             users_permissions_users {
-              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+              data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
             }
           }
         }
@@ -11658,13 +11658,13 @@ export const moachQids = {
                 attributes {
                   name
                   users_permissions_users {
-                    data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                    data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
                   }
                 }
               }
             }
             proposer_users {
-              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+              data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
             }
           }
         }
@@ -11674,8 +11674,8 @@ export const moachQids = {
           id
           attributes {
             amount
-            usersend { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
-            userrecive { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            usersend { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
+            userrecive { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
             project { data { ...ForumProjectCore } }
           }
         }
@@ -11692,7 +11692,7 @@ export const moachQids = {
                 id
                 attributes {
                   users_permissions_user {
-                    data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                    data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
                   }
                 }
               }
@@ -11704,7 +11704,7 @@ export const moachQids = {
         data {
           id
           attributes {
-            users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
             project { data { ...ForumProjectCore } }
           }
         }
@@ -11716,12 +11716,12 @@ export const moachQids = {
             name
             descrip
             project { data { ...ForumProjectCore } }
-            users_permissions_users { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            users_permissions_users { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
             sheirutpend {
               data {
                 id
                 attributes {
-                  users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                  users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
                 }
               }
             }
@@ -11732,7 +11732,7 @@ export const moachQids = {
         data {
           id
           attributes {
-            users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
             project { data { ...ForumProjectCore } }
             sheirut { data { id attributes { name project { data { ...ForumProjectCore } } } } }
           }
@@ -11757,8 +11757,8 @@ export const moachQids = {
               data {
                 id
                 attributes {
-                  reporter { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
-                  users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                  reporter { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
+                  users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
                 }
               }
             }
@@ -11777,7 +11777,7 @@ export const moachQids = {
         data {
           id
           attributes {
-            username
+            username nameLatin nameArabic nameCyrillic nameHebrew
             profilePic { data { attributes { url formats } } }
           }
         }
@@ -11809,7 +11809,7 @@ export const moachQids = {
             content
             when
             users_permissions_user {
-              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+              data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
             }
           }
         }
@@ -11821,7 +11821,7 @@ export const moachQids = {
           attributes {
             name
             users_permissions_users {
-              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+              data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
             }
           }
         }
@@ -11836,13 +11836,13 @@ export const moachQids = {
                 attributes {
                   name
                   users_permissions_users {
-                    data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                    data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
                   }
                 }
               }
             }
             proposer_users {
-              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+              data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
             }
           }
         }
@@ -11852,8 +11852,8 @@ export const moachQids = {
           id
           attributes {
             amount
-            usersend { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
-            userrecive { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            usersend { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
+            userrecive { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
             project { data { ...ForumProjectSummaryCore } }
           }
         }
@@ -11870,7 +11870,7 @@ export const moachQids = {
                 id
                 attributes {
                   users_permissions_user {
-                    data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                    data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
                   }
                 }
               }
@@ -11882,7 +11882,7 @@ export const moachQids = {
         data {
           id
           attributes {
-            users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
             project { data { ...ForumProjectSummaryCore } }
           }
         }
@@ -11894,12 +11894,12 @@ export const moachQids = {
             name
             descrip
             project { data { ...ForumProjectSummaryCore } }
-            users_permissions_users { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            users_permissions_users { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
             sheirutpend {
               data {
                 id
                 attributes {
-                  users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                  users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
                 }
               }
             }
@@ -11910,7 +11910,7 @@ export const moachQids = {
         data {
           id
           attributes {
-            users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
             project { data { ...ForumProjectSummaryCore } }
             sheirut { data { id attributes { name project { data { ...ForumProjectSummaryCore } } } } }
           }
@@ -11935,8 +11935,8 @@ export const moachQids = {
               data {
                 id
                 attributes {
-                  reporter { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
-                  users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                  reporter { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
+                  users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
                 }
               }
             }
@@ -11955,7 +11955,7 @@ export const moachQids = {
         data {
           id
           attributes {
-            username
+            username nameLatin nameArabic nameCyrillic nameHebrew
             profilePic { data { attributes { url formats } } }
           }
         }
@@ -11968,7 +11968,7 @@ export const moachQids = {
       data {
         id
         attributes {
-          username
+          username nameLatin nameArabic nameCyrillic nameHebrew
           projects_1s {
             data {
               id
@@ -12081,7 +12081,7 @@ export const moachQids = {
             content
             when
             users_permissions_user {
-              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+              data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
             }
           }
         }
@@ -12097,13 +12097,13 @@ export const moachQids = {
                 attributes {
                   name
                   users_permissions_users {
-                    data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                    data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
                   }
                 }
               }
             }
             proposer_users {
-              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+              data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
             }
           }
         }
@@ -12113,8 +12113,8 @@ export const moachQids = {
           id
           attributes {
             amount
-            usersend { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
-            userrecive { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            usersend { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
+            userrecive { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
             project { data { ...ForumListProjectCore } }
           }
         }
@@ -12131,7 +12131,7 @@ export const moachQids = {
                 id
                 attributes {
                   users_permissions_user {
-                    data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                    data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
                   }
                 }
               }
@@ -12143,7 +12143,7 @@ export const moachQids = {
         data {
           id
           attributes {
-            users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
             project { data { ...ForumListProjectCore } }
           }
         }
@@ -12155,12 +12155,12 @@ export const moachQids = {
             name
             descrip
             project { data { ...ForumListProjectCore } }
-            users_permissions_users { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            users_permissions_users { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
             sheirutpend {
               data {
                 id
                 attributes {
-                  users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                  users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
                 }
               }
             }
@@ -12171,7 +12171,7 @@ export const moachQids = {
         data {
           id
           attributes {
-            users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
             project { data { ...ForumListProjectCore } }
             sheirut { data { id attributes { name project { data { ...ForumListProjectCore } } } } }
           }
@@ -12196,8 +12196,8 @@ export const moachQids = {
               data {
                 id
                 attributes {
-                  reporter { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
-                  users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                  reporter { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
+                  users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
                 }
               }
             }
@@ -12216,7 +12216,7 @@ export const moachQids = {
         data {
           id
           attributes {
-            username
+            username nameLatin nameArabic nameCyrillic nameHebrew
             profilePic { data { attributes { url formats } } }
           }
         }
@@ -12270,7 +12270,7 @@ export const qids = {
     data {
       id
       attributes {
-        username
+        username nameLatin nameArabic nameCyrillic nameHebrew
         hervachti
         profilePic {
           data {
@@ -12557,7 +12557,7 @@ export const qids = {
                 data {
                   id
                   attributes {
-                    username
+                    username nameLatin nameArabic nameCyrillic nameHebrew
                     haskamaz
                     haskamac
                     email
@@ -12606,7 +12606,7 @@ export const qids = {
                       data {
                         id
                         attributes {
-                          username
+                          username nameLatin nameArabic nameCyrillic nameHebrew
                           profilePic {
                             data {
                               attributes {
@@ -12688,7 +12688,7 @@ export const qids = {
                 data {
                   id
                   attributes {
-                    username
+                    username nameLatin nameArabic nameCyrillic nameHebrew
                     haskamaz
                     haskamac
                     email
@@ -12754,7 +12754,7 @@ export const qids = {
                       data {
                         id
                         attributes {
-                          username
+                          username nameLatin nameArabic nameCyrillic nameHebrew
                           profilePic {
                             data {
                               attributes {
@@ -12770,7 +12770,7 @@ export const qids = {
                       data {
                         id
                         attributes {
-                          username
+                          username nameLatin nameArabic nameCyrillic nameHebrew
                           profilePic {
                             data {
                               attributes {
@@ -12786,7 +12786,7 @@ export const qids = {
                       data {
                         id
                         attributes {
-                          username
+                          username nameLatin nameArabic nameCyrillic nameHebrew
                           profilePic {
                             data {
                               attributes {
@@ -12832,7 +12832,7 @@ export const qids = {
                                   data {
                                     id
                                     attributes {
-                                      username
+                                      username nameLatin nameArabic nameCyrillic nameHebrew
                                       profilePic {
                                         data {
                                           attributes {
@@ -12863,7 +12863,7 @@ export const qids = {
                             data {
                               id
                               attributes {
-                                username
+                                username nameLatin nameArabic nameCyrillic nameHebrew
                                 profilePic { data { attributes { url formats } } }
                               }
                             }
@@ -12872,7 +12872,7 @@ export const qids = {
                             data {
                               id
                               attributes {
-                                username
+                                username nameLatin nameArabic nameCyrillic nameHebrew
                                 profilePic { data { attributes { url formats } } }
                               }
                             }
@@ -12906,7 +12906,7 @@ export const qids = {
                 data {
                   id
                   attributes {
-                    username
+                    username nameLatin nameArabic nameCyrillic nameHebrew
                     haskamaz
                     haskamac
                     email
@@ -13034,7 +13034,7 @@ export const qids = {
                 data {
                   id
                   attributes {
-                    username
+                    username nameLatin nameArabic nameCyrillic nameHebrew
                     haskamaz
                     haskamac
                     email
@@ -13122,7 +13122,7 @@ ${PROMO_DECISION_FIELDS}
                 data {
                   id
                   attributes {
-                    username
+                    username nameLatin nameArabic nameCyrillic nameHebrew
                     haskamaz
                     haskamac
                     email
@@ -13216,7 +13216,7 @@ ${PROMO_DECISION_FIELDS}
                             data {
                               id
                               attributes {
-                                username
+                                username nameLatin nameArabic nameCyrillic nameHebrew
                               }
                             }
                           }
@@ -13393,7 +13393,7 @@ ${PROMO_DECISION_FIELDS}
                 data {
                   id
                   attributes {
-                    username
+                    username nameLatin nameArabic nameCyrillic nameHebrew
                     haskamaz
                     haskamac
                     email
@@ -13455,7 +13455,7 @@ ${PROMO_DECISION_FIELDS}
                             data {
                               id
                               attributes {
-                                username
+                                username nameLatin nameArabic nameCyrillic nameHebrew
                                 profilePic {
                                   data {
                                     attributes {
@@ -13520,7 +13520,7 @@ ${PROMO_DECISION_FIELDS}
                 data {
                   id
                   attributes {
-                    username
+                    username nameLatin nameArabic nameCyrillic nameHebrew
                     haskamaz
                     haskamac
                     email
@@ -13610,7 +13610,7 @@ ${PROMO_DECISION_FIELDS}
                       data {
                         id
                         attributes {
-                          username
+                          username nameLatin nameArabic nameCyrillic nameHebrew
                           profilePic {
                             data {
                               attributes {
@@ -13677,7 +13677,7 @@ ${PROMO_DECISION_FIELDS}
                             data {
                               id
                               attributes {
-                                username
+                                username nameLatin nameArabic nameCyrillic nameHebrew
                                 profilePic {
                                   data {
                                     attributes {
@@ -13718,7 +13718,7 @@ ${PROMO_DECISION_FIELDS}
                 data {
                   id
                   attributes {
-                    username
+                    username nameLatin nameArabic nameCyrillic nameHebrew
                     haskamaz
                     haskamac
                     email
@@ -13822,7 +13822,7 @@ ${PROMO_DECISION_FIELDS}
     data {
       id
       attributes {
-        username
+        username nameLatin nameArabic nameCyrillic nameHebrew
         profilePic {
           data {
             attributes {
@@ -13841,7 +13841,7 @@ ${PROMO_DECISION_FIELDS}
                 data {
                   id
                   attributes {
-                    username
+                    username nameLatin nameArabic nameCyrillic nameHebrew
                     haskamaz
                     haskamac
                     email
@@ -13913,7 +13913,7 @@ ${PROMO_DECISION_FIELDS}
                     shem
                     myIshur
                     link
-                    vali{data{id attributes{ username profilePic {data{attributes{ url }}}}}}
+                    vali{data{id attributes{ username nameLatin nameArabic nameCyrillic nameHebrew profilePic {data{attributes{ url }}}}}}
                     hashivut
                     valiIshur
                     des
@@ -13937,7 +13937,7 @@ ${PROMO_DECISION_FIELDS}
     data {
       id
       attributes {
-        username
+        username nameLatin nameArabic nameCyrillic nameHebrew
         profilePic {
           data {
             attributes {
@@ -13959,7 +13959,7 @@ ${PROMO_DECISION_FIELDS}
                       data {
                         id
                         attributes {
-                          username
+                          username nameLatin nameArabic nameCyrillic nameHebrew
                           profilePic {
                             data {
                               attributes {
@@ -14017,7 +14017,7 @@ ${PROMO_DECISION_FIELDS}
                 data {
                   id
                   attributes {
-                    username
+                    username nameLatin nameArabic nameCyrillic nameHebrew
                     profilePic {
                       data {
                         attributes {
@@ -14033,7 +14033,7 @@ ${PROMO_DECISION_FIELDS}
                 data {
                   id
                   attributes {
-                    username
+                    username nameLatin nameArabic nameCyrillic nameHebrew
                     profilePic {
                       data {
                         attributes {
@@ -14049,7 +14049,7 @@ ${PROMO_DECISION_FIELDS}
                 data {
                   id
                   attributes {
-                    username
+                    username nameLatin nameArabic nameCyrillic nameHebrew
                     profilePic {
                       data {
                         attributes {
@@ -14095,7 +14095,7 @@ ${PROMO_DECISION_FIELDS}
                             data {
                               id
                               attributes {
-                                username
+                                username nameLatin nameArabic nameCyrillic nameHebrew
                                 profilePic {
                                   data {
                                     attributes {
@@ -14126,7 +14126,7 @@ ${PROMO_DECISION_FIELDS}
                       data {
                         id
                         attributes {
-                          username
+                          username nameLatin nameArabic nameCyrillic nameHebrew
                           profilePic { data { attributes { url formats } } }
                         }
                       }
@@ -14171,7 +14171,7 @@ ${PROMO_DECISION_FIELDS}
       data {
         id
         attributes {
-          username
+          username nameLatin nameArabic nameCyrillic nameHebrew
           profilePic { data { attributes { url formats } } }
           skills { data { id attributes { skillName } } }
           projects_1s { data { id attributes { projectName } } }
@@ -14207,7 +14207,7 @@ ${PROMO_DECISION_FIELDS}
           kindOf
           location { lat lng radius location_mode }
           mashaabim { data { id attributes { name } } }
-          users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } location { lat lng radius location_mode } } } }
+          users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } location { lat lng radius location_mode } } } }
           project { data { id attributes { projectName location { lat lng radius location_mode } } } }
         }
       }
@@ -14457,7 +14457,7 @@ ${PROMO_DECISION_FIELDS}
         members { data { id attributes {
           status_member visibility joinedAt
           signed_offer { data { id } }
-          user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
         } } }
         offers { data { id attributes {
           title description unit_price price_tiers
@@ -14466,7 +14466,7 @@ ${PROMO_DECISION_FIELDS}
           price_current price_envelope price_lock_at
           matanot { data { id attributes { name } } }
           currency { data { id attributes { name } } }
-          proposer_user { data { id attributes { username } } }
+          proposer_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
           proposer_project { data { id attributes { projectName currencyCode profilePic { data { attributes { url } } } } } }
         } } }
       } }
@@ -14694,7 +14694,7 @@ ${PROMO_DECISION_FIELDS}
   '250getUserPersonalProject': `query GetUserPersonalProject($uid: ID!) {
     usersPermissionsUser(id: $uid) {
       data { id attributes {
-        username
+        username nameLatin nameArabic nameCyrillic nameHebrew
         personal_project { data { id attributes { projectName } } }
       } }
     }
@@ -14992,7 +14992,7 @@ ${PROMO_DECISION_FIELDS}
             name start end status_mashab finnished kindOf recurring
             quantityAssigned lifecycle
             mashaabim { data { id attributes { name } } }
-            users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
             rikmash { data { id } }
           } }
         }
@@ -15000,7 +15000,7 @@ ${PROMO_DECISION_FIELDS}
           data { id attributes {
             name kindOf hm sqadualed sqadualef createdAt
             sp { data { id attributes { name kindOf sdate fdate unit panui availability capacity leadTimeHours granularity } } }
-            users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
             mashabetahalich { data { id } }
           } }
         }
@@ -15115,7 +15115,7 @@ ${PROMO_DECISION_FIELDS}
   // "visible" (the default) instead of losing the membership check with it.
   // The display name a forum typing ticket carries (getForumTypingTicket).
   'typingNameFor': `query TypingNameFor($uid: ID!) {
-    usersPermissionsUser(id: $uid) { data { id attributes { username } } }
+    usersPermissionsUser(id: $uid) { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
   }`,
 
   'presenceHiddenFor': `query PresenceHiddenFor($uid: ID!) {
@@ -15144,7 +15144,7 @@ ${PROMO_DECISION_FIELDS}
       data { id attributes {
         name perhour price hours
         mission { data { id attributes { missionName } } }
-        users_permissions_user { data { id attributes { username } } }
+        users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
       } }
     }
   }`,
@@ -15158,7 +15158,7 @@ ${PROMO_DECISION_FIELDS}
         name perhour price hours
         mission { data { id attributes { missionName } } }
         users_permissions_user { data { id attributes {
-          username
+          username nameLatin nameArabic nameCyrillic nameHebrew
           profilePic { data { attributes { url } } }
           skills { data { attributes { skillName } } }
           projects_1s { data { attributes { projectName } } }
@@ -15182,7 +15182,7 @@ ${PROMO_DECISION_FIELDS}
       data { id attributes {
         name price origin lat lng radius
         location { lat lng radius location_hint location_mode }
-        owner_user { data { id attributes { username } } }
+        owner_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         projectcreates { data { id attributes { projectName location { lat lng radius location_hint location_mode } } } }
       } }
     }
@@ -15270,7 +15270,7 @@ ${PROMO_DECISION_FIELDS}
         name price quant kindOf origin createdAt lat lng radius
         pic { data { attributes { url formats } } }
         location { lat lng radius location_hint location_mode }
-        owner_user { data { id attributes { username } } }
+        owner_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         projectcreates { data { id attributes { projectName location { lat lng radius location_hint location_mode } } } }
         categories { data { id attributes { name } } }
       } }
@@ -15375,7 +15375,7 @@ ${PROMO_DECISION_FIELDS}
         hideFromDiscovery
         projectcreates { data { id } }
         owner_user { data { id attributes {
-          username
+          username nameLatin nameArabic nameCyrillic nameHebrew
           profilePic { data { attributes { url formats } } }
         } } }
       } }
@@ -15474,7 +15474,7 @@ ${PROMO_DECISION_FIELDS}
           in
           date
           matanot { data { id attributes { name } } }
-          users_permissions_user { data { id attributes { username } } }
+          users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         }
       }
     }
@@ -15516,8 +15516,8 @@ ${PROMO_DECISION_FIELDS}
         in unit startDate finishDate note
         matanot { data { id attributes { name kindOf } } }
         project { data { id attributes { projectName restime } } }
-        users_permissions_user { data { id attributes { username email lang noMail } } }
-        customer { data { id attributes { username email lang noMail } } }
+        users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew email lang noMail } } }
+        customer { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew email lang noMail } } }
         sheiruts { data { id } }
         recurringSales(pagination: { limit: 500 }) { data { id attributes { cycleStart pending } } }
       } }
@@ -15572,8 +15572,8 @@ ${PROMO_DECISION_FIELDS}
       data { id attributes {
         pending holderStatus in cycleStart cycleEnd
         customerAmount customerReportedAt receivedConfirmedAt
-        users_permissions_user { data { id attributes { username } } }
-        customer { data { id attributes { username email lang noMail } } }
+        users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
+        customer { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew email lang noMail } } }
         project { data { id attributes { projectName } } }
         matanot { data { id attributes { name } } }
         recurringSource { data { id attributes {
@@ -15620,7 +15620,7 @@ ${PROMO_DECISION_FIELDS}
         customerAmount customerReportedAt
         matanot { data { id attributes { name } } }
         project { data { id attributes { projectName } } }
-        customer { data { id attributes { username } } }
+        customer { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         recurringSource { data { id attributes { in unit } } }
       } }
     }
@@ -15642,7 +15642,7 @@ ${PROMO_DECISION_FIELDS}
         customerAmount customerReportedAt
         matanot { data { id attributes { name } } }
         project { data { id attributes { projectName } } }
-        users_permissions_user { data { id attributes { username } } }
+        users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         recurringSource { data { id attributes { in unit } } }
       } }
     }
@@ -15655,7 +15655,7 @@ ${PROMO_DECISION_FIELDS}
       filters: { or: [ { username: { eq: $q } }, { email: { eq: $q } } ] }
       pagination: { limit: 1 }
     ) {
-      data { id attributes { username } }
+      data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } }
     }
   }`,
 
@@ -15815,7 +15815,7 @@ ${PROMO_DECISION_FIELDS}
       data { id attributes {
         name organization status source sourceLabel followUpAt nextAction lastActivityAt createdAt
         pausedReason estimatedValue currencyCode
-        owner { data { id attributes { username } } }
+        owner { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         act { data { id } }
         products(pagination: { limit: 10 }) { data { id attributes { name } } }
         orders(pagination: { limit: 50 }) { data { id attributes { status } } }
@@ -15942,7 +15942,7 @@ ${PROMO_DECISION_FIELDS}
       data { id attributes {
         createdMissions { data { id attributes {
           name hoursassinged howmanyhoursalready finnished
-          users_permissions_user { data { id attributes { username } } }
+          users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         } } }
       } }
     }
@@ -15965,7 +15965,7 @@ ${PROMO_DECISION_FIELDS}
               hoursPerUnit ratePerHour unitsPerProduct
               mesimabetahalich { data { id attributes {
                 name hoursassinged howmanyhoursalready finnished
-                users_permissions_user { data { id attributes { username } } }
+                users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
               } } }
             } }
           }
@@ -16044,7 +16044,7 @@ ${PROMO_DECISION_FIELDS}
             content
             when
             users_permissions_user {
-              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+              data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
             }
           }
         }
@@ -16060,13 +16060,13 @@ ${PROMO_DECISION_FIELDS}
                 attributes {
                   name
                   users_permissions_users {
-                    data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                    data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
                   }
                 }
               }
             }
             proposer_users {
-              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+              data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
             }
           }
         }
@@ -16076,8 +16076,8 @@ ${PROMO_DECISION_FIELDS}
           id
           attributes {
             amount
-            usersend { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
-            userrecive { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            usersend { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
+            userrecive { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
             project { data { ...ForumListProjectCore } }
           }
         }
@@ -16094,7 +16094,7 @@ ${PROMO_DECISION_FIELDS}
                 id
                 attributes {
                   users_permissions_user {
-                    data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                    data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
                   }
                 }
               }
@@ -16106,7 +16106,7 @@ ${PROMO_DECISION_FIELDS}
         data {
           id
           attributes {
-            users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
             project { data { ...ForumListProjectCore } }
           }
         }
@@ -16118,12 +16118,12 @@ ${PROMO_DECISION_FIELDS}
             name
             descrip
             project { data { ...ForumListProjectCore } }
-            users_permissions_users { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            users_permissions_users { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
             sheirutpend {
               data {
                 id
                 attributes {
-                  users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                  users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
                 }
               }
             }
@@ -16134,7 +16134,7 @@ ${PROMO_DECISION_FIELDS}
         data {
           id
           attributes {
-            users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
             project { data { ...ForumListProjectCore } }
             sheirut { data { id attributes { name project { data { ...ForumListProjectCore } } } } }
           }
@@ -16159,8 +16159,8 @@ ${PROMO_DECISION_FIELDS}
               data {
                 id
                 attributes {
-                  reporter { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
-                  users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                  reporter { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
+                  users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
                 }
               }
             }
@@ -16179,7 +16179,7 @@ ${PROMO_DECISION_FIELDS}
         data {
           id
           attributes {
-            username
+            username nameLatin nameArabic nameCyrillic nameHebrew
             profilePic { data { attributes { url formats } } }
           }
         }
@@ -16194,9 +16194,9 @@ ${PROMO_DECISION_FIELDS}
         status pausedReason pausedNote followUpAt nextAction
         source sourceLabel sourceUrl estimatedValue currencyCode consentAt createdAt lastActivityAt
         project { data { id } }
-        owner { data { id attributes { username } } }
+        owner { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         act { data { id } }
-        customer_user { data { id attributes { username } } }
+        customer_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         previousLead { data { id } }
         sheirut { data { id } }
         products(pagination: { limit: 20 }) { data { id attributes { name } } }
@@ -16205,7 +16205,7 @@ ${PROMO_DECISION_FIELDS}
         } } }
         activities(sort: ["at:desc", "id:desc"], pagination: { limit: 200 }) { data { id attributes {
           kind direction body fromStatus toStatus at
-          actor { data { id attributes { username } } }
+          actor { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         } } }
       } }
     }
@@ -16228,7 +16228,7 @@ ${PROMO_DECISION_FIELDS}
       externalId: { eq: $externalId }
     }) {
       data { id attributes { shem externalId myIshur naasa status isAssigned
-        my { data { id attributes { username } } }
+        my { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
       } }
     }
   }`,
@@ -16259,7 +16259,7 @@ ${PROMO_DECISION_FIELDS}
         attributes {
           shem externalId source myIshur naasa status isAssigned
           project { data { id } }
-          my { data { id attributes { username } } }
+          my { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
           tafkidims { data { id } }
         }
       }
@@ -16436,7 +16436,7 @@ ${PROMO_DECISION_FIELDS}
       data {
         id
         attributes {
-          username
+          username nameLatin nameArabic nameCyrillic nameHebrew
           profilePic { data { attributes { url formats } } }
           projects_1s {
             data {
@@ -16455,7 +16455,7 @@ ${PROMO_DECISION_FIELDS}
                   data {
                     id
                     attributes {
-                      username
+                      username nameLatin nameArabic nameCyrillic nameHebrew
                     }
                   }
                 }
@@ -16483,7 +16483,7 @@ ${PROMO_DECISION_FIELDS}
                           id
                           attributes {
                             reporter { data { id } }
-                            users_permissions_user { data { id attributes { username } } }
+                            users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
                             matanot { data { attributes { name } } }
                           }
                         }
@@ -16514,7 +16514,7 @@ ${PROMO_DECISION_FIELDS}
           mesimabetahaliches(filters: { lifecycle: { in: ["archived", "released"] } }, pagination: { limit: 200 }, sort: "updatedAt:desc") {
             data { id attributes {
               name descrip howmanyhoursalready perhour lifecycle updatedAt archiveEffectiveFrom
-              users_permissions_user { data { id attributes { username } } }
+              users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
             } }
           }
           open_mashaabims(filters: { lifecycle: { eq: "archived" } }, pagination: { limit: 200 }, sort: "updatedAt:desc") {
@@ -16523,7 +16523,7 @@ ${PROMO_DECISION_FIELDS}
           mashabetahaliches(filters: { lifecycle: { in: ["archived", "released"] } }, pagination: { limit: 200 }, sort: "updatedAt:desc") {
             data { id attributes {
               name descrip pricePerUnit lifecycle updatedAt archiveEffectiveFrom
-              users_permissions_user { data { id attributes { username } } }
+              users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
             } }
           }
           matanotofs(filters: { lifecycle: { eq: "archived" } }, pagination: { limit: 200 }, sort: "updatedAt:desc") {
@@ -16532,7 +16532,7 @@ ${PROMO_DECISION_FIELDS}
           decisions(filters: { kind: { in: ["archiveObject", "editObject"] } }, pagination: { limit: 300 }, sort: "updatedAt:desc") {
             data { id attributes {
               kind archived targetKind archScope archSource archWhy archEndsMembership
-              archMember { data { id attributes { username } } }
+              archMember { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
               updatedAt
               negoarch { ordern mode why hoursOutcome hoursToCredit effectiveFrom }
               archOpenMission { data { id } }
@@ -16567,7 +16567,7 @@ ${PROMO_DECISION_FIELDS}
           machshirs { data { id attributes { jsoni } } }
           email
           noMail
-          username
+          username nameLatin nameArabic nameCyrillic nameHebrew
           hervachti
           profilManualAlready
           profilePic { data { attributes { url formats } } }
@@ -16666,7 +16666,7 @@ ${PROMO_DECISION_FIELDS}
         id
         attributes {
           repoId owner name defaultBranch license isPrivate status installationId createdAt
-          connectedBy { data { id attributes { username } } }
+          connectedBy { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         }
       }
     }
@@ -16734,7 +16734,7 @@ ${PROMO_DECISION_FIELDS}
 
   'githubContributorsByGithubIds': `query GithubContributorsByGithubIds($githubIds: [String]) {
     usersPermissionsUsers(filters: { githubId: { in: $githubIds } }, pagination: { limit: 200 }) {
-      data { id attributes { githubId username } }
+      data { id attributes { githubId username nameLatin nameArabic nameCyrillic nameHebrew } }
     }
   }`,
 
@@ -16845,7 +16845,7 @@ ${PROMO_DECISION_FIELDS}
       data {
         id
         attributes {
-          username
+          username nameLatin nameArabic nameCyrillic nameHebrew
           email
           lang
           noMail
@@ -16864,7 +16864,7 @@ ${PROMO_DECISION_FIELDS}
       data {
         id
         attributes {
-          username
+          username nameLatin nameArabic nameCyrillic nameHebrew
           email
           lang
           noMail
@@ -16951,7 +16951,7 @@ ${PROMO_DECISION_FIELDS}
       data {
         id
         attributes {
-          username
+          username nameLatin nameArabic nameCyrillic nameHebrew
           email
           lang
           noMail
@@ -17048,7 +17048,7 @@ ${PROMO_DECISION_FIELDS}
                 stipendRate
                 stipendCostShare
                 stipendMode
-                stipendFunder { data { id attributes { username } } }
+                stipendFunder { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
                 dates
                 sqadualed
                 iskvua
@@ -17322,7 +17322,7 @@ ${PROMO_DECISION_FIELDS}
           restime
           profilePic { data { attributes { url formats } } }
           vallues(pagination: { limit: 50 }) { data { attributes { valueName localizations { data { attributes { valueName } } } } } }
-          user_1s(pagination: { limit: 100 }) { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          user_1s(pagination: { limit: 100 }) { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
           matanotofs(filters: { and: [ { archived: { ne: true } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 100 }) {
             data { id attributes { name price pic { data { attributes { url formats } } } } }
           }
@@ -17398,7 +17398,7 @@ ${PROMO_DECISION_FIELDS}
           in
           note
           holderStatus
-          users_permissions_user { data { id attributes { username } } }
+          users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         }
       }
     }
@@ -17416,7 +17416,7 @@ ${PROMO_DECISION_FIELDS}
           restime
           currencyCode
           supportPage
-          user_1s { data { id attributes { username } } }
+          user_1s { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         }
       }
     }
@@ -17435,7 +17435,7 @@ ${PROMO_DECISION_FIELDS}
       data { id attributes {
         title descrip rationale origin status sourceText revisionNote
         expandedAt order createdAt
-        createdBy: creator { data { id attributes { username } } }
+        createdBy: creator { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         items(pagination: { limit: 100 }, sort: ["order:asc"]) {
           data { id attributes {
             kind name descrip imp status spec existingRef createdRef order
@@ -17451,7 +17451,7 @@ ${PROMO_DECISION_FIELDS}
         title descrip rationale origin status sourceText revisionNote
         ai_meta expandedAt order createdAt
         project { data { id attributes { projectName restime } } }
-        createdBy: creator { data { id attributes { username } } }
+        createdBy: creator { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         items(pagination: { limit: 100 }, sort: ["order:asc"]) {
           data { id attributes {
             kind name descrip imp status spec existingRef createdRef order
@@ -17523,7 +17523,7 @@ ${PROMO_DECISION_FIELDS}
         mesimabetahaliches(filters: { and: [ { finnished: { ne: true } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 30 }) {
           data { id attributes {
             name
-            users_permissions_user { data { id attributes { username } } }
+            users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
             tafkidims { data { id attributes { roleDescription } } }
           } }
         }
@@ -17542,7 +17542,7 @@ ${PROMO_DECISION_FIELDS}
   // the caller cannot ask for another user's forums.
   '292initialForumAll': `query InitialForumAll($idL: ID!) {
     usersPermissionsUser(id: $idL) { data { attributes {
-      username
+      username nameLatin nameArabic nameCyrillic nameHebrew
       profilePic { data { attributes { url formats } } }
       projects_1s { data { id attributes {
         projectName
@@ -17553,15 +17553,15 @@ ${PROMO_DECISION_FIELDS}
           messages(filters: { archived: { ne: true } }) { data { id attributes {
             content when
             users_permissions_user { data { id attributes {
-              username profilePic { data { attributes { url formats } } }
+              username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } }
             } } }
           } } }
         } } }
       } } }
       halukasres { data { id attributes {
         amount
-        usersend { data { id attributes { username } } }
-        userrecive { data { id attributes { username } } }
+        usersend { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
+        userrecive { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         project { data { id attributes {
           projectName profilePic { data { attributes { url formats } } }
         } } }
@@ -17570,15 +17570,15 @@ ${PROMO_DECISION_FIELDS}
           messages(filters: { archived: { ne: true } }) { data { id attributes {
             content when
             users_permissions_user { data { id attributes {
-              username profilePic { data { attributes { url formats } } }
+              username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } }
             } } }
           } } }
         } } }
       } } }
       halukasend { data { id attributes {
         amount
-        usersend { data { id attributes { username } } }
-        userrecive { data { id attributes { username } } }
+        usersend { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
+        userrecive { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         project { data { id attributes {
           projectName profilePic { data { attributes { url formats } } }
         } } }
@@ -17587,7 +17587,7 @@ ${PROMO_DECISION_FIELDS}
           messages(filters: { archived: { ne: true } }) { data { id attributes {
             content when
             users_permissions_user { data { id attributes {
-              username profilePic { data { attributes { url formats } } }
+              username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } }
             } } }
           } } }
         } } }
@@ -17607,7 +17607,7 @@ ${PROMO_DECISION_FIELDS}
       messages(filters: { archived: { ne: true } }, sort: ["when:asc"]) { data { id attributes {
         content when
         users_permissions_user { data { id attributes {
-          username profilePic { data { attributes { url formats } } }
+          username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } }
         } } }
       } } }
     } } }
@@ -17694,7 +17694,7 @@ ${PROMO_DECISION_FIELDS}
           price
           quant
           total
-          users_permissions_user { data { id attributes { username } } }
+          users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
           project { data { id attributes { projectName restime user_1s { data { id } } } } }
           forum { data { id } }
           sheirut { data { id attributes { isApruved archived } } }
@@ -17841,11 +17841,11 @@ ${PROMO_DECISION_FIELDS}
                 finiapruvals { data { id attributes { missname archived } } }
                 tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
                 acts { data { id attributes { shem dateS hashivut naasa des dateF myIshur valiIshur status
-                  my { data { id attributes { username profilePic { data { attributes { url } } } } } }
+                  my { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
                   vali { data { id } }
                   mesimabetahaliches { data { id } }
                 } } }
-                users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+                users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
               }
             }
           }
@@ -18131,12 +18131,12 @@ ${PROMO_DECISION_FIELDS}
           codeLicense codeLicenseOpenYears
           linkToWebsite githublink drivelink discordlink fblink twiterlink watsapplink
           vallues { data { id attributes { valueName localizations { data { attributes { valueName } } } } } }
-          user_1s { data { id attributes { username } } }
+          user_1s { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
           tafkidims { data { id attributes { roleDescription } } }
           open_missions(filters: { and: [{ archived: { eq: false } }, { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }, ${NOT_ARCHIVED} ] }, pagination: { limit: 100 }) { data { id attributes { name } } }
-          mesimabetahaliches(filters: { and: [ { finnished: { ne: true } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 100 }) { data { id attributes { name users_permissions_user { data { id attributes { username } } } } } }
+          mesimabetahaliches(filters: { and: [ { finnished: { ne: true } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 100 }) { data { id attributes { name users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } } } } }
           open_mashaabims(filters: { and: [ { archived: { ne: true } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 100 }) { data { id attributes { name kindOf } } }
-          mashabetahaliches(filters: { and: [ { finnished: { ne: true } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 100 }) { data { id attributes { name kindOf users_permissions_user { data { id attributes { username } } } } } }
+          mashabetahaliches(filters: { and: [ { finnished: { ne: true } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 100 }) { data { id attributes { name kindOf users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } } } } }
           matanotofs(pagination: { limit: 100 }) { data { id attributes { name price } } }
         }
       }
@@ -18186,7 +18186,7 @@ ${PROMO_DECISION_FIELDS}
             name note kind url folder archived createdAt updatedAt
             storageKey fileName mime size sha256
             file { data { id attributes { url name mime size ext } } }
-            uploadedBy { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            uploadedBy { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
           } }
         }
       } }
@@ -18251,7 +18251,7 @@ ${PROMO_DECISION_FIELDS}
       filters: { and: [ { project: { user_1s: { id: { eq: $uid } } } }, { finnished: { ne: true } }, ${NOT_ARCHIVED}, { or: [{ name: { containsi: $q } }, { descrip: { containsi: $q } }] } ] }
       sort: ["updatedAt:desc"]
       pagination: { limit: $limit }
-    ) { data { id attributes { name descrip project { data { id attributes { projectName } } } users_permissions_user { data { attributes { username } } } } } }
+    ) { data { id attributes { name descrip project { data { id attributes { projectName } } } users_permissions_user { data { attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } } } } }
 
     acts(
       filters: { and: [ { project: { user_1s: { id: { eq: $uid } } } }, { or: [{ shem: { containsi: $q } }, { des: { containsi: $q } }] } ] }
@@ -18382,7 +18382,7 @@ ${PROMO_DECISION_FIELDS}
   // (an unreadable field refuses every key on the deployment), and a missing
   // display name must not do that.
   'rikmaApiUserName': `query RikmaApiUserName($uid: ID!) {
-    usersPermissionsUser(id: $uid) { data { id attributes { username } } }
+    usersPermissionsUser(id: $uid) { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
   }`,
 
   /* ─────────────────────────────────────────────────────────────────────
@@ -18686,7 +18686,7 @@ ${PROMO_DECISION_FIELDS}
         ref displayNumber status oversold total currencyCode note source
         buyerName buyerEmail buyerPhone deliveryPreference deliveryAddress
         paymentRef paymentMethod paidAt shippedAt fulfilledAt expiresAt createdAt fulfillmentPending
-        holder { data { id attributes { username } } }
+        holder { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         lines(pagination: { limit: 100 }) { data { id attributes {
           position quantity unitPrice lineTotal
           nameSnapshot optionLabelSnapshot skuSnapshot imageUrlSnapshot
@@ -18750,7 +18750,7 @@ ${PROMO_DECISION_FIELDS}
         matanot { data { id attributes { name } } }
         product_variant { data { id attributes { name optionValues } } }
         order { data { id } }
-        users_permissions_user { data { id attributes { username } } }
+        users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         tosplits { data { id } }
       } }
     }
@@ -18771,7 +18771,7 @@ ${PROMO_DECISION_FIELDS}
         vots { what order zman users_permissions_user { data { id } } }
         timegrama { data { attributes { date done } } }
         open_mission { data { id attributes { name noofhours perhour } } }
-        project { data { id attributes { projectName user_1s { data { id attributes { username } } } } } }
+        project { data { id attributes { projectName user_1s { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } } } } }
         negopendmissions(sort: "ordern:asc", pagination: { limit: 50 }) { data { id attributes { ordern noofhours perhour proposedBy status } } }
       } }
     }
@@ -18785,7 +18785,7 @@ ${PROMO_DECISION_FIELDS}
         vots { what order zman users_permissions_user { data { id } } }
         timegrama { data { attributes { date done } } }
         open_mashaabim { data { id attributes { name hm price } } }
-        project { data { id attributes { projectName user_1s { data { id attributes { username } } } } } }
+        project { data { id attributes { projectName user_1s { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } } } } }
         nego_mashes(sort: "ordern:asc", pagination: { limit: 50 }) { data { id attributes { ordern hm price proposedBy status } } }
       } }
     }
@@ -18839,7 +18839,7 @@ ${PROMO_DECISION_FIELDS}
       data {
         id
         attributes {
-          username
+          username nameLatin nameArabic nameCyrillic nameHebrew
           findableByAgents
           skills { data { attributes { skillName } } }
           tafkidims { data { attributes { roleDescription } } }

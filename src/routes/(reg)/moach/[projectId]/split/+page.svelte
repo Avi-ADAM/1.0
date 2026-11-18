@@ -1,4 +1,5 @@
 <script>
+  import { nameOf } from '$lib/translation/memberName';
   import { t } from '$lib/translations';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import { page } from '$app/state';
@@ -64,7 +65,7 @@
         ...r,
         color: COLORS[i % COLORS.length],
         photo: picOf.get(r.uid) ?? null,
-        initial: (r.username || '?').trim().charAt(0).toUpperCase()
+        initial: ($nameOf(r) || '?').trim().charAt(0).toUpperCase()
       }));
   });
 

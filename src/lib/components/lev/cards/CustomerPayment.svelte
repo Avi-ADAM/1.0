@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { nameOf } from '$lib/translation/memberName';
   /**
    * The customer's payment for a deal: choose who receives the money from the rikma's
    * receivers (`iCanGetMonay`), confirm, and `createSheirutHaluka` opens the transfer —
@@ -135,17 +136,17 @@
           {#if member.profilePic}
             <img
               src={member.profilePic}
-              alt={member.username}
+              alt={$nameOf(member)}
               class="w-6 h-6 rounded-full object-cover"
             />
           {:else}
             <div
               class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold"
             >
-              {member.username?.charAt(0)}
+              {$nameOf(member)?.charAt(0)}
             </div>
           {/if}
-          <span>{member.username}</span>
+          <span>{$nameOf(member)}</span>
         </button>
       {:else}
         <div class="flex items-center justify-between w-full gap-2">
@@ -168,7 +169,7 @@
         aria-label={$t('lev.cards.customerSale.confirmTitle')}
       >
         <p class="text-gray-800 dark:text-gray-100">
-          {$t('lev.cards.customerSale.confirmTo', { name: pendingReceiver.username ?? '' })}
+          {$t('lev.cards.customerSale.confirmTo', { name: $nameOf(pendingReceiver) || '' })}
           {#if due}<span class="font-black"><Money amount={due.remaining} /></span>{/if}
         </p>
         <p class="text-gray-500 dark:text-gray-400">{$t('lev.cards.customerSale.confirmHint')}</p>
@@ -197,7 +198,7 @@
     senderId={meId}
     receiverId={String(buble.iTransferedTo?.id ?? '')}
     senderName={myName ?? $username}
-    receiverName={buble.iTransferedTo?.username ?? ''}
+    receiverName={$nameOf(buble.iTransferedTo) || ''}
     senderPic={myPic ?? $uPic}
     receiverPic={buble.iTransferedTo?.profilePic}
     amount={halukaAmount}

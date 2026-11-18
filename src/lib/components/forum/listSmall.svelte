@@ -1,4 +1,5 @@
 ﻿<script>
+  import { nameOf } from '$lib/translation/memberName';
   import { t, isRtl } from '$lib/translations';
   import { isToday } from '$lib/func/uti/isToday.svelte';
   import { lang } from '$lib/stores/lang';
@@ -67,7 +68,7 @@
               {/if}
               <span class="ls-last">
                 {#if last}
-                  <b>{last.username ?? $t('common.chat.system')}:</b>
+                  <b>{$nameOf(last) || $t('common.chat.system')}:</b>
                   {last.message ?? ''}
                 {:else}
                   {$t('common.chat.noMessages')}
