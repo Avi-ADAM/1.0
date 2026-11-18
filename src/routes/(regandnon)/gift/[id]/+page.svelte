@@ -568,7 +568,7 @@
               <AskAboutProduct
                 productId={String(data.mId)}
                 productName={data.alld.name ?? ''}
-                rikmaName={$nameOf(data.personalSeller) || data.alld.projectcreates?.data?.[0]?.attributes?.projectName ?? ''}
+                rikmaName={$nameOf(data.personalSeller) || (data.alld.projectcreates?.data?.[0]?.attributes?.projectName ?? '')}
                 lang={$lang || 'he'}
                 signedIn={!!data.tok}
               />
