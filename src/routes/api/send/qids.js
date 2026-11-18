@@ -18798,6 +18798,13 @@ ${PROMO_DECISION_FIELDS}
   'findableByAgentsFor': `query FindableByAgentsFor($uid: ID!) {
     usersPermissionsUser(id: $uid) { data { id attributes { findableByAgents } } }
   }`,
+  // A member's own spelling of their name per script (PLAN_UGC_TRANSLATION §18).
+  // Separate from meProfile for the same reason as findableByAgentsFor: until
+  // the fields are deployed this read fails alone, and /me/settings hides the
+  // fields instead of breaking the whole profile.
+  'nameScriptsFor': `query NameScriptsFor($uid: ID!) {
+    usersPermissionsUser(id: $uid) { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
+  }`,
   // People by skill or role (PLAN_MCP_PARTNER_INTEGRATION P1.5), in two steps.
   // A single users query filtering four joined relations (skills, their
   // localizations, roles, theirs) with containsi scanned every user and timed

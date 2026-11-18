@@ -1021,6 +1021,7 @@ export const qidsAccess = {
   '481backfillEvents': { allow: ['serviceAdmin'] },
   'mcpMyApplications': { allow: ['serviceAdmin'] }, // MCP listMyApplicationsTool; the tool passes the key owner
   'findableByAgentsFor': { allow: ['serviceAdmin'] }, // /me/settings/mcp loader, with locals.uid
+  'nameScriptsFor': { allow: ['serviceAdmin'] }, // /me/settings loader, with locals.uid
   'mcpPartnerTerms': { allow: ['serviceAdmin'] }, // MCP findPartnersTool step 1; catalogue ids only, no people
   'mcpFindPartners': { allow: ['serviceAdmin'] }, // MCP findPartnersTool; names only of the opted-in
   'mcpCountPartners': { allow: ['serviceAdmin'] }, // MCP findPartnersTool fallback; a count, no people

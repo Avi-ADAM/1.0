@@ -15,7 +15,8 @@
   } from '$lib/stores/autoTranslate.js';
   import CurrencyPicker from '$lib/components/money/CurrencyPicker.svelte';
   import SettingsRow from '$lib/components/settings/SettingsRow.svelte';
-  import { SETTINGS_SECTIONS, btnSecondary } from '$lib/components/settings/ui.js';
+  import { SETTINGS_SECTIONS, btnSecondary, field, fieldLabel } from '$lib/components/settings/ui.js';
+  import { checkOwnName, NAME_FIELD, NAME_MAX, scriptsToAsk } from '$lib/translation/displayName';
   import { useMoney, setDisplayCurrency, adoptCurrencyFromProfile } from '$lib/money/context.svelte';
   import { formatMoney } from '$lib/money/format.js';
   let { data } = $props();
@@ -65,6 +66,27 @@
     githublink = $state(data.meData?.githublink),
     noMail = $state(data.meData?.noMail);
 
+  // The member's own spelling of their name per script (PLAN_UGC_TRANSLATION
+  // §18). `data.nameScripts` is null when the read failed — the fields are not
+  // deployed yet — and then the fields are hidden and never sent.
+  let names = $state({ ...(data.nameScripts ?? {}) });
+  let askScripts = $derived(scriptsToAsk(meData?.username));
+  let nameChecks = $derived(
+    Object.fromEntries(askScripts.map((sc) => [sc, checkOwnName(names[NAME_FIELD[sc]], sc)]))
+  );
+
+  /** Only fields that pass the same check the server runs; the rest stay unsaved and say why. */
+  function nameParams() {
+    if (!data.nameScripts) return {};
+    const out = {};
+    for (const sc of askScripts) {
+      const f = NAME_FIELD[sc];
+      const c = nameChecks[sc];
+      if (c?.ok && (c.value ?? '') !== (data.nameScripts[f] ?? '')) out[f] = c.value ?? '';
+    }
+    return out;
+  }
+
   let userName_value;
   let biog;
   let frd;
@@ -81,6 +103,7 @@
     discordlink = data.meData.discordlink;
     githublink = data.meData.githublink;
     noMail = data.meData.noMail;
+    if (data.nameScripts) names = { ...data.nameScripts };
     isG = data.meData.profilManualAlready;
     // A device that has never chosen picks up the account's answer
     // (PLAN_UGC_TRANSLATION §4.4). A device that *has* chosen keeps its own —
@@ -102,7 +125,8 @@
       githublink,
       preferCards: cards,
       noMail,
-      location: locationVal
+      location: locationVal,
+      ...nameParams()
     });
     // updateUserBasic's updateStrategy reloads app:meProfile, which this
     // page depends on too, so meData refreshes automatically.
@@ -236,6 +260,40 @@
            their own currency; this only chooses what *this* reader sees amounts
            in. The cookie makes the next server render right, the account copy
            follows. -->
+      <!-- Own spelling of the name in other alphabets (PLAN_UGC_TRANSLATION §18).
+           Saved with the rest of the form; a field that fails the script check
+           is not sent, and says why. -->
+      {#snippet nameScripts()}
+        {#if data.nameScripts}
+          <SettingsRow title={$t('pages.editBasic.nameScripts.title')} desc={$t('pages.editBasic.nameScripts.desc')}>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {#each askScripts as sc (sc)}
+                {@const f = NAME_FIELD[sc]}
+                {@const c = nameChecks[sc]}
+                <div>
+                  <label for="name-{sc}" class={fieldLabel}>{$t(`pages.editBasic.nameScripts.${sc}`)}</label>
+                  <input
+                    id="name-{sc}"
+                    bind:value={names[f]}
+                    maxlength={NAME_MAX}
+                    autocomplete="off"
+                    dir={sc === 'latin' || sc === 'cyrillic' ? 'ltr' : 'rtl'}
+                    aria-invalid={c && !c.ok}
+                    aria-describedby={c && !c.ok ? `name-${sc}-err` : undefined}
+                    class={field}
+                  />
+                  {#if c && !c.ok}
+                    <p id="name-{sc}-err" class="text-xs mt-1 text-red-600" role="alert">
+                      {$t(`pages.editBasic.nameScripts.${c.reason}`)}
+                    </p>
+                  {/if}
+                </div>
+              {/each}
+            </div>
+          </SettingsRow>
+        {/if}
+      {/snippet}
+
       {#snippet currencyPref()}
         <SettingsRow title="💱 {$t('money.pref.title')}" desc={$t('money.pref.desc')}>
           <div class="flex flex-wrap items-center gap-3">

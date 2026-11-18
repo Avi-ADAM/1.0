@@ -370,7 +370,18 @@
     "saved": "Changes saved",
     "deleteKeyConfirm": "Delete the key \"{{name}}\"?",
     "keyDeleted": "Key deleted",
-    "keyCreateError": "Could not create the key"
+    "keyCreateError": "Could not create the key",
+    "nameScripts": {
+      "title": "Your name in other alphabets",
+      "desc": "How members who read the site in another alphabet see your name, and how you see it when you switch language. Left empty, your name shows as you wrote it.",
+      "latin": "Latin letters (English, Spanish)",
+      "arabic": "Arabic letters",
+      "cyrillic": "Cyrillic letters (Russian)",
+      "hebrew": "Hebrew letters",
+      "wrongScript": "Only this field's alphabet, please",
+      "mixedScript": "One letter here is from another alphabet",
+      "tooLong": "Up to 60 characters"
+    }
   },
   "editPic": {
     "myThing": "My {{name}}",

@@ -2,6 +2,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 import { normalizeCode } from '$lib/money/currencies.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
+import { checkOwnName, NAME_FIELD, type NameScript } from '$lib/translation/displayName.js';
 
 /**
  * Update the current user's basic profile fields and settings.
@@ -12,6 +13,7 @@ import { scope, scopeList } from '$lib/realtime/scopes.js';
  *
  * Client sends any subset of:
  *   { username, bio, frd, lang, autoTranslate, fblink, twiterlink,
+ *     nameLatin, nameArabic, nameCyrillic, nameHebrew,
  *     discordlink, githublink, preferCards, noMail, hidePresence, findableByAgents, location }
  *
  * `autoTranslate` is the UGC-translation preference (PLAN_UGC_TRANSLATION §4.4).
@@ -98,6 +100,20 @@ const handler: ActionExecutionHandler = async (params, context) => {
     if (code) lines.push(`currency: ${JSON.stringify(code)}`);
   }
 
+  // The member's own spelling of their name per script (PLAN_UGC_TRANSLATION
+  // §18). Validated here, not trusted from the form: a field holds only its own
+  // script, and empty clears it. Only fields the client sent are touched — and
+  // only those are read back, so a save without them keeps working against a
+  // backend that does not have the fields yet.
+  const nameFieldsSent: string[] = [];
+  for (const [script, field] of Object.entries(NAME_FIELD) as Array<[NameScript, string]>) {
+    if (params[field] === undefined) continue;
+    const check = checkOwnName(params[field], script);
+    if (check.ok === false) throw new Error(`invalid ${field}: ${check.reason}`);
+    lines.push(`${field}: ${check.value === null ? 'null' : JSON.stringify(check.value)}`);
+    nameFieldsSent.push(field);
+  }
+
   if (params.preferCards !== undefined) lines.push(`preferCards: ${!!params.preferCards}`);
   if (params.noMail !== undefined) lines.push(`noMail: ${!!params.noMail}`);
   // "Who is here" in the moach: off = not seen and not seeing (/api/v1/presence/ticket).
@@ -133,7 +149,7 @@ const handler: ActionExecutionHandler = async (params, context) => {
         updateUsersPermissionsUser(id: ${userId}, data: { ${lines.join(', ')} }) {
           data {
             attributes {
-              username bio frd lang autoTranslate${params.currency !== undefined ? " currency" : ""}${params.hidePresence !== undefined ? " hidePresence" : ""}${params.findableByAgents !== undefined ? " findableByAgents" : ""} preferCards noMail
+              username bio frd lang autoTranslate${params.currency !== undefined ? " currency" : ""}${params.hidePresence !== undefined ? " hidePresence" : ""}${params.findableByAgents !== undefined ? " findableByAgents" : ""}${nameFieldsSent.length ? " " + nameFieldsSent.join(" ") : ""} preferCards noMail
               fblink twiterlink discordlink githublink
               location { location_mode lat lng radius location_hint }
             }
@@ -168,6 +184,10 @@ export const updateUserBasicConfig: ActionConfig = {
     twiterlink: { type: 'string', required: false },
     discordlink: { type: 'string', required: false },
     githublink: { type: 'string', required: false },
+    nameLatin: { type: 'string', required: false, description: 'Own spelling of the name in Latin script (en, es); empty clears' },
+    nameArabic: { type: 'string', required: false, description: 'Own spelling of the name in Arabic script; empty clears' },
+    nameCyrillic: { type: 'string', required: false, description: 'Own spelling of the name in Cyrillic script; empty clears' },
+    nameHebrew: { type: 'string', required: false, description: 'Own spelling of the name in Hebrew script; empty clears' },
     preferCards: { type: 'boolean', required: false },
     noMail: { type: 'boolean', required: false },
     hidePresence: { type: 'boolean', required: false, description: 'Switch moach presence off (symmetric)' },

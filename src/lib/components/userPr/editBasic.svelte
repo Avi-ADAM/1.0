@@ -69,10 +69,12 @@
     onGuid,
     translationPref,
     currencyPref,
-    githubAccount
+    githubAccount,
+    nameScripts
   }: {
     location?: EditLocation;
     translationPref?: Snippet;
+    nameScripts?: Snippet;
     currencyPref?: Snippet;
     githubAccount?: Snippet;
   } & Record<string, any> = $props();
@@ -423,6 +425,8 @@
         </div>
       </div>
     </SettingsRow>
+
+    {@render nameScripts?.()}
 
     <SettingsRow title={$t('pages.editBasic.links')}>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">

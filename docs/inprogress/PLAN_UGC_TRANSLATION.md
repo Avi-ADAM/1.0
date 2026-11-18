@@ -5,7 +5,8 @@ default; P3 shipped, off by default; P4 — §7.1's public surfaces are in
 (missions, resources, rikmot, products: every directory and every entity page
 except `/gift/[id]`), each with its backfill walker; `/demand` and §7.2–7.6 are
 not; P5 and P6 not started. §18 — a member's own spelling of their name in
-each script — is planned, not built.**
+each script — S1+S2 built 2026-11-17, waiting on a 1.0b deploy; S3–S5 not
+started.**
 
 > **P3 — §15, "guests read translations" — is in.** A guest still cannot *buy*
 > a translation, deliberately (§15.2: an anonymous public page is what a
@@ -1248,7 +1249,7 @@ turns most of these pages' misses into free hits too.
 
 ---
 
-## 18. A member's name in other scripts — their own spelling first *(planned)*
+## 18. A member's name in other scripts — their own spelling first *(S1+S2 built)*
 
 §4.3 sends `username` to the engine in `transliterate` mode. That is the right
 *default*, and the wrong *authority*: a name is the one string on the site whose
@@ -1369,6 +1370,15 @@ native). §14 item 6.
 | **S3** | qids that select `username` also select the four fields; components move to `displayName` — lev cards, member lists, chat authors, profile header first | S2 |
 | **S4** | mail/notifications/MCP resolve per recipient; member search over all spellings | S3 |
 | **S5** | engine fallback: a `user.username` walker in `backfillSources.ts` (members of public rikmot first), surface key under `TRANSLATE_SURFACES` | S3 + §13 switches |
+
+**Shipped as (2026-11-17):** S1 is the four fields in 1.0b's user
+`schema.json` (not yet deployed) and `updateUserBasic` accepting them through
+`checkOwnName`. S2 is `src/lib/translation/displayName.ts` (+ tests) and the
+fields on `/me/settings`, read through their own qid `nameScriptsFor` — the
+`findableByAgentsFor` pattern: until the deploy the read fails alone and the
+fields stay hidden, and a save sends them only when the read worked. The
+engine-row placeholder of §18.4 waits for S5, since no walker fills username
+rows yet. Nothing renders a name through `displayName` until S3.
 
 S1–S4 cost nothing to run — no engine, no quota — and already fix the case
 that prompted this section (a member wanting their own name in English). S5 is

@@ -371,7 +371,18 @@
     "saved": "Cambios guardados",
     "deleteKeyConfirm": "¿Eliminar la clave «{{name}}»?",
     "keyDeleted": "Clave eliminada",
-    "keyCreateError": "No se pudo crear la clave"
+    "keyCreateError": "No se pudo crear la clave",
+    "nameScripts": {
+      "title": "Tu nombre en otros alfabetos",
+      "desc": "Así ven tu nombre los miembros que leen el sitio en otro alfabeto, y así lo ves tú al cambiar de idioma. Si lo dejas vacío, tu nombre aparece tal como lo escribiste.",
+      "latin": "Letras latinas (inglés, español)",
+      "arabic": "Letras árabes",
+      "cyrillic": "Letras cirílicas (ruso)",
+      "hebrew": "Letras hebreas",
+      "wrongScript": "Solo con el alfabeto de este campo",
+      "mixedScript": "Hay una letra de otro alfabeto",
+      "tooLong": "Hasta 60 caracteres"
+    }
   },
   "editPic": {
     "myThing": "Mis {{name}}",
