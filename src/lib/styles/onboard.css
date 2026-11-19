@@ -42,7 +42,7 @@
   align-items: center;
   gap: 14px;
   padding: 22px 16px 28px;
-  direction: rtl;
+  /* direction inherits from <html dir> (PLAN_LTR_LAYOUT §0). */
 }
 
 .onboard-root .screen::before,

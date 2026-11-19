@@ -4,7 +4,8 @@
   import { idPr } from '$lib/stores/idPr';
   // Reused, not copied: this atom already handles all five locales, writes the
   // `lang` cookie with `path=/` (a cookie written without it would scope to
-  // /guid and never apply site-wide) and flips `documentElement` dir/lang.
+  // /guid and never apply site-wide); `<html dir/lang>` then follow `locale`
+  // from the root layout.
   // `locale.set` inside it re-triggers the loader for this route, so the
   // route-gated `guide` namespace arrives in the new language.
   import LangSwitch from '$lib/components/onboard/LangSwitch.svelte';

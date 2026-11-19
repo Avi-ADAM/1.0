@@ -23,6 +23,7 @@ onMessage(messaging, (payload) => {
   import { normalizeTheme, THEME_PARAM } from '$lib/theme/themeParam.js';
   import { onMount } from 'svelte';
   import { locale, isRtl, t } from '$lib/translations';
+  import { dirOf } from '$lib/translations/dir.js';
   import { goto } from '$app/navigation';
   import { navigating, page } from '$app/state';
   import { browser } from '$app/environment';
@@ -107,6 +108,19 @@ onMessage(messaging, (payload) => {
   $effect(() => {
     const pinned = normalizeTheme(page.url.searchParams.get(THEME_PARAM));
     if (pinned) setTheme(pinned);
+  });
+
+  // `<html dir/lang>` follow the locale — the one place the client keeps them
+  // in sync. The server stamps both on first paint (hooks.server.js `%dir%`);
+  // this covers every later change (LangSwitch, /me/settings, a `data.lang`
+  // from the loader) without each caller touching the document itself.
+  $effect(() => {
+    const code = $locale;
+    if (!browser || !code) return;
+    const root = document.documentElement;
+    const dir = dirOf(code);
+    if (root.getAttribute('dir') !== dir) root.setAttribute('dir', dir);
+    if (root.getAttribute('lang') !== code) root.setAttribute('lang', code);
   });
 
   // Ensure locale and lang are synchronized
@@ -283,8 +297,9 @@ onMessage(messaging, (payload) => {
   <OfflineBanner />
   {@render children?.()}
   <Toaster
+    dir={$isRtl ? 'rtl' : 'ltr'}
     toastOptions={{
-      style: `dir: ${$isRtl ? 'rtl' : 'ltr'}; text-align: ${$isRtl ? 'right' : 'left'}; `
+      style: `direction: ${$isRtl ? 'rtl' : 'ltr'}; text-align: start;`
     }}
     richColors
     closeButton

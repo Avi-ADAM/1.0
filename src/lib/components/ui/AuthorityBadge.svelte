@@ -5,13 +5,18 @@
 
   let {
     logoSrc = '',
-    projectName = '',
+    projectName: rawProjectName = '',
     memberCount = 0,
     size = 200,
     goldColor = '#FFD700',
     darkGoldColor = '#B8860B',
     pinkGlow = true
   } = $props();
+
+  // A prop default only covers `undefined`; callers pass a rikma name straight
+  // from Strapi, where a missing one is `null` — and `.trim()` on it crashed the
+  // whole heart deck (inpro → CardHeader).
+  const projectName = $derived(String(rawProjectName ?? ''));
 
   /*
    * שני מראות, DOM אחד.

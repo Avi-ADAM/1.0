@@ -10,9 +10,6 @@
     { code: 'es', label: 'ES', dir: 'ltr' }
   ]);
 
-  // Locales that render left-to-right; everything else is RTL.
-  const ltrLocales = ['en', 'ru', 'es'];
-
   /** @param {'he'|'en'|'ar'|'ru'|'es'} code */
   function pick(code) {
     if ($locale === code) return;
@@ -22,9 +19,7 @@
     doesLang.set(true);
     document.cookie =
       `lang=${code}; path=/; expires=` + new Date(2027, 0, 1).toUTCString();
-    // Update document dir so RTL/LTR layout flips immediately.
-    document.documentElement.setAttribute('dir', ltrLocales.includes(code) ? 'ltr' : 'rtl');
-    document.documentElement.setAttribute('lang', code);
+    // `<html dir/lang>` follow `locale` from the root layout (dirOf).
   }
 </script>
 

@@ -26,11 +26,10 @@
   const money = useMoney();
   let currencyVal = $state(money.currency);
 
-  // Locales that render left-to-right; everything else is RTL. Mirrors
-  // LangSwitch.svelte — saving a preferred language here must flip the same
-  // stores/cookie it does, or the site keeps rendering in the old language
-  // even though Strapi's `lang` field updated.
-  const LTR_LOCALES = ['en', 'ru', 'es'];
+  // Mirrors LangSwitch.svelte — saving a preferred language here must flip the
+  // same stores/cookie it does, or the site keeps rendering in the old language
+  // even though Strapi's `lang` field updated. `<html dir/lang>` then follow
+  // `locale` from the root layout (dirOf).
 
   function syncDisplayLanguage(code) {
     if (!code || $lang === code) return;
@@ -40,8 +39,6 @@
     doesLang.set(true);
     document.cookie =
       `lang=${code}; path=/; expires=` + new Date(2027, 0, 1).toUTCString();
-    document.documentElement.setAttribute('dir', LTR_LOCALES.includes(code) ? 'ltr' : 'rtl');
-    document.documentElement.setAttribute('lang', code);
   }
 
   function toLocationValue(loc) {

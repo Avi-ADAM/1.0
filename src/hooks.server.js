@@ -10,6 +10,7 @@ import { resolveEventIdentity } from '$lib/server/identity.js';
 import { log, requestId } from '$lib/server/log.js';
 import { csrfRejection } from '$lib/server/csrf.js';
 import { buildSeoFallbacks } from '$lib/server/seoFallback.js';
+import { dirOf } from '$lib/translations/dir.js';
 import { allowedCorsOrigins } from '$lib/server/corsOrigins.js';
 import { dev } from '$app/environment';
 import { guessCurrency } from '$lib/money/guess.js';
@@ -550,6 +551,10 @@ async function handleRequest({ event, resolve }) {
         )
         .replaceAll('%themeclass%', themeClass)
         .replaceAll('%lang%', lang)
+        // The page's direction comes from here and nowhere else — `body` used
+        // to carry `direction: rtl` for every locale, so English forms that
+        // never declared `dir` laid out right-to-left (PLAN_LTR_LAYOUT §0).
+        .replaceAll('%dir%', dirOf(lang))
         .replaceAll('%canonical%', canonical)
         .replaceAll('%hreflang%', hreflang)
         .replaceAll('%xtitle%', title[lang])

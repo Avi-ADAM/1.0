@@ -1,0 +1,41 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "1lev1",
+  "version": "1.0.0",
+  "description": "Run consent-based partnerships on 1lev1: manage missions, track work, and prepare shared decisions for human approval.",
+  "author": {
+    "name": "1lev1",
+    "email": "notifications@1lev1.com",
+    "url": "https://www.1lev1.com"
+  },
+  "homepage": "https://www.1lev1.com/mcp",
+  "repository": "https://github.com/Avi-ADAM/1lev1-agent",
+  "license": "MIT",
+  "keywords": ["partnership", "consent", "missions", "time-tracking", "mcp"],
+  "extensions": {
+    "com.openai": {
+      "onboardingSkill": "./skills/1lev1-platform/SKILL.md",
+      "interface": {
+        "displayName": "1lev1",
+        "shortDescription": "Consent-based partnerships",
+        "longDescription": "Manage your 1lev1 partnerships from ChatGPT or Codex. Find missions, run timers, log work, review progress, and prepare shared changes for people to approve on 1lev1. The plugin never votes, signs a profit split, or accepts an offer for you.",
+        "developerName": "1lev1",
+        "category": "Productivity",
+        "capabilities": ["Find missions", "Track work time", "Plan partnership work", "Prepare shared changes"],
+        "websiteURL": "https://www.1lev1.com",
+        "supportURL": "https://www.1lev1.com/mcp",
+        "privacyPolicyURL": "https://www.1lev1.com/privacy",
+        "termsOfServiceURL": "https://www.1lev1.com/terms",
+        "defaultPrompt": [
+          "What should I be working on today in 1lev1?",
+          "Start the timer on my mission.",
+          "Show what is waiting for my approval in 1lev1."
+        ],
+        "brandColor": "#C89B3C",
+        "brandColorDark": "#E9C86D",
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/logo.png"
+      }
+    }
+  }
+}

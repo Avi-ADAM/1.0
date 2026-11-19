@@ -2,6 +2,7 @@ import i18n from 'sveltekit-i18n';
 import { derived } from 'svelte/store';
 import lang from './lang.json';
 import { LOCALES, ROUTED } from './routes.js';
+import { dirOf } from './dir.js';
 import { customModifiers } from './modifiers.js';
 
 /**
@@ -61,6 +62,6 @@ const instance = new i18n(config);
 
 export const { t, loading, locales, locale, loadTranslations } = instance;
 
-export const isRtl = derived(locale, ($locale) => $locale === 'he' || $locale === 'ar');
+export const isRtl = derived(locale, ($locale) => dirOf($locale) === 'rtl');
 
 loading.subscribe(($loading) => $loading && console.log('Loading translations...'));

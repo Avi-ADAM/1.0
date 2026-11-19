@@ -1665,7 +1665,9 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: 'Heebo', sans-serif;
-  direction: rtl;
+  /* No `direction` here: it inherits from `<html dir>`, which the server
+     stamps per locale (hooks.server.js `%dir%`, PLAN_LTR_LAYOUT §0). A hard
+     `rtl` here laid every English form out right-to-left. */
   min-height: 100vh;
   overflow-x: hidden;
   /* Room for the fixed footer bar, so a scrolling page's last row is never
