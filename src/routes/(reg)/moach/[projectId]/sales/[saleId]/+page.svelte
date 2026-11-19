@@ -1,6 +1,7 @@
 <script>
   import { nameOf } from '$lib/translation/memberName';
   import { t } from '$lib/translations';
+  import Money from '$lib/components/money/Money.svelte';
   const moachStore = getMoachStore();
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
@@ -86,7 +87,7 @@
       <div class="grid grid-cols-2 gap-4 border-b pb-4">
         <div>
           <p class="text-sm text-gray-500">{$t('moach.sale.amount')}</p>
-          <p class="text-xl font-bold">{sale.attributes.in}</p>
+          <p class="text-xl font-bold"><Money amount={sale.attributes.in} entry={sale.attributes} /></p>
         </div>
         <div>
           <p class="text-sm text-gray-500">{$t('moach.sale.date')}</p>

@@ -3,6 +3,7 @@
   import { isRtl, t } from '$lib/translations';
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang';
+  import Money from '$lib/components/money/Money.svelte';
 
   /**
    * @typedef {Object} Props
@@ -99,9 +100,7 @@
             <div class="field">
               <span class="field-label">{$t('project.finisin.per_hour')}</span>
               <span class="field-value numeric">
-                {$t('project.finisin.currency')}{a.perhour.toLocaleString('en-US', {
-                  maximumFractionDigits: 2
-                })}
+                <Money amount={a.perhour} />
               </span>
             </div>
           {/if}
@@ -110,7 +109,7 @@
             <div class="field highlight-field">
               <span class="field-label">{$t('project.finisin.total')}</span>
               <span class="field-value total-val">
-                {$t('project.finisin.currency')}{a.total}
+                <Money amount={a.total} />
               </span>
             </div>
           {/if}

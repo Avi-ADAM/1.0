@@ -12,6 +12,7 @@
   import { parseSiteShareNote } from '$lib/revenue/parseSiteShareNote';
   import { isRtl, t } from '$lib/translations';
   import { lang as uiLang } from '$lib/stores/lang.js';
+  import Money from '$lib/components/money/Money.svelte';
 
   let { chain, projectId, lang = 'en' } = $props();
 
@@ -104,9 +105,9 @@
     >
       <div class="pl-facts">
         <span class="pl-fact">{attrs.fixPrice ? $t('moach.saleLife.fixPrice') : $t('moach.saleLife.dynamicPrice')}</span>
-        {#if attrs.price != null}<span class="pl-fact">{$t('moach.saleLife.price')}: {attrs.price}</span>{/if}
+        {#if attrs.price != null}<span class="pl-fact">{$t('moach.saleLife.price')}: <Money amount={attrs.price} /></span>{/if}
         {#if attrs.estimatedPrice != null && attrs.price == null}
-          <span class="pl-fact">{$t('moach.saleLife.estimated')}: {attrs.estimatedPrice}</span>
+          <span class="pl-fact">{$t('moach.saleLife.estimated')}: <Money amount={attrs.estimatedPrice} /></span>
         {/if}
         {#if attrs.quant != null}<span class="pl-fact">{$t('moach.saleLife.quant')}: {attrs.quant}</span>{/if}
         {#if attrs.kindOf}<span class="pl-fact">{attrs.kindOf}</span>{/if}
@@ -158,7 +159,7 @@
                     <span class="pl-fact">{attrs.quantityPerUnit} {$t('moach.saleLife.perUnit')}</span>
                   {/if}
                   {#if attrs.pricePerUnit != null}
-                    <span class="pl-fact">{$t('moach.saleLife.price')}: {attrs.pricePerUnit}</span>
+                    <span class="pl-fact">{$t('moach.saleLife.price')}: <Money amount={attrs.pricePerUnit} /></span>
                   {/if}
                   <span class="pl-card-links">
                     {#if ref}
@@ -185,7 +186,7 @@
           {@const badge = saleBadge(attrs)}
           <div class="pl-card" class:pl-card--pending={!saleEffective(attrs)}>
             <div class="pl-card-head">
-              <span class="pl-card-name">{attrs.in != null ? attrs.in : '—'}</span>
+              <span class="pl-card-name">{#if attrs.in != null}<Money amount={attrs.in} />{:else}—{/if}</span>
               {#if attrs.date}<span class="pl-fact">{formatDate(attrs.date)}</span>{/if}
               {#if holder}
                 <span class="pl-fact pl-fact--user">

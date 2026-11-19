@@ -34,6 +34,7 @@
   import PromotionTerms from '$lib/components/shop/PromotionTerms.svelte';
   import type { PromoSetup } from '$lib/server/promotions/manage';
   import type { PromotionRow } from '$lib/server/promotions/store';
+  import Money from '$lib/components/money/Money.svelte';
 
   let { data } = $props();
   let projectId = $derived(page.params.projectId ?? '');
@@ -369,7 +370,7 @@
                 <li>
                   <label class="pm-check" class:pm-disabled={!!why}>
                     <input type="checkbox" checked={draft.products.includes(p.id)} disabled={!!why} onchange={() => toggleProduct(p.id)} />
-                    <span><bdi>{p.name}</bdi>{#if p.price != null}<span class="pm-muted"> · {p.price}</span>{/if}</span>
+                    <span><bdi>{p.name}</bdi>{#if p.price != null}<span class="pm-muted"> · <Money amount={p.price} /></span>{/if}</span>
                     {#if why}<span class="pm-muted">{$t(`shop.promo.ineligible.${why}`)}</span>{/if}
                   </label>
                 </li>

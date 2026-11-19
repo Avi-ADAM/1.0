@@ -17,6 +17,7 @@
   import ShareLink from '$lib/components/share/ShareLink.svelte';
   import Tile from '$lib/celim/tile.svelte';
   import OpenMissionCard from '$lib/components/prPr/open/OpenMissionCard.svelte';
+  import Money from '$lib/components/money/Money.svelte';
 
   /**
    * @typedef {Object} Props
@@ -82,9 +83,9 @@
           <h2 class="text-2xl font-bold text-barbi underline lg:text-4xl">{data.name}</h2>
           {#if hours > 0 && perhour > 0}
             <div class="flex flex-col items-center rounded-xl border border-gold/60 bg-slate-900/70 px-3 py-2 text-gold">
-              <strong class="text-xl">{fmtNum(hours * perhour)}</strong>
+              <strong class="text-xl"><Money amount={hours * perhour} /></strong>
               <span class="text-xs opacity-80">
-                {fmtNum(hours)} {$t('moach.open.hours')} × {fmtNum(perhour)}
+                {fmtNum(hours)} {$t('moach.open.hours')} × <Money amount={perhour} />
               </span>
             </div>
           {/if}

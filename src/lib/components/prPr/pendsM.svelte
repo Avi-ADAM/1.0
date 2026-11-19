@@ -2,6 +2,7 @@
   let isonly = $state(false);
   import { onMount } from 'svelte';
   import { isRtl, t } from '$lib/translations';
+  import Money from '$lib/components/money/Money.svelte';
   /**
    * @typedef {Object} Props
    * @property {any} [pmiData]
@@ -182,7 +183,7 @@ function confirm (id) {
           <td>
             {#if data.attributes.perhour > 0}
 
-            {data.attributes.perhour}
+            <Money amount={data.attributes.perhour} />
             {/if}
           </td>
           {/each}
@@ -191,7 +192,7 @@ function confirm (id) {
       {#each pmiData as data, i}
       <td>
       {#if data.attributes.perhour > 0 & data.attributes.noofhours > 0}
-      {data.attributes.perhour * data.attributes.noofhours}
+      <Money amount={data.attributes.perhour * data.attributes.noofhours} />
       {:else} 
       <p>0</p>
       {/if}

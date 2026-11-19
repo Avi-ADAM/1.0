@@ -1,6 +1,7 @@
 <script>
   import { nameOf } from '$lib/translation/memberName';
   import { t } from '$lib/translations';
+  import Money from '$lib/components/money/Money.svelte';
   const moachStore = getMoachStore();
   import { page } from '$app/state';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
@@ -82,7 +83,7 @@
             {#each split.attributes.halukas?.data || [] as haluka}
               <div class="flex justify-between p-3 bg-gray-50 rounded">
                 <span>{$nameOf(haluka.attributes.userrecive?.data?.attributes)}</span>
-                <span class="font-bold">{haluka.attributes.amount}</span>
+                <span class="font-bold"><Money amount={haluka.attributes.amount} /></span>
               </div>
             {/each}
           </div>

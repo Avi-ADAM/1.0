@@ -3,6 +3,7 @@
   import moment from 'moment';
   import { isRtl, t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
+  import Money from '$lib/components/money/Money.svelte';
 
   let { meData = $bindable([]) } = $props();
 
@@ -193,7 +194,7 @@
                 >{$t('moach.tables.forWholePeriod')}</span
               ><span style="display:{meData[i].kc ? '' : 'none'};">{$t('moach.tables.perUnit')}</span>
             </small>
-            <h2>{data.attributes.price}</h2>
+            <h2><Money amount={data.attributes.price} /></h2>
           </td>{/each}
       </tr><tr>
         <th>{$t('moach.tables.maxRikmaValue')}</th>
@@ -207,7 +208,7 @@
                 >{$t('moach.tables.forWholePeriod')}</span
               ><span style="display:{meData[i].kc ? '' : 'none'};">{$t('moach.tables.perUnit')}</span>
             </small>
-            {data.attributes.easy}
+            <Money amount={data.attributes.easy} />
           </td>{/each}
       </tr><tr style="display:{kc || ky ? '' : 'none'};">
         <th>{$t('moach.tables.totalCost')}</th>
@@ -221,7 +222,7 @@
                 ? ''
                 : 'none'};"
             >
-              {data.total}
+              <Money amount={data.total} />
             </h3>
           </td>{/each}
       </tr><tr style="display:{kc || ky ? '' : 'none'};">
@@ -236,7 +237,7 @@
                 ? ''
                 : 'none'};"
             >
-              {data.totaltotal}
+              <Money amount={data.totaltotal} />
             </h3>
           </td>{/each}
       </tr>

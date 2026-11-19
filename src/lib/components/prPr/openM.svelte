@@ -2,6 +2,7 @@
   let isonly = $state(false);
   import { onMount } from 'svelte';
   import { isRtl, t } from '$lib/translations';
+  import Money from '$lib/components/money/Money.svelte';
   /**
    * @typedef {Object} Props
    * @property {any} [omiData]
@@ -138,7 +139,7 @@ function edit (id) {
           <td>
             {#if data.attributes.perhour > 0}
 
-            {data.attributes.perhour}
+            <Money amount={data.attributes.perhour} />
             {/if}
           </td>
           {/each}
@@ -148,7 +149,7 @@ function edit (id) {
       <td>
       {#if data.attributes.perhour > 0 & data.attributes.noofhours > 0}
       
-      {(data.attributes.perhour * data.attributes.noofhours).toLocaleString('en-US', {maximumFractionDigits:2})}
+      <Money amount={data.attributes.perhour * data.attributes.noofhours} />
       
       {:else} <p>0</p>
       {/if}

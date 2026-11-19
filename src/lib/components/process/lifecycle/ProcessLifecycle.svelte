@@ -14,6 +14,7 @@
   import { mediaUrl } from '$lib/utils/processLifecycle';
   import { isRtl, t } from '$lib/translations';
   import { lang as uiLang } from '$lib/stores/lang.js';
+  import Money from '$lib/components/money/Money.svelte';
 
   let {
     kind = 'mission', // 'mission' | 'resource'
@@ -116,7 +117,7 @@
         {/if}
         <div class="pl-facts">
           {#if attrs.noofhours}
-            <span class="pl-fact">{attrs.noofhours} {$t('moach.lifecycle.hours')}{attrs.perhour ? ` · ${attrs.perhour} ${$t('moach.lifecycle.perhour')}` : ''}</span>
+            <span class="pl-fact">{attrs.noofhours} {$t('moach.lifecycle.hours')}{#if attrs.perhour} · <Money amount={attrs.perhour} /> {$t('moach.lifecycle.perhour')}{/if}</span>
           {/if}
           {#if attrs.timegrama?.data?.attributes?.date}
             <span class="pl-fact">{$t('moach.lifecycle.deadline')}: {formatDate(attrs.timegrama.data.attributes.date)}</span>
@@ -350,10 +351,10 @@
             <!-- hours × rate = money. `total` is the money value, never hours. -->
             {#if fHours != null}
               <span class="pl-fact">
-                {formatNum(fHours)} {$t('moach.lifecycle.hours')}{fRate != null ? ` × ${formatNum(fRate)} ${$t('moach.lifecycle.perhour')}` : ''}
+                {formatNum(fHours)} {$t('moach.lifecycle.hours')}{#if fRate != null} × <Money amount={fRate} /> {$t('moach.lifecycle.perhour')}{/if}
               </span>
             {/if}
-            {#if fTotal != null}<span class="pl-fact">{$t('moach.lifecycle.total')}: {formatNum(fTotal)}</span>{/if}
+            {#if fTotal != null}<span class="pl-fact">{$t('moach.lifecycle.total')}: <Money amount={fTotal} /></span>{/if}
           </div>
           {#if plainText(fAttrs.why || fAttrs.descrip)}
             <p class="pl-desc">{$t('moach.lifecycle.why')}: {plainText(fAttrs.why || fAttrs.descrip)}</p>
@@ -385,7 +386,7 @@
           <p class="pl-desc">{plainText(attrs.descrip || attrs.spnot)}</p>
         {/if}
         <div class="pl-facts">
-          {#if attrs.price}<span class="pl-fact">{$t('moach.lifecycle.price')}: {attrs.price}</span>{/if}
+          {#if attrs.price}<span class="pl-fact">{$t('moach.lifecycle.price')}: <Money amount={attrs.price} /></span>{/if}
           {#if attrs.hm}<span class="pl-fact">{$t('moach.lifecycle.amount')}: {attrs.hm}</span>{/if}
           {#if attrs.timegrama?.data?.attributes?.date}
             <span class="pl-fact">{$t('moach.lifecycle.deadline')}: {formatDate(attrs.timegrama.data.attributes.date)}</span>
@@ -420,7 +421,7 @@
         {/if}
         <div class="pl-facts">
           {#if attrs.kindOf}<span class="pl-fact">{attrs.kindOf}</span>{/if}
-          {#if attrs.price}<span class="pl-fact">{$t('moach.lifecycle.price')}: {attrs.price}</span>{/if}
+          {#if attrs.price}<span class="pl-fact">{$t('moach.lifecycle.price')}: <Money amount={attrs.price} /></span>{/if}
           {#if attrs.hm}<span class="pl-fact">{$t('moach.lifecycle.amount')}: {attrs.hm}</span>{/if}
         </div>
       </LifecycleStation>
@@ -510,8 +511,8 @@
             <div class="pl-card">
               <div class="pl-card-head">
                 <span class="pl-card-name">{rAttrs.name ?? `#${rikmash.id}`}</span>
-                {#if rAttrs.total != null}<span class="pl-fact">{$t('moach.lifecycle.total')}: {rAttrs.total}</span>{/if}
-                {#if rAttrs.price != null}<span class="pl-fact">{$t('moach.lifecycle.price')}: {rAttrs.price}</span>{/if}
+                {#if rAttrs.total != null}<span class="pl-fact">{$t('moach.lifecycle.total')}: <Money amount={rAttrs.total} /></span>{/if}
+                {#if rAttrs.price != null}<span class="pl-fact">{$t('moach.lifecycle.price')}: <Money amount={rAttrs.price} /></span>{/if}
                 {#if rAttrs.createdAt}<span class="pl-fact">{formatDate(rAttrs.createdAt)}</span>{/if}
                 <span class="pl-card-links">
                   <a class="pl-action" href={`${base}/object/rikmash/${rikmash.id}`}>{$t('moach.lifecycle.objectPage')}</a>

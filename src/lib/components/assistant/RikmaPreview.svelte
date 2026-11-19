@@ -12,6 +12,7 @@
   import { readable } from 'svelte/store';
   import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
   import Tile from '$lib/celim/tile.svelte';
+  import { useFormatMoney } from '$lib/money/context.svelte';
 
   const t = translations.t;
   const activeLocale = 'locale' in translations && translations.locale ? translations.locale : readable('he');
@@ -51,6 +52,8 @@
   let members = $derived(1 + view.partners.length);
   let totalSplitValue = $derived(view.split.reduce((acc, s) => acc + s.value, 0));
 
+  const fmt_ = useFormatMoney();
+
   function who(/** @type {Holder | undefined} */ h) {
     if (!h || h.kind === 'open') return $t('rikmaImport.preview.lookingFor');
     if (h.kind === 'partner') return h.name;
@@ -62,8 +65,7 @@
   }
 
   function money(/** @type {number} */ n) {
-    const cur = view.currency ? ` ${view.currency}` : '';
-    return `${fmt(n)}${cur}`;
+    return fmt_(n, view.currency ?? 'ILS');
   }
 
   function periodOf(/** @type {string | undefined} */ kindOf) {
