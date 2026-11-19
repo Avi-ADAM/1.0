@@ -13,6 +13,7 @@
 
   let {
     buble,
+    projectId = buble?.projectId,
     isFirst = false,
     glowColor = 'blue',
     onProj,
@@ -355,7 +356,7 @@
             class="w-5 h-5"
           />
           <span class="font-bold text-gray-800 dark:text-gray-100"
-            >{buble.price}</span
+            ><Money amount={buble.price} projectId={projectId ?? buble.projectId} /></span
           >
         </div>
       </div>
@@ -379,7 +380,7 @@
             alt="money"
             class="w-6 h-6"
           />
-          <span class="text-xl font-black text-blue-600">{buble.total}</span>
+          <span class="text-xl font-black text-blue-600"><Money amount={buble.total} projectId={projectId ?? buble.projectId} /></span>
         </div>
       </div>
     </div>
@@ -394,7 +395,7 @@
             >{$t('deals.due.heroLabel')}</span
           >
           <span class="text-lg font-black text-amber-900 dark:text-amber-200"
-            ><Money amount={due.due} /></span
+            ><Money amount={due.due} projectId={projectId ?? buble.projectId} /></span
           >
         </div>
         <p class="text-xs text-amber-900 dark:text-amber-200 leading-snug">{$t('deals.due.explain')}</p>
@@ -407,9 +408,9 @@
                   >{/if}</span
               >
               <span class="shrink-0 font-semibold"
-                ><Money amount={line.due} />
+                ><Money amount={line.due} projectId={projectId ?? buble.projectId} />
                 <span class="font-normal text-gray-500 dark:text-gray-400"
-                  >/ <Money amount={line.cap} /></span
+                  >/ <Money amount={line.cap} projectId={projectId ?? buble.projectId} /></span
                 ></span
               >
             </li>

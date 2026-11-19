@@ -481,7 +481,7 @@ id: ${pendId}
   {resname}
   {projectId}
   {kind}
-  {amount}
+  amount={amount}
   {sendcon}
   {confirmed}
   {low}

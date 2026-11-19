@@ -8,6 +8,7 @@
     newChat,
     forum
   } from '$lib/stores/pendMisMes.js';
+  import Money from '$lib/components/money/Money.svelte';
 
   let {
     halukaId,
@@ -293,7 +294,7 @@
     <div class="flex flex-col items-center gap-1 shrink-0">
       {#if amount != null}
         <span class="text-sm font-black text-amber-700 dark:text-amber-300"
-          >{amount}</span
+          ><Money {amount} {projectId} /></span
         >
       {/if}
       <svg

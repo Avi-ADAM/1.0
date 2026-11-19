@@ -608,7 +608,7 @@
               onmouseleave={() => hover('0')}
               class="text-gray-900 dark:text-white font-bold"
             >
-              {price}
+              <Money amount={price} {projectId} />
             </span>
           </div>
           <span class="text-gray-400 hidden sm:inline">|</span>
@@ -621,7 +621,7 @@
               onmouseleave={() => hover('0')}
               class="text-barbi font-bold"
             >
-              {myp}
+              <Money amount={myp} {projectId} />
             </span>
           </div>
           <span class="text-gray-400 hidden sm:inline">|</span>
@@ -634,7 +634,7 @@
               onmouseleave={() => hover('0')}
               class="text-gray-700 dark:text-gray-300 font-medium"
             >
-              {easy}
+              <Money amount={easy} {projectId} />
             </span>
           </div>
         </div>

@@ -472,7 +472,7 @@
           name1={missionName}
           {hearotMeyuchadot}
           noofhours={noOfHours}
-          {perhour}
+          perhour={perhour}
           {projectId}
           total={noOfHours * perhour}
           noofusers={noOfusers}
@@ -526,8 +526,8 @@
   {alreadyi}
   {missionName}
   {noOfHours}
-  {perhour}
-  {stipendRate}
+  perhour={perhour}
+  stipendRate={stipendRate}
   {stipendCostShare}
   {stipendMode}
   {stipendFunderName}

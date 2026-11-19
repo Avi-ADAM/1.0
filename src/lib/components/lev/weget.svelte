@@ -528,7 +528,7 @@
   onHover={hoverc}
   {isVisible}
   {low}
-  {agprice}
+  agprice={agprice}
   {useraplyname}
   {src2}
   {projectId}
@@ -551,7 +551,7 @@
   {cycleReported}
   {cycleIndex}
   quantityDelivered={shownAmount}
-  {pricePerUnit}
+  pricePerUnit={pricePerUnit}
   {isResponsible}
   {awaitingReport}
 />

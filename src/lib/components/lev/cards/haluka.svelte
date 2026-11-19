@@ -19,6 +19,7 @@
   // רכיבים מודרניים חדשים
   import CardHeader from './CardHeader.svelte';
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
+  import Money from '$lib/components/money/Money.svelte';
 
   /**
    * @typedef {Object} Props
@@ -471,7 +472,7 @@
                   · {$t('lev.haluka.bridge.resolvedShare')}:
                 </span>
                 <span class="font-bold text-emerald-700 dark:text-emerald-300"
-                  >{row.value.toFixed(2)}</span
+                  ><Money amount={row.value} {projectId} /></span
                 >
               </span>
             {/each}

@@ -143,6 +143,7 @@
 {:else if buble.ani === 'sale' && milon.sales == true}
   <SaleCard
       {buble}
+      projectId={buble.projectId}
       isFirst={isVisible}
       onProj={proj}
       {onChat}
@@ -150,6 +151,7 @@
 {:else if buble.ani === 'buy' && milon.sales == true}
   <CustomerSaleCard
       {buble}
+      projectId={buble.projectId}
       isFirst={isVisible}
       onProj={proj}
       {onChat}

@@ -444,9 +444,7 @@
             onmouseleave={() => hover('0')}
             class="font-black text-gray-900 dark:text-white"
           >
-            {easy > 0
-              ? (easy * hm).toLocaleString()
-              : (price * hm).toLocaleString()}
+            <Money amount={easy > 0 ? easy * hm : price * hm} {projectId} />
           </span>
         {:else if kindOf === 'total' || kindOf === 'rent'}
           <span
@@ -454,7 +452,7 @@
             onmouseleave={() => hover('0')}
             class="text-barbi dark:text-pink-400 font-bold text-lg"
           >
-            {easy > 0 ? easy.toLocaleString() : price.toLocaleString()}
+            <Money amount={easy > 0 ? easy : price} {projectId} />
           </span>
         {:else if kindOf === 'monthly'}
           <span
@@ -462,7 +460,7 @@
             onmouseleave={() => hover('0')}
             class="text-barbi dark:text-pink-400 font-bold"
           >
-            {easy > 0 ? easy.toLocaleString() : price.toLocaleString()} {$t('lev.cards.common.perMonth')}
+            <Money amount={easy > 0 ? easy : price} {projectId} /> {$t('lev.cards.common.perMonth')}
           </span>
           <span class="text-gray-400">×</span>
           <span
@@ -478,9 +476,7 @@
             onmouseleave={() => hover('0')}
             class="font-black text-gray-900 dark:text-white"
           >
-            {easy > 0
-              ? (easy * monts).toLocaleString()
-              : (price * monts).toLocaleString()}
+            <Money amount={easy > 0 ? easy * monts : price * monts} {projectId} />
           </span>
         {:else if kindOf === 'yearly'}
           <span
@@ -488,7 +484,7 @@
             onmouseleave={() => hover('0')}
             class="text-barbi dark:text-pink-400 font-bold"
           >
-            {easy > 0 ? easy.toLocaleString() : price.toLocaleString()} {$t('lev.cards.common.perYear')}
+            <Money amount={easy > 0 ? easy : price} {projectId} /> {$t('lev.cards.common.perYear')}
           </span>
           <span class="text-gray-400">×</span>
           <span
@@ -504,9 +500,7 @@
             onmouseleave={() => hover('0')}
             class="font-black text-gray-900 dark:text-white"
           >
-            {easy > 0
-              ? (easy * yers).toLocaleString()
-              : (price * yers).toLocaleString()}
+            <Money amount={easy > 0 ? easy * yers : price * yers} {projectId} />
           </span>
         {/if}
       </div>
@@ -601,7 +595,7 @@
               </span>
               <span><Money amount={Math.round(dateRangeTotal)} {projectId} /></span>
               <span class="text-gray-400 font-normal text-xs">
-                ({unitPrice.toLocaleString()} × {periodCount.toFixed(1)}
+                (<Money amount={unitPrice} {projectId} /> × {periodCount.toFixed(1)}
                 {isYearlyResource
                   ? $t('lev.cards.voteCard.years')
                   : $t('lev.cards.resourcePeriod.months')})

@@ -951,7 +951,7 @@
   {show}
   {hourstotal}
   {hoursdon}
-  {perhour}
+  perhour={perhour}
   {status}
 />
 

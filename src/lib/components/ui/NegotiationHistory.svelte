@@ -6,6 +6,7 @@
   import RichText from '$lib/celim/ui/richText.svelte';
   import { t } from '$lib/translations';
   import { get } from 'svelte/store';
+  import { useFormatMoney, useProjectCurrency } from '$lib/money/context.svelte';
 
   /**
    * @typedef {Object} Props
@@ -36,6 +37,10 @@
     isCandidateFlow = false,
     howMeny = null
   } = $props();
+
+  const fmt = useFormatMoney();
+  const projectCur = useProjectCurrency();
+  const cur = $derived(projectCur(projectId));
 
   function locationSummary(loc) {
     if (!loc) return '—';
@@ -116,8 +121,8 @@
             {#if attrs.perhour && attrs.perhour !== perhour}
               <ComparisonDisplay
                 label={$t('common.perhourLabel')}
-                oldValue={old_perhour}
-                newValue={new_perhour}
+                oldValue={fmt(old_perhour, cur)}
+                newValue={fmt(new_perhour, cur)}
               />
             {/if}
 
@@ -132,8 +137,8 @@
             {#if (attrs.perhour && attrs.perhour !== perhour) || (attrs.noofhours && attrs.noofhours !== noofhours)}
               <ComparisonDisplay
                 label={$t('common.totalLabel')}
-                oldValue={String(old_hours * old_perhour)}
-                newValue={String(new_hours * new_perhour)}
+                oldValue={fmt(old_hours * old_perhour, cur)}
+                newValue={fmt(new_hours * new_perhour, cur)}
               />
             {/if}
 

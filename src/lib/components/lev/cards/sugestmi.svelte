@@ -1,4 +1,4 @@
-﻿<script>
+<script>
   import Tile from '$lib/celim/tile.svelte';
   import Chaticon from '$lib/celim/chaticon.svelte';
   import { lang } from '$lib/stores/lang.js';
@@ -15,6 +15,7 @@
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
   import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
   import MissionStipendOffer from '$lib/components/stipend/MissionStipendOffer.svelte';
+  import Money from '$lib/components/money/Money.svelte';
 
   /**
    * @typedef {Object} Props
@@ -209,15 +210,12 @@
             >
               {(myRound.noofhours ?? noOfHours).toLocaleString()}
               {$t('lev.cards.common.hours')}
-              × {(myRound.perhour ?? perhour).toLocaleString()}
-              = {(
-                (myRound.noofhours ?? noOfHours) * (myRound.perhour ?? perhour)
-              ).toLocaleString()}
+              × <Money amount={myRound.perhour ?? perhour} {projectId} />
+              = <Money amount={(myRound.noofhours ?? noOfHours) * (myRound.perhour ?? perhour)} {projectId} />
             </span>
             {#if hoursChanged}
               <span class="text-xs text-gray-500 dark:text-gray-400">
-                ({$t('nego.rikmaReq')}: {noOfHours} × {perhour} = {noOfHours *
-                  perhour})
+                ({$t('nego.rikmaReq')}: {noOfHours} × <Money amount={perhour} {projectId} /> = <Money amount={noOfHours * perhour} {projectId} />)
               </span>
             {/if}
           </div>
@@ -307,8 +305,7 @@
         onmouseenter={() => hover($t('common.valph'))}
         onmouseleave={() => hover('0')}
       >
-        {perhour.toLocaleString('en-US', { maximumFractionDigits: 2 })}
-        {$t('lev.cards.common.perHour')}
+        <Money amount={perhour} {projectId} /> {$t('lev.cards.common.perHour')}
       </span>
       <span class="text-gray-400 mx-1">*</span>
       <span
@@ -327,9 +324,7 @@
         onmouseenter={() => hover($t('lev.cards.voteCard.inTotal'))}
         onmouseleave={() => hover('0')}
       >
-        {(noOfHours * perhour).toLocaleString('en-US', {
-          maximumFractionDigits: 2
-        })}
+        <Money amount={noOfHours * perhour} {projectId} />
         {isMonthly ? ' ' + $t('lev.cards.common.monthly') : ''}
       </span>
       {#if wishName == null}

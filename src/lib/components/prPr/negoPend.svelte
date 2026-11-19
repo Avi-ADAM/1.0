@@ -16,6 +16,7 @@
   import { updatePmashesStore } from '$lib/utils/levVotePatch';
   import { onMount } from 'svelte';
   import { fetchBridgeResolution, openNegoBridge, readNegoBridgeReturn } from '$lib/func/negoBridge.js';
+  import Money from '$lib/components/money/Money.svelte';
 
   let error1;
   let clicked = false;
@@ -465,13 +466,13 @@
           <span>{$t('nego.cand.qty')} <strong>{candidateRound.hm}</strong></span>
         {/if}
         {#if candidateRound.price != null}
-          <span>{$t('nego.cand.price')} <strong>{candidateRound.price}</strong></span>
+          <span>{$t('nego.cand.price')} <strong><Money amount={candidateRound.price} {projectId} /></strong></span>
         {/if}
         {#if candidateRound.easy != null}
-          <span>{$t('nego.cand.levValue')} <strong>{candidateRound.easy}</strong></span>
+          <span>{$t('nego.cand.levValue')} <strong><Money amount={candidateRound.easy} {projectId} /></strong></span>
         {/if}
         {#if candTotal > 0}
-          <span class="font-bold">{$t('nego.cand.total')} <strong>{candTotal.toLocaleString()}</strong></span>
+          <span class="font-bold">{$t('nego.cand.total')} <strong><Money amount={candTotal} {projectId} /></strong></span>
         {/if}
         {#if candidateRound.sqadualed}
           <span>{$t('nego.cand.start')} <strong>{new Date(candidateRound.sqadualed).toLocaleDateString($lang)}</strong></span>
@@ -520,7 +521,7 @@
       lebel={$t('mash.shovi')}
     />
     {#if onSubmit && candidateRound?.price != null && candidateRound.price !== price}
-      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1"><EntityIcon kind="idea" size={12} /> {$t('nego.cand.candidateProposed')} <strong>{candidateRound.price}</strong></p>
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1"><EntityIcon kind="idea" size={12} /> {$t('nego.cand.candidateProposed')} <strong><Money amount={candidateRound.price} {projectId} /></strong></p>
     {/if}
     <NumberField
       number={easy}
@@ -528,7 +529,7 @@
       lebel={$t('mash.shovile')}
     />
     {#if onSubmit && candidateRound?.easy != null && candidateRound.easy !== easy}
-      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1"><EntityIcon kind="idea" size={12} /> {$t('nego.cand.candidateProposed')} <strong>{candidateRound.easy}</strong></p>
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1"><EntityIcon kind="idea" size={12} /> {$t('nego.cand.candidateProposed')} <strong><Money amount={candidateRound.easy} {projectId} /></strong></p>
     {/if}
     {#if kindOf == 'yearly' || kindOfb == 'yearly' || kindOfb == 'monthly' || kindOf == 'monthly' || kindOf == 'rent' || kindOfb == 'rent'}
       <DateNego
@@ -620,9 +621,9 @@
       <div class="flex flex-col gap-2">
         <div>
           <p class="text-gold">
-            {$t('mash.shovi')}: {totalNew.toLocaleString()}
+            {$t('mash.shovi')}: <Money amount={totalNew} {projectId} />
             <span class="text-barbi text-sm">
-              ({$t('nego.original')}: {totalOrig.toLocaleString()})
+              ({$t('nego.original')}: <Money amount={totalOrig} {projectId} />)
             </span>
           </p>
           {#key chartKey}
@@ -634,9 +635,9 @@
         {#if Number(easy) !== Number(easy2) || Number(price) !== Number(price2)}
           <div>
             <p class="text-gold">
-              {$t('mash.shovile')}: {totalEasyNew.toLocaleString()}
+              {$t('mash.shovile')}: <Money amount={totalEasyNew} {projectId} />
               <span class="text-barbi text-sm">
-                ({$t('nego.original')}: {totalEasyOrig.toLocaleString()})
+                ({$t('nego.original')}: <Money amount={totalEasyOrig} {projectId} />)
               </span>
             </p>
             {#key `${chartKey}-easy`}
@@ -648,13 +649,13 @@
         {/if}
       </div>
     {:else if totalNew > 0}
-      {totalNew.toLocaleString()}
+      <Money amount={totalNew} {projectId} />
       {#if Number(price2) !== Number(easy2)}
         {$t('mash.shovile')}:
-        {totalEasyNew.toLocaleString()}
+        <Money amount={totalEasyNew} {projectId} />
       {/if}
     {:else}
-      <p>0</p>
+      <p><Money amount={0} {projectId} /></p>
     {/if}
   </div>
 

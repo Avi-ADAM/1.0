@@ -6,6 +6,25 @@
 > in a different currency in negotiations and the remaining forms) is **out of
 > scope**; don't start it.
 
+## Progress — where we are (updated 2026-11-19)
+
+**Continuing from a previous agent?** Your working checklist, with line
+numbers per file, is [currency-sweep-plan.md](./currency-sweep-plan.md). Its
+top table says what's done. Mark `[x]` there as you go, and add a
+`batchN-report.md` at the end of each batch like
+[batch1-report.md](./batch1-report.md).
+
+| Batch | State |
+|---|---|
+| 1 — moach | ✅ done (`67ef3d3c`). Audit went from 96/142 to 88/132. |
+| 2 — heart / hub | 🔶 **almost done** (27 files in the working tree, not committed). This includes `negoM`, `negoPend` and `NegotiationHistory`. Audit is down to 69/82. Four items are left, and they're the **next** step: `WishOfferCard`, `pending.svelte`, `MissionStipendOffer` and `BlueprintReview`. The checklist has them as items 44, 46, 47b and 47c. |
+| 3 — public pages / deals / concierge | ⏳. Also `prPr/open/OpenMissionCard` and `OpenResourceCard`: add an optional `currency` prop, passed by `OpenBoard`. |
+| 4 — translations / server / mails / Telegram | ⏳. Also `project.finisin.currency`, which has had no call site since batch 1. |
+
+Deferred, don't do: `prPr/missionForm/MissionSummary` — its callers already
+pass it a string formatted in the right currency, so changing it would be a
+prop API change, not a display fix.
+
 ## What is wrong, in one paragraph
 
 Every rikma counts in one currency (`Project.currencyCode`, null = ILS) and every
@@ -32,16 +51,24 @@ dollars, all of these are wrong.
    `quorum/copy.js`, `/api/chat`, `server/concierge/externalOffers.ts`, and
    example sentences inside help text (`shop.zonesEmptyBody`,
    `consensus.initialNote`, `shopPage.p3`, `home.*`).
-5. **A number that isn't money stays as it is.** `total` is sometimes an item
+5. **Change only what shows money.** Don't reformat a file and don't rewrite a
+   shorthand prop (`{perhour}` → `perhour={perhour}`) just to make the audit
+   number drop. The audit mistakes a shorthand prop on its own line for
+   rendered text, so list it in the report as a false positive. Batch 2 did both,
+   which left a lot of noise in the diff.
+6. **A number that isn't money stays as it is.** `total` is sometimes an item
    count (`DonutChart`, `DailyBrief`, `DemandMapTeaser`), `value` is sometimes a
    percentage or a form value (`its-yours`, `VersionHistory`, `crtask`,
    `nameField`, `switch`, `me/settings`). The audit script lists these too —
    read the line before changing it.
-6. i18n per `CLAUDE.md`: no Hebrew typed into markup; placeholders are
+7. i18n per `CLAUDE.md`: no Hebrew typed into markup; placeholders are
    `{{name}}` with two or more characters; edit all five locales
    (`he en ar ru es`) together.
-7. Work on `main`, **don't commit or push** — the human commits once at the end
-   (every push deploys).
+8. Work on `main`, **don't commit, don't push, and don't run `git add`.** The
+   human commits once at the end, because every push deploys. Other sessions
+   work in this folder at the same time and share the git index, so a `git add`
+   or `git commit` here also takes their staged files. That's what happened in
+   batch 1, which swept another session's `PLAN_LTR_LAYOUT.md` into its commit.
 
 ## The toolkit — that's all you need
 
@@ -191,7 +218,7 @@ in the report and leave it as is).
 ## Acceptance — how to know it's done
 
 1. `node scripts/audit-money-display.mjs` — every remaining line is a non-money
-   number (rule 5) or out of scope; list them in the report with a one-word
+   number (rule 6) or out of scope; list them in the report with a one-word
    reason each.
 2. `grep -rn "₪" src --include=*.svelte --include=*.ts --include=*.js | grep -v translations`
    — only comments, the files in rule 4, and `src/lib/money/**`.

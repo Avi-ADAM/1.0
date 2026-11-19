@@ -483,13 +483,13 @@ diunim = ` ${diu},`
           {hm}
           {timegramaId}
           {projectId}
-          {total}
+          total={total}
           {noofusers}
-          {price}
-          {easy}
+          price={price}
+          easy={easy}
           {recurring}
           {recurringNoEnd}
-          {pricePerUnit}
+          pricePerUnit={pricePerUnit}
           {cycleSize}
           {linkto}
           {pendId}
@@ -578,8 +578,8 @@ diunim = ` ${diu},`
   {hm}
   {monts}
   {yers}
-  {easy}
-  {price}
+  easy={easy}
+  price={price}
   {hearotMeyuchadot}
   {already}
   {projectName}
@@ -597,7 +597,7 @@ diunim = ` ${diu},`
   {location}
   {recurring}
   {recurringNoEnd}
-  {pricePerUnit}
+  pricePerUnit={pricePerUnit}
   {cycleSize}
   {sqadualed}
   {sqadualedf}

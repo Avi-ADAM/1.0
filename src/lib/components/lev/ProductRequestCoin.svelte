@@ -2,6 +2,7 @@
   import { nameOf } from '$lib/translation/memberName';
   import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
+  import Money from '$lib/components/money/Money.svelte';
 
   let { buble } = $props();
 </script>
@@ -62,6 +63,6 @@
   <div
     class="absolute -top-2 -left-2 bg-barbi text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-sm z-10 border border-white/50"
   >
-    {buble.total}
+    <Money amount={buble.total} projectId={buble.projectId} />
   </div>
 </div>

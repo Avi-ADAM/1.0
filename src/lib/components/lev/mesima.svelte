@@ -4,7 +4,8 @@ import { lang } from '$lib/stores/lang.js'
 import { t } from '$lib/translations'
   import Spinner from '$lib/celim/Spinner.svelte';
 import { sendToSer } from '$lib/send/sendToSer.js';
-import RichText from '$lib/celim/ui/richText.svelte'
+import RichText from '$lib/celim/ui/richText.svelte';
+import Money from '$lib/components/money/Money.svelte';
   let { missionId, onProject } = $props();
 let error1 = null;
 let projecto = [];
@@ -72,7 +73,7 @@ async function xyd () {
     <div  class="mb-8">
          <p style="line-height: 1;" class="text-sm text-surfaceMuted flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-            <span onmouseenter={()=>hover($t('common.valph'))} onmouseleave={()=>hover("0")} > {data.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} {$t('lev.cards.common.perHour')} </span> * <span onmouseenter={()=>hover($t('common.noofhours'))} onmouseleave={()=>hover("0")}  > {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} {$t('common.hours')} </span> = <span onmouseenter={()=>hover($t('lev.cards.voteCard.inTotal'))} onmouseleave={()=>hover("0")}>{(data.noofhours * data.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
+            <span onmouseenter={()=>hover($t('common.valph'))} onmouseleave={()=>hover("0")} > <Money amount={data.perhour} projectId={data.project?.data?.id} /> {$t('lev.cards.common.perHour')} </span> * <span onmouseenter={()=>hover($t('common.noofhours'))} onmouseleave={()=>hover("0")}  > {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} {$t('common.hours')} </span> = <span onmouseenter={()=>hover($t('lev.cards.voteCard.inTotal'))} onmouseleave={()=>hover("0")}><Money amount={data.noofhours * data.perhour} projectId={data.project?.data?.id} /> </span>
       </p>
       <div style="font-size: 17px;" class="  mb-2"><h2 class="text-barbi font-bold">{data.name}</h2></div>
   {#if data.descrip !== null && data.descrip !== "null"  && data.descrip !== "undefined"  && data.descrip !== undefined} <RichText outpot={data.descrip} editable={false} /> {/if}
@@ -183,7 +184,7 @@ async function xyd () {
           <td>
             {#if data.perhour > 0}
 
-            {data.perhour}
+            <Money amount={data.perhour} projectId={data.project?.data?.id} />
             {/if}
           </td>
         </tr><tr >
@@ -191,7 +192,7 @@ async function xyd () {
       <td>
       {#if data.perhour > 0 & data.noofhours > 0}
       
-      {(data.perhour * data.noofhours)}
+      <Money amount={data.perhour * data.noofhours} projectId={data.project?.data?.id} />
       
       {:else} <p>0</p>
       {/if}

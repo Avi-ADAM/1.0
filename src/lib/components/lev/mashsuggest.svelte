@@ -370,10 +370,10 @@
           {kindOf}
           hm={0}
           {projectId}
-          {total}
+          total={total}
           noofusers={1}
-          {price}
-          {easy}
+          price={price}
+          easy={easy}
           linkto={''}
           pendId={null}
           bridgeSourceId={id}
@@ -413,8 +413,8 @@
   {isVisible}
   {low}
   {mashName}
-  {easy}
-  {myp}
+  easy={easy}
+  myp={myp}
   {already}
   {deadLine}
   {sqedualedf}
@@ -422,8 +422,8 @@
   {kindOf}
   {recurring}
   {cycleSize}
-  {price}
-  {total}
+  price={price}
+  total={total}
   {descrip}
   {projectName}
   {projectId}

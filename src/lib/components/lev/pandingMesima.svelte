@@ -547,9 +547,9 @@
               name1={name}
               {hearotMeyuchadot}
               {noofhours}
-              {perhour}
+              perhour={perhour}
               {projectId}
-              {total}
+              total={total}
               {ordern}
               {noofusers}
               {missionId}
@@ -660,7 +660,7 @@
   {isshift}
   {pendId}
   {noofhours}
-  {perhour}
+  perhour={perhour}
   {hearotMeyuchadot}
   {already}
   {projectName}

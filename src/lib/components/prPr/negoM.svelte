@@ -25,6 +25,8 @@
   import PendmStaffing, { loadPendmPlan, forgetPendmPlan } from '$lib/components/shifts/PendmStaffing.svelte';
   import ShiftPlanForm, { emptyShiftPlan } from '$lib/components/shifts/ShiftPlanForm.svelte';
   import { isStaffable, samePattern } from '$lib/shifts/pattern';
+  import Money from '$lib/components/money/Money.svelte';
+  import { useFormatMoney, useProjectCurrency } from '$lib/money/context.svelte';
   /**
    * @typedef {Object} Props
    * @property {any} [negopendmissions]
@@ -137,6 +139,9 @@
   } = $props();
   $inspect(acts);
   let datai = $state([]);
+  const fmtMoney = useFormatMoney();
+  const projectCur = useProjectCurrency();
+  const resolvedCur = $derived(projectCur(projectId));
 
   $effect(() => {
     const items = [
@@ -683,10 +688,10 @@
             <span>{$t('nego.cand.hours')} <strong>{candidateRound.noofhours}</strong></span>
           {/if}
           {#if candidateRound.perhour != null}
-            <span>{$t('nego.cand.perHour')} <strong>{candidateRound.perhour}</strong></span>
+            <span>{$t('nego.cand.perHour')} <strong><Money amount={candidateRound.perhour} {projectId} /></strong></span>
           {/if}
           {#if candTot > 0}
-            <span class="font-bold">{$t('nego.cand.total')} <strong>{candTot.toLocaleString()}</strong></span>
+            <span class="font-bold">{$t('nego.cand.total')} <strong><Money amount={candTot} {projectId} /></strong></span>
           {/if}
           {#if candidateRound.mdate}
             <span>{$t('nego.cand.start')} <strong>{new Date(candidateRound.mdate).toLocaleDateString($lang)}</strong></span>
@@ -720,7 +725,7 @@
       lebel={$t('mission.hourlyVallue')}
     />
     {#if onSubmit && candidateRound?.perhour != null && candidateRound.perhour !== perhour}
-      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1"><EntityIcon kind="idea" size={12} /> {$t('nego.cand.candidateProposed')} <strong>{candidateRound.perhour}</strong></p>
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1"><EntityIcon kind="idea" size={12} /> {$t('nego.cand.candidateProposed')} <strong><Money amount={candidateRound.perhour} {projectId} /></strong></p>
     {/if}
     {#if pendmFlow}
       <!-- כמה אנשים דרושים (PLAN_SHIFTS §2) — תנאי של ההצעה, כמו שעות ותעריף -->
@@ -818,9 +823,9 @@
     <h2 class="underline decoration-mturk">{$t('mission.total')}</h2>
     {#if noofhours == noofhours2 && perhour == perhour2}
       {#if noofhours > 0 && perhour > 0}
-        {noofhours * perhour}
+        <Money amount={noofhours * perhour} {projectId} />
       {:else}
-        <p>0</p>
+        <p><Money amount={0} {projectId} /></p>
       {/if}
     {:else}
       <div class="w-4/5 mx-auto">
@@ -831,10 +836,8 @@
       <p class="text-sm font-semibold">
         {$t('mission.form.rikmaTotal', {
           count: seatsNow,
-          value: ((+noofhours2 || 0) * (+perhour2 || 0)).toLocaleString('en-US', { maximumFractionDigits: 2 }),
-          total: ((+noofhours2 || 0) * (+perhour2 || 0) * seatsNow).toLocaleString('en-US', {
-            maximumFractionDigits: 2
-          })
+          value: fmtMoney((+noofhours2 || 0) * (+perhour2 || 0), resolvedCur),
+          total: fmtMoney((+noofhours2 || 0) * (+perhour2 || 0) * seatsNow, resolvedCur)
         })}
       </p>
     {/if}
@@ -851,20 +854,20 @@
                                     <td>
                                          {#if noofhours > 0 & perhour> 0}
 
-                                        {noofhours * perhour}
+                                        <Money amount={noofhours * perhour} {projectId} />
 
-                                        {:else} <p>0</p>
+                                        {:else} <p><Money amount={0} {projectId} /></p>
                                         {/if}
                                     </td>
                                     <td>
                                         {#if noofhours2 > 0 & perhour2 > 0}
 
-                                        {noofhours2 * perhour2}
+                                        <Money amount={noofhours2 * perhour2} {projectId} />
 
                                         {:else if noofhours > 0 & perhour> 0} 
-                                        {noofhours * perhour}
+                                        <Money amount={noofhours * perhour} {projectId} />
 
-                                        {:else} <p>0</p>
+                                        {:else} <p><Money amount={0} {projectId} /></p>
                                         {/if}
                                     </td>
                               <tr>
@@ -897,7 +900,7 @@
                                     </td>
                                 </tr><tr style="display:none" id="vallueperhourC">
                                     <th>כמה שווה שעה? </th>
-                                    <td>{perhour}</td>
+                                    <td><Money amount={perhour} {projectId} /></td>
                                     <td>
                                          <div dir="rtl" class='textinput'>
   <input type="number"  id="vallueperhour" name="vallueperhour" placeholder="0"
@@ -914,20 +917,20 @@
                                     <td>
                                          {#if noofhours > 0 & perhour> 0}
 
-                                        {noofhours * perhour}
+                                        <Money amount={noofhours * perhour} {projectId} />
 
-                                        {:else} <p>0</p>
+                                        {:else} <p><Money amount={0} {projectId} /></p>
                                         {/if}
                                     </td>
                                     <td>
                                         {#if noofhours2 > 0 & perhour2 > 0}
 
-                                        {noofhours2 * perhour2}
+                                        <Money amount={noofhours2 * perhour2} {projectId} />
 
                                         {:else if noofhours > 0 & perhour> 0} 
-                                        {noofhours * perhour}
+                                        <Money amount={noofhours * perhour} {projectId} />
 
-                                        {:else} <p>0</p>
+                                        {:else} <p><Money amount={0} {projectId} /></p>
                                         {/if}
                                     </td>
                                 </tr>

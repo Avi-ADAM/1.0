@@ -1,7 +1,7 @@
 <script lang="ts">
   import { nameOf } from '$lib/translation/memberName';
   import { lang } from '$lib/stores/lang.js';
-  import { t, isRtl} from '$lib/translations';
+  import { t, isRtl } from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import { userStore } from '$lib/stores/levStores';
   import RichText from '$lib/celim/ui/richText.svelte';
@@ -10,9 +10,11 @@
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
   import SheirutHalukaCard from './SheirutHalukaCard.svelte';
   import { idd } from '$lib/stores/idd.js';
+  import Money from '$lib/components/money/Money.svelte';
 
   let {
     buble,
+    projectId = buble?.projectId,
     isFirst = false,
     glowColor = 'green',
     onProj,
@@ -72,8 +74,6 @@
     }
   }
 
-
-
   let isProcessing = $state(false);
   let isTogglingReceiver = $state(false);
 
@@ -115,7 +115,9 @@
         );
       }
       toast.success(
-        action === 'add' ? $t('lev.cards.saleCard.addMeReceiver') : $t('lev.cards.saleCard.removeMeReceiver')
+        action === 'add'
+          ? $t('lev.cards.saleCard.addMeReceiver')
+          : $t('lev.cards.saleCard.removeMeReceiver')
       );
     } catch (err) {
       console.error(err);
@@ -151,7 +153,11 @@
       buble.alreadyVoted = true;
       buble.weFinnish = [
         ...(buble.weFinnish || []),
-        { what: true, order: 0, users_permissions_user: { data: { id: String($idd) } } }
+        {
+          what: true,
+          order: 0,
+          users_permissions_user: { data: { id: String($idd) } }
+        }
       ];
       toast.success($t('lev.cards.saleCard.deliveryConfirmed'));
     } catch (err) {
@@ -192,9 +198,16 @@
     }
   }
 
-  const voterId = (v: any) => String(v?.users_permissions_user?.data?.id ?? v?.users_permissions_user ?? '');
+  const voterId = (v: any) =>
+    String(
+      v?.users_permissions_user?.data?.id ?? v?.users_permissions_user ?? ''
+    );
   const uniqueById = (list: any[]) =>
-    list.filter((m, i) => m?.id != null && list.findIndex((x) => String(x?.id) === String(m.id)) === i);
+    list.filter(
+      (m, i) =>
+        m?.id != null &&
+        list.findIndex((x) => String(x?.id) === String(m.id)) === i
+    );
 
   // Members list: project members (flat→Strapi format) + customer
   const weFinnishMembers = $derived.by(() => {
@@ -219,7 +232,10 @@
   // twice for the same person (QA C-22: the customer showed up two times).
   const weFinnishVotes = $derived.by(() => {
     const votes = [...(buble.weFinnish || [])];
-    if (buble.iGotIt && !votes.some((v: any) => voterId(v) === String(buble.customerId))) {
+    if (
+      buble.iGotIt &&
+      !votes.some((v: any) => voterId(v) === String(buble.customerId))
+    ) {
       votes.push({
         id: 'customer-iGotIt',
         what: true,
@@ -241,7 +257,10 @@
       });
     }
     if (buble.iTransferMoney) {
-      items.push({ label: $t('lev.cards.saleCard.customerPaid'), color: 'blue' });
+      items.push({
+        label: $t('lev.cards.saleCard.customerPaid'),
+        color: 'blue'
+      });
     }
     if (buble.moneyTransfered) {
       items.push({
@@ -412,7 +431,10 @@
             class="w-5 h-5"
           />
           <span class="font-bold text-gray-800 dark:text-gray-100"
-            >{buble.price}</span
+            ><Money
+              amount={buble.price}
+              projectId={projectId ?? buble.projectId}
+            /></span
           >
         </div>
       </div>
@@ -436,7 +458,12 @@
             alt="money"
             class="w-6 h-6"
           />
-          <span class="text-xl font-black text-green-600">{buble.total}</span>
+          <span class="text-xl font-black text-green-600"
+            ><Money
+              amount={buble.total}
+              projectId={projectId ?? buble.projectId}
+            /></span
+          >
         </div>
       </div>
     </div>
@@ -453,7 +480,9 @@
             class="w-5 h-5"
           />
           <div class="flex items-center gap-1">
-            <span class="font-semibold">{$t('lev.cards.saleCard.startDate')}</span>
+            <span class="font-semibold"
+              >{$t('lev.cards.saleCard.startDate')}</span
+            >
             <span>{new Date(buble.startDate).toLocaleDateString($lang)}</span>
           </div>
         </div>
@@ -465,7 +494,9 @@
               class="w-5 h-5"
             />
             <div class="flex items-center gap-1">
-              <span class="font-semibold">{$t('lev.cards.saleCard.endDate')}</span>
+              <span class="font-semibold"
+                >{$t('lev.cards.saleCard.endDate')}</span
+              >
               <span
                 >{new Date(buble.finnishDate).toLocaleDateString($lang)}</span
               >
@@ -507,7 +538,9 @@
             onclick={handleToggleReceiver}
             disabled={isTogglingReceiver}
           >
-            {isTogglingReceiver ? $t('lev.cards.saleCard.processing') : $t('lev.cards.saleCard.addMeReceiver')}
+            {isTogglingReceiver
+              ? $t('lev.cards.saleCard.processing')
+              : $t('lev.cards.saleCard.addMeReceiver')}
           </button>
         </div>
       {:else}
@@ -547,7 +580,9 @@
               onclick={handleToggleReceiver}
               disabled={isTogglingReceiver}
             >
-              {isTogglingReceiver ? $t('lev.cards.saleCard.processing') : $t('lev.cards.saleCard.removeMeReceiver')}
+              {isTogglingReceiver
+                ? $t('lev.cards.saleCard.processing')
+                : $t('lev.cards.saleCard.removeMeReceiver')}
             </button>
           {:else}
             <button
@@ -555,7 +590,9 @@
               onclick={handleToggleReceiver}
               disabled={isTogglingReceiver}
             >
-              {isTogglingReceiver ? $t('lev.cards.saleCard.processing') : $t('lev.cards.saleCard.addMeReceiver')}
+              {isTogglingReceiver
+                ? $t('lev.cards.saleCard.processing')
+                : $t('lev.cards.saleCard.addMeReceiver')}
             </button>
           {/if}
         </div>

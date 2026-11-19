@@ -1,4 +1,4 @@
-﻿<script>
+<script>
   import Money from '$lib/components/money/Money.svelte';
   import { lang } from '$lib/stores/lang.js';
   import { t, isRtl } from '$lib/translations';
@@ -289,18 +289,16 @@
                 ? 'text-barbi'
                 : 'text-yellow-700 dark:text-yellow-400'}
             >
-              {(myRound.easy ?? easy)?.toLocaleString?.() ??
-                myRound.easy ??
-                easy}
+              <Money amount={myRound.easy ?? easy} {projectId} />
               {$t('lev.cards.sugestma.askedVal')}
               {#if myRound.price != null}
-                · {myRound.price?.toLocaleString?.() ?? myRound.price}
+                · <Money amount={myRound.price} {projectId} />
                 {$t('lev.cards.sugestma.acceptedVal')}
               {/if}
             </span>
             {#if easyChanged || priceChanged}
               <span class="text-xs text-gray-500 dark:text-gray-400">
-                ({$t('nego.rikmaReq')}: {easy}{price ? ` · ${price}` : ''})
+                ({$t('nego.rikmaReq')}: <Money amount={easy} {projectId} />{#if price} · <Money amount={price} {projectId} />{/if})
               </span>
             {/if}
           </div>
@@ -415,7 +413,7 @@
           onmouseleave={() => hover('0')}
           class="font-bold text-barbi"
         >
-          {easy}
+          <Money amount={easy} {projectId} />
           {$t('lev.cards.sugestma.askedVal')}
         </span>
         <span class="text-gray-400 font-light">/</span>
@@ -425,7 +423,7 @@
           onmouseleave={() => hover('0')}
           class="font-bold"
         >
-          {myp}
+          <Money amount={myp} {projectId} />
           {$t('lev.cards.sugestma.myval')}
         </span>
       </div>
@@ -436,7 +434,7 @@
           onmouseleave={() => hover('0')}
           class="text-lg font-bold text-gray-900 dark:text-gray-100"
         >
-          {price}
+          <Money amount={price} {projectId} />
           <span class="text-sm font-normal text-gray-500 dark:text-gray-400"
             >{$t('lev.cards.sugestma.acceptedVal')}</span
           >
@@ -448,7 +446,7 @@
             onmouseleave={() => hover('0')}
             class="font-semibold text-gray-700 dark:text-gray-300"
           >
-            {total}
+            <Money amount={total} {projectId} />
           </p>
         {/if}
         <span class="text-emerald-700 dark:text-emerald-400 font-bold text-sm ms-1">

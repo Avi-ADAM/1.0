@@ -117,7 +117,7 @@
     {#if due}
       <div class="flex items-baseline justify-between gap-2 mb-2 text-xs text-indigo-900 dark:text-indigo-100">
         <span>{$t('deals.due.payNow')}</span>
-        <span class="font-black"><Money amount={due.remaining} /></span>
+        <span class="font-black"><Money amount={due.remaining} projectId={buble.projectId} /></span>
       </div>
     {/if}
     <div
@@ -170,7 +170,7 @@
       >
         <p class="text-gray-800 dark:text-gray-100">
           {$t('lev.cards.customerSale.confirmTo', { name: $nameOf(pendingReceiver) || '' })}
-          {#if due}<span class="font-black"><Money amount={due.remaining} /></span>{/if}
+          {#if due}<span class="font-black"><Money amount={due.remaining} projectId={buble.projectId} /></span>{/if}
         </p>
         <p class="text-gray-500 dark:text-gray-400">{$t('lev.cards.customerSale.confirmHint')}</p>
         <div class="flex gap-2">

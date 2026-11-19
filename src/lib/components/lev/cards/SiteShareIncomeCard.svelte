@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   import { nameOf } from '$lib/translation/memberName';
   /**
    * SiteShareIncomeCard — the platform-rikma RECEIVING side of a site-share
@@ -22,6 +22,7 @@
   import { isMobileOrTablet } from '$lib/utilities/device';
   import CardHeader from './CardHeader.svelte';
   import SheirutHalukaCard from './SheirutHalukaCard.svelte';
+  import Money from '$lib/components/money/Money.svelte';
 
   let { buble, isFirst = false, onProj } = $props();
 
@@ -146,7 +147,7 @@
           class="w-6 h-6"
         />
         <span class="text-xl font-black text-amber-700 dark:text-amber-300"
-          >{buble.total || buble.price}</span
+          ><Money amount={buble.total || buble.price} projectId={buble.projectId} /></span
         >
       </div>
     </div>

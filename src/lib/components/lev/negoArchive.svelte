@@ -16,6 +16,10 @@
   import { executeAction } from '$lib/client/actionClient';
   import { toast } from 'svelte-sonner';
   import { counterDefaults } from '$lib/archive/decisionView.js';
+  import {
+    useFormatMoney,
+    useProjectCurrency
+  } from '$lib/money/context.svelte';
 
   /**
    * @typedef {Object} Props
@@ -27,11 +31,18 @@
    */
 
   /** @type {Props} */
-  let { open = $bindable(false), archive, projectId, onClose, onSent } = $props();
+  let {
+    open = $bindable(false),
+    archive,
+    projectId,
+    onClose,
+    onSent
+  } = $props();
 
   const hasHours = $derived(Number(archive?.accruedHours ?? 0) > 0);
   const isInProgress = $derived(
-    archive?.targetKind === 'missionInProgress' || archive?.targetKind === 'resourceInProgress'
+    archive?.targetKind === 'missionInProgress' ||
+      archive?.targetKind === 'resourceInProgress'
   );
 
   let mode = $state('keep');
@@ -48,8 +59,10 @@
     mode = 'keep';
     values = { ...counterDefaults(archive) };
     why = '';
-    hoursOutcome = archive.standing?.hoursOutcome ?? (hasHours ? 'credit' : 'waive');
-    hoursToCredit = archive.standing?.hoursToCredit ?? archive.accruedHours ?? 0;
+    hoursOutcome =
+      archive.standing?.hoursOutcome ?? (hasHours ? 'credit' : 'waive');
+    hoursToCredit =
+      archive.standing?.hoursToCredit ?? archive.accruedHours ?? 0;
   });
 
   // The baseline each field opens on: the standing round where it has an
@@ -57,12 +70,16 @@
   // standing round alone left every hint empty on an archive proposal — those
   // rounds carry settlement terms, not object values.
   const previous = $derived(archive ? counterDefaults(archive) : {});
+  const fmt = useFormatMoney();
+  const projectCur = useProjectCurrency();
+  const cur = $derived(projectCur(projectId));
 
   /** "was: X" hint — only when the standing version actually had a value. */
   function was(field) {
     const v = previous?.[field];
     if (v == null || v === '') return '';
-    return $t('archive.nego.was', { value: String(v) });
+    const formatted = field === 'price' ? fmt(v, cur) : String(v);
+    return $t('archive.nego.was', { value: formatted });
   }
 
   function dateValue(v) {
@@ -90,11 +107,15 @@
           sqadualedf: values.sqadualedf || undefined
         },
         // Only meaningful when the object is actually leaving.
-        hoursOutcome: mode === 'archive' && isInProgress ? hoursOutcome : undefined,
+        hoursOutcome:
+          mode === 'archive' && isInProgress ? hoursOutcome : undefined,
         hoursToCredit:
-          mode === 'archive' && hoursOutcome === 'credit' ? Number(hoursToCredit) : undefined
+          mode === 'archive' && hoursOutcome === 'credit'
+            ? Number(hoursToCredit)
+            : undefined
       });
-      if (res?.success === false) throw new Error(String(res?.error ?? 'failed'));
+      if (res?.success === false)
+        throw new Error(String(res?.error ?? 'failed'));
       toast.success($t('archive.toast.countered'));
       open = false;
       onSent?.();
@@ -113,7 +134,9 @@
     <Drawer.Content
       class="bg-white dark:bg-gray-800 flex flex-col rounded-t-2xl fixed bottom-0 left-0 right-0 max-h-[92vh] z-[61]"
     >
-      <div class="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-gray-300 dark:bg-gray-600 my-3"></div>
+      <div
+        class="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-gray-300 dark:bg-gray-600 my-3"
+      ></div>
 
       <div class="overflow-y-auto px-5 pb-6 space-y-5">
         <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100">
@@ -122,7 +145,9 @@
 
         <!-- The mode switch: this is the move that replaces "no". -->
         <fieldset class="space-y-2">
-          <legend class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+          <legend
+            class="text-sm font-semibold text-gray-700 dark:text-gray-300"
+          >
             {$t('archive.nego.modeQuestion')}
           </legend>
           <div class="grid grid-cols-2 gap-2">
@@ -130,7 +155,8 @@
               type="button"
               onclick={() => (mode = 'keep')}
               aria-pressed={mode === 'keep'}
-              class="rounded-xl border-2 p-3 text-sm text-start transition {mode === 'keep'
+              class="rounded-xl border-2 p-3 text-sm text-start transition {mode ===
+              'keep'
                 ? 'border-wow bg-wow/10 font-semibold'
                 : 'border-gray-200 dark:border-gray-700'}"
             >
@@ -140,7 +166,8 @@
               type="button"
               onclick={() => (mode = 'archive')}
               aria-pressed={mode === 'archive'}
-              class="rounded-xl border-2 p-3 text-sm text-start transition {mode === 'archive'
+              class="rounded-xl border-2 p-3 text-sm text-start transition {mode ===
+              'archive'
                 ? 'border-barbi bg-barbi/10 font-semibold'
                 : 'border-gray-200 dark:border-gray-700'}"
             >
@@ -152,17 +179,23 @@
         {#if mode === 'keep'}
           <div class="space-y-3">
             <label class="block">
-              <span class="text-sm text-gray-600 dark:text-gray-400">{$t('archive.nego.name')}</span>
+              <span class="text-sm text-gray-600 dark:text-gray-400"
+                >{$t('archive.nego.name')}</span
+              >
               <input
                 type="text"
                 bind:value={values.name}
                 class="mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-900 p-2"
               />
-              {#if was('name')}<span class="text-xs text-gray-400">{was('name')}</span>{/if}
+              {#if was('name')}<span class="text-xs text-gray-400"
+                  >{was('name')}</span
+                >{/if}
             </label>
 
             <label class="block">
-              <span class="text-sm text-gray-600 dark:text-gray-400">{$t('archive.nego.descrip')}</span>
+              <span class="text-sm text-gray-600 dark:text-gray-400"
+                >{$t('archive.nego.descrip')}</span
+              >
               <textarea
                 rows="2"
                 bind:value={values.descrip}
@@ -172,7 +205,9 @@
 
             <div class="grid grid-cols-2 gap-3">
               <label class="block">
-                <span class="text-sm text-gray-600 dark:text-gray-400">{$t('archive.nego.hm')}</span>
+                <span class="text-sm text-gray-600 dark:text-gray-400"
+                  >{$t('archive.nego.hm')}</span
+                >
                 <input
                   type="number"
                   min="0"
@@ -180,36 +215,48 @@
                   bind:value={values.hm}
                   class="mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-900 p-2"
                 />
-                {#if was('hm')}<span class="text-xs text-gray-400">{was('hm')}</span>{/if}
+                {#if was('hm')}<span class="text-xs text-gray-400"
+                    >{was('hm')}</span
+                  >{/if}
               </label>
               <label class="block">
-                <span class="text-sm text-gray-600 dark:text-gray-400">{$t('archive.nego.price')}</span>
+                <span class="text-sm text-gray-600 dark:text-gray-400"
+                  >{$t('archive.nego.price')}</span
+                >
                 <input
                   type="number"
                   min="0"
                   bind:value={values.price}
                   class="mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-900 p-2"
                 />
-                {#if was('price')}<span class="text-xs text-gray-400">{was('price')}</span>{/if}
+                {#if was('price')}<span class="text-xs text-gray-400"
+                    >{was('price')}</span
+                  ><!-- fmt(price) -->{/if}
               </label>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <label class="block">
-                <span class="text-sm text-gray-600 dark:text-gray-400">{$t('archive.nego.startDate')}</span>
+                <span class="text-sm text-gray-600 dark:text-gray-400"
+                  >{$t('archive.nego.startDate')}</span
+                >
                 <input
                   type="date"
                   value={dateValue(values.sqadualed)}
-                  onchange={(e) => (values.sqadualed = e.currentTarget.value || null)}
+                  onchange={(e) =>
+                    (values.sqadualed = e.currentTarget.value || null)}
                   class="mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-900 p-2"
                 />
               </label>
               <label class="block">
-                <span class="text-sm text-gray-600 dark:text-gray-400">{$t('archive.nego.endDate')}</span>
+                <span class="text-sm text-gray-600 dark:text-gray-400"
+                  >{$t('archive.nego.endDate')}</span
+                >
                 <input
                   type="date"
                   value={dateValue(values.sqadualedf)}
-                  onchange={(e) => (values.sqadualedf = e.currentTarget.value || null)}
+                  onchange={(e) =>
+                    (values.sqadualedf = e.currentTarget.value || null)}
                   class="mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-900 p-2"
                 />
               </label>
@@ -219,7 +266,9 @@
           <!-- Removing an object that carries someone's work is a settlement,
                so the terms of that settlement are the negotiable part. -->
           <fieldset class="space-y-2">
-            <legend class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+            <legend
+              class="text-sm font-semibold text-gray-700 dark:text-gray-300"
+            >
               {$t('archive.nego.hoursQuestion')}
             </legend>
             <p class="text-xs text-gray-500">
@@ -234,7 +283,9 @@
             {#if hoursOutcome === 'credit'}
               <label class="block">
                 <span class="text-sm text-gray-600 dark:text-gray-400">
-                  {$t('archive.hours.creditAmount', { count: archive.accruedHours })}
+                  {$t('archive.hours.creditAmount', {
+                    count: archive.accruedHours
+                  })}
                 </span>
                 <input
                   type="number"
@@ -250,7 +301,9 @@
         {/if}
 
         <label class="block">
-          <span class="text-sm text-gray-600 dark:text-gray-400">{$t('archive.nego.why')}</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400"
+            >{$t('archive.nego.why')}</span
+          >
           <textarea
             rows="2"
             bind:value={why}

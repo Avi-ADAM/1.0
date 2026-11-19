@@ -675,7 +675,7 @@
         onHover={hover}
         onShowall={showall}
         onShowonly={showonly}
-        {total}
+        total={total}
         {picLink}
         {ask}
         {wel}

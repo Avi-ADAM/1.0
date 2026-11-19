@@ -1,4 +1,4 @@
-﻿<script>
+<script>
   import { isRtl } from '$lib/translations';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Lev from '../../../celim/lev.svelte';
@@ -12,6 +12,7 @@
   import ComparisonDisplay from '../../ui/ComparisonDisplay.svelte';
   import NegotiationHistory from '../../ui/NegotiationHistory.svelte';
   import MissionBackfillSummary from '../../mission/MissionBackfillSummary.svelte';
+  import Money from '$lib/components/money/Money.svelte';
   /**
    * @typedef {Object} Props
    * @property {boolean} [low]
@@ -262,12 +263,12 @@
               <img style="width:1.5rem;" src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="" />
               <span class="{byCandidate ? 'text-barbi' : 'text-yellow-700 dark:text-yellow-400'}">
                 {(latestRound.noofhours ?? noofhours).toLocaleString()} {$trans('common.hours')}
-                × {(latestRound.perhour ?? perhour).toLocaleString()}
-                = {((latestRound.noofhours ?? noofhours) * (latestRound.perhour ?? perhour)).toLocaleString()}
+                × <Money amount={latestRound.perhour ?? perhour} {projectId} />
+                = <Money amount={(latestRound.noofhours ?? noofhours) * (latestRound.perhour ?? perhour)} {projectId} />
               </span>
               {#if latestRound?.noofhours !== noofhours || latestRound?.perhour !== perhour}
                 <span class="text-xs text-gray-500 dark:text-gray-400">
-                  ({$trans('nego.rikmaReq')}: {noofhours} × {perhour} = {noofhours * perhour})
+                  ({$trans('nego.rikmaReq')}: {noofhours} × <Money amount={perhour} {projectId} /> = <Money amount={noofhours * perhour} {projectId} />)
                 </span>
               {/if}
             </div>
@@ -320,8 +321,7 @@
             onmouseenter={() => hover($trans('common.valph'))}
             onmouseleave={() => hover('0')}
           >
-            {perhour}
-            {$trans('common.perhour')}
+            <Money amount={perhour} {projectId} /> {$trans('common.perhour')}
           </span>
           <span class="text-gray-600 dark:text-gray-400">*</span>
           <span
@@ -573,7 +573,7 @@
       {negopendmissions}
       {openmissionName}
       {noofhours}
-      {perhour}
+      perhour={perhour}
       {missionDetails}
       {hearotMeyuchadot}
       {acts}

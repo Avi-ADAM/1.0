@@ -636,9 +636,9 @@
   {recurring}
   {cycleSize}
   {backfill}
-  {easy}
-  {myp}
-  {price}
+  easy={easy}
+  myp={myp}
+  price={price}
   {hearotMeyuchadot}
   {spnot}
   {noofusersWaiting}

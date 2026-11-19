@@ -82,7 +82,7 @@
 | **C5** | `<MoneyInput>` + `normalizeEntry` ב-`createSale` (+API חיצוני), `createMission`, `createComplexMatanot`, `createResource` | ✅ |
 | **C6** | מטבע רקמה: `setRikmaCurrency` (עם נעילת D-C8), בחירה ביצירת רקמה, שורה בהגדרות | ✅ |
 | **C7** | מחרוזות i18n (26 מפתחות × 5 שפות) + הודעות שרת ⇒ סכום מעוצב | ✅ חלקי — ראה §6 |
-| **C8** | תצוגה: כל סכום שמוצג כמספר ערום ⇒ `<Money>` | ⏳ לא התחיל — §6.1 |
+| **C8** | תצוגה: כל סכום שמוצג כמספר ערום ⇒ `<Money>` | 🔶 מנה 1 (המוח) ✅ `67ef3d3c`; מנה 2 (הלב) כמעט גמורה — עדיין לא בקומיט, נשארו 4 פריטים; מנה 3 לא התחילה — §6.1, [checklist](./currency-sweep-plan.md) |
 | **C9** | מקור מטבע: `<Money>` מחוץ ל-moach שנופל בשקט לשקל | ⏳ לא התחיל — §6.2 |
 | **C10** | תוויות `(₪)` / `₪ לשעה` בקבצי ה-JSON ⇒ סמל המטבע ליד השדה | ⏳ לא התחיל — §6.3 |
 | **C11** | הודעות שרת, מיילים, בוט טלגרם | ⏳ לא התחיל — §6.4 |
@@ -130,15 +130,21 @@ C4 כ"החלפת ~100 מופעי ₪" — זה נכון, אבל רוב המסכ�
 `total`, `myp`, `agprice`, `amount`, `in`, `totalBounti`) בלי `<Money>` /
 `fmt`. הריכוזים:
 
-- **קלפי הלב** (`src/lib/components/lev/` ו-`lev/cards/`) — `reqtojoin`,
+- **קלפי הלב** — 🔶 תוקנו ב-2026-11-19 (מנה 2, לא בקומיט), כולל `negoM`,
+  `negoPend` ו-`NegotiationHistory`. נשארו `WishOfferCard`, `pending`,
+  `MissionStipendOffer` ו-`BlueprintReview`. הרשימה המקורית: (`src/lib/components/lev/` ו-`lev/cards/`) — `reqtojoin`,
   `sugestmi`, `sugestma`, `mashsuggest`, `pandingMesima`, `pmas`, `pending`,
   `projectSuggestor`, `reqtom`, `rektom`, `pma`, `mesima`, `missionInProgress`,
   `didiget`, `newcoinui`, `weget`, `negoArchive`, `ProductRequestCoin`,
   `SaleCard`, `CustomerSaleCard`, `SheirutHalukaCard`, `SiteShareIncomeCard`,
   `haluka`. 22 מתוך ~45 הקלפים לא מייבאים שום דבר מ-`$lib/money`.
-- **טבלאות המוח הישנות** (`src/lib/components/prPr/`) — `negoM`, `negoPend`,
-  `pendsM`, `openM`, `newOpn`, `mashmam`, `finisin`, `open/OpenMissionCard`,
-  `open/OpenResourceCard`, `missionForm/MissionSummary`, `ui/NegotiationHistory`.
+- **טבלאות המוח הישנות** (`src/lib/components/prPr/`) — ✅ תוקנו ב-2026-11-19
+  (`67ef3d3c`): `pendsM`, `openM`, `newOpn`, `mashmam`, `finisin`,
+  `process/lifecycle/*`, `assistant/RikmaPreview`, עמודי מכירה/חלוקה/מבצעים במוח.
+  **נשארו**, כי מתברר שהן מוצגות גם מחוץ למוח וצריכות prop של מטבע: `negoM`,
+  `negoPend`, `ui/NegotiationHistory` (מנה 2), `open/OpenMissionCard`,
+  `open/OpenResourceCard` (מנה 3). נדחה: `missionForm/MissionSummary`, שמקבל
+  מחרוזת שכבר מעוצבת במטבע הנכון.
 - **מסכים ציבוריים** — `availableMission`, `availiableResorce` (+`[id]`),
   `gift` (+`[id]`), `maagad/[id]`, `user/[id]`, `rikmaPublic/RikmaPage`,
   `offerings/UserStorefront`, `MyProductsSection`, `MyResourcesEditor`,
