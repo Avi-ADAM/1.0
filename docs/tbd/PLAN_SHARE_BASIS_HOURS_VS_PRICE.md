@@ -448,4 +448,4 @@ p         = userTotal / net
 - `src/lib/stipend/computeStipendEquity.ts`, `docs/done/PLAN_STIPEND.md`
 - `src/lib/server/actions/configs/createTosplit.ts`, `voteOnMaap.ts` (`Rikmash.total`)
 - `src/lib/server/actions/configs/createSheirutFromPending.ts`, `materializeWish.ts`, `src/lib/server/wish/volunteerProposal.ts`
-- `src/lib/server/archive/apply.ts`, `docs/done/PLAN_MULTI_CURRENCY.md`, `docs/done/PLAN_MISSION_EQUITY_PREVIEW.md`
+- `src/lib/server/archive/apply.ts`, `docs/inprogress/PLAN_MULTI_CURRENCY.md`, `docs/done/PLAN_MISSION_EQUITY_PREVIEW.md`

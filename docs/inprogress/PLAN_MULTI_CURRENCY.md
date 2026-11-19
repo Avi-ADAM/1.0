@@ -81,7 +81,12 @@
 | **C4** | `<Money>` + `CurrencySymbol` + החלפת ~100 מופעי `₪` בתצוגה; מפת מטבע-לרקמה ב-lev/hub | ✅ |
 | **C5** | `<MoneyInput>` + `normalizeEntry` ב-`createSale` (+API חיצוני), `createMission`, `createComplexMatanot`, `createResource` | ✅ |
 | **C6** | מטבע רקמה: `setRikmaCurrency` (עם נעילת D-C8), בחירה ביצירת רקמה, שורה בהגדרות | ✅ |
-| **C7** | מחרוזות i18n (26 מפתחות × 5 שפות) + הודעות שרת ⇒ סכום מעוצב | ✅ חלקי — ראה §7 |
+| **C7** | מחרוזות i18n (26 מפתחות × 5 שפות) + הודעות שרת ⇒ סכום מעוצב | ✅ חלקי — ראה §6 |
+| **C8** | תצוגה: כל סכום שמוצג כמספר ערום ⇒ `<Money>` | ⏳ לא התחיל — §6.1 |
+| **C9** | מקור מטבע: `<Money>` מחוץ ל-moach שנופל בשקט לשקל | ⏳ לא התחיל — §6.2 |
+| **C10** | תוויות `(₪)` / `₪ לשעה` בקבצי ה-JSON ⇒ סמל המטבע ליד השדה | ⏳ לא התחיל — §6.3 |
+| **C11** | הודעות שרת, מיילים, בוט טלגרם | ⏳ לא התחיל — §6.4 |
+| **C12** | קלט במטבע אחר גם במשא-ומתן ובשאר הטפסים (`<MoneyInput>` + `normalizeEntry`) | ⏳ לא התחיל — §6.5, **לא לסוכן זול** |
 
 ## 5.1 סדר פריסה — **קודם Strapi**
 
@@ -109,22 +114,89 @@
 - **טסטים:** 23 (ספרייה טהורה) + 11 (שערים) + 7 (נרמול כתיבה) + 10 (`<Money>`)
   + 3 (API מכירות) — כולם עוברים; אין כשל חדש בסוויטה המלאה.
 
-## 6. מה נשאר (C8)
+## 6. מה נשאר — מצב בשטח (נבדק מול הקוד 2026-11-19)
 
-הדברים האלה עדיין מציגים ₪ קשיח. אף אחד מהם לא שובר חישוב — הם טקסט —
-וכולם נכונים כל עוד הרקמה סופרת בשקלים:
+התשתית (C0–C6) בנויה ועובדת, אבל **היא נכנסה רק לחלק מהמסכים**. §5 סימן את
+C4 כ"החלפת ~100 מופעי ₪" — זה נכון, אבל רוב המסכים לא הציגו ₪ מלכתחילה: הם
+מציגים `{perhour}` / `{price}` / `{total}` כמספר ערום, ולכן הסריקה של ₪ לא
+ראתה אותם. אף פריט כאן לא שובר חישוב — `amount` תמיד במטבע הרקמה — אבל ברקמה
+שסופרת בדולרים המסכים האלה מראים מספר בלי מטבע, או שקל במקום דולר.
 
-- **מיילים** (`src/lib/components/mail/HalukaApproved.svelte`,
-  `monthlyRecurringSale.svelte`, `monthlyResourceActive.svelte`) — צריכים
-  לקבל את מטבע הרקמה כ-prop מהשולח.
-- **הודעות שרת שנותרו**: `proposeStipendProgram.ts`,
-  `publishStipendFundingRequest.ts` (העוזר `nis()`), `requestDonation.ts`.
-  הדפוס מוכן — `rikmaMoneyText(projectId, jwt, fetch)`.
-- **בוט הטלגרם** (`/api/newTelegram`) — שאלת המחיר אומרת "(₪)".
-- **טקסטי הדגמה** (`/routes/quorum/copy.js`, `/api/chat`, דפי הקונסיירז'
-  לדוגמה) — תוכן דמה, לא נתונים.
-- **`<Money>` בלי מקור מטבע**: `WishOfferCard` (הצעת משאלה שאינה שייכת
-  לרקמה) ומסכים ציבוריים מסוימים נשענים על ברירת המחדל ILS.
+ההנחיות לביצוע, עם רשימות הקבצים: [CURRENCY_SWEEP_BRIEF.md](./CURRENCY_SWEEP_BRIEF.md).
+
+### 6.1 C8 — מספר ערום במקום `<Money>`
+
+סריקה של ה-markup מצאה כ-60 קומפוננטות שמציגות שדה כסף (`perhour`, `price`,
+`total`, `myp`, `agprice`, `amount`, `in`, `totalBounti`) בלי `<Money>` /
+`fmt`. הריכוזים:
+
+- **קלפי הלב** (`src/lib/components/lev/` ו-`lev/cards/`) — `reqtojoin`,
+  `sugestmi`, `sugestma`, `mashsuggest`, `pandingMesima`, `pmas`, `pending`,
+  `projectSuggestor`, `reqtom`, `rektom`, `pma`, `mesima`, `missionInProgress`,
+  `didiget`, `newcoinui`, `weget`, `negoArchive`, `ProductRequestCoin`,
+  `SaleCard`, `CustomerSaleCard`, `SheirutHalukaCard`, `SiteShareIncomeCard`,
+  `haluka`. 22 מתוך ~45 הקלפים לא מייבאים שום דבר מ-`$lib/money`.
+- **טבלאות המוח הישנות** (`src/lib/components/prPr/`) — `negoM`, `negoPend`,
+  `pendsM`, `openM`, `newOpn`, `mashmam`, `finisin`, `open/OpenMissionCard`,
+  `open/OpenResourceCard`, `missionForm/MissionSummary`, `ui/NegotiationHistory`.
+- **מסכים ציבוריים** — `availableMission`, `availiableResorce` (+`[id]`),
+  `gift` (+`[id]`), `maagad/[id]`, `user/[id]`, `rikmaPublic/RikmaPage`,
+  `offerings/UserStorefront`, `MyProductsSection`, `MyResourcesEditor`,
+  `main/ProductPeek`.
+- **שונות במוח** — `sales/[saleId]`, `splits/[splitId]`, `sales/manage/promotions`,
+  `process/lifecycle/SaleLifecycle`, `ProcessLifecycle`, `products/ProductChangesPanel`,
+  `assistant/RikmaPreview`, `deals/sales-center` (`pages.salesCenter.shekel`).
+
+### 6.2 C9 — `<Money>` בלי מקור מטבע
+
+`provideRikmaCurrency` קיים רק ב-moach layout ובדף התמיכה; `provideProjectCurrencies`
+רק בלב וב-hub. כל `<Money amount={x} />` בלי `currency` / `projectId` מחוץ
+לשם נופל **בשקט** ל-ILS. נמצאו כ-50 קבצים כאלה. רובם תקינים כי הם רצים בתוך
+moach (`hamatanot`, `ProductForm`, `betaha`…), אבל אלה לא:
+
+- כל `src/routes/deals/**` ו-`src/lib/components/deals/*` — אין ספק הקשר.
+- `src/routes/(reg)/concierge/[id]` (11 מופעים) ו-`concierge/+page` (`fmtBudget` ⇒
+  `fmtMoney(+n)` בלי מטבע), `offer/[key]`, `project/[id]/join`.
+- קלפי לב שמשתמשים ב-`<Money>` בלי `projectId`: `CustomerPayment`, `CustomerSaleCard`,
+  `dowegeot`, `weget`, `sugestma`, `rektom`, `hachlata`, `pma`, `StipendDecisionCard`,
+  `WishOfferCard`, `decisionMaking`.
+
+### 6.3 C10 — הסימן בתוך הטקסט המתורגם
+
+מפתחות שה-₪ כתוב בתוכם, בעברית ובמקבילות בארבע השפות האחרות:
+`stipend.json` (rate, monthlyCap, totalCap, revenueTrigger, howMuchArrived),
+`pages.json` (mPerhour, rPrice, shekel), `consensus.json` (perHourUnit,
+perHourLabel), `concierge.json` (budgetLabel, fixedAmount, atCostAmount),
+`revenue.json` (amount, amountOpt), `project.json` (currency), `server.json`
+(stipend, stipendWithBudget). דוגמאות בתוך טקסט הסבר (`shop.zonesEmptyBody`,
+`consensus.initialNote`, `shopPage.p3`, `home.*`) נשארות — הן דוגמה, לא נתון.
+
+### 6.4 C11 — שרת, מיילים, טלגרם
+
+- **הודעות שרת**: `proposeStipendProgram.ts` (שורות 215–362), `publishStipendFundingRequest.ts`
+  (`nis()`), `requestDonation.ts`, `notifications/maturedNotices.ts` (550, 562).
+  הדפוס: `rikmaMoneyText(projectId, jwt, fetch)` מ-`$lib/server/money/notifyMoney`.
+- **מיילים**: `mail/HalukaApproved.svelte`, `monthlyRecurringSale.svelte`,
+  `monthlyResourceActive.svelte` — צריכים prop `currency` מהשולח.
+- **טלגרם**: `botTexts.js` (`salePricePrompt` × 5 שפות), `api/newTelegram/+server.js` (321, 326).
+- **תיאורי פרמטרים ל-AI** (`"₪ per month"` ב-`proposeStipendPledge`,
+  `publishStipendFundingRequest`) — להחליף ב-"in the rikma's currency".
+- **לא נוגעים**: הערות קוד, `quorum/copy.js`, `/api/chat`, `externalOffers.ts`
+  (מפענח סימנים, לא מציג), מחשבון דף הבית (מטבע הצופה, כבר דרך `money.format`).
+
+### 6.5 C12 — קלט במטבע אחר בכל מקום (לא לסוכן זול)
+
+`<MoneyInput>` לא בשימוש באף טופס. הבחירה במטבע קיימת רק בטופס משימה,
+יצירת משאב וטופס מוצר (`CurrencyPicker` ישיר), ו-`normalizeEntry` רק ב-4
+actions. שאר הטפסים — הצעות נגד (`submitNegoMission/Mash`, `counterOnAsk*`,
+`counterSaleClaim`), מכירה ידנית ב-`sale.svelte`, קצבאות, משאלות (`createRatson`),
+הצעות ליד, מבצעים, משלוח — כותבים במטבע הרקמה. **זה תקין** (null = מטבע הרקמה),
+בתנאי שה-UI אומר באיזה מטבע מקלידים — וזה בדיוק C8/C10. הרחבת הקלט למטבע אחר
+דורשת החלטה לכל זרם (גרסה חתומה במשא-ומתן חייבת להיות באותו מטבע לשני הצדדים)
+ולכן נשארת מחוץ לסוויפ.
+
+משאלה (`ratson`) לא שייכת לרקמה — המטבע שלה הוא של מי שפתחה אותה. צריך
+`ratson.entryCurrency` כמקור (השדה קיים), לא ILS.
 
 ## 7. קושיות פתוחות
 

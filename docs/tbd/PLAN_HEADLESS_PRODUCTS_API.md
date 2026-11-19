@@ -9,7 +9,7 @@
 > [PLAN_USER_OFFERINGS](../done/PLAN_USER_OFFERINGS.md) (מוצר של ספק יחיד),
 > [PLAN_RIKMA_SUBDOMAINS](../inprogress/PLAN_RIKMA_SUBDOMAINS.md) (הדף הציבורי והמראה),
 > [PLAN_UGC_TRANSLATION](../inprogress/PLAN_UGC_TRANSLATION.md) (תרגום תוכן משתמשים),
-> [PLAN_MULTI_CURRENCY](../done/PLAN_MULTI_CURRENCY.md), ו-[PLAN_MONEY_RAILS](./PLAN_MONEY_RAILS.md).
+> [PLAN_MULTI_CURRENCY](../inprogress/PLAN_MULTI_CURRENCY.md), ו-[PLAN_MONEY_RAILS](./PLAN_MONEY_RAILS.md).
 >
 > **הבנצ'מרק:** Payload CMS v3 (השוואה בסעיף 3). הבנצ'מרק הוא כלי השוואה, לא
 > יעד חיקוי — סעיף 7 מפרט מה במכוון **לא** להעתיק.
@@ -1078,7 +1078,7 @@ SDK, ו-OAuth/MCP שמעגנים שני מודלים במקביל. כל שבוע
 | Webhooks | `src/lib/server/webhooks/{dispatch,targets,secret}.ts` |
 | הרשאות | `src/lib/server/authz/*`, `src/routes/api/permissions/+server.ts` |
 | תרגום | `src/lib/server/translation/*`, `docs/inprogress/PLAN_UGC_TRANSLATION.md` |
-| מטבע/מחירים | `src/routes/api/fx/+server.ts`, `src/lib/money/*`, `docs/done/PLAN_MULTI_CURRENCY.md` |
+| מטבע/מחירים | `src/routes/api/fx/+server.ts`, `src/lib/money/*`, `docs/inprogress/PLAN_MULTI_CURRENCY.md` |
 | מדיה | `src/routes/api/upload/+server.ts`, `src/lib/uploads/policy.js` |
 | MCP כתבנית תיעוד | `src/routes/mcp/*`, `src/lib/server/mcp/toolManifest.ts` |
 | **מכירה שמייצרת עבודה** | `src/lib/server/actions/configs/createSheirutFromPending.ts` (§4a — Mesimabetahalich + Act + Maap), `createSale.ts` (מלאי, monter, saleClaim) |
