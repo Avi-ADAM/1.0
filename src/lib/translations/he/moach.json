@@ -538,7 +538,9 @@
     "by": "ע״י",
     "start": "התחלה",
     "finish": "סיום",
-    "noEntity": "—"
+    "noEntity": "—",
+    "rateEras": "השעות נספרות ביותר משווי שעה אחד — שווי השעה שונה במהלך המשימה:",
+    "rateEraTotal": "סה״כ"
   },
   "saleLife": {
     "product": "מוצר",

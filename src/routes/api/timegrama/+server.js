@@ -200,7 +200,9 @@ async function x(id, kind, taid, fetch, scopes = []) {
     await finiapp(id, taid, fetch);
   } else if (kind == 'decision') {
     // saleClaim silence-as-consent maturation (PLAN_sale_holder_consent)
-    await Decision(id, taid, fetch);
+    // `scopes` is handed down so a matured hourly-value change can add the
+    // owner's timer to what gets published (flushRateChange.rateFlushScopes).
+    await Decision(id, taid, fetch, scopes);
   } else if (kind == 'mesimabetahalich') {
     // Dormancy clock (PLAN_OBJECT_ARCHIVAL): a mission nobody touched for
     // dormancyDays opens its own release proposal.

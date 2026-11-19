@@ -538,7 +538,9 @@
     "by": "por",
     "start": "Inicio",
     "finish": "Fin",
-    "noEntity": "—"
+    "noEntity": "—",
+    "rateEras": "Estas horas cuentan a más de un valor por hora: se cambió durante la misión:",
+    "rateEraTotal": "En total"
   },
   "saleLife": {
     "product": "Producto",

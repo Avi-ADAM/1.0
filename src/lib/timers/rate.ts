@@ -120,3 +120,49 @@ export function segmentHours(
   }
   return total;
 }
+
+/** One stretch of hours priced at a single hourly value, for display. */
+export interface RateEra {
+  rate: number;
+  hours: number;
+  /** hours × rate — what this era is worth. */
+  value: number;
+  /** Earliest start in the era (ms), so eras read in the order they happened. */
+  firstAt: number;
+}
+
+/**
+ * The rate a Timer's hours are priced at, for display: its own stamp, else the
+ * fallback (the mission's value — exactly how an unstamped timer is filed).
+ * null when neither is known, so a screen never invents a price.
+ */
+export function timerRate(attrs: { rate?: unknown } | null | undefined, fallback?: unknown): number | null {
+  return toNum(attrs?.rate) ?? toNum(fallback);
+}
+
+/**
+ * Group priced stretches of hours into rate eras, oldest first. A mission whose
+ * hourly value changed mid-way yields two (or more) eras; one that never did
+ * yields one — the caller shows the split only when there is more than one.
+ * Items with no known rate are left out rather than guessed.
+ */
+export function rateEras(
+  items: Array<{ rate: number | null | undefined; hours: number; at?: number | null }> | null | undefined,
+): RateEra[] {
+  const eras: RateEra[] = [];
+  for (const item of items ?? []) {
+    const rate = toNum(item?.rate);
+    if (rate == null) continue;
+    const hours = Number(item?.hours) || 0;
+    const at = Number.isFinite(Number(item?.at)) && item?.at != null ? Number(item.at) : Infinity;
+    const era = eras.find((e) => sameRate(e.rate, rate));
+    if (era) {
+      era.hours += hours;
+      era.value += hours * rate;
+      era.firstAt = Math.min(era.firstAt, at);
+    } else {
+      eras.push({ rate, hours, value: hours * rate, firstAt: at });
+    }
+  }
+  return eras.sort((a, b) => a.firstAt - b.firstAt);
+}

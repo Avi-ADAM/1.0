@@ -5935,6 +5935,9 @@ ${PROMO_DECISION_FIELDS}
                     }
                     missname
                     noofhours
+                    # the value these hours are filed at — stamped when they were
+                    # worked, so it can differ from the mission's value today
+                    perhour
                     why
                     what {
                       data {
@@ -5960,6 +5963,7 @@ ${PROMO_DECISION_FIELDS}
                           saveText
                           # every sitting behind the hours, so a voter sees when they were worked
                           timers { start stop }
+                          rate
                         }
                       }
                     }
@@ -10544,13 +10548,14 @@ export const moachQids = {
             open_missions { data { id } }
             users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
             finiapruvals { data { id attributes {
-              missname archived createdAt month noofhours why isTimerSave
+              missname archived createdAt month noofhours why isTimerSave perhour
+              timer { data { id attributes { rate } } }
               vots { id what why order zman users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } } }
               users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
               timegrama { data { id attributes { date done } } }
             } } }
             timers { data { id attributes {
-              start finnish totalHours isActive saved appruved saveText saveLinks
+              start finnish totalHours isActive saved appruved saveText saveLinks rate
               saveFiles { data { id attributes { url name mime size } } }
               timers { start stop }
               users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
@@ -10658,6 +10663,7 @@ export const moachQids = {
           appruved
           forApruve
           totalHours
+          rate
           saveText
           saveLinks
           saveFiles { data { id attributes { url name mime size } } }
@@ -12945,6 +12951,9 @@ export const qids = {
                     }
                     missname
                     noofhours
+                    # the value these hours are filed at — stamped when they were
+                    # worked, so it can differ from the mission's value today
+                    perhour
                     why
                     what {
                       data {
@@ -12970,6 +12979,7 @@ export const qids = {
                           saveText
                           # every sitting behind the hours, so a voter sees when they were worked
                           timers { start stop }
+                          rate
                         }
                       }
                     }

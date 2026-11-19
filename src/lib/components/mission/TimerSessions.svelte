@@ -20,6 +20,7 @@
   import { buildTimerSessions } from '$lib/timers/timerSessions.js';
   import { saveLinkLabel } from '$lib/timers/saveLinks.js';
   import { mediaUrl } from '$lib/utils/processLifecycle';
+  import Money from '$lib/components/money/Money.svelte';
 
   /**
    * @typedef {Object} Props
@@ -28,10 +29,19 @@
    * @property {string} [error] - message to show instead of the list.
    * @property {boolean} [showTitle]
    * @property {number} [initialDays] - days shown before "show all".
+   * @property {number|null} [perhour] - the mission's current hourly value, for
+   *   timers written before each Timer carried its own `rate` stamp.
    */
 
   /** @type {Props} */
-  let { timers = [], loading = false, error = '', showTitle = true, initialDays = 4 } = $props();
+  let {
+    timers = [],
+    loading = false,
+    error = '',
+    showTitle = true,
+    initialDays = 4,
+    perhour = null
+  } = $props();
 
   const FALLBACK_AVATAR =
     'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
@@ -52,7 +62,10 @@
     return open ? clock.seconds : Date.now();
   });
 
-  let log = $derived(buildTimerSessions(timers, nowMs));
+  // Each session carries the hourly value its hours count at. A mission whose
+  // value the rikma changed mid-way has two; then — and only then — every row
+  // says which one it belongs to (PLAN_OBJECT_ARCHIVAL, rate eras).
+  let log = $derived(buildTimerSessions(timers, nowMs, perhour == null ? null : Number(perhour)));
   let days = $derived(expanded ? log.days : log.days.slice(0, initialDays));
   let hiddenDays = $derived(Math.max(0, log.days.length - days.length));
 
@@ -143,6 +156,22 @@
   {:else}
     <p class="ts-note ts-note--soft">{$t('timers.sessionsHint')}</p>
 
+    {#if log.mixedRates}
+      <div class="ts-eras">
+        <p class="ts-eras-note">{$t('timers.sessionsRateChanged')}</p>
+        <ul class="ts-eras-list" aria-label={$t('timers.sessionsByRate')}>
+          {#each log.rateEras as era (era.rate)}
+            <li class="ts-era">
+              <strong>{span(era.hours)}</strong>
+              {$t('timers.sessionsAtRate')}
+              <Money amount={era.rate} /> {$t('common.perhour')}
+              <span class="ts-era-value">= <Money amount={era.value} /></span>
+            </li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
+
     <ol class="ts-days">
       {#each days as day (day.key)}
         <li class="ts-day">
@@ -176,6 +205,10 @@
                 </span>
 
                 <span class="ts-chip ts-chip--{session.state}">{stateLabel(session.state)}</span>
+
+                {#if log.mixedRates && session.rate != null}
+                  <span class="ts-rate"><Money amount={session.rate} /> {$t('common.perhour')}</span>
+                {/if}
 
                 {#if session.user}
                   <span class="ts-who">
@@ -296,6 +329,51 @@
   }
   .ts-count {
     margin-inline-start: 6px;
+  }
+
+  /* The hourly value changed mid-mission: what each era adds up to, and a tag
+     on every row naming the value its hours count at. */
+  .ts-eras {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--badge-gold-border, rgba(217, 119, 6, 0.35));
+    background: var(--badge-gold-bg, rgba(217, 119, 6, 0.12));
+  }
+  .ts-eras-note {
+    margin: 0;
+    font-size: 11px;
+    color: var(--ts-text-2);
+  }
+  .ts-eras-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    font-size: 12px;
+    color: var(--ts-text);
+  }
+  .ts-era strong {
+    font-variant-numeric: tabular-nums;
+  }
+  .ts-era-value {
+    color: var(--ts-text-3);
+  }
+  .ts-rate {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px 7px;
+    border-radius: 9999px;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+    background: var(--badge-gold-bg, rgba(217, 119, 6, 0.14));
+    color: var(--badge-gold-text, #fbbf24);
   }
 
   .ts-note {

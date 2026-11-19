@@ -141,5 +141,8 @@
     "assignedHoursLabel": "שעות שהוקצו:",
     "completedHoursLabel": "שעות שבוצעו כבר:",
     "close": "סגירה"
-  }
+  },
+  "sessionsByRate": "לפי שווי שעה",
+  "sessionsRateChanged": "שווי השעה של המשימה השתנה באמצע — כל שורה מציינת לפי איזה שווי נספרות השעות שלה.",
+  "sessionsAtRate": "שעות לפי"
 }

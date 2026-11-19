@@ -15,6 +15,7 @@
   import { isRtl, t } from '$lib/translations';
   import { lang as uiLang } from '$lib/stores/lang.js';
   import Money from '$lib/components/money/Money.svelte';
+  import { resolveRate } from '$lib/timers/rate.js';
 
   let {
     kind = 'mission', // 'mission' | 'resource'
@@ -32,6 +33,34 @@
   let betahalich = $derived(kind === 'mission' ? (chain?.mesimabetahalich ?? null) : null);
   let finiapruvals = $derived(kind === 'mission' ? (chain?.finiapruvals ?? []) : []);
   let finnished = $derived(kind === 'mission' ? (chain?.finnishedMission ?? null) : null);
+  // One row per rate era: a mission whose hourly value the rikma changed
+  // mid-way keeps its hours before the change at the old value on their own row.
+  let finnishedRows = $derived(
+    kind === 'mission'
+      ? (chain?.finnishedMissions?.length ? chain.finnishedMissions : finnished ? [finnished] : [])
+      : []
+  );
+  let rateRows = $derived(
+    finnishedRows.map((fm) => {
+      const a = fm?.attributes ?? {};
+      const hours = Number(a.noofhours) || 0;
+      const rate = a.perhour == null ? null : Number(a.perhour);
+      const total = a.total != null ? Number(a.total) : rate != null ? hours * rate : null;
+      return { id: fm.id, hours, rate, total };
+    })
+  );
+  let rateRowsHours = $derived(rateRows.reduce((sum, r) => sum + r.hours, 0));
+  let rateRowsValue = $derived(rateRows.reduce((sum, r) => sum + (r.total ?? 0), 0));
+
+  /** The hourly value an approval asks the rikma to sign, as it will be filed. */
+  function approvalRate(fAttrs) {
+    const rate = resolveRate(
+      fAttrs?.perhour,
+      fAttrs?.timer?.data?.attributes?.rate,
+      betahalich?.attributes?.perhour
+    );
+    return rate > 0 ? rate : null;
+  }
   let acts = $derived(kind === 'mission' ? (chain?.acts ?? []) : []);
   let asks = $derived(openMission?.attributes?.asks?.data ?? []);
 
@@ -270,6 +299,7 @@
           timers={attrs.timers?.data ?? []}
           hoursassinged={attrs.hoursassinged}
           counter={attrs.howmanyhoursalready}
+          perhour={attrs.perhour}
         />
 
         <!-- What this mission is worth as a share of the rikma. A mission in
@@ -310,7 +340,11 @@
                   <span class="pl-fact">{formatDate(fAttrs.month)}</span>
                 {/if}
                 {#if fAttrs.noofhours}
-                  <span class="pl-fact">{fAttrs.noofhours} {$t('moach.lifecycle.hours')}</span>
+                  {@const aRate = approvalRate(fAttrs)}
+                  <!-- Each approval is filed at the value its hours were worked
+                       at, so after a mid-mission change two approvals of the same
+                       mission can carry different values — say which. -->
+                  <span class="pl-fact">{fAttrs.noofhours} {$t('moach.lifecycle.hours')}{#if aRate != null} × <Money amount={aRate} /> {$t('moach.lifecycle.perhour')}{/if}</span>
                 {/if}
                 <span class="pl-badge {fAttrs.archived ? 'pl-badge--green' : 'pl-badge--gold'}">
                   {fAttrs.archived ? $t('moach.lifecycle.resolved') : $t('moach.lifecycle.pending')}
@@ -349,12 +383,28 @@
             {#if fAttrs.start}<span class="pl-fact">{$t('moach.lifecycle.start')}: {formatDate(fAttrs.start)}</span>{/if}
             {#if fAttrs.finish}<span class="pl-fact">{$t('moach.lifecycle.finish')}: {formatDate(fAttrs.finish)}</span>{/if}
             <!-- hours × rate = money. `total` is the money value, never hours. -->
-            {#if fHours != null}
+            {#if rateRows.length > 1}
+              <!-- More than one rate era: one line per hourly value, then the
+                   sum — never Σ hours × the latest value. -->
+              <div class="pl-eras">
+                <span class="pl-eras-note">{$t('moach.lifecycle.rateEras')}</span>
+                <ul class="pl-eras-list">
+                  {#each rateRows as row (row.id)}
+                    <li class="pl-fact">
+                      {formatNum(row.hours)} {$t('moach.lifecycle.hours')}{#if row.rate != null} × <Money amount={row.rate} /> {$t('moach.lifecycle.perhour')}{/if}{#if row.total != null} = <Money amount={row.total} />{/if}
+                    </li>
+                  {/each}
+                </ul>
+                <span class="pl-fact">
+                  {$t('moach.lifecycle.rateEraTotal')}: {formatNum(rateRowsHours)} {$t('moach.lifecycle.hours')} · <Money amount={rateRowsValue} />
+                </span>
+              </div>
+            {:else if fHours != null}
               <span class="pl-fact">
                 {formatNum(fHours)} {$t('moach.lifecycle.hours')}{#if fRate != null} × <Money amount={fRate} /> {$t('moach.lifecycle.perhour')}{/if}
               </span>
             {/if}
-            {#if fTotal != null}<span class="pl-fact">{$t('moach.lifecycle.total')}: <Money amount={fTotal} /></span>{/if}
+            {#if fTotal != null && rateRows.length <= 1}<span class="pl-fact">{$t('moach.lifecycle.total')}: <Money amount={fTotal} /></span>{/if}
           </div>
           {#if plainText(fAttrs.why || fAttrs.descrip)}
             <p class="pl-desc">{$t('moach.lifecycle.why')}: {plainText(fAttrs.why || fAttrs.descrip)}</p>
@@ -539,6 +589,25 @@
     line-height: 1.5;
     color: var(--pcv-text-2, #78716c);
     max-width: 46rem;
+  }
+
+  .pl-eras {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-basis: 100%;
+  }
+  .pl-eras-note {
+    font-size: 12px;
+    color: var(--pcv-text-2, #57534e);
+  }
+  .pl-eras-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
   }
 
   .pl-facts {

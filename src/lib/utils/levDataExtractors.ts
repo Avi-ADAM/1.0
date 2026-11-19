@@ -191,6 +191,9 @@ export function extractFiapp(userData: any): ApprovalData[] {
         // Additional fields
         missname: approval.attributes.missname || '',
         noofhours: approval.attributes.noofhours || 0,
+        // The value the hours were worked at (src/lib/timers/rate.ts): the
+        // approval's own stamp, else its timer's. Null on legacy rows.
+        perhour: approval.attributes.perhour ?? approval.attributes.timer?.data?.attributes?.rate ?? null,
         why: approval.attributes.why || '',
         what: approval.attributes.what || { data: [] },
         // A timer save files its links on the timer (Finiapruval has no column

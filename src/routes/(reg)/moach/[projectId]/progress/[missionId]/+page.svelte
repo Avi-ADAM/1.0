@@ -371,7 +371,12 @@
              stop the platform actually recorded. -->
         <section class="mp-card">
           <h2 class="mp-card-title">{$t('timers.sessionsTitle')}</h2>
-          <TimerSessions timers={timerEntities} error={timersError} showTitle={false} />
+          <TimerSessions
+            timers={timerEntities}
+            error={timersError}
+            showTitle={false}
+            perhour={attrs.perhour}
+          />
         </section>
 
         <section class="mp-card">

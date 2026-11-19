@@ -142,5 +142,8 @@
     "assignedHoursLabel": "Horas asignadas:",
     "completedHoursLabel": "Horas ya realizadas:",
     "close": "Cerrar"
-  }
+  },
+  "sessionsByRate": "Por valor por hora",
+  "sessionsRateChanged": "El valor por hora de esta misión cambió a mitad de camino: cada fila indica el valor al que cuentan sus horas.",
+  "sessionsAtRate": "horas a"
 }

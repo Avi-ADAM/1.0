@@ -538,7 +538,9 @@
     "by": "by",
     "start": "Start",
     "finish": "Finish",
-    "noEntity": "—"
+    "noEntity": "—",
+    "rateEras": "These hours count at more than one hourly value — it was changed during the mission:",
+    "rateEraTotal": "Altogether"
   },
   "saleLife": {
     "product": "Product",

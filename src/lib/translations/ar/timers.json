@@ -141,5 +141,8 @@
     "assignedHoursLabel": "الساعات المخصصة:",
     "completedHoursLabel": "الساعات المنجزة:",
     "close": "إغلاق"
-  }
+  },
+  "sessionsByRate": "حسب قيمة الساعة",
+  "sessionsRateChanged": "تغيّرت قيمة الساعة لهذه المهمة في منتصفها — كل سطر يبيّن القيمة التي تُحتسب بها ساعاته.",
+  "sessionsAtRate": "ساعات بسعر"
 }

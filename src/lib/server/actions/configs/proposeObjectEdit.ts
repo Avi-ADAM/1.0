@@ -23,6 +23,7 @@ import { loadMissionDeal, loadProductDeals, notifyDealClientsOfEdit, notifyDealC
 import { raisesPart } from '$lib/sheirut/dealEdit.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 import { objectScope } from '../../realtime/objectScope.js';
+import { rateFlushScopes } from '../../timers/flushRateChange.js';
 import { ActionError } from '../errors.js';
 import { noticeSubject } from '$lib/notices/links';
 import { parseVariantTerms, variantTermsLive, variantTermsSummary } from '$lib/server/archive/variantTerms.js';
@@ -285,6 +286,12 @@ export const proposeObjectEditConfig: ActionConfig = {
 
   realtime: {
     scopes: (p, r) =>
-      scopeList([scope('project', r?.data?.projectId), decisionScope('decision', r?.data?.decisionId), objectScope(p.targetKind, p.targetId)]),
+      scopeList([
+        scope('project', r?.data?.projectId),
+        decisionScope('decision', r?.data?.decisionId),
+        objectScope(p.targetKind, p.targetId),
+        // A new hourly value applied on the spot closed the owner's timer.
+        ...rateFlushScopes(r?.data?.rateFlush),
+      ]),
   },
 };

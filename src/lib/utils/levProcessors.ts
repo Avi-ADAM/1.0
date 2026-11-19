@@ -1,3 +1,4 @@
+import { resolveRate } from '$lib/timers/rate.js';
 import type {
   PendMissionData,
   InProgressMissionData,
@@ -678,7 +679,10 @@ export function processFiapp(
       missionDetails: mbData.descrip,
       nhours: approval.noofhours,
       mId: mbId,
-      perhour: mbData.perhour,
+      // What these hours are filed at — not the mission's value today: an
+      // approval opened when the rikma changed the hourly value carries the
+      // old one, and the vote must show the price it will actually book.
+      perhour: resolveRate(approval.perhour, mbData.perhour),
       missId: mbData.mission?.data?.id,
       openName: approval.missname,
       omid: approval.id,
