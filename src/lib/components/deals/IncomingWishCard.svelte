@@ -104,7 +104,7 @@
     <div class="meta-item">
       <div class="ml">{$t('deals.inviteBudget')}</div>
       <div class="mv gold">
-        {#if wish.totalBounti != null}<Money amount={wish.totalBounti} />{:else}{$t('deals.byOffer')}{/if}
+        {#if wish.totalBounti != null}<Money amount={wish.totalBounti} currency={wish.wishCurrency} />{:else}{$t('deals.byOffer')}{/if}
       </div>
     </div>
     <div class="meta-item">
@@ -120,6 +120,8 @@
 
 {#if showOffer}
   <AcceptWishOffer
+    currency={wish.proposalCurrency}
+    budgetCurrency={wish.wishCurrency}
     proposalId={wish.proposalId}
     ratsonId={wish.ratsonId}
     item={offerItem}

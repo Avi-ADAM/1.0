@@ -27,6 +27,7 @@ type RatsonCard = {
   startDate: string | null;
   finnishDate: string | null;
   totalBounti: number | null;
+  currency: string | null;
   createdAt: string | null;
   authorName?: string;
   authorAvatar?: string;
@@ -86,6 +87,7 @@ function mapRatsonCard(node: any): RatsonCard {
     categories: (a.categories?.data ?? []).map((c: any) => c.attributes?.name).filter(Boolean),
     startDate: a.startDate ?? null,
     finnishDate: a.finnishDate ?? null,
+    currency: a.entryCurrency ?? null,
     totalBounti: typeof a.totalbounti === 'number' ? a.totalbounti : null,
     createdAt: a.createdAt ?? null,
   };

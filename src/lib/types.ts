@@ -8,6 +8,7 @@ export type BomMissionMode      = 'createNew' | 'consumeExisting';
 export type BomResourceMode     = 'createNew' | 'consumeExisting' | 'reuseSp';
 
 export interface Deal {
+  currency?: string | null;
   id: string;
   product: string;
   project: string;

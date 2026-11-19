@@ -1,4 +1,7 @@
 <script>
+  import Money from '$lib/components/money/Money.svelte';
+  import { rikmaCurrency } from '$lib/money/resolve.js';
+  import { useFormatMoney } from '$lib/money/context.svelte';
   import { t, isRtl } from '$lib/translations';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
 
@@ -12,7 +15,8 @@
    * Props: { storefront: { products, resources, missionOffers }, userId }
    */
 
-  let { storefront = { products: [], resources: [], missionOffers: [] }, userId } = $props();
+  /** @type {{ storefront?: any; userId: string; userCurrency?: string | null }} */
+  let { storefront = { products: [], resources: [], missionOffers: [] }, userId, userCurrency = null } = $props();
 
   const hasAny = $derived(
     (storefront.products?.length ?? 0) +
@@ -21,9 +25,11 @@
       0
   );
 
+  const fmtMoney = useFormatMoney();
+
   function offerPrice(a) {
-    if (a.perhour > 0) return `${a.perhour} · ${$t('offerings.storefront.per_hour')}`;
-    if (a.price > 0) return `${a.price}`;
+    if (a.perhour > 0) return `${fmtMoney(a.perhour, userCurrency)} · ${$t('offerings.storefront.per_hour')}`;
+    if (a.price > 0) return `${fmtMoney(a.price, userCurrency)}`;
     return '';
   }
 </script>
@@ -64,7 +70,7 @@
                       {p.attributes.name}
                     </span>
                     <span class="block text-xs text-gray-500 dark:text-gray-400">
-                      <EntityIcon kind="money" size={13} /> {p.attributes.price}
+                      <EntityIcon kind="money" size={13} /> <Money amount={p.attributes.price} currency={p.attributes.projectcreates?.data?.[0] ? rikmaCurrency(p.attributes.projectcreates.data[0]) : userCurrency} />
                     </span>
                   </span>
                   <span class="shrink-0 text-xs font-bold text-barbi">{$t('offerings.storefront.order')} ←</span>
@@ -90,7 +96,7 @@
                       {r.attributes.name}
                     </span>
                     <span class="block text-xs text-gray-500 dark:text-gray-400">
-                      <EntityIcon kind="money" size={13} /> {r.attributes.price}
+                      <EntityIcon kind="money" size={13} /> <Money amount={r.attributes.price} currency={r.attributes.project?.data ? rikmaCurrency(r.attributes.project.data) : userCurrency} />
                     </span>
                   </span>
                   <span class="shrink-0 text-xs font-bold text-barbi">{$t('offerings.storefront.order')} ←</span>

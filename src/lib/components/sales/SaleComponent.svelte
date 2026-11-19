@@ -21,6 +21,7 @@
    * @property {number} availableQuantity - Available quantity of the product
    * @property {number} price - Price per unit
    * @property {'monthly' | 'yearly' | 'total' | 'unlimited'} kindOf - Type of sale
+   * @property {string | null} [currency]
    * @property {string} projectId - The ID of the project
    * @property {Array<{id: string, attributes: {username: string}}>} projectUsers - Users in the project
    * @property {number} [each] - Price per unit (bindable)
@@ -45,6 +46,7 @@
     price,
     kindOf = 'monthly',
     projectId,
+    currency,
     projectUsers = [],
     each = $bindable(price || 0),
     kindUlimit = false,
@@ -311,7 +313,7 @@
 
   <div class="rs-total">
     <span>{$t('sales.total')}{per ? ` ${kindOf === 'monthly' ? $t('sales.perMonth') : $t('sales.perYear')}` : ''}</span>
-    <strong><Money amount={total} /></strong>
+    <strong><Money amount={total} {currency} /></strong>
   </div>
 
   <fieldset class="rs-fs">
@@ -477,7 +479,7 @@
       {kindOf === 'monthly' ? $t('sales.perMonth') : $t('sales.perYear')}
     {/if}
   </small>
-  <p class="text-center text-barbi"><Money amount={total} /></p>
+  <p class="text-center text-barbi"><Money amount={total} {currency} /></p>
 
   {#if already == false}
     <div class="flex items-center justify-center">

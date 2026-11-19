@@ -77,13 +77,13 @@
                 {$t(l.kind === 'mission' ? 'directOffer.page.hours' : 'directOffer.page.qty', { count: l.amount })}
               {/if}
             </span>
-            <span class="of-line-price">{#if l.price != null}<Money amount={l.price} />{/if}</span>
+            <span class="of-line-price">{#if l.price != null}<Money amount={l.price} currency={offer.currency} />{/if}</span>
           </li>
         {/each}
       </ul>
       <p class="of-total">
         <span>{$t('directOffer.page.total')}</span>
-        <b><Money amount={offer.total} /></b>
+        <b><Money amount={offer.total} currency={offer.currency} /></b>
       </p>
     </section>
 

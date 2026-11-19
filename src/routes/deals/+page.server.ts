@@ -29,6 +29,7 @@ export const load: PageServerLoad = async ({ locals, fetch, depends }) => {
         customerReportedAt: at.customerReportedAt ?? null,
         sellerName: at.users_permissions_user?.data?.attributes?.username ?? '',
         productName: at.matanot?.data?.attributes?.name ?? '',
+        currency: at.project?.data?.attributes?.currencyCode ?? null,
         projectName: at.project?.data?.attributes?.projectName ?? '',
         expectedAmount: at.recurringSource?.data?.attributes?.in ?? null
       };

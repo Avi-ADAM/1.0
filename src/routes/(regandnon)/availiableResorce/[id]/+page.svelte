@@ -1,5 +1,6 @@
 <script>
-  import CurrencySymbol from '$lib/components/money/CurrencySymbol.svelte';
+  import { provideRikmaCurrency } from '$lib/money/context.svelte';
+  import { rikmaCurrency } from '$lib/money/resolve.js';
   import Money from '$lib/components/money/Money.svelte';
     import { toast } from 'svelte-sonner';
     import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
@@ -221,6 +222,7 @@
 
 
     let { askedarr = [], alr = $bindable(false), data } = $props();
+  provideRikmaCurrency(() => data.alld?.project?.data ? rikmaCurrency(data.alld.project.data) : data.alld?.ratson?.data?.attributes?.entryCurrency);
     console.log(data);
 
     let title = 'This is Svead a Svelte Head Component';
@@ -435,12 +437,12 @@
                                     <p style="line-height: 1;" class="text-sm text-gray-100 flex items-center lg:text-2xl m-5">
                                         <img class="w-6 lg:w-12" src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch" />
                                         <span>
-                                            <span>{data.alld.price}</span>
+                                            <span><Money amount={data.alld.price} /></span>
                                             {#if data.alld.price != data.alld.easy}
-                                                <span> ↔️ {data.alld.easy}</span>
+                                                <span> ↔️ <Money amount={data.alld.easy} /></span>
                                             {/if}
                                             {#if data.alld.recurring}
-                                                <span class="text-gold"> <CurrencySymbol /> {data.alld.kindOf == "yearly" ? $t('pages.availResource.perY') : $t('pages.availResource.perM')}</span>
+                                                <span class="text-gold"> {data.alld.kindOf == "yearly" ? $t('pages.availResource.perY') : $t('pages.availResource.perM')}</span>
                                             {/if}
                                         </span>
                                         {#if data.alld.kindOf != "total" && units > 1}
@@ -456,9 +458,9 @@
                                             </span>
                                         {/if}
                                         {#if data.alld.kindOf != "total" && !(data.alld.recurring && !data.alld.sqadualedf)}
-                                            <span>  =  {((Number(data.alld.price) || 0) * units * cycles).toLocaleString($lang)}
+                                            <span>  =  <Money amount={(Number(data.alld.price) || 0) * units * cycles} />
                                                 {#if data.alld.price != data.alld.easy}
-                                                    <span> ↔️ {((Number(data.alld.easy) || 0) * units * cycles).toLocaleString($lang)}</span>
+                                                    <span> ↔️ <Money amount={(Number(data.alld.easy) || 0) * units * cycles} /></span>
                                                 {/if}
                                                 {$t('pages.availResource.total')}
                                             </span>

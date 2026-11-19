@@ -1985,6 +1985,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
               id
               attributes {
                 projectName
+                currencyCode
                 user_1s { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
                 restime
                 timeToP
@@ -2020,6 +2021,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       data {
         attributes {
           projectName
+          currencyCode
           user_1s { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } } } }
           linkToWebsite
           restime
@@ -2059,7 +2061,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           name
           easy
           source
-          ratson { data { id attributes { name } } }
+          ratson { data { id attributes { name entryCurrency } } }
           declinedsps { data { id } }
           users { data { id } }
           mashaabim { data { id } }
@@ -2069,6 +2071,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
               attributes {
                 restime
                 projectName
+                currencyCode
                 user_1s { data { id } }
                 restime
                 timeToP
@@ -2087,11 +2090,11 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           sqadualed
           archived
           source
-          ratson { data { id attributes { name } } }
+          ratson { data { id attributes { name entryCurrency } } }
           acts { data { id attributes { shem des dateF dateS link } } }
           users { data { id } }
           mission { data { id } }
-          project { data { id attributes { projectName user_1s { data { id } } restime timeToP profilePic { data { attributes { url } } } } } }
+          project { data { id attributes { projectName currencyCode user_1s { data { id } } restime timeToP profilePic { data { attributes { url } } } } } }
           tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
           skills { data { attributes { skillName localizations { data { attributes { skillName } } } } } }
           descrip
@@ -2151,7 +2154,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           discordlink
           githublink
           bio
-          username nameLatin nameArabic nameCyrillic nameHebrew
+          currency username nameLatin nameArabic nameCyrillic nameHebrew
           finnished_missions { data { attributes { missionName } } }
           profilePic { data { attributes { url formats } } }
           projects_1s { data { id attributes { projectName } } }
@@ -3134,7 +3137,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
             data {
               id
               attributes {
-                projectName
+                projectName currencyCode
                 profilePic {
                   data {
                     attributes {
@@ -4285,6 +4288,7 @@ ${PROMO_DECISION_FIELDS}
             attributes {
               name
               desc
+              entryCurrency
               logo { data { attributes { url formats } } }
               extracted_missions { id name }
               extracted_resources { id name }
@@ -4295,6 +4299,8 @@ ${PROMO_DECISION_FIELDS}
                     kind
                     status_proposal
                     total_price
+                    entryCurrency
+                    project { data { attributes { currencyCode } } }
                     createdAt
                     proposer_users {
                       data {
@@ -7510,7 +7516,7 @@ ${PROMO_DECISION_FIELDS}
                   data {
                     id
                     attributes {
-                      projectName
+                      projectName currencyCode
                       profilePic { data { attributes { url formats } } }
                       user_1s {
                         data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
@@ -7560,7 +7566,7 @@ ${PROMO_DECISION_FIELDS}
                   }
                 }
                 project {
-                  data { id attributes { projectName profilePic { data { attributes { url } } } } }
+                  data { id attributes { projectName currencyCode profilePic { data { attributes { url } } } } }
                 }
               }
             }
@@ -7569,7 +7575,7 @@ ${PROMO_DECISION_FIELDS}
             data {
               id
               attributes {
-                projectName
+                projectName currencyCode
                 profilePic { data { attributes { url formats } } }
                 user_1s {
                   data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
@@ -7752,7 +7758,7 @@ ${PROMO_DECISION_FIELDS}
             data {
               id
               attributes {
-                projectName
+                projectName currencyCode
                 profilePic { data { attributes { url formats } } }
                 user_1s {
                   data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } }
@@ -8160,7 +8166,7 @@ ${PROMO_DECISION_FIELDS}
           fulfilled
           allowJoin
           bounti
-          totalbounti
+          totalbounti entryCurrency
           language
           age_group
           frequency
@@ -8228,13 +8234,13 @@ ${PROMO_DECISION_FIELDS}
           kind
           status_proposal
           match_score
-          total_price
+          total_price entryCurrency
           auto_generated
           createdAt
           proposer_users {
             data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } }
           }
-          project { data { id attributes { projectName } } }
+          project { data { id attributes { projectName currencyCode } } }
           matanot { data { id attributes { name } } }
           matbea { data { id attributes { name simbol code } } }
           forum { data { id } }
@@ -8276,7 +8282,7 @@ ${PROMO_DECISION_FIELDS}
           startDate
           finnishDate
           fulfilled
-          totalbounti
+          totalbounti entryCurrency
           access_mode
           status_ratson
           fulfillment_score
@@ -8569,7 +8575,7 @@ ${PROMO_DECISION_FIELDS}
           longDes
           startDate
           finnishDate
-          totalbounti
+          totalbounti entryCurrency
           lat
           lng
           sub_category
@@ -8605,12 +8611,12 @@ ${PROMO_DECISION_FIELDS}
         attributes {
           status_proposal
           kind
-          total_price
+          total_price entryCurrency
           createdAt
           forum { data { id } }
           open_mission { data { id } }
           matanot { data { id } }
-          project { data { id } }
+          project { data { id attributes { currencyCode } } }
           covered_missions { id extracted_mission_idx hours price }
           covered_resources { id extracted_resource_idx quantity price }
           # The signatures on the versions of this proposal — whose move it is
@@ -8638,7 +8644,7 @@ ${PROMO_DECISION_FIELDS}
                 startDate
                 finnishDate
                 bounti
-                totalbounti
+                totalbounti entryCurrency
                 terms_digest
                 chat_forum { data { id } }
                 users_permissions_users {
@@ -9888,10 +9894,10 @@ ${PROMO_DECISION_FIELDS}
   '433directOfferById': `query DirectOfferById($id: ID!) {
     ratson(id: $id) { data { id attributes {
       name desc longDes startDate finnishDate isOnline lat lng radius location_hint
-      status_ratson fulfilled terms_digest createdAt
+      entryCurrency status_ratson fulfilled terms_digest createdAt
       offer_recipient_hint offer_email_lock offer_link_at offer_expires_at claimed_at
-      offered_by { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
-      offered_by_project { data { id attributes { projectName } } }
+      offered_by { data { id attributes { currency username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url formats } } } } } }
+      offered_by_project { data { id attributes { projectName currencyCode } } }
       users_permissions_users { data { id } }
       extracted_missions { id name hoursEst importance notes }
       extracted_resources { id name quantityEst importance notes }
@@ -14207,8 +14213,8 @@ ${PROMO_DECISION_FIELDS}
           kindOf
           location { lat lng radius location_mode }
           mashaabim { data { id attributes { name } } }
-          users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } location { lat lng radius location_mode } } } }
-          project { data { id attributes { projectName location { lat lng radius location_mode } } } }
+          users_permissions_user { data { id attributes { currency username nameLatin nameArabic nameCyrillic nameHebrew profilePic { data { attributes { url } } } location { lat lng radius location_mode } } } }
+          project { data { id attributes { projectName currencyCode location { lat lng radius location_mode } } } }
         }
       }
     }
@@ -14236,12 +14242,13 @@ ${PROMO_DECISION_FIELDS}
           desc
           price
           estimatedPrice
+          owner_user { data { attributes { currency } } }
           pricingMode
           lat lng radius
           location { lat lng radius location_mode }
           currency { data { id attributes { name simbol } } }
           projectcreates {
-            data { id attributes { projectName profilePic { data { attributes { url } } } location { lat lng radius location_mode } } }
+            data { id attributes { projectName currencyCode profilePic { data { attributes { url } } } location { lat lng radius location_mode } } }
           }
         }
       }
@@ -14876,6 +14883,8 @@ ${PROMO_DECISION_FIELDS}
       sort: "createdAt:desc"
     ) {
       data { id attributes {
+        projectcreates { data { attributes { currencyCode } } }
+        owner_user { data { attributes { currency } } }
         name price quant kindOf archived hideFromDiscovery
         pic { data { attributes { url } } }
         sp { data { id attributes { name } } }
@@ -14922,12 +14931,14 @@ ${PROMO_DECISION_FIELDS}
   '308myResourcesViaUser': `query MyResourcesViaUser($uid: ID!) {
     usersPermissionsUser(id: $uid) {
       data { id attributes {
+        currency
         sps(
           filters: { archived: { ne: true } }
           pagination: { limit: 100 }
           sort: "createdAt:desc"
         ) {
           data { id attributes {
+            project { data { attributes { currencyCode } } }
             name descrip kindOf unit price myp spnot linkto
             sdate fdate offerScope panui archived
             mashaabim { data { id attributes { name } } }
@@ -15144,7 +15155,7 @@ ${PROMO_DECISION_FIELDS}
       data { id attributes {
         name perhour price hours
         mission { data { id attributes { missionName } } }
-        users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
+        users_permissions_user { data { id attributes { currency username nameLatin nameArabic nameCyrillic nameHebrew } } }
       } }
     }
   }`,
@@ -15270,8 +15281,8 @@ ${PROMO_DECISION_FIELDS}
         name price quant kindOf origin createdAt lat lng radius
         pic { data { attributes { url formats } } }
         location { lat lng radius location_hint location_mode }
-        owner_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
-        projectcreates { data { id attributes { projectName location { lat lng radius location_hint location_mode } } } }
+        owner_user { data { id attributes { currency username nameLatin nameArabic nameCyrillic nameHebrew } } }
+        projectcreates { data { id attributes { projectName currencyCode location { lat lng radius location_hint location_mode } } } }
         categories { data { id attributes { name } } }
       } }
     }
@@ -15288,11 +15299,11 @@ ${PROMO_DECISION_FIELDS}
       data { id attributes {
         name descrip noofhours perhour iskvua isglobal dates sqadualed source createdAt
         location { lat lng radius location_hint location_mode }
-        project { data { id attributes { projectName profilePic { data { attributes { url formats } } } location { lat lng radius location_hint location_mode } } } }
+        project { data { id attributes { projectName currencyCode profilePic { data { attributes { url formats } } } location { lat lng radius location_hint location_mode } } } }
         skills { data { id attributes { skillName } } }
         work_ways { data { id attributes { workWayName } } }
         tafkidims { data { id attributes { roleDescription } } }
-        ratson { data { id attributes { lat lng radius isOnline } } }
+        ratson { data { id attributes { lat lng radius isOnline entryCurrency } } }
       } }
     }
   }`,
@@ -15307,8 +15318,8 @@ ${PROMO_DECISION_FIELDS}
       data { id attributes {
         name descrip kindOf price howMeny recurring source createdAt
         location { lat lng radius location_hint location_mode }
-        project { data { id attributes { projectName profilePic { data { attributes { url formats } } } location { lat lng radius location_hint location_mode } } } }
-        ratson { data { id attributes { lat lng radius isOnline } } }
+        project { data { id attributes { projectName currencyCode profilePic { data { attributes { url formats } } } location { lat lng radius location_hint location_mode } } } }
+        ratson { data { id attributes { lat lng radius isOnline entryCurrency } } }
       } }
     }
   }`,
@@ -15320,6 +15331,7 @@ ${PROMO_DECISION_FIELDS}
     ) {
       data { id attributes {
         name descrip price kindOf
+        project { data { attributes { currencyCode } } }
         matanot { data { id attributes { archived } } }
       } }
     }
@@ -15339,6 +15351,7 @@ ${PROMO_DECISION_FIELDS}
     ) {
       data { id attributes {
         name price quant kindOf
+        projectcreates { data { attributes { currencyCode } } }
         pic { data { attributes { url } } }
         sp { data { id } }
       } }
@@ -15355,7 +15368,7 @@ ${PROMO_DECISION_FIELDS}
     ) {
       data { id attributes {
         name price
-        projectcreates { data { id attributes { projectName } } }
+        projectcreates { data { id attributes { projectName currencyCode } } }
       } }
     }
   }`,
@@ -15375,7 +15388,7 @@ ${PROMO_DECISION_FIELDS}
         hideFromDiscovery
         projectcreates { data { id } }
         owner_user { data { id attributes {
-          username nameLatin nameArabic nameCyrillic nameHebrew
+          currency username nameLatin nameArabic nameCyrillic nameHebrew
           profilePic { data { attributes { url formats } } }
         } } }
       } }
@@ -15619,7 +15632,7 @@ ${PROMO_DECISION_FIELDS}
         cycleStart cycleEnd note
         customerAmount customerReportedAt
         matanot { data { id attributes { name } } }
-        project { data { id attributes { projectName } } }
+        project { data { id attributes { projectName currencyCode } } }
         customer { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         recurringSource { data { id attributes { in unit } } }
       } }
@@ -15641,7 +15654,7 @@ ${PROMO_DECISION_FIELDS}
         cycleStart cycleEnd note
         customerAmount customerReportedAt
         matanot { data { id attributes { name } } }
-        project { data { id attributes { projectName } } }
+        project { data { id attributes { projectName currencyCode } } }
         users_permissions_user { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
         recurringSource { data { id attributes { in unit } } }
       } }
@@ -16442,7 +16455,7 @@ ${PROMO_DECISION_FIELDS}
             data {
               id
               attributes {
-                projectName
+                projectName currencyCode
                 profilePic {
                   data {
                     attributes {

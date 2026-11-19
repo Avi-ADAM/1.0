@@ -1,5 +1,5 @@
 <script>
-  import { useFormatMoney } from '$lib/money/context.svelte';
+  import { useFormatMoney, useProjectCurrency } from '$lib/money/context.svelte';
   import Money from '$lib/components/money/Money.svelte';
   /**
    * What a funded mission is actually offering, in two separate lines
@@ -38,6 +38,8 @@
    * @property {string} [funderName] - the member funding it, when there is one
    * @property {boolean} [monthly] - recurring mission: the figures are per cycle
    * @property {boolean} [compact]
+   * @property {string | number | null} [projectId]
+   * @property {string | null} [currency]
    */
 
   /** @type {Props} */
@@ -49,9 +51,13 @@
     mode = 'equity',
     funderName = '',
     monthly = false,
-    compact = false
+    compact = false,
+    projectId,
+    currency
   } = $props();
   const fmtMoney = useFormatMoney();
+  const projectCurrency = useProjectCurrency();
+  const source = $derived(currency ?? projectCurrency(projectId));
 
   const investment = $derived(
     Math.round((Number(hours) || 0) * (Number(perhour) || 0))
@@ -73,18 +79,18 @@
     <div class="so-lines">
       <div class="so-line">
         <span class="so-label {MUTED}">{$t('stipend.offer.investment')}</span>
-        <span class="so-value"><Money amount={investment} fraction="whole" /></span>
+        <span class="so-value"><Money amount={investment} currency={source} fraction="whole" /></span>
         <span class="so-sub {FAINT}">
-          {$t('stipend.offer.investmentSub', { count: fmtMoney(perhour, null, { fraction: 'whole' }) })}
+          {$t('stipend.offer.investmentSub', { count: fmtMoney(perhour, source, { fraction: 'whole' }) })}
           {monthly ? $t('stipend.offer.perCycle') : ''}
         </span>
       </div>
 
       <div class="so-line">
         <span class="so-label {MUTED}">{$t('stipend.offer.stipend')}</span>
-        <span class="so-value {ACCENT}"><Money amount={stipend} fraction="whole" /></span>
+        <span class="so-value {ACCENT}"><Money amount={stipend} currency={source} fraction="whole" /></span>
         <span class="so-sub {FAINT}">
-          {$t('stipend.offer.stipendSub', { count: fmtMoney(stipendRate, null, { fraction: 'whole' }) })}
+          {$t('stipend.offer.stipendSub', { count: fmtMoney(stipendRate, source, { fraction: 'whole' }) })}
           {monthly ? $t('stipend.offer.perCycle') : ''}
         </span>
       </div>

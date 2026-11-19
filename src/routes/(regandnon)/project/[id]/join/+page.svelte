@@ -1,4 +1,7 @@
 <script>
+  import { provideRikmaCurrency } from '$lib/money/context.svelte';
+  import { rikmaCurrency } from '$lib/money/resolve.js';
+  import CurrencySymbol from '$lib/components/money/CurrencySymbol.svelte';
   import Money from '$lib/components/money/Money.svelte';
   import { t } from '$lib/translations';
   import Header from '$lib/components/header/header.svelte';
@@ -9,6 +12,7 @@
   import { lookFrame, shownLook } from '$lib/rikmaLook/frame.svelte';
 
   let { data } = $props();
+  provideRikmaCurrency(() => rikmaCurrency(data.projectData));
 
   let projectId = $derived(data.projectId);
   // Inside the look editor's preview the page shows what a guest sees.
@@ -352,7 +356,7 @@
                 <input type="number" min="0" step="0.5" bind:value={mHours} disabled={!isRegisteredUser} />
               </label>
               <label class="field">
-                <span>{$t('pages.projectJoin.mPerhour')}</span>
+                <span>{$t('pages.projectJoin.mPerhour')} (<CurrencySymbol />)</span>
                 <input type="number" min="0" step="1" bind:value={mPerhour} disabled={!isRegisteredUser} />
               </label>
             </div>
@@ -368,7 +372,7 @@
             </label>
             <div class="grid grid-cols-3 gap-4">
               <label class="field">
-                <span>{$t('pages.projectJoin.rPrice')}</span>
+                <span>{$t('pages.projectJoin.rPrice')} (<CurrencySymbol />)</span>
                 <input type="number" min="0" step="1" bind:value={rPrice} disabled={!isRegisteredUser} />
               </label>
               <label class="field">

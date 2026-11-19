@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Money from '$lib/components/money/Money.svelte';
   import { page } from '$app/state';
   import DiscoveryMap from '$lib/components/location/DiscoveryMap.svelte';
   import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
@@ -178,7 +179,7 @@
             </div>
             {#if r.price}
               <div class="value">
-                <strong>{r.price}</strong>
+                <strong><Money amount={r.price} currency={r.currency} /></strong>
                 {#if r.recurring}
                   <span>{$t('discover.resources_recurring')}</span>
                 {/if}

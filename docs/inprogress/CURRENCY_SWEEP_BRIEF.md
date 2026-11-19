@@ -17,8 +17,8 @@ top table says what's done. Mark `[x]` there as you go, and add a
 | Batch | State |
 |---|---|
 | 1 — moach | ✅ done (`67ef3d3c`). Audit went from 96/142 to 88/132. |
-| 2 — heart / hub | 🔶 **almost done** (27 files in the working tree, not committed). This includes `negoM`, `negoPend` and `NegotiationHistory`. Audit is down to 69/82. Four items are left, and they're the **next** step: `WishOfferCard`, `pending.svelte`, `MissionStipendOffer` and `BlueprintReview`. The checklist has them as items 44, 46, 47b and 47c. |
-| 3 — public pages / deals / concierge | ⏳. Also `prPr/open/OpenMissionCard` and `OpenResourceCard`: add an optional `currency` prop, passed by `OpenBoard`. |
+| 2 — heart / hub | Display fixes complete. See [batch2-report.md](./batch2-report.md). |
+| 3 — public pages / deals / concierge | Display fixes complete. See [batch3-report.md](./batch3-report.md) for the remaining verification gates. |
 | 4 — translations / server / mails / Telegram | ⏳. Also `project.finisin.currency`, which has had no call site since batch 1. |
 
 Deferred, don't do: `prPr/missionForm/MissionSummary` — its callers already

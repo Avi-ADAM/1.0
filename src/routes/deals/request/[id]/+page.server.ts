@@ -83,6 +83,7 @@ export const load: PageServerLoad = async ({ locals, params, fetch, depends }) =
       marginPct: mAttrsFull.marginPct || null,
       matanot_recipe_missions: mAttrsFull.matanot_recipe_missions?.data ?? [],
       matanot_recipe_resources: mAttrsFull.matanot_recipe_resources?.data ?? [],
+      currency: proj?.attributes?.currencyCode ?? null,
       projectId: proj?.id || '',
       projectName: proj?.attributes?.projectName || '',
       projectPic: proj?.attributes?.profilePic?.data?.attributes?.url || null,
