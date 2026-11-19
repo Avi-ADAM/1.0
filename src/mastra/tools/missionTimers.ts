@@ -31,6 +31,16 @@ const MissionDetailSchema = z.object({
   tags: z.array(z.string()).optional()
 });
 
+/** Start of the timer segment that has no stop yet — the running session. */
+export function openSegmentStart(timers: unknown): string | undefined {
+  if (!Array.isArray(timers)) return undefined;
+  for (let i = timers.length - 1; i >= 0; i--) {
+    const seg = timers[i] as { start?: string | null; stop?: string | null } | null;
+    if (seg?.start && !seg.stop) return seg.start;
+  }
+  return undefined;
+}
+
 const TimerDetailSchema = z.object({
   id: z.string(),
   missionId: z.string(),
@@ -41,7 +51,10 @@ const TimerDetailSchema = z.object({
   endTime: z.string().optional(),
   duration: z.number().optional(),
   isActive: z.boolean(),
-  description: z.string().optional()
+  description: z.string().optional(),
+  /** Start of the segment still running (the last one without a stop) — what a live clock counts from. */
+  sessionStart: z.string().optional(),
+  totalHours: z.number().nullable().optional()
 });
 
 // MISSION TOOLS
@@ -394,7 +407,9 @@ export const getActiveTimersTool = createTool({
           projectName: mission.attributes.project?.data?.attributes?.projectName || 'N/A',
           startTime: timerData.attributes.startTime || timerData.attributes.start || '',
           isActive: true,
-          description: timerData.attributes.description || ''
+          description: timerData.attributes.description || '',
+          sessionStart: openSegmentStart(timerData.attributes.timers),
+          totalHours: timerData.attributes.totalHours ?? null
         };
       });
 

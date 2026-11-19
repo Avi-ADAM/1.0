@@ -20,6 +20,7 @@
  */
 
 import type { McpToolPolicy } from './guard.js';
+import { TIMER_APP_URI } from './apps/index';
 import { timerActionTool } from '../../../mastra/tools/timerActionTool';
 import {
   listUserMissionsTool,
@@ -137,6 +138,11 @@ export interface McpManifestEntry extends McpToolPolicy {
    * page ("the current page the user is on").
    */
   description?: string;
+  /**
+   * The interactive view (MCP Apps, `ui://…`) a host draws for this tool's
+   * result. One of `MCP_APP_URIS` in ./apps; the text result is unchanged.
+   */
+  ui?: string;
 }
 
 /** Public reference for every tool, generated from this manifest (src/routes/mcp). */
@@ -201,7 +207,7 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
       'details. It does not search openings: to discover open missions and resources use searchCatalogTool, and ' +
       'for what fits this user use listMyMatchesTool.'
   },
-  getActiveTimersTool: { tool: getActiveTimersTool, title: "Get running timers", tier: 'read', scopedOutput: ['timers'] },
+  getActiveTimersTool: { tool: getActiveTimersTool, title: "Get running timers", tier: 'read', scopedOutput: ['timers'], ui: TIMER_APP_URI },
   // Aggregates can't be narrowed after the fact — a scoped key must name the rikma.
   getMissionStatsTool: { tool: getMissionStatsTool, title: "Get mission stats", tier: 'read', project: 'scope', scopedKeyNeeds: 'projectId' },
   // --- concierge reads (M7). No projectId: a wish belongs to a person, not to a
@@ -292,7 +298,7 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   // --- selfWrite ---
   // The tool checks the caller holds the mission; the guard adds the key scope,
   // and a scoped key may not fall back to "whatever timer is running".
-  timerActionTool: { tool: timerActionTool, title: "Start or stop a mission timer", tier: 'selfWrite', mission: 'scope', scopedKeyNeeds: 'missionId' },
+  timerActionTool: { tool: timerActionTool, title: "Start or stop a mission timer", tier: 'selfWrite', mission: 'scope', scopedKeyNeeds: 'missionId', ui: TIMER_APP_URI },
 
   // --- consentWrite ---
   // createTask runs with the admin token but is projectMember-gated on the key's

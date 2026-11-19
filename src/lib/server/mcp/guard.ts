@@ -208,7 +208,12 @@ export function wrapMcpTool<T extends { id: string }>(
   tool: T,
   policy: McpToolPolicy,
   /** What the MCP client sees, when it differs from the tool itself (see toolManifest). */
-  face: { description?: string; annotations?: Record<string, unknown> } = {}
+  face: {
+    description?: string;
+    annotations?: Record<string, unknown>;
+    /** Tool `_meta` for the client — today only the MCP Apps view link. */
+    meta?: Record<string, unknown>;
+  } = {}
 ): T {
   const inner = tool as any;
   const bucket = bucketFor(policy);
@@ -219,7 +224,9 @@ export function wrapMcpTool<T extends { id: string }>(
     id: inner.id,
     description: face.description ?? inner.description,
     inputSchema: inner.inputSchema,
-    ...(annotations ? { mcp: { annotations } } : {}),
+    ...(annotations || face.meta
+      ? { mcp: { ...(annotations ? { annotations } : {}), ...(face.meta ? { _meta: face.meta } : {}) } }
+      : {}),
     execute: async (input: any, context: any) => {
       const started = Date.now();
       const ctx = getMcpContext();

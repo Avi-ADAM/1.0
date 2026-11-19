@@ -33,6 +33,7 @@ import { getPlatformInfoTool, noAccountTools, noAccountToolNames } from '$lib/se
 import { assistantMcpEnabled } from '../../../mastra/tools/assistantTools';
 import { normalizeApiKeyScopes } from '$lib/server/apiKeys';
 import { fetchUserLang, resolveMcpLang } from '$lib/server/mcp/lang';
+import { mcpAppResources, mcpUiMeta } from '$lib/server/mcp/apps';
 
 // --- Public Tools for Unauthenticated Users ---
 
@@ -156,7 +157,8 @@ const WRAPPED_TOOLS: Record<string, any> = Object.fromEntries(
         name,
         wrapMcpTool(entry.tool, entry, {
             description: mcpDescription(name, entry),
-            annotations: { ...mcpAnnotations(entry) }
+            annotations: { ...mcpAnnotations(entry) },
+            meta: mcpUiMeta(entry.ui)
         })
     ])
 );
@@ -353,7 +355,11 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
                         : mcpInstructions({ rikmaImport: false, publicSignup: assistantMcpEnabled() }),
             agents: agentsToExpose,
             workflows: workflowsToExpose,
-            tools: toolsToExpose
+            tools: toolsToExpose,
+            // Interactive views (MCP Apps) for the tools that name one — only for a
+            // signed-in caller, the only one who has those tools. A host without
+            // MCP Apps support ignores them and reads the text result.
+            ...(user ? { appResources: mcpAppResources(getMcpContext()?.lang) } : {})
         });
     } catch (e: any) {
         console.error("MCPServer Init Error:", e);
