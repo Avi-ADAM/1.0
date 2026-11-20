@@ -22,6 +22,9 @@
   import GuestMenu from '$lib/components/footer/GuestMenu.svelte';
   import DiscoverMenu from '$lib/components/footer/DiscoverMenu.svelte';
   import AppearanceMenu from '$lib/components/footer/AppearanceMenu.svelte';
+  // Guests only: a signed-in member has the language row in the appearance
+  // menu and /me/settings, and their cluster already carries Quick Create —
+  // a third handle there crowded the bar and rode over the rikma cards.
   import LangMenu from '$lib/components/footer/LangMenu.svelte';
   import QuickCreateLauncher from '$lib/components/quick-create/QuickCreateLauncher.svelte';
   import { idPr } from '$lib/stores/idPr';
@@ -239,7 +242,7 @@
       <span class="sr-only">{L('openBar')}</span>
     </button>
     <span class="w-px h-5 bg-gray-200 dark:bg-gray-600"></span>
-    <LangMenu />
+    {#if !isAuthed}<LangMenu />{/if}
     <AppearanceMenu compact />
     {#if isAuthed}<QuickCreateLauncher compact />{/if}
   </div>
@@ -274,7 +277,7 @@
              area. Opens downward: the column already reaches high up the
              screen, so upward is where the room isn't. -->
         <div class="flex items-center gap-1">
-          <LangMenu drop="down" />
+          {#if !isAuthed}<LangMenu drop="down" />{/if}
           <AppearanceMenu compact drop="down" />
         </div>
         <button
@@ -300,7 +303,7 @@
            it can land on the bot bubble or the lev demand map. Quick Create
            lives here; future accessibility controls can join this cluster. -->
       <div class="absolute -top-3 start-3 flex items-center gap-1">
-        <LangMenu />
+        {#if !isAuthed}<LangMenu />{/if}
         <AppearanceMenu compact />
         {#if isAuthed}<QuickCreateLauncher compact />{/if}
       </div>

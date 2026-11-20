@@ -9,7 +9,7 @@
    * cannot read the current language, still finds the way out in one tap.
    * Pages no longer float a switcher of their own over the top of the screen,
    * where it covered the page's header (e.g. /hascama arriving from the
-   * concierge).
+   * concierge). Shown to guests only — mobileFooter gates it on `isAuthed`.
    *
    * @typedef {Object} Props
    * @property {'up' | 'down'} [drop] - which way the panel opens off the trigger
@@ -137,7 +137,8 @@
     display: inline-block;
   }
 
-  /* The size of the bar's other handles, so the cluster reads as one row. */
+  /* A round handle, the same 26px circle as the appearance trigger and the
+     bar's minimize button, so the cluster reads as one set. */
   .trigger {
     display: inline-flex;
     align-items: center;
@@ -145,17 +146,23 @@
     width: 26px;
     height: 26px;
     padding: 0;
-    border: none;
-    border-radius: 6px;
-    background: transparent;
+    overflow: hidden;
+    border: 1px solid var(--border-g);
+    border-radius: 999px;
+    background: var(--card, #fff);
     cursor: pointer;
     box-shadow: var(--shadow-theme, 0 2px 8px rgb(0 0 0 / 0.12));
+    transition: border-color 0.15s;
+  }
+  .trigger:hover {
+    border-color: var(--barbi-pink);
   }
   .trigger img {
     display: block;
-    width: 26px;
-    height: 26px;
-    border-radius: 6px;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 999px;
   }
   .trigger:focus-visible {
     outline: 2px solid var(--barbi-pink);
