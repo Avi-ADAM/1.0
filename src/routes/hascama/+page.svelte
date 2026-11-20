@@ -8,7 +8,6 @@
   import { userName } from '$lib/stores/store.js';
   import Amana1 from '$lib/components/main/amana.svelte';
   import AgentSignup from '$lib/components/main/AgentSignup.svelte';
-  import LangSwitch from '$lib/components/onboard/LangSwitch.svelte';
   import { regHelper } from '$lib/stores/regHelper.js';
   import { onMount } from 'svelte';
   import { email } from '$lib/components/registration/email.js';
@@ -162,7 +161,6 @@ regHelperL = 0;
 <svelte:window onbeforeunload={reportExit} />
 
 <div class="main">
-  <div class="hascama-lang" dir="ltr"><LangSwitch /></div>
   {#if data.concierge && regHelperL !== 1}
     <!-- A customer who came to order something: the agreement is the one
          step that stays, and they should know it is the only one. -->
@@ -209,14 +207,6 @@ regHelperL = 0;
   *:after,
   *:before {
     box-sizing: border-box;
-  }
-
-  .hascama-lang {
-    position: fixed;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 50;
   }
 
   .mfy-ribbon {
