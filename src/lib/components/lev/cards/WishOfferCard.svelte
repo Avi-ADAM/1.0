@@ -165,7 +165,7 @@
       <div class="flex-1">
         <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-0.5">{$t('lev.cards.wishOffer.price')}</div>
         <div class="text-base font-bold text-yellow-700 dark:text-yellow-400">
-          {#if buble.price != null}<Money amount={buble.price} />{:else}{$t('lev.cards.wishOffer.byOffer')}{/if}
+          {#if buble.price != null}<Money amount={buble.price} currency={buble.currency} />{:else}{$t('lev.cards.wishOffer.byOffer')}{/if}
         </div>
       </div>
     </div>

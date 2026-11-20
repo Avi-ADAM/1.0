@@ -1,4 +1,5 @@
 <script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
   /**
    * The one prefilled control & approval screen of a rikma import
    * (docs/inprogress/PLAN_AI_SIGNUP_CONCIERGE.md §4.5, §5.7).
@@ -247,6 +248,7 @@
   }
 
   const specOf = (/** @type {Row} */ row) => effectiveSpec(/** @type {any} */ (row), edits[row.key]);
+  const fmtMoney = useFormatMoney();
   const fmt = (/** @type {number} */ n) => n.toLocaleString(undefined, { maximumFractionDigits: 2 });
 
   function splitWhoLabel(/** @type {any} */ who) {
@@ -280,7 +282,13 @@
   function valueLine(/** @type {Row} */ row) {
     const v = rowValue(row.group, specOf(row));
     if (!v) return '';
-    return $t('rikmaImport.row.calc', { left: fmt(v.left), right: fmt(v.right), value: fmt(v.value) });
+    const source = String(specOf(row).currency ?? currency);
+    const mission = row.group === 'rikmaMissions';
+    return $t('rikmaImport.row.calc', {
+      left: mission ? fmt(v.left) : fmtMoney(v.left, source),
+      right: mission ? fmtMoney(v.right, source) : fmt(v.right),
+      value: fmtMoney(v.value, source)
+    });
   }
 
   /** Record one fix; a fresh object each time so the edit stays reactive. `undefined` takes it back. */
@@ -558,7 +566,7 @@
               <div class="flex justify-between text-xs mb-0.5 text-surfaceInk">
                 <span>{splitWhoLabel(s.who)}</span>
                 <span class="font-semibold">
-                  {fmt(s.value)}{#if currency}{' '}{currency}{/if} · {s.pct}%
+                  {fmtMoney(s.value, currency)} · {s.pct}%
                 </span>
               </div>
               <div class="h-2 rounded-full bg-surface border border-surfaceLine overflow-hidden" role="presentation">

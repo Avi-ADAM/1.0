@@ -7,6 +7,7 @@
  * without side effects or mutations.
  */
 
+import { rikmaCurrency } from '$lib/money/resolve.js';
 import type {
   PendMissionData,
   InProgressMissionData,
@@ -2135,6 +2136,7 @@ export function mapSaleData(sheirut: any, projectId: string, userData: any, mode
     projectId: projectId,
     projectName: projectName,
     projectSrc: projectSrc,
+    currency: projectInfo?.attributes?.currencyCode ?? userData.attributes?.projects_1s?.data?.find((p: any) => p.id === projectId)?.attributes?.currencyCode ?? null,
     members: projectInfo?.attributes?.user_1s?.data?.map((u: any) => ({
       id: u.id,
       ...nameFieldsOf(u.attributes), username: u.attributes?.username,
@@ -2345,6 +2347,7 @@ export function extractWishOffers(userData: any): WishOfferData[] {
         missionName,
         hours: covered?.hours ?? omAttrs.noofhours ?? null,
         price: covered?.price ?? pAttrs.total_price ?? omAttrs.perhour ?? null,
+        currency: pAttrs.entryCurrency ?? (pAttrs.project?.data ? rikmaCurrency(pAttrs.project.data) : rAttrs.entryCurrency),
         coveredIdx,
 
         // Coordination chat forum, if one has already been opened

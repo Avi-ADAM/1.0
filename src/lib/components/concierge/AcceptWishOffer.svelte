@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { useFormatMoney } from '$lib/money/context.svelte';
   import Money from '$lib/components/money/Money.svelte';
   import { isRtl } from '$lib/translations';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
@@ -43,6 +44,8 @@
   };
 
   let {
+    currency = null,
+    budgetCurrency = null,
     proposalId,
     ratsonId,
     item,
@@ -52,6 +55,8 @@
     onClose,
     onDone
   }: {
+    currency?: string | null;
+    budgetCurrency?: string | null;
     proposalId: string;
     ratsonId: string;
     item: WishItem;
@@ -63,6 +68,7 @@
     onClose?: () => void;
     onDone?: (result: { accepted: boolean }) => void;
   } = $props();
+  const fmtMoney = useFormatMoney();
 
   type Step = 'view' | 'counter' | 'submitting' | 'done' | 'countered' | 'error';
   let step = $state<Step>('view');
@@ -193,7 +199,7 @@
         <div class="ofr-offer-name">{item.name}</div>
         <div class="ofr-offer-meta">
           {#if item.hours}<span><EntityIcon kind="timer" size={13} /> {item.hours} {$tr('deals.acceptOffer.hours')}</span>{/if}
-          {#if item.price != null}<span><EntityIcon kind="money" size={13} /> <Money amount={item.price} /></span>{/if}
+          {#if item.price != null}<span><EntityIcon kind="money" size={13} /> <Money amount={item.price} {currency} /></span>{/if}
           {#if pricingTrack}<span>{$tr(`deals.pricingTrack.${pricingTrack}`)}</span>{/if}
         </div>
       </div>
@@ -202,7 +208,7 @@
         <!-- Part of this work would be a gift — only the provider's own yes gives it (§5.2). -->
         <p class="ofr-help" role="note">
           <strong>{helpAmount > 0 ? $tr('deals.help.symbolic') : $tr('deals.help.free')}</strong>
-          {helpAmount > 0 ? $tr('deals.help.explainSymbolic', { amount: String(helpAmount) }) : $tr('deals.help.explainFree')}
+          {helpAmount > 0 ? $tr('deals.help.explainSymbolic', { amount: fmtMoney(helpAmount, budgetCurrency) }) : $tr('deals.help.explainFree')}
         </p>
       {/if}
 
@@ -220,7 +226,7 @@
           {#each negotiation.counters as c (c.round)}
             <p>
               ⇄ {c.amount ?? '—'}{item.kind === 'mission' ? ` ${$tr('deals.acceptOffer.hours')}` : ' ×'}
-              · {c.price ?? '—'}
+              · {#if c.price != null}<Money amount={c.price} {currency} />{:else}—{/if}
               {#if c.note}— {c.note}{/if}
             </p>
           {/each}

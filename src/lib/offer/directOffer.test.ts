@@ -89,6 +89,13 @@ describe('offerView — qid 433 as the pages read it', () => {
     ]);
   });
 
+  it('carries the provider or project currency without changing offer amounts', () => {
+    const offered_by = { data: { id: '256', attributes: { currency: 'EUR' } } };
+    const offered_by_project = { data: { id: '8', attributes: { currencyCode: 'USD' } } };
+    expect(offerView(raw({ offered_by }))).toMatchObject({ currency: 'EUR', total: 1500 });
+    expect(offerView(raw({ offered_by, offered_by_project }))).toMatchObject({ currency: 'USD', total: 1500 });
+  });
+
   it('knows when it was taken, and when it is closed', () => {
     expect(offerView(raw({ claimed_at: '2026-10-08T00:00:00.000Z', users_permissions_users: { data: [{ id: '261' }] } }))).toMatchObject({
       state: 'claimed',

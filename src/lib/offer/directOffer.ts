@@ -8,6 +8,7 @@
  *
  * Pure: the composer, the actions, the preview page and the tests read the same rules.
  */
+import { rikmaCurrency } from '$lib/money/resolve.js';
 import { isEssenceOnly } from '$lib/pooling/bomPrice';
 
 export const MAX_LINES = 20;
@@ -117,6 +118,7 @@ export interface OfferView {
   locationHint: string | null;
   provider: { id: string; name: string; pic: string | null } | null;
   projectName: string | null;
+  currency?: string | null;
   /** Shown to the provider only — the caller decides. */
   recipientHint: string | null;
   state: OfferState;
@@ -193,6 +195,7 @@ export function offerView(res: any): OfferView | null {
       name: String(pa.username ?? ''),
       pic: pic?.formats?.small?.url ?? pic?.url ?? null
     },
+    currency: a.entryCurrency ?? (a.offered_by_project?.data ? rikmaCurrency(a.offered_by_project.data) : pa.currency ?? null),
     projectName: a.offered_by_project?.data?.attributes?.projectName ?? null,
     recipientHint: a.offer_recipient_hint ?? null,
     state,

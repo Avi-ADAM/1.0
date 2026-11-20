@@ -1,4 +1,6 @@
 <script>
+  import Money from '$lib/components/money/Money.svelte';
+  import { rikmaCurrency } from '$lib/money/resolve.js';
   import { nameOf } from '$lib/translation/memberName';
   /**
    * A member's public profile — the outside view of what `/me` shows its owner.
@@ -63,6 +65,7 @@
         kind: $t('lev.hevel.kindProduct'),
         name: p.attributes.name,
         price: p.attributes.price,
+        currency: p.attributes.projectcreates?.data?.[0] ? rikmaCurrency(p.attributes.projectcreates.data[0]) : user?.currency,
         href: `/gift/${p.id}`
       })),
       ...(sf.resources ?? []).map((r) => ({
@@ -71,6 +74,7 @@
         kind: $t('lev.hevel.kindResource'),
         name: r.attributes.name,
         price: r.attributes.price,
+        currency: r.attributes.project?.data ? rikmaCurrency(r.attributes.project.data) : user?.currency,
         href: `/gift/${r.attributes.matanot.data.id}`
       })),
       ...(sf.missionOffers ?? []).map((o) => {
@@ -80,12 +84,9 @@
           icon: '🛠️',
           kind: $t('lev.hevel.kindService'),
           name: a.name || a.mission?.data?.attributes?.missionName || '',
-          price:
-            a.perhour > 0
-              ? `${a.perhour} ${$t('offerings.storefront.per_hour')}`
-              : a.price > 0
-                ? a.price
-                : null,
+          price: a.perhour > 0 ? a.perhour : a.price > 0 ? a.price : null,
+          perHour: a.perhour > 0,
+          currency: user?.currency,
           href: `/concierge/new?provider=${data.userId}`
         };
       })
@@ -100,6 +101,7 @@
       kind: $t('lev.hevel.kindProduct'),
       name: p.attributes.name,
       price: p.attributes.price,
+      currency: rikmaCurrency(p.attributes.projectcreates?.data?.[0]),
       from: p.attributes.projectcreates?.data?.[0]?.attributes?.projectName,
       href: `/gift/${p.id}`
     }))
@@ -206,7 +208,7 @@
       <span aria-hidden="true">{it.icon}</span>
       <span class="sr-only">{it.kind}:</span>
       <span>
-        {it.name}{#if it.price}<span class="u-price"> · {it.price}</span>{/if}
+        {it.name}{#if it.price}<span class="u-price"> · <Money amount={it.price} currency={it.currency} />{#if it.perHour} {$t('offerings.storefront.per_hour')}{/if}</span>{/if}
         {#if it.from}<span class="u-from">{it.from}</span>{/if}
       </span>
     </a>

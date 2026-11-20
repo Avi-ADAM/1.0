@@ -25,6 +25,7 @@
    * @property {string} [sellerName]
    * @property {string} [productName]
    * @property {string} [projectName]
+   * @property {string | null} [currency]
    * @property {number | null} [expectedAmount]
    */
 
@@ -97,7 +98,7 @@
 
   <div class="cycle-meta">
     {#if cycle.expectedAmount != null}
-      <span>{$t('project.recurringCycle.expected')}: <b><Money amount={cycle.expectedAmount} /></b></span>
+      <span>{$t('project.recurringCycle.expected')}: <b><Money amount={cycle.expectedAmount} currency={cycle.currency} /></b></span>
     {/if}
     {#if role === 'holder' && cycle.customerName}
       <span>{$t('project.recurringCycle.customer')}: <b>{cycle.customerName}</b></span>
@@ -110,7 +111,7 @@
   {#if role === 'holder' && cycle.customerName}
     {#if cycle.customerReportedAt && cycle.customerAmount != null}
       <p class="cycle-customer-line ok">
-        <EntityIcon kind="card" size={13} /> {$t('project.recurringCycle.customerReported', { name: cycle.customerName || $t('project.recurringCycle.customer'), amt: fmtMoney(cycle.customerAmount) })}
+        <EntityIcon kind="card" size={13} /> {$t('project.recurringCycle.customerReported', { name: cycle.customerName || $t('project.recurringCycle.customer'), amt: fmtMoney(cycle.customerAmount, cycle.currency) })}
       </p>
     {:else}
       <p class="cycle-customer-line"><EntityIcon kind="card" size={13} /> {$t('project.recurringCycle.customerWaiting')}</p>

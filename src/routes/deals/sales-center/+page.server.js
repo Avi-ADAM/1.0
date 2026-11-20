@@ -42,6 +42,7 @@ export async function load({ locals, fetch, depends }) {
               id: project.id,
               attributes: {
                 projectName: project.attributes.projectName,
+                currencyCode: project.attributes.currencyCode,
                 profilePic: project.attributes.profilePic
               }
             }
@@ -100,6 +101,7 @@ export async function load({ locals, fetch, depends }) {
         customerReportedAt: at.customerReportedAt ?? null,
         customerName: at.customer?.data?.attributes?.username ?? '',
         productName: at.matanot?.data?.attributes?.name ?? '',
+        currency: at.project?.data?.attributes?.currencyCode ?? null,
         projectName: at.project?.data?.attributes?.projectName ?? '',
         engineId: at.recurringSource?.data?.id ?? null,
         expectedAmount: at.recurringSource?.data?.attributes?.in ?? null

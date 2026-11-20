@@ -1,3 +1,4 @@
+import { rikmaCurrency } from '$lib/money/resolve.js';
 import type { SaleData } from '$lib/stores/levStores';
 import { mapSaleData } from '$lib/utils/levDataExtractors';
 import { stripHtml } from '$lib/utils/stripHtml';
@@ -17,6 +18,7 @@ export interface PendingRequestData {
   productPic?: string;
   projectId: string;
   projectName: string;
+  currency?: string | null;
   price: number;
   /** No price yet — priced by quote; the seller names it on the request. */
   openPrice?: boolean;
@@ -54,6 +56,8 @@ export interface IncomingWishInvitation {
   startDate?: string;
   finnishDate?: string;
   totalBounti?: number | null;
+  wishCurrency?: string | null;
+  proposalCurrency?: string | null;
   wisherName: string;
   wisherPic?: string;
   /** Main wish forum — where the conversation with the wisher happens. */
@@ -111,6 +115,8 @@ function mapWishInvitation(
     ratsonStatus: ra.status_ratson || 'open',
     startDate: ra.startDate || undefined,
     finnishDate: ra.finnishDate || undefined,
+    wishCurrency: ra.entryCurrency ?? null,
+    proposalCurrency: pa.entryCurrency ?? (pa.project?.data ? rikmaCurrency(pa.project.data) : ra.entryCurrency ?? null),
     totalBounti: typeof ra.totalbounti === 'number' ? ra.totalbounti : null,
     wisherName: wisher?.attributes?.username || '',
     wisherPic: wisher?.attributes?.profilePic?.data?.attributes?.url || undefined,
@@ -135,7 +141,7 @@ function mapWishInvitation(
   };
 }
 
-function mapSheirutpend(node: any, projectId?: string, projectName?: string): PendingRequestData {
+function mapSheirutpend(node: any, projectId?: string, projectName?: string, currency?: string | null): PendingRequestData {
   const attrs = node?.attributes ?? {};
   const matanot = attrs.matanots?.data?.[0];
   const mAttrs = matanot?.attributes ?? {};
@@ -154,6 +160,7 @@ function mapSheirutpend(node: any, projectId?: string, projectName?: string): Pe
     productKindOf: mAttrs.kindOf || undefined,
     productPic: mAttrs.pic?.data?.attributes?.url || undefined,
     projectId: proj?.id ? String(proj.id) : (projectId ?? ''),
+    currency: proj?.attributes?.currencyCode ?? currency ?? null,
     projectName: proj?.attributes?.projectName || projectName || '',
     price: Number(attrs.price) || 0,
     openPrice: attrs.price === null && !attrs.sheirut?.data,
@@ -377,7 +384,7 @@ export async function fetchDealsForUser(
       sales.push(mapSaleData(sheirut, project.id, userData, 'sale'));
     }
     for (const sp of project?.attributes?.sheirutpends?.data ?? []) {
-      pendingSell.push(mapSheirutpend(sp, project.id, project?.attributes?.projectName));
+      pendingSell.push(mapSheirutpend(sp, project.id, project?.attributes?.projectName, project?.attributes?.currencyCode));
     }
   }
 

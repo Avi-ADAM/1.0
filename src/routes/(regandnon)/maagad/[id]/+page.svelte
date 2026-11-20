@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Money from '$lib/components/money/Money.svelte';
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/state';
   import MaagadOfferForm from '$lib/components/maagad/MaagadOfferForm.svelte';
@@ -456,7 +457,7 @@
               <EntityIcon kind="product" size={14} /> <strong>{p.name}</strong>
               {#if p.sellerName}<span class="muted small">· {p.sellerName}</span>{/if}
             </span>
-            {#if p.price != null}<span class="muted small"><EntityIcon kind="money" size={12} /> {p.price}</span>{/if}
+            {#if p.price != null}<span class="muted small"><EntityIcon kind="money" size={12} /> <Money amount={p.price} currency={p.currency} /></span>{/if}
           </a>
         {/each}
         {#each data.supplySuggestions.missionOffers as o (o.id)}
@@ -466,8 +467,8 @@
               {#if o.ownerName}<span class="muted small">· {o.ownerName}</span>{/if}
               {#if o.mine}<span class="badge">{$t('demand.supply_sugg_mine')}</span>{/if}
             </span>
-            {#if o.perhour != null}<span class="muted small"><EntityIcon kind="money" size={12} /> {o.perhour}</span>
-            {:else if o.price != null}<span class="muted small"><EntityIcon kind="money" size={12} /> {o.price}</span>{/if}
+            {#if o.perhour != null}<span class="muted small"><EntityIcon kind="money" size={12} /> <Money amount={o.perhour} currency={o.currency} /></span>
+            {:else if o.price != null}<span class="muted small"><EntityIcon kind="money" size={12} /> <Money amount={o.price} currency={o.currency} /></span>{/if}
           </a>
         {/each}
       </div>

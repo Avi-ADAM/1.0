@@ -24,6 +24,7 @@
  * `fetch`, so auth cookies + the qids allow-list are reused.
  */
 
+import { rikmaCurrency } from '$lib/money/resolve.js';
 import { fuzzyMissionMatch } from '../../utils/fuzzyMatch';
 import { matchCategory, type MatchResult } from '../../embed/matcher';
 import {
@@ -73,6 +74,7 @@ export interface SuggestedPerson {
 }
 
 export interface AvailableResource {
+  currencyCode?: string | null;
   id: string;
   name: string;
   template: string | null;
@@ -87,6 +89,7 @@ export interface AvailableResource {
 }
 
 export interface SuggestedProduct {
+  currencyCode?: string | null;
   id: string;
   name: string;
   desc: string | null;
@@ -428,6 +431,7 @@ export async function enrichWish(
         price: typeof a.price === 'number' ? a.price : null,
         kindOf: a.kindOf ?? null,
         ownerId: owner?.id ? String(owner.id) : null,
+        currencyCode: a.project?.data ? rikmaCurrency(a.project.data) : owner?.attributes?.currency ?? null,
         ownerName: owner?.attributes?.username ?? null,
         ownerAvatar: owner?.attributes?.profilePic?.data?.attributes?.url ?? null,
         project: a.project?.data?.attributes?.projectName ?? null,
@@ -463,6 +467,7 @@ export async function enrichWish(
         projectId: proj?.id ? String(proj.id) : null,
         projectName: proj?.attributes?.projectName ?? null,
         projectLogo: proj?.attributes?.profilePic?.data?.attributes?.url ?? null,
+        currencyCode: proj ? rikmaCurrency(proj) : a.owner_user?.data?.attributes?.currency ?? null,
         currencyName: a.currency?.data?.attributes?.name ?? null,
         currencySymbol: a.currency?.data?.attributes?.simbol ?? null,
         matchedTerm: q,

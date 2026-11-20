@@ -1,4 +1,7 @@
 <script>
+  import Money from '$lib/components/money/Money.svelte';
+  import { provideRikmaCurrency } from '$lib/money/context.svelte';
+  import { rikmaCurrency } from '$lib/money/resolve.js';
   import { nameOf } from '$lib/translation/memberName';
   import { isRtl, locale, t } from '$lib/translations';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
@@ -20,6 +23,7 @@
   // Assuming standard icons or library usage in your project context.
 
   let { data } = $props();
+  provideRikmaCurrency(() => data.alld?.projectcreates?.data?.[0] ? rikmaCurrency(data.alld.projectcreates.data[0]) : data.personalSeller?.currency);
 
   // State
   let showSaleInterface = $state(false);
@@ -373,12 +377,10 @@
                   class="text-xl font-bold text-gray-800 dark:text-gray-100"
                 >
                   {#if data.promo}
-                    <s class="text-sm font-normal text-gray-400">{Number(data.promo.listPrice).toLocaleString('en-US', { maximumFractionDigits: 2 })}</s>
-                    {Number(data.promo.price).toLocaleString('en-US', { maximumFractionDigits: 2 })}
+                    <s class="text-sm font-normal text-gray-400"><Money amount={data.promo.listPrice} /></s>
+                    <Money amount={data.promo.price} />
                   {:else if data.alld.price != null}
-                    {Number(data.alld.price).toLocaleString('en-US', {
-                      maximumFractionDigits: 2
-                    })}
+                    <Money amount={data.alld.price} />
                   {/if}
                   <span class="text-sm font-normal text-gray-500">
                     {#if data.alld.kindOf === 'monthly'}
@@ -541,7 +543,7 @@
                 <div
                   class="mb-4 rounded-lg bg-barbi/10 px-4 py-2 text-xl font-bold text-barbi"
                 >
-                  {data.promo?.price ?? data.alld.price}
+                  <Money amount={data.promo?.price ?? data.alld.price} />
                   {data.alld.currency ?? ''}
                 </div>
 

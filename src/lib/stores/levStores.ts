@@ -250,6 +250,7 @@ export interface DecisionData {
 
 /** Sale data (sheirut - approved product/service sale) */
 export interface SaleData {
+  currency?: string | null;
   id: string;
   projectId: string;
   projectName?: string;
@@ -389,6 +390,7 @@ export interface WishOfferData {
   missionName: string;
   hours?: number | null;
   price?: number | null;
+  currency?: string | null;
   coveredIdx?: string | null;
 
   // Coordination chat forum (owner ↔ volunteer), lazily created on first open

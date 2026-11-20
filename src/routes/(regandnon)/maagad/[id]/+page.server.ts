@@ -1,3 +1,4 @@
+import { rikmaCurrency } from '$lib/money/resolve.js';
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { error } from '@sveltejs/kit';
 import { serverTranslator } from '$lib/server/notices/translate';
@@ -147,6 +148,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
               id: String(n.id),
               name: n.attributes?.name ?? '',
               price: n.attributes?.price ?? n.attributes?.estimatedPrice ?? null,
+              currency: n.attributes?.projectcreates?.data?.[0] ? rikmaCurrency(n.attributes.projectcreates.data[0]) : n.attributes?.owner_user?.data?.attributes?.currency,
               sellerName: n.attributes?.projectcreates?.data?.[0]?.attributes?.projectName ?? null
             });
           }
@@ -162,6 +164,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
             offerByUserMission.set(key, {
               id: String(n.id),
               name: oa.name ?? oa.mission?.data?.attributes?.missionName ?? '',
+              currency: owner?.attributes?.currency ?? null,
               perhour: oa.perhour ?? null,
               price: oa.price ?? null,
               ownerId: owner?.id ? String(owner.id) : null,

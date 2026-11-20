@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { DEFAULT_CURRENCY, normalizeCode } from '$lib/money/currencies.js';
   import StatsRow from '$lib/components/deals/StatsRow.svelte';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import DealCard from '$lib/components/deals/DealCard.svelte';
@@ -37,6 +38,8 @@
       ? activeList.map((s) => saleToDeal(s, tab as DealKind, $t))
       : []
   );
+  const statsCurrencies = $derived(new Set(activeList.map((sale) => normalizeCode(sale.currency) ?? DEFAULT_CURRENCY)));
+  const statsCurrency = $derived(statsCurrencies.size > 1 ? null : [...statsCurrencies][0] ?? DEFAULT_CURRENCY);
   const stats = $derived(salesToStats(activeList));
 </script>
 
@@ -143,7 +146,7 @@
   </div>
 
   {#if tab === 'purchase' || tab === 'sale'}
-    <StatsRow {stats} />
+    <StatsRow {stats} currency={statsCurrency} />
 
     <div class="section-label">
       {tab === 'purchase' ? $t('deals.active_purchases') : $t('deals.active_sales')}

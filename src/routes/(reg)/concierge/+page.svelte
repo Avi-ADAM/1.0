@@ -36,9 +36,9 @@
     if (Number.isNaN(d.getTime())) return $t('concierge.no_date');
     return d.toLocaleDateString($lang, { day: 'numeric', month: 'short' });
   }
-  function fmtBudget(n) {
+  function fmtBudget(n, currency) {
     if (n == null || !Number.isFinite(+n)) return $t('concierge.by_proposal');
-    return fmtMoney(+n);
+    return fmtMoney(+n, currency);
   }
   function relativeTime(iso) {
     if (!iso) return '';
@@ -83,7 +83,7 @@
       resourcesCount: c.resourcesCount || 0,
       lastEvent: eventFromStatus(c.status, (c.proposalsCount || 0) > 0),
       lastEventTime: relativeTime(c.createdAt),
-      budget: fmtBudget(c.totalBounti),
+      budget: fmtBudget(c.totalBounti, c.currency),
       whenStr: fmtDate(c.startDate),
       values: c.values || [],
       // Glow where something is waiting for the customer's answer.
@@ -99,7 +99,7 @@
       title: c.name,
       excerpt: c.excerpt,
       whenStr: fmtDate(c.startDate),
-      budget: fmtBudget(c.totalBounti),
+      budget: fmtBudget(c.totalBounti, c.currency),
       values: c.values || [],
       proposalsCount: c.proposalsCount || 0,
       tags: c.categories || [],

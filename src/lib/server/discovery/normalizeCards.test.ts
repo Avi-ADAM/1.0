@@ -99,7 +99,7 @@ describe('normalizeMissionCard', () => {
         project: {
           data: {
             id: 2,
-            attributes: { projectName: 'רקמת רשת', location: { ...TLV } }
+            attributes: { projectName: 'רקמת רשת', currencyCode: 'USD', location: { ...TLV } }
           }
         },
         skills: { data: [{ id: 1, attributes: { skillName: 'svelte' } }] },
@@ -107,6 +107,7 @@ describe('normalizeMissionCard', () => {
         tafkidims: { data: [{ id: 1, attributes: { roleDescription: 'dev' } }] }
       }
     });
+    expect(card?.currency).toBe('USD');
     expect(card?.value).toBe(1200);
     expect(card?.excerpt).toBe('נדרש מפתח & מעצב');
     expect(card?.skills).toEqual(['svelte']);
@@ -119,8 +120,9 @@ describe('normalizeMissionCard', () => {
   it('marks concierge missions and keeps unlocated ones as online', () => {
     const card = normalizeMissionCard({
       id: 12,
-      attributes: { name: 'm', ratson: { data: { id: 1, attributes: {} } } }
+      attributes: { name: 'm', ratson: { data: { id: 1, attributes: { entryCurrency: 'EUR' } } } }
     });
+    expect(card?.currency).toBe('EUR');
     expect(card?.concierge).toBe(true);
     expect(card?.isOnline).toBe(true);
     expect(card?.value).toBeNull();
@@ -148,4 +150,12 @@ describe('normalizeResourceCard', () => {
     expect(card?.lat).toBe(TLV.lat);
     expect(card?.isOnline).toBe(false);
   });
+});
+
+it('uses the owner currency for a product with no project', () => {
+  const card = normalizeProductCard({
+    id: 8,
+    attributes: { name: 'Personal product', price: 30, owner_user: { data: { attributes: { currency: 'GBP' } } } }
+  });
+  expect(card).toMatchObject({ price: 30, currency: 'GBP' });
 });

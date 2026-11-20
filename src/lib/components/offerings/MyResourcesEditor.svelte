@@ -1,4 +1,6 @@
 <script>
+  import Money from '$lib/components/money/Money.svelte';
+  import { rikmaCurrency } from '$lib/money/resolve.js';
   import { onMount } from 'svelte';
   import Spinner from '$lib/celim/Spinner.svelte';
   import { executeAction } from '$lib/client/actionClient';
@@ -68,6 +70,9 @@
 
   onMount(load);
 
+  /** @type {string | null} */
+  let userCurrency = $state(null);
+
   async function load() {
     loading = true;
     error1 = null;
@@ -76,6 +81,7 @@
         sendToSer({ uid: String(uid) }, '308myResourcesViaUser', 0, 0, false, fetch),
         executeAction('loadCatalog', { linkp: 'mashaabims', lang: $locale })
       ]);
+      userCurrency = mine?.data?.usersPermissionsUser?.data?.attributes?.currency ?? null;
       resources =
         mine?.data?.usersPermissionsUser?.data?.attributes?.sps?.data ?? [];
       catalog = cat.success ? localizeCatalog(cat.data ?? []) : [];
@@ -492,7 +498,7 @@
             </p>
             <p class="text-xs text-gray-500 dark:text-gray-400 flex flex-wrap gap-x-2">
               <span>🔁 {$t(shareModeKey(a.kindOf))}</span>
-              {#if a.price > 0}<span>💰 {a.price}</span>{/if}
+              {#if a.price > 0}<span>💰 <Money amount={a.price} currency={a.project?.data ? rikmaCurrency(a.project.data) : userCurrency} /></span>{/if}
               {#if dateLine(a)}<span>🗓️ {dateLine(a)}</span>{/if}
             </p>
             <p class="mt-1 flex flex-wrap gap-1">

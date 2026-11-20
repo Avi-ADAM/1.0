@@ -264,6 +264,7 @@ export function saleToDeal(
     missions: { done: 0, inProgress: 0, total: 0 },
     hours: { done: 0, total: 0 },
     resources: { done: s.iGotIt ? 1 : 0, total: 1 },
+    currency: s.currency,
     totalCost: total,
     paid,
     startDate: formatDate(s.startDate),

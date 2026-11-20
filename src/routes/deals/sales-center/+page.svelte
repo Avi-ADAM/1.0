@@ -1,4 +1,6 @@
 <script>
+  import Money from '$lib/components/money/Money.svelte';
+  import { rikmaCurrency } from '$lib/money/resolve.js';
   import { isRtl, t } from '$lib/translations';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { lang } from '$lib/stores/lang.js';
@@ -351,7 +353,7 @@
             <div class="product-details">
               <div class="detail-row">
                 <span class="dl">{$t('pages.salesCenter.price')}:</span>
-                <span class="dv gold">{product.attributes.price} {$t('pages.salesCenter.shekel')}</span>
+                <span class="dv gold"><Money amount={product.attributes.price} currency={rikmaCurrency(product.attributes.projectcreates?.data?.[0])} /></span>
               </div>
               <div class="detail-row">
                 <span class="dl">{$t('pages.salesCenter.quantity')}:</span>
@@ -395,6 +397,7 @@
                     </div>
                   {:else}
                     <SaleComponent
+                      currency={rikmaCurrency(product.attributes.projectcreates?.data?.[0])}
                       productId={product.id}
                       productName={product.attributes.name}
                       availableQuantity={product.attributes.quant}
