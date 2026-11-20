@@ -8,12 +8,10 @@
    * @typedef {Object} Props
    * @property {'up' | 'down'} [drop] - which way the panel opens off the trigger
    * @property {boolean} [compact] - icon-only handle, for docking on the footer
-   * @property {boolean} [showLang] - false on a page that already carries its
-   *   own language switcher (e.g. /hascama), so the reader is not offered two
    */
 
   /** @type {Props} */
-  let { drop = 'up', compact = false, showLang = true } = $props();
+  let { drop = 'up', compact = false } = $props();
 
   let open = $state(false);
   /** @type {HTMLDivElement | undefined} */
@@ -119,12 +117,10 @@
         <span>{$t('ui.appearance.settings')}</span>
       </a>
 
-      {#if showLang}
-        <section>
-          <h3>{$t('ui.appearance.language')}</h3>
-          <LangSwitch />
-        </section>
-      {/if}
+      <section>
+        <h3>{$t('ui.appearance.language')}</h3>
+        <LangSwitch />
+      </section>
 
       <section>
         <h3>{$t('ui.appearance.look')}</h3>

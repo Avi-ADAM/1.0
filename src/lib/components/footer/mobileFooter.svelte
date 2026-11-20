@@ -56,9 +56,6 @@
     }
   }
   let activeRoute = $derived(page.url.pathname);
-  // /hascama puts a language switcher at the top of the page itself; a second
-  // one inside the footer's appearance menu would only repeat it.
-  let pageHasLangSwitch = $derived(/^\/hascama(?:\/|$)/.test(activeRoute));
 
   // Footer display mode: full horizontal bar, minimized pill, or a vertical
   // column (for screen widths where the 7-slot bar gets cramped — opening
@@ -241,7 +238,7 @@
       <span class="sr-only">{L('openBar')}</span>
     </button>
     <span class="w-px h-5 bg-gray-200 dark:bg-gray-600"></span>
-    <AppearanceMenu showLang={!pageHasLangSwitch} compact />
+    <AppearanceMenu compact />
     {#if isAuthed}<QuickCreateLauncher compact />{/if}
   </div>
 {:else}
@@ -274,7 +271,7 @@
              page. Quick Create and appearance stay in the footer's utility
              area. Opens downward: the column already reaches high up the
              screen, so upward is where the room isn't. -->
-        <AppearanceMenu showLang={!pageHasLangSwitch} compact drop="down" />
+        <AppearanceMenu compact drop="down" />
         <button
           type="button"
           onclick={() => setMode('mini')}
@@ -298,7 +295,7 @@
            it can land on the bot bubble or the lev demand map. Quick Create
            lives here; future accessibility controls can join this cluster. -->
       <div class="absolute -top-3 start-3 flex items-center gap-1">
-        <AppearanceMenu showLang={!pageHasLangSwitch} compact />
+        <AppearanceMenu compact />
         {#if isAuthed}<QuickCreateLauncher compact />{/if}
       </div>
       <!-- Minimize handle floating on the bar's corner -->
