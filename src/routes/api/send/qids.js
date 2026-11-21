@@ -18258,7 +18258,7 @@ ${PROMO_DECISION_FIELDS}
   // so the query itself cannot return a rikma the caller is not in — the tool
   // does not have to be trusted to filter afterwards. Public material is not
   // here on purpose: that is searchCatalogTool.
-  '324mcpSearchMine': `query McpSearchMine($uid: ID!, $q: String!, $qj: JSON!, $limit: Int = 10) {
+  '324mcpSearchMine': `query McpSearchMine($uid: ID!, $q: String!, $limit: Int = 10) {
     rikmas: projects(
       filters: { user_1s: { id: { eq: $uid } }, or: [{ projectName: { containsi: $q } }, { publicDescription: { containsi: $q } }, { descripFor: { containsi: $q } }] }
       pagination: { limit: $limit }
@@ -18294,7 +18294,7 @@ ${PROMO_DECISION_FIELDS}
     ) { data { id attributes { name descrip kindOf project { data { id attributes { projectName } } } } } }
 
     products: matanots(
-      filters: { and: [ { projectcreates: { user_1s: { id: { eq: $uid } } } }, { archived: { ne: true } }, ${NOT_ARCHIVED}, { or: [{ name: { containsi: $q } }, { desc: { containsi: $qj } }] } ] }
+      filters: { and: [ { projectcreates: { user_1s: { id: { eq: $uid } } } }, { archived: { ne: true } }, ${NOT_ARCHIVED}, { or: [{ name: { containsi: $q } }, { desc: { containsi: $q } }] } ] }
       pagination: { limit: $limit }
     ) { data { id attributes { name desc price projectcreates { data { id attributes { projectName } } } } } }
   }`,
