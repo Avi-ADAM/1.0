@@ -63,7 +63,11 @@ describe('MCP tool manifest', () => {
       // (joinLoopTools.test.ts "outside the key scope").
       'applyToMissionTool',
       // Taking that candidacy back: the action checks the candidate from the row.
-      'withdrawCandidacyTool'
+      'withdrawCandidacyTool',
+      // A task is named by its id: the tool reads its rikma and checks the key
+      // scope itself, and the reportTask action checks the caller is its assignee
+      // and a member of that rikma (PLAN_AGENT_WORK AW1).
+      'reportTaskTool'
     ];
     for (const [name, entry] of entries) {
       if (entry.tier === 'read' || entry.tier === 'prepare') continue;

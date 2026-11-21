@@ -3,6 +3,41 @@ import { z } from 'zod';
 import { sendToSer } from '../../lib/send/sendToSer.js';
 import { startTimer, stopTimer } from '../../lib/func/timers.js';
 import { getMcpContext, isMissionMember } from '../../lib/server/mcpContext.js';
+import { taskOf } from '../../lib/acts/agentTasks';
+
+/**
+ * Why this task cannot ride on this timer, or null. Its hours are the
+ * caller's on this mission, so the task must be theirs and hang on it
+ * (claimTaskTool links it) — PLAN_AGENT_WORK AW1.
+ */
+async function actTimerProblem(actId: string, missionId: string, userId: string): Promise<string | null> {
+  const ctx = getMcpContext()!;
+  const res: any = await sendToSer({ id: actId }, 'agentTaskById', 0, 0, true, ctx.fetchInstance);
+  const task = taskOf(res?.data?.act?.data);
+  if (!task || !task.assignees.some((p) => p.id === userId)) return `Task ${actId} is not yours - claimTaskTool first.`;
+  if (!task.missions.some((m) => m.id === missionId)) {
+    return `Task ${actId} is not on mission ${missionId} - claimTaskTool with that missionId links it.`;
+  }
+  return null;
+}
+
+/** Add the task to the running timer's acts, keeping the ones already there. */
+async function linkTimerToAct(timerId: string, actId: string): Promise<boolean> {
+  const ctx = getMcpContext()!;
+  try {
+    const res: any = await sendToSer({ id: timerId }, 'agentTimerActs', 0, 0, true, ctx.fetchInstance);
+    const t = res?.data?.timer?.data?.attributes;
+    if (!t || String(t.users_permissions_user?.data?.id ?? '') !== String(ctx.userId)) return false;
+    const acts = new Set<string>((t.acts?.data ?? []).map((a: any) => String(a.id)));
+    if (acts.has(actId)) return true;
+    acts.add(actId);
+    const out: any = await sendToSer({ id: timerId, acts: [...acts] }, 'agentTimerSetActs', 0, 0, true, ctx.fetchInstance);
+    return !out?.errors && !!out?.data?.updateTimer?.data?.id;
+  } catch (e) {
+    console.warn('[timerActionTool] could not attach the task to the timer:', e);
+    return false;
+  }
+}
 
 export const timerActionTool = createTool({
   id: 'timerActionTool',
@@ -16,10 +51,16 @@ export const timerActionTool = createTool({
       .optional()
       .describe(
         'Specific mission ID (optional, will find active timer if not provided)'
+      ),
+    actId: z
+      .string()
+      .optional()
+      .describe(
+        'start only: the task (act) these hours are for, from listMyTasksTool. It must be yours and hang on this mission; the hours are filed against it when the timer is saved on the site.'
       )
   }),
   execute: async (inputData) => {
-    const { action, missionId } = inputData;
+    const { action, missionId, actId } = inputData;
     const ctx = getMcpContext();
 
     if (!ctx?.userId || !ctx?.fetchInstance) {
@@ -169,7 +210,13 @@ export const timerActionTool = createTool({
             };
           }
 
-          await startTimer(
+          // Checked before the clock starts, so a wrong task starts nothing.
+          if (actId) {
+            const problem = await actTimerProblem(String(actId), String(targetMissionId), String(userId));
+            if (problem) return { success: false, message: problem, action };
+          }
+
+          const started: any = await startTimer(
             activeTimer,
             targetMissionId,
             userId,
@@ -179,13 +226,18 @@ export const timerActionTool = createTool({
             isServerRequest,
             { via }
           );
+          const startedId = started?.id ?? timerId;
+          const linked = actId && startedId ? await linkTimerToAct(String(startedId), String(actId)) : false;
 
           return {
             success: true,
-            message: `Timer started for ${missionName}`,
+            message:
+              `Timer started for ${missionName}` +
+              (actId ? (linked ? `, for task ${actId}.` : `. Task ${actId} could not be attached - pick it when saving the timer.`) : ''),
             action: action,
-            timerId: timerId.toString(),
-            missionId: targetMissionId
+            timerId: String(startedId),
+            missionId: targetMissionId,
+            ...(actId ? { actId: String(actId), actLinked: linked } : {})
           };
 
         case 'stop':

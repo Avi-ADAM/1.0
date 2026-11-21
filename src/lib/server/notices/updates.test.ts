@@ -225,12 +225,12 @@ describe('loadMyUpdates', () => {
     expect(out.waiting[0].figures[0]).toBe('15 hours');
   });
 
-  it('when the candidacies or her hidden list cannot be read, it says so — the rest still loads', async () => {
+  it('when the candidacies, her tasks or her hidden list cannot be read, it says so — the rest still loads', async () => {
     world();
     send.mockResolvedValue({ errors: [{ message: 'Forbidden access' }], data: null });
     prefs.mockResolvedValue(null);
     const out = await loadMyUpdates('271', fetch, { door: 'service', lang: 'en', now: NOW });
-    expect(out.unavailable).toEqual(['missionApplications', 'hiddenNotices']);
+    expect(out.unavailable).toEqual(['missionApplications', 'tasks', 'hiddenNotices']);
     expect(out.waiting.length).toBeGreaterThan(0);
   });
 

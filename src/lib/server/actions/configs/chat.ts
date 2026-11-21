@@ -1,7 +1,7 @@
 
 import type { ActionConfig } from '../types.js';
 import { env } from '$env/dynamic/private';
-import { forumParticipantIds, getForumEntity, leadOfForum, normalizeForum } from '../forumAccess.js';
+import { actThreadRecipients, forumParticipantIds, getForumEntity, leadOfForum, normalizeForum } from '../forumAccess.js';
 import { createChatMessageConsentSpec } from '$lib/consent/specs/s2b';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
 
@@ -100,7 +100,8 @@ export const chatActions: ActionConfig[] = [
             const projectName = forumView.projectName || '';
             const taskName = forumView.title || '';
             // A lead's conversation includes the person who asked (PLAN_LEADS L4).
-            const recipients = await forumParticipantIds(strapi, forumEntity, context);
+            // A task's thread is read by the rikma but written to its doer and validator.
+            const recipients = actThreadRecipients(forumEntity) ?? (await forumParticipantIds(strapi, forumEntity, context));
 
             // …and what is said there is part of the lead's story: the person
             // writing is an inbound contact, a member answering is contact out.

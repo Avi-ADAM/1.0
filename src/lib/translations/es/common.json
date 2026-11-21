@@ -83,7 +83,16 @@
     "saleLabel": "Venta: {{name}}",
     "saleReport": "Informe de venta",
     "saleReportNamed": "Informe de venta: {{name}}",
-    "meetingCreated": "Reunión creada"
+    "meetingCreated": "Reunión creada",
+    "report": {
+      "plan": "📋 Plan",
+      "progress": "⏳ Avance",
+      "blocked": "⛔ Bloqueado",
+      "done": "✅ Reportado como hecho",
+      "verify": "Cómo revisarlo:",
+      "remaining": "Queda para después:",
+      "notYet": "↩ Todavía no"
+    }
   },
   "footer": {
     "brain": "Cerebro de las rikmas",

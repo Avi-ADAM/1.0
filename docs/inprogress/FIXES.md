@@ -431,3 +431,43 @@
 > **הלקח:** בדיקות יחידה, `svelte-check` ואימות ברמת ה-API אישרו את שני אלה
 > כתקינים. מיפוי חסר ששקוף לטיפוסים, וצפיפות מידע — אף אחד משניהם לא מתגלה בלי
 > להסתכל על הדף.
+
+---
+
+## סבב 4 — XSS שמור בצ׳אט של הפורומים (2026-11-21) `[כללי]`
+
+**נמצא תוך כדי** בדיקת לולאת המשימות של הסוכן (`docs/tbd/PLAN_AGENT_WORK.md` AW1).
+ניתוח קוד + בדיקת רכיב; לא שוחזר מול backend חי.
+
+### 19. כל הודעת צ׳אט רונדרה דרך `{@html}`
+
+`src/lib/celim/messeges.svelte` (הבועה של `levchat.svelte`, `diun.svelte` ו-`/forum/[forumId]`)
+הציג כל הודעה רגילה ב-`{@html message}`, ושום דבר בדרך לא ניקה אותה:
+`createChatMessage` (`server/actions/configs/chat.ts`) שומר `message.trim()` כמו
+שהוא ב-`Message.content` (qid `1chatsend`), ו-`messageView` (`forumAccess.ts`) מעביר
+את `content` כמו שהוא. כל משתתף בשיחה — וגם סוכן דרך `postConversationMessageTool` —
+יכול היה להריץ קוד בדפדפן של שאר המשתתפים (`<img src=x onerror=…>`).
+
+**אף כותב לא שומר HTML מכוון.** כל קריאות `1chatsend` בשרת (`acceptRatsonProposal`,
+`directOffer`, `materializeWish`, `requestSuggestion`, `sendAskMessage`, …) כותבות טקסט
+פשוט, וכך גם כל הלקוחות (`createMessage`, `pmas`, `pandingMesima`, `diun`). לכן אין צורך
+בסניטייזר (וגם אין אחד ב-`package.json`).
+
+**תוקן:** ההודעה מרונדרת כטקסט. `src/lib/chat/messageText.ts` מפצל אותה לטקסט וקישורים:
+רק `http(s)://` נעשה לחיץ (`rel="noopener noreferrer nofollow"`, `target=_blank`),
+קישור נעצר ב-`<`, `>` ובמרכאות, וסימני פיסוק בסוף משפט נשארים מחוץ לקישור. `<br>`
+ששמור בשורות ישנות הופך לשבירת שורה (`whitespace-pre-line`), כל תג אחר מוצג כתווים
+שהוקלדו. מסלול הדוחות של משימות (`[1lev1:report` / `[1lev1:return]`) לא השתנה — הוא
+כבר רונדר כטקסט.
+
+**בדיקות:** `src/lib/chat/messageText.test.ts` (הפיצול, סכמות שאינן http(s)) ו-
+`src/lib/celim/messeges.svelte.test.ts` — הודעה `<img src=x onerror=alert(1)>` לא יוצרת
+אלמנט, `<script>` ו-`javascript:` מוצגים כטקסט.
+
+**מה עוד נבדק ונמצא תקין:** המייל של "הודעה חדשה" (`simpleNuti.svelte`) מכניס את גוף
+ההודעה כטקסט, טלגרם עושה escape, push הוא טקסט, ו-`ForumInboxList` / `chatSmall` לא
+משתמשים ב-`{@html}`.
+
+**נשאר פתוח (לא צ׳אט):** `{@html}` על טקסט שחברים כתבו גם ב-`prPr/tasks/taskModal.svelte`
+(`act.des`), `mail/missionInvite.svelte` (`descrip`) ו-`conf/{text,dateNego,kindOfnego}.svelte`
+(`htmlon`) — כל אחד צריך בדיקה משלו של מי כותב שם HTML מכוון (עורך `richText`).

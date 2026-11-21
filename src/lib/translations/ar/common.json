@@ -82,7 +82,16 @@
     "saleLabel": "بيع: {{name}}",
     "saleReport": "تقرير بيع",
     "saleReportNamed": "تقرير بيع: {{name}}",
-    "meetingCreated": "تم إنشاء الاجتماع"
+    "meetingCreated": "تم إنشاء الاجتماع",
+    "report": {
+      "plan": "📋 خطة العمل",
+      "progress": "⏳ تقدّم",
+      "blocked": "⛔ متوقف",
+      "done": "✅ أُبلغ عن الإنجاز",
+      "verify": "كيف يُتحقق:",
+      "remaining": "متبقٍّ لاحقًا:",
+      "notYet": "↩ ليس بعد"
+    }
   },
   "footer": {
     "brain": "عقل الريكمات",

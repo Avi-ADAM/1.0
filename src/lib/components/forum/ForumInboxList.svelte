@@ -2,6 +2,7 @@
   import { nameOf } from '$lib/translation/memberName';
   import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
+  import { messagePreview } from '$lib/acts/agentTasks';
 
   type ForumSummary = {
     id: string;
@@ -122,7 +123,7 @@
               <strong class="text-pink-100/90"
                 >{$nameOf(forum.lastMessage) || $t('common.forumInbox.system')}:</strong
               >
-              {forum.lastMessage.message}
+              {messagePreview(forum.lastMessage.message)}
             {:else}
               {$t('common.forumInbox.system')}
             {/if}

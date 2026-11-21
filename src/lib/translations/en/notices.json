@@ -84,5 +84,9 @@
   "notify": {
     "openRikma": "Open in the rikma",
     "openLev": "Open in the Heart"
+  },
+  "task": {
+    "approve": "The task \"{{item}}\" was handed to you and waits for your yes",
+    "validate": "The task \"{{item}}\" is reported done and waits for you to check it"
   }
 }

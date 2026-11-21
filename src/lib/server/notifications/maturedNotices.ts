@@ -800,3 +800,42 @@ export function dealReceiptMatured(p: { sheirutId: Id; projectId: Id; customerId
     }
   ];
 }
+
+// ── act validation (PLAN_AGENT_WORK AW1) ─────────────────────────────────────
+
+/** A done report its validator did not answer within restime: the task is validated. */
+export function actValidatedBySilence(p: {
+  projectId: Id;
+  actId: Id;
+  name: string;
+  doerIds: Id[];
+  validatorId: Id;
+}): MaturedNotice[] {
+  const url = p.projectId != null && p.actId != null ? `/moach/${p.projectId}/acts/${p.actId}` : moach(p.projectId, 'acts');
+  return [
+    {
+      kind: 'act',
+      intent: 'personal',
+      to: { userIds: p.doerIds },
+      title: L(`המטלה "${p.name}" אומתה בשתיקה`, `The task "${p.name}" was validated by silence`, `تم التحقق من المهمة «${p.name}» بالصمت`),
+      body: L(
+        'לא הייתה תשובה על הדיווח שהמטלה בוצעה בזמן התגובה של הרקמה, ולכן היא נסגרה כמאומתת.',
+        "There was no answer to the done report within the rikma's response time, so the task is closed as validated.",
+        'لم يصل رد على تقرير الإنجاز خلال وقت الاستجابة في الريكما، لذلك أُغلقت المهمة كمُتحقَّق منها.'
+      ),
+      url
+    },
+    {
+      kind: 'act',
+      intent: 'personal',
+      to: { userIds: [p.validatorId] },
+      title: L(`המטלה "${p.name}" אומתה בשתיקה`, `The task "${p.name}" was validated by silence`, `تم التحقق من المهمة «${p.name}» بالصمت`),
+      body: L(
+        'לא הייתה תשובה שלך על הדיווח בזמן התגובה של הרקמה, ולכן המטלה נסגרה כמאומתת. אם משהו עדיין לא עובד, אפשר לפתוח מטלה חדשה ולקשר אליה.',
+        "You did not answer the done report within the rikma's response time, so the task is closed as validated. If something still does not work, open a new task and link to it.",
+        'لم يصل ردّك على التقرير خلال وقت الاستجابة في الريكما، لذلك أُغلقت المهمة كمُتحقَّق منها. إن كان شيء ما زال لا يعمل، يمكن فتح مهمة جديدة والإشارة إليها.'
+      ),
+      url
+    }
+  ];
+}

@@ -72,6 +72,7 @@ import {
   postConversationMessageTool,
   openRikmaConversationTool
 } from '../../../mastra/tools/forumTools';
+import { listMyTasksTool, getTaskContextTool, claimTaskTool, reportTaskTool } from '../../../mastra/tools/agentTaskTools';
 import {
   proposeRikmaBlueprintTool,
   getAssistantTool,
@@ -269,6 +270,16 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   // Creates the rikma-wide thread on first use (the only forum that is not
   // attached to some object), then hands its id to the two tools above.
   openRikmaConversationTool: { tool: openRikmaConversationTool, title: "Open the rikma conversation", tier: 'communicate', project: 'member' },
+
+  // --- the task loop (PLAN_AGENT_WORK AW1). A task is named by its id, so the
+  // rikma - and the key scope - is known only once it is loaded: the tools check
+  // it themselves, and the two writes are actions with the real checks.
+  listMyTasksTool: { tool: listMyTasksTool, title: "List my tasks", tier: 'read', project: 'scope', scopedOutput: ['tasks'] },
+  getTaskContextTool: { tool: getTaskContextTool, title: "Get a task with its context", tier: 'read' },
+  // Binds only the caller: an act handed to them, or open to their role, becomes theirs.
+  claimTaskTool: { tool: claimTaskTool, title: "Take a task", tier: 'selfWrite', mission: 'member' },
+  // "done" hands the act to its validator, whose check is awaited - consent lands on them.
+  reportTaskTool: { tool: reportTaskTool, title: "Report on a task", tier: 'consentWrite' },
 
   getSitePagesTool: { tool: getSitePagesTool, title: "List site pages", tier: 'read' },
   // getPageContextTool is deliberately absent: its table (src/lib/bot/pageContexts.js)

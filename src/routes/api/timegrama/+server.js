@@ -33,7 +33,9 @@ import { shiftsEnabled, shiftsMode } from '$lib/server/shifts/mode.js';
 //ask need to creater 0on first vote or on request if the requester is project member4
 //מעביר ראשון ראשון ברסק , אם מישהו ביקש מחכים למענה בעניינו ורק לאחר שיש כן 1 לפחות או לא 1 לפחות  ניתן לקבלו או לא 1 לפחות וניתן להציע לאנשים נוספים, בקשה של הקודם כאשר יש לא נשארת אך ניתן להוסיף עוד סקשות
 import { SendToAdmin } from '$lib/server/sendToAdmin.js';
-import { realtimeBroadcaster, strapiClient } from '$lib/server/actions/index.js';
+import { actionService, realtimeBroadcaster, strapiClient } from '$lib/server/actions/index.js';
+import { serviceContext } from '$lib/server/github/service.js';
+import { matureActValidation } from '$lib/server/acts/validationClock';
 import { maturedScopes, relationSelection } from '$lib/server/realtime/timegramaScopes';
 import { projectIdsOf } from '$lib/realtime/scopes';
 import { tellMatured } from '$lib/server/notifications/matured';
@@ -249,8 +251,32 @@ async function x(id, kind, taid, fetch, scopes = []) {
     // the table is approved for the side that stayed silent (C-9).
     await WishProposal(id, taid, fetch);
   } else if (kind == 'act') {
-    // An automatic act is close to its due time (PLAN_SHOP_OPERATIONS A2). Whatever
-    // the act's state, the clock ends here; a failed read leaves it for the next run.
+    // Two clocks ride on the act relation. A done report its validator left
+    // unanswered is validated by silence (PLAN_AGENT_WORK AW1); an automatic act
+    // close to its due time gets its reminder (PLAN_SHOP_OPERATIONS A2) — whatever
+    // the act's state, that clock ends here; a failed read leaves it for the next run.
+    try {
+      const validation = await matureActValidation({
+        run: (qid, vars) => strapiClient.execute(qid, vars),
+        actId: String(id),
+        runAction: async (key, params, userId) => {
+          const res = await actionService.executeAction(key, params, serviceContext(userId, fetch));
+          return { success: !!res.success, error: res.error };
+        },
+        tell: (notices) => tellMatured(notices, fetch)
+      });
+      if (validation === 'failed') {
+        console.error(`[timegrama] act validation #${id} failed — left for the next run`);
+        return;
+      }
+      if (validation !== 'reminder') {
+        await markDone(taid, `act validation: ${validation}`);
+        return;
+      }
+    } catch (e) {
+      console.error(`[timegrama] act validation #${id} failed:`, e);
+      return;
+    }
     try {
       const outcome = await remindAct(
         (qid, vars) => strapiClient.execute(qid, vars),

@@ -40,7 +40,8 @@ const ALL: Array<[string, MaturedNotice[]]> = [
   ['fulfillmentRuleMatured', N.fulfillmentRuleMatured({ projectId: 7, name: 'משלוח', agreedIds: [4], proposerId: 5, live: true })],
   ['fulfillmentActDue', [N.fulfillmentActDue({ projectId: 7, name: 'משלוח · #1', userIds: [4], overdue: false })]],
   ['stockReceiptSettled', [N.stockReceiptSettled({ projectId: 7, name: 'צנצנות', quantity: 50 })]],
-  ['dealReceiptMatured', N.dealReceiptMatured({ sheirutId: 8, projectId: 7, customerIds: [5], memberIds: [4] })]
+  ['dealReceiptMatured', N.dealReceiptMatured({ sheirutId: 8, projectId: 7, customerIds: [5], memberIds: [4] })],
+  ['actValidatedBySilence', N.actValidatedBySilence({ projectId: 7, actId: 9, name: 'T', doerIds: [4], validatorId: 5 })]
 ];
 
 describe('every matured notice', () => {

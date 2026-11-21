@@ -2,6 +2,7 @@ import { digestQids, serviceTwin } from './qidsDigest.js';
 import { assistantQids } from './qidsAssistant.js';
 import { shopEditorQids } from './qidsShopEditor.js';
 import { fulfillmentQids } from './qidsFulfillment.js';
+import { agentTaskQids } from './qidsAgentTasks.js';
 import { shippingQids } from './qidsShipping.js';
 import { eventsQids } from './qidsEvents.js';
 
@@ -11420,6 +11421,14 @@ export const moachQids = {
         id
         attributes {
           shem des status naasa dateS dateF link
+          # The task page's lane and actions (getActStatus / ActQuickActions).
+          myIshur valiIshur isAssigned hashivut
+          tafkidims { data { id attributes { roleDescription } } }
+          mesimabetahaliches { data { id attributes { name } } }
+          pendm { data { id } }
+          open_mission { data { id } }
+          forums(pagination: { limit: 1 }) { data { id } }
+          timegrama { data { attributes { date done } } }
           my { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
           vali { data { id attributes { username nameLatin nameArabic nameCyrillic nameHebrew } } }
           # Ownership check for linkActToMission: the caller names the project
@@ -11809,6 +11818,9 @@ export const moachQids = {
     id
     attributes {
       subject
+      # A task's thread (PLAN_AGENT_WORK AW1): who a message there is for —
+      # its doer and its validator, not the whole rikma (chat.ts).
+      acts(pagination: { limit: 1 }) { data { id attributes { my { data { id } } vali { data { id } } } } }
       spec
       done
       createdAt
@@ -18897,6 +18909,7 @@ ${PROMO_DECISION_FIELDS}
   ...assistantQids,
   ...shopEditorQids,
   ...fulfillmentQids,
+  ...agentTaskQids,
   ...shippingQids,
   ...eventsQids
 };
