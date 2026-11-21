@@ -1,5 +1,6 @@
 <script>
-  import { useFormatMoney } from '$lib/money/context.svelte';
+  import { useFormatMoney, useProjectCurrency } from '$lib/money/context.svelte';
+  import CurrencySymbol from '$lib/components/money/CurrencySymbol.svelte';
   /**
    * "Dana marked ₪2,100 as sent — did it arrive?" (PLAN_STIPEND §6, §8).
    *
@@ -22,6 +23,7 @@
 
   let { buble, isFirst = false, onProj, onUser, onDone } = $props();
   const fmtMoney = useFormatMoney();
+  const projectCurrency = useProjectCurrency();
 
   let busy = $state(false);
   let counterOpen = $state(false);
@@ -114,7 +116,8 @@
       <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-3 flex flex-col gap-2">
         <label class="flex flex-col gap-1">
           <span class="text-xs font-bold uppercase text-gray-600 dark:text-gray-300"
-            >{$t('stipend.confirm.howMuchArrived')}</span
+            >{$t('stipend.confirm.howMuchArrived')}
+            <CurrencySymbol currency={projectCurrency(buble.projectId)} /></span
           >
           <input
             type="number"

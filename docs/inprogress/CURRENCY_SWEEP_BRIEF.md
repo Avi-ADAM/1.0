@@ -19,7 +19,7 @@ top table says what's done. Mark `[x]` there as you go, and add a
 | 1 — moach | ✅ done (`67ef3d3c`). Audit went from 96/142 to 88/132. |
 | 2 — heart / hub | Display fixes complete. See [batch2-report.md](./batch2-report.md). |
 | 3 — public pages / deals / concierge | Display fixes complete. See [batch3-report.md](./batch3-report.md) for the remaining verification gates. |
-| 4 — translations / server / mails / Telegram | ⏳. Also `project.finisin.currency`, which has had no call site since batch 1. |
+| 4 — translations / server / mails / Telegram | ✅ done. See [batch4-report.md](./batch4-report.md). C8–C11 are complete; C12 is still out of scope. |
 
 Deferred, don't do: `prPr/missionForm/MissionSummary` — its callers already
 pass it a string formatted in the right currency, so changing it would be a

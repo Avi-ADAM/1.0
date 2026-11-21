@@ -762,6 +762,7 @@
           <SiteShareDecision
             proposed={myProposed}
             basis={myShare}
+            {projectId}
             initial={initialDecision}
             busy={ssBusy}
             onDecide={onMyDecide}

@@ -1,5 +1,6 @@
 <script>
   import { useFormatMoney } from '$lib/money/context.svelte';
+  import CurrencySymbol from '$lib/components/money/CurrencySymbol.svelte';
   /**
    * "This mission also wants a subsistence stipend" — stated while the mission
    * is being written (docs/done/PLAN_STIPEND.md §13).
@@ -110,7 +111,7 @@
   {#if open || active}
     <div class="mt-3 flex flex-col gap-3">
       <label class="flex flex-col gap-1">
-        <span class={LABEL}>{$t('stipend.terms.rate')}</span>
+        <span class={LABEL}>{$t('stipend.terms.rate')} <CurrencySymbol /></span>
         <input type="number" min="0" step="1" bind:value={rate} class={INPUT} />
         {#if Number(marketRate) > 0}
           <span class={MUTED}>

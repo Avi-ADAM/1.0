@@ -29,7 +29,7 @@
     "roundLabel": "Round",
     "proposerYou": "You",
     "proposerPartner": "Dana",
-    "perHourUnit": "$/hour",
+    "perHourUnit": "{{amount}}/hour",
     "hoursUnit": "hours",
     "totalLabel": "Total",
     "windowLabel": "Decision time remaining",
@@ -40,7 +40,7 @@
     "actions": { "approve": "Approve", "discuss": "Discuss", "counter": "Counter" },
     "counterForm": {
       "title": "Your version",
-      "perHourLabel": "Rate per hour ($)",
+      "perHourLabel": "Rate per hour",
       "hoursLabel": "Number of hours",
       "noteLabel": "Note (optional)",
       "notePlaceholder": "Why are you proposing this?",

@@ -31,7 +31,7 @@ export const createMissionTool = createTool({
     roles:       z.array(z.string()).optional().describe('Role/position names for the mission.'),
     workways:    z.array(z.string()).optional().describe('Work mode names (remote, onsite, hybrid…).'),
     nhours:      z.number().optional().describe('Estimated hours.'),
-    valph:       z.number().optional().describe('Value per hour (₪/$ per hour).'),
+    valph:       z.number().optional().describe("Value per hour, in the rikma's currency."),
     iskvua:      z.boolean().optional().describe('True if this is a recurring monthly mission.'),
     dateStart:   z.string().optional().describe('Start date (ISO 8601).'),
     dateEnd:     z.string().optional().describe('End date (ISO 8601).'),

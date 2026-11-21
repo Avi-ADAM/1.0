@@ -3,6 +3,9 @@
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import LangSwitch from '$lib/components/onboard/LangSwitch.svelte';
   import { onDestroy } from 'svelte';
+  import { useFormatMoney } from '$lib/money/context.svelte';
+  import { DEFAULT_CURRENCY } from '$lib/money/currencies.js';
+  import CurrencySymbol from '$lib/components/money/CurrencySymbol.svelte';
 
   // Registration route mirrors the home page: locale-aware convention/agreement signup.
   let registerHref = $derived(
@@ -38,6 +41,9 @@
     isYou(p) ? $t('consensus.demo.proposerYou') : $t('consensus.demo.proposerPartner');
 
   let currentTotal = $derived(demo.current.valuePerHour * demo.current.hours);
+  // The demo belongs to no rikma, so its figures are in the platform's default currency.
+  const fmtMoney = useFormatMoney();
+  const demoMoney = (n) => fmtMoney(n, DEFAULT_CURRENCY);
   let timePercent = $derived(Math.max(0, Math.min(100, (demo.timeLeft / DEMO_DURATION) * 100)));
   let roundNumber = $derived(demo.rounds.length + 1);
   let canSimulatePartner = $derived(isYou(demo.current.proposer) && !demo.signed);
@@ -262,7 +268,7 @@
                 : $t('consensus.demo.signed.body')}
             </p>
             <div class="cp-signed-summary">
-              {proposerLabel(demo.current.proposer)} · {demo.current.valuePerHour} {$t('consensus.demo.perHourUnit')} × {demo.current.hours} {$t('consensus.demo.hoursUnit')} = {currentTotal}
+              {proposerLabel(demo.current.proposer)} · {$t('consensus.demo.perHourUnit', { amount: demoMoney(demo.current.valuePerHour) })} × {demo.current.hours} {$t('consensus.demo.hoursUnit')} = {demoMoney(currentTotal)}
             </div>
             <button type="button" class="cp-btn cp-btn--gold" onclick={restartDemo}>
               {$t('consensus.demo.signed.restart')}
@@ -277,7 +283,7 @@
               <span class="cp-round-timer">{demo.timeLeft}s</span>
             </div>
             <div class="cp-round-total">
-              {demo.current.valuePerHour} {$t('consensus.demo.perHourUnit')} × {demo.current.hours} {$t('consensus.demo.hoursUnit')} = {currentTotal}
+              {$t('consensus.demo.perHourUnit', { amount: demoMoney(demo.current.valuePerHour) })} × {demo.current.hours} {$t('consensus.demo.hoursUnit')} = {demoMoney(currentTotal)}
             </div>
             {#if currentNote}
               <p class="cp-round-note">{currentNote}</p>
@@ -320,7 +326,7 @@
                 <div class="cp-counter-title">{$t('consensus.demo.counterForm.title')}</div>
                 <div class="cp-counter-fields">
                   <label class="cp-field">
-                    {$t('consensus.demo.counterForm.perHourLabel')}
+                    <span>{$t('consensus.demo.counterForm.perHourLabel')} <CurrencySymbol currency={DEFAULT_CURRENCY} /></span>
                     <input type="number" bind:value={demo.counterValue} />
                   </label>
                   <label class="cp-field">
@@ -381,7 +387,7 @@
             {#each historyDisplay as r (r.n)}
               <div class="cp-history-row">
                 <span>
-                  {$t('consensus.demo.roundLabel')} {r.n} · {r.proposerText} · {r.valuePerHour} {$t('consensus.demo.perHourUnit')} × {r.hours} {$t('consensus.demo.hoursUnit')}
+                  {$t('consensus.demo.roundLabel')} {r.n} · {r.proposerText} · {$t('consensus.demo.perHourUnit', { amount: demoMoney(r.valuePerHour) })} × {r.hours} {$t('consensus.demo.hoursUnit')}
                 </span>
                 <span class="cp-history-badge cp-history-badge--{r.statusClass}">{r.statusText}</span>
               </div>

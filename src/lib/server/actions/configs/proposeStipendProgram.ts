@@ -26,6 +26,7 @@
 import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { restimeLabel } from './actionUtils.js';
+import { moneyTextFor } from '$lib/server/money/notifyMoney.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { dateField, enumField, fields, gqlStr, numField, run, strField } from '$lib/server/archive/gql.js';
 import { openStipendDecision } from '$lib/server/stipend/decision.js';
@@ -59,6 +60,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
 
   const project = await fetchProjectContext(exec, projectId);
   if (!project) throw new Error(`Project ${projectId} not found`);
+  // Every amount below is stored in the rikma's currency; say it in that one.
+  const money = moneyTextFor(project.currency);
   if (!project.memberIds.includes(userId)) {
     throw new Error('Only a member of the rikma may propose a stipend program');
   }
@@ -212,14 +215,14 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     ? project.members.find((m) => m.id === recipientId)?.username ?? ''
     : '';
   const budgetLabel = openEnded
-    ? `עד ₪${terms.monthlyCap} לחודש, עד עצירה`
-    : `תקציב ₪${terms.totalCap}`;
+    ? `עד ${money(terms.monthlyCap, 'he')} לחודש, עד עצירה`
+    : `תקציב ${money(terms.totalCap, 'he')}`;
   const forWhom = recipientName ? `ל${recipientName}` : 'לרקמה';
   const namedMission = missions.length === 1 ? missions[0] : openMission;
   const forWhat = namedMission ? ` · ${namedMission.name}` : '';
   const name = params.name
     ? String(params.name)
-    : `מלגת קיום ${forWhom}${forWhat} · ₪${terms.stipendRate}/ש׳ · ${budgetLabel}`;
+    : `מלגת קיום ${forWhom}${forWhat} · ${money(terms.stipendRate, 'he')}/ש׳ · ${budgetLabel}`;
 
   const created = await run(
     exec,
@@ -329,11 +332,11 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   if (notifier) {
     const lang = (context.lang === 'he' ? 'he' : 'en') as 'he' | 'en';
     const budgetHe = openEnded
-      ? `עד ₪${terms.monthlyCap} לחודש, ללא תאריך סיום — ממשיך עד שעוצרים אותו`
-      : `תקציב כולל ₪${terms.totalCap}`;
+      ? `עד ${money(terms.monthlyCap, 'he')} לחודש, ללא תאריך סיום — ממשיך עד שעוצרים אותו`
+      : `תקציב כולל ${money(terms.totalCap, 'he')}`;
     const budgetEn = openEnded
-      ? `up to ${terms.monthlyCap} a month, with no end date — it runs until someone stops it`
-      : `a total budget of ${terms.totalCap}`;
+      ? `up to ${money(terms.monthlyCap, 'en')} a month, with no end date — it runs until someone stops it`
+      : `a total budget of ${money(terms.totalCap, 'en')}`;
 
     // Who and what for — the two things a voter needs before any number.
     const missionNames = [...missions, ...(openMission ? [openMission] : [])].map((m) => m.name);
@@ -359,8 +362,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
             templates: {
               title: { he: 'הצעה לתוכנית מלגות קיום', en: 'A subsistence stipend program was proposed' },
               body: {
-                he: `${forWhomHe}: ₪${terms.stipendRate} לשעה, ${budgetHe}. הקלף מראה מה יקרה לחלק שלך. אפשר לאשר, לפתוח שיחה או להציע תקציב או חלוקת-עלות אחרת. ללא תגובה תוך ${restimeLabel(project.restime, 'he')} ההצעה תאושר מעצמה — אלא אם המממן עדיין לא חתם.`,
-                en: `${forWhomEn}: ${terms.stipendRate} per hour, ${budgetEn}. The card shows what happens to your share. Approve, discuss, or propose a different budget or cost split — with no response within ${restimeLabel(project.restime, lang)} it is approved on its own, unless the funder has yet to sign.`
+                he: `${forWhomHe}: ${money(terms.stipendRate, 'he')} לשעה, ${budgetHe}. הקלף מראה מה יקרה לחלק שלך. אפשר לאשר, לפתוח שיחה או להציע תקציב או חלוקת-עלות אחרת. ללא תגובה תוך ${restimeLabel(project.restime, 'he')} ההצעה תאושר מעצמה — אלא אם המממן עדיין לא חתם.`,
+                en: `${forWhomEn}: ${money(terms.stipendRate, 'en')} per hour, ${budgetEn}. The card shows what happens to your share. Approve, discuss, or propose a different budget or cost split — with no response within ${restimeLabel(project.restime, lang)} it is approved on its own, unless the funder has yet to sign.`
               }
             },
             // Every member votes on a program that dilutes them.
@@ -387,8 +390,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
                 en: 'A subsistence stipend was proposed for you'
               },
               body: {
-                he: `הוצע שהרקמה תממן לך ₪${terms.stipendRate} לשעה מאושרת${missionHe}, ${budgetHe}. הקלף מראה מה את/ה מקבל/ת ומה זה עושה לחלק שלך. אפשר לאשר, לפתוח שיחה או להציע תנאים אחרים.`,
-                en: `It was proposed that the rikma funds you at ${terms.stipendRate} per approved hour${missionEn}, ${budgetEn}. The card shows what you receive and what it does to your share. Approve, open a discussion, or propose different terms.`
+                he: `הוצע שהרקמה תממן לך ${money(terms.stipendRate, 'he')} לשעה מאושרת${missionHe}, ${budgetHe}. הקלף מראה מה את/ה מקבל/ת ומה זה עושה לחלק שלך. אפשר לאשר, לפתוח שיחה או להציע תנאים אחרים.`,
+                en: `It was proposed that the rikma funds you at ${money(terms.stipendRate, 'en')} per approved hour${missionEn}, ${budgetEn}. The card shows what you receive and what it does to your share. Approve, open a discussion, or propose different terms.`
               }
             },
             // The recipient is asked to accept.
@@ -415,8 +418,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
                 en: 'You were named as the funder of a stipend program'
               },
               body: {
-                he: `הוצע שאת/ה תממן/י ${recipientName ? `את ${recipientName}` : 'מלגת קיום'}${missionHe} ב־₪${terms.stipendRate} לשעה מאושרת, ${budgetHe}. זו התחייבות לתשלום מכיסך: היא לא תיכנס לתוקף בלי אישור מפורש שלך, גם אם אף אחד אחר לא יגיב. אפשר לאשר, לפתוח שיחה או להציע תנאים אחרים.`,
-                en: `You have been proposed as the funder of ${recipientName ? recipientName + '’s' : 'a'} subsistence stipend${missionEn} at ${terms.stipendRate} per approved hour, ${budgetEn}. This is a commitment to pay out of your own pocket: it cannot take effect without your explicit approval, no matter who else stays silent. Approve, open a discussion, or propose different terms.`
+                he: `הוצע שאת/ה תממן/י ${recipientName ? `את ${recipientName}` : 'מלגת קיום'}${missionHe} ב־${money(terms.stipendRate, 'he')} לשעה מאושרת, ${budgetHe}. זו התחייבות לתשלום מכיסך: היא לא תיכנס לתוקף בלי אישור מפורש שלך, גם אם אף אחד אחר לא יגיב. אפשר לאשר, לפתוח שיחה או להציע תנאים אחרים.`,
+                en: `You have been proposed as the funder of ${recipientName ? recipientName + '’s' : 'a'} subsistence stipend${missionEn} at ${money(terms.stipendRate, 'en')} per approved hour, ${budgetEn}. This is a commitment to pay out of your own pocket: it cannot take effect without your explicit approval, no matter who else stays silent. Approve, open a discussion, or propose different terms.`
               }
             },
             // The funder is asked to commit money of their own.
@@ -456,9 +459,9 @@ export const proposeStipendProgramConfig: ActionConfig = {
   paramSchema: {
     projectId: { type: 'string', required: true, description: 'Rikma the program belongs to' },
     name: { type: 'string', required: false, description: 'Program name' },
-    stipendRate: { type: 'number', required: false, description: 'Maximum ₪ per approved hour' },
+    stipendRate: { type: 'number', required: false, description: "Maximum amount per approved hour, in the rikma's currency" },
     totalCap: { type: 'number', required: false, description: 'Total budget — the closed bound on the dilution. Optional only when monthlyCap is given (an open-ended program that runs until stopped)' },
-    monthlyCap: { type: 'number', required: false, description: '₪ ceiling per cycle per recipient — and the bound of an open-ended program' },
+    monthlyCap: { type: 'number', required: false, description: "Ceiling per cycle per recipient, in the rikma's currency — and the bound of an open-ended program" },
     mode: { type: 'string', required: false, description: 'equity (default) | advance | gift' },
     costShare: { type: 'number', required: false, description: 'α — 0 (default for a program) puts the cost on the whole rikma' },
     equityMultiplier: { type: 'number', required: false, description: 'k — risk premium for the funder, ≥ 1' },

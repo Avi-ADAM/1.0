@@ -11,7 +11,7 @@
 > | 1 — moach | ✅ done (commit `67ef3d3c`, report: [batch1-report.md](./batch1-report.md)). Items 1, 2b, 7, 8 moved out (not moach-only), 9 deferred. |
 > | 2 — heart / hub | Display fixes complete, including 44, 46, 47b and 47c. [Report](./batch2-report.md); full type-check gate open. |
 > | 3 — public pages, deals, concierge | Display fixes complete, including 7 and 8. [Report](./batch3-report.md); full verification gate open. |
-> | 4 — translations, server, mails, Telegram | ⏳ not started — also the `project.finisin.currency` key, unused since batch 1. |
+> | 4 — translations, server, mails, Telegram | ✅ done — [report](./batch4-report.md). Unused keys left in place: `revenue.amount`, `revenue.amountOpt`, `project.currency`, `project.finisin.currency`. |
 >
 > Latest audit: **59 files / 59 lines** after batch 3; **69 / 81** after finishing batch 2.
 > Earlier batch-2 handover measurement (2026-11-19): **69 files / 82 lines** (after batch 1: 88 / 132; baseline 96 / 142).
@@ -669,7 +669,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
 > `{{amount}}` placeholder and format with `fmt(x, code)` at the call site.
 > Keys with **no call site**: leave the key in place, note in the report.
 
-- [ ] 76. **`stipend.terms.rate`** — path: `src/lib/translations/*/stipend.json`
+- [x] 76. **`stipend.terms.rate`** — path: `src/lib/translations/*/stipend.json`
   - Current he: `"rate": "תעריף המלגה (₪ לשעה)"`.
   - Remove `₪` from all 5 locales (the parenthetical, keep the Hebrew label).
   - Call sites: `StipendTermsFields.svelte`, `MissionStipendSection.svelte`,
@@ -681,23 +681,23 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
     `₪` from the label text.
   - Verify: `npm run check` and `npm run check:i18n`.
 
-- [ ] 77. **`stipend.terms.monthlyCap`** — `src/lib/translations/*/stipend.json`
+- [x] 77. **`stipend.terms.monthlyCap`** — `src/lib/translations/*/stipend.json`
   - Same approach as `rate`: remove `₪` from label, add `<CurrencySymbol>`.
   - Call sites: `StipendTermsFields.svelte`.
   - Verify: `npm run check` and `npm run check:i18n`.
 
-- [ ] 78. **`stipend.terms.totalCap`** — same file
+- [x] 78. **`stipend.terms.totalCap`** — same file
   - Same approach.
   - Call sites: `StipendTermsFields.svelte`, `StipendDecisionCard.svelte`,
     `StipendFundingRequestDialog.svelte`.
   - Verify.
 
-- [ ] 79. **`stipend.terms.revenueTrigger`** — same file
+- [x] 79. **`stipend.terms.revenueTrigger`** — same file
   - Same approach.
   - Call sites: `StipendTermsFields.svelte`.
   - Verify.
 
-- [ ] 80. **`stipend.confirmation.howMuchArrived`** — same file
+- [x] 80. **`stipend.confirmation.howMuchArrived`** — same file
   - Current he: `"howMuchArrived": "כמה באמת הגיע (₪)"`.
   - Remove `₪`. Find call sites (`grep -rn "howMuchArrived" src`). Add
     `<CurrencySymbol>` next to the input.
@@ -715,7 +715,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
   - After item 72 removes it from markup, delete the key from all 5 locales.
   - Verify: `npm run check:i18n`.
 
-- [ ] 83. **`consensus.demo.perHourUnit`** — `src/lib/translations/*/consensus.json`
+- [x] 83. **`consensus.demo.perHourUnit`** — `src/lib/translations/*/consensus.json`
   - Current he: `"perHourUnit": "₪ לשעה"`.
   - This appears inline as `{demo.current.valuePerHour} {$t('consensus.demo.perHourUnit')}`.
   - Switch to a placeholder: change all 5 locale strings to e.g. `"{{amount}} לשעה"` / `"{{amount}} per hour"`.
@@ -726,14 +726,14 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
     for the demo.)
   - Verify.
 
-- [ ] 84. **`consensus.demo.counterForm.perHourLabel`** — same file
+- [x] 84. **`consensus.demo.counterForm.perHourLabel`** — same file
   - Current he: `"perHourLabel": "תעריף לשעה (₪)"`.
   - Remove `₪` from all 5 locales.
   - Call site: `routes/(regandnon)/consensus/+page.svelte`. Add
     `<CurrencySymbol currency="ILS" />` next to the input.
   - Verify.
 
-- [ ] 85. **`concierge.new.budgetLabel`** — `src/lib/translations/*/concierge.json`
+- [x] 85. **`concierge.new.budgetLabel`** — `src/lib/translations/*/concierge.json`
   - Current he: `"budgetLabel": "תקציב (₪)"`.
   - Remove `₪` from all 5 locales.
   - Call site: `src/lib/components/concierge/WishForm.svelte` (line ~2536).
@@ -741,17 +741,17 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
     budget input.
   - Verify.
 
-- [ ] 86. **`concierge.new.money.fixedAmount`** and **`concierge.new.money.atCostAmount`** — same file
+- [x] 86. **`concierge.new.money.fixedAmount`** and **`concierge.new.money.atCostAmount`** — same file
   - Same pattern as `budgetLabel`.
   - Verify.
 
-- [ ] 87. **`revenue.amount`** and **`revenue.amountOpt`** — `src/lib/translations/*/revenue.json`
+- [x] 87. **`revenue.amount`** and **`revenue.amountOpt`** — `src/lib/translations/*/revenue.json`
   - Both have `(₪)` baked in.
   - Call sites: `grep -rn "revenue\.amount" src` → **no call sites found in
     initial search**. Leave the keys in place and note in the report:
     "revenue.amount and revenue.amountOpt have no call sites."
 
-- [ ] 88. **`project.currency`** — `src/lib/translations/*/project.json`
+- [x] 88. **`project.currency`** — `src/lib/translations/*/project.json`
   - Current he: `"currency": "₪"`. This is used as a column header label.
   - Call sites: `grep -rn "project\.currency" src` — found in
     `src/lib/server/actions/configs/proposeStipendPledge.ts` (not a translation
@@ -762,7 +762,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
   - If a call site exists: remove `₪` from all 5 locales and add
     `<CurrencySymbol>` at the call site.
 
-- [ ] 89. **`server.stipend`** and **`server.stipendWithBudget`** — `src/lib/translations/*/server.json`
+- [x] 89. **`server.stipend`** and **`server.stipendWithBudget`** — `src/lib/translations/*/server.json`
   - Current he: `"stipend": "למימון מלגת הקיום שלה (₪{{rate}} לשעה)"`.
   - The symbol is inside a sentence (the `₪` before `{{rate}}`). Switch to
     passing an already-formatted amount: change the template to
@@ -778,7 +778,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
 
 ### C11 — Server files
 
-- [ ] 90. **`src/lib/server/actions/configs/proposeStipendProgram.ts`** — lines 215–362
+- [x] 90. **`src/lib/server/actions/configs/proposeStipendProgram.ts`** — lines 215–362
   - Pattern: `₪${terms.X}` → `m(terms.X, lang)` where
     `m = moneyTextFor(rikmaCode)`.
   - At the top of the action's run function (before the first notification
@@ -802,7 +802,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
     `'₪ ceiling per cycle'` → `'Ceiling per cycle (in the rikma\'s currency)'`.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 91. **`src/lib/server/actions/configs/publishStipendFundingRequest.ts`** — lines 72–82
+- [x] 91. **`src/lib/server/actions/configs/publishStipendFundingRequest.ts`** — lines 72–82
   - Remove the local `nis()` helper.
   - Add at the top of the run function:
     ```ts
@@ -815,7 +815,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
   - For the AI param description `'₪ per month'` → `'per month (in the rikma\'s currency)'`.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 92. **`src/lib/server/actions/configs/requestDonation.ts`** — line ~76
+- [x] 92. **`src/lib/server/actions/configs/requestDonation.ts`** — line ~76
   - `${amount}₪` → `moneyTextFor(rikmaCurrency(projectAttrs))(amount, context.lang)`.
   - For the `server.stipend*` translation fix (item 89): the action already
     calls `sendToSer … missionDonationTarget`. Find that qid, add `currencyCode`
@@ -824,7 +824,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
   - Derive `const projectCurrency = rikmaCurrency(oma?.project?.data?.attributes)`.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 93. **`src/lib/server/notifications/maturedNotices.ts`** — lines 550, 562
+- [x] 93. **`src/lib/server/notifications/maturedNotices.ts`** — lines 550, 562
   - `stipendPaymentConfirmed` signature currently: `{ projectId, projectName, amount, … }`.
   - Add `currency?: CurrencyCode` to the parameter type (optional, default
     `'ILS'` for backward compat).
@@ -839,7 +839,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
 
 ### Mails
 
-- [ ] 94. **`src/lib/components/mail/HalukaApproved.svelte`** — line 195
+- [x] 94. **`src/lib/components/mail/HalukaApproved.svelte`** — line 195
   - Add `currency` prop (default `'ILS'`) to the component's `$props()`.
   - Import `formatMoney` from `$lib/money/format.js`.
   - Replace `{amount} ₪` with `{formatMoney(amount, currency, lang ?? 'he')}`.
@@ -849,7 +849,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
     to the template props when available.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 95. **`src/lib/components/mail/monthlyRecurringSale.svelte`** (audit shows `₪1`, meaning 1 `<Money>` or 1 `₪` symbol)
+- [x] 95. **`src/lib/components/mail/monthlyRecurringSale.svelte`** (audit shows `₪1`, meaning 1 `<Money>` or 1 `₪` symbol)
   - Add `currency` prop (default `'ILS'`).
   - Import `formatMoney` from `$lib/money/format.js`.
   - Replace every `{amount} ₪` or `{amount}₪` with
@@ -858,14 +858,14 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
     Pass the rikma's currency code when sending.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 96. **`src/lib/components/mail/monthlyResourceActive.svelte`** (same, `₪1`)
+- [x] 96. **`src/lib/components/mail/monthlyResourceActive.svelte`** (same, `₪1`)
   - Same pattern as `monthlyRecurringSale`.
   - Find sender. Pass currency.
   - Verify: `npm run check` — no new errors.
 
 ### Telegram
 
-- [ ] 97. **`src/lib/server/telegram/botTexts.js`** — `salePricePrompt` in all 5 languages (lines 103, 246, 389, 532, 675)
+- [x] 97. **`src/lib/server/telegram/botTexts.js`** — `salePricePrompt` in all 5 languages (lines 103, 246, 389, 532, 675)
   - Remove `(₪)` from each `salePricePrompt` string.
   - Add `{{currency}}` placeholder: e.g. `'שלח/י מחיר ליחידה ({{currency}}):'`.
   - Verify the file exports a function that accepts variables and check how
@@ -875,7 +875,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
     "botTexts.js does not support runtime substitution; ₪ removed from prompts
     but dynamic symbol not yet injected."
 
-- [ ] 98. **`src/routes/api/newTelegram/+server.js`** — lines 321, 326
+- [x] 98. **`src/routes/api/newTelegram/+server.js`** — lines 321, 326
   - Lines: `` `${sale.each} ₪` `` and `` `${total} ₪` ``.
   - Check whether `sale.projectId` is available at this point (it is — confirmed
     from the `pendingSale` state map which carries `projectId`).
@@ -890,7 +890,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
   - **Report**: `saleCenterUserProducts` now selects `currencyCode`.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 99. **Batch 4 gate**
+- [x] 99. **Batch 4 gate**
   - `node scripts/audit-money-display.mjs` — remaining lines should all be
     confirmed non-money numbers or out-of-scope items (list each with reason).
   - `grep -rn "₪" src --include="*.svelte" --include="*.ts" --include="*.js" | grep -v translations` — only comments, out-of-scope files (`$lib/money/**`, `externalOffers.ts`, `/api/chat`), and `$lib/crypto/money.ts`.

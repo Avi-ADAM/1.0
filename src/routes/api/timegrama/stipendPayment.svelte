@@ -14,6 +14,7 @@
   import { SendToAdmin } from '$lib/server/sendToAdmin.js';
   import { tellMatured } from '$lib/server/notifications/matured';
   import { stipendPaymentConfirmed } from '$lib/server/notifications/maturedNotices';
+  import { rikmaCurrency } from '$lib/money/resolve.js';
   // Server-only secret — this module is imported only by timegrama/+server.js.
   import { env } from '$env/dynamic/private';
 
@@ -36,7 +37,7 @@
           haluka { data { id } }
           funder { data { id } }
           recipient { data { id } }
-          project { data { id attributes { projectName } } }
+          project { data { id attributes { projectName currencyCode } } }
         } } } }`,
         env.ADMINMONTHER
       );
@@ -80,6 +81,7 @@
           projectId,
           projectName,
           amount,
+          currency: rikmaCurrency(a.project?.data?.attributes),
           moved,
           recipientId: a.recipient?.data?.id,
           funderId: a.funder?.data?.id

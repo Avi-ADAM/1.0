@@ -30,7 +30,7 @@
     "roundLabel": "Ronda",
     "proposerYou": "Tú",
     "proposerPartner": "Dana",
-    "perHourUnit": "$/hora",
+    "perHourUnit": "{{amount}}/hora",
     "hoursUnit": "horas",
     "totalLabel": "Total",
     "windowLabel": "Tiempo de decisión restante",
@@ -41,7 +41,7 @@
     "actions": { "approve": "Aprobar", "discuss": "Discutir", "counter": "Contraproponer" },
     "counterForm": {
       "title": "Tu versión",
-      "perHourLabel": "Tarifa por hora ($)",
+      "perHourLabel": "Tarifa por hora",
       "hoursLabel": "Número de horas",
       "noteLabel": "Nota (opcional)",
       "notePlaceholder": "¿Por qué propones esto?",

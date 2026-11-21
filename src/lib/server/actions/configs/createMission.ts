@@ -809,7 +809,7 @@ export const createMissionConfig: ActionConfig = {
     assignedUserId:     { type: 'string',  required: false, description: 'Assigned user ID (branch 2: specific member, branch 4: self = context.userId)' },
     checklist:          { type: 'array',   required: false, description: 'Checklist tasks [{shem, des?, link?, dateS?, dateF?}]' },
     processId:          { type: 'string',  required: false, description: 'Process ID to attach created entity to' },
-    stipendRate:        { type: 'number',  required: false, description: 'Subsistence stipend this mission comes with, ₪ per approved hour (≤ valph)' },
+    stipendRate:        { type: 'number',  required: false, description: "Subsistence stipend this mission comes with, in the rikma's currency per approved hour (≤ valph)" },
     stipendCostShare:   { type: 'number',  required: false, description: 'α — 1 (default) the recipient carries it and nobody is diluted, 0 the whole rikma does' },
     stipendMode:        { type: 'string',  required: false, description: 'equity (default) | gift' },
     stipendFunderId:    { type: 'string',  required: false, description: 'Member offering to fund it, when there already is one' },

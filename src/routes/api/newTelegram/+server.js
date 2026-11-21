@@ -1,6 +1,8 @@
 // create a server with telegraf to listen for new messages
 import { Telegraf, Markup } from 'telegraf';
 import { sendToSer } from '$lib/send/sendToSer.js';
+import { formatMoney, currencySymbol } from '$lib/money/format.js';
+import { rikmaCurrency } from '$lib/money/resolve.js';
 import { startTimer, stopTimer, saveTimer, updateTimer, calculateTotalHours } from '$lib/func/timers.js';
 import {
     normalizeSaveLink,
@@ -189,6 +191,8 @@ async function getUserProducts(uid, fetchInstance) {
                     kindOf: product.attributes.kindOf ?? 'total',
                     projectId: project.id,
                     projectName: project.attributes.projectName,
+                    // Prices are stored in the rikma's currency.
+                    currency: rikmaCurrency(project.attributes),
                     projectUsers // [{ id, attributes: { username } }]
                 });
             }
@@ -311,6 +315,7 @@ function formatSaleCard(sale, lang) {
     const t = (key) => getText(key, lang);
     const total = calcSaleTotal(sale);
     const isSubscription = sale.kindOf === 'monthly' || sale.kindOf === 'yearly';
+    const money = (n) => formatMoney(Number(n), sale.currency ?? 'ILS', lang);
 
     const kindLabel = sale.kindOf === 'monthly' ? ` (${t('saleKindMonthly')})`
         : sale.kindOf === 'yearly' ? ` (${t('saleKindYearly')})` : '';
@@ -318,12 +323,12 @@ function formatSaleCard(sale, lang) {
     if (sale.kindOf !== 'total' && sale.kindOf !== 'unlimited') {
         card += `📊 ${t('saleCardQty')}: *${sale.quantity}*\n`;
     }
-    card += `💰 ${t('saleCardPerUnit')}: *${sale.each} ₪*\n`;
+    card += `💰 ${t('saleCardPerUnit')}: *${money(sale.each)}*\n`;
     if (isSubscription && sale.startDate) {
         card += `📅 ${t('saleCardFrom')}: *${fmt(sale.startDate)}*`;
         card += sale.finishDate ? ` ${t('saleCardTo')}: *${fmt(sale.finishDate)}*\n` : ` (${t('saleCardOpen')})\n`;
     }
-    card += `💵 ${t('saleCardTotal')}: *${total} ₪*\n`;
+    card += `💵 ${t('saleCardTotal')}: *${money(total)}*\n`;
     card += `🗓️ ${t('saleCardDate')}: *${fmt(sale.saleDate)}*\n`;
     card += `👤 ${t('saleCardHolder')}: *${sale.holderName}*`;
     if (sale.note) card += `\n📋 ${t('saleCardNote')}: _${sale.note}_`;
@@ -1348,6 +1353,7 @@ bot.action(/^saleProd-(\d+)-(\d+)$/, async (ctx) => {
             kindOf: product.kindOf,
             projectId: product.projectId,
             projectName: product.projectName,
+            currency: product.currency,
             projectUsers: product.projectUsers,
             quantity: 1,
             each: product.price,
@@ -1441,7 +1447,7 @@ bot.action(/^saleFld-(quantity|each|date|note|startDate|finishDate)-(\d+)$/, asy
     const prompt = field === 'quantity'
         ? getText('saleQuantityPrompt', lang)
         : field === 'each'
-            ? getText('salePricePrompt', lang)
+            ? getText('salePricePrompt', lang, { currency: currencySymbol(sale.currency ?? 'ILS', lang) })
             : field === 'note'
                 ? getText('saleNotePrompt', lang)
                 : field === 'startDate'

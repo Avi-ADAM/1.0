@@ -20,6 +20,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { moneyTextFor } from '$lib/server/money/notifyMoney.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { dateField, enumField, fields, gqlStr, numField, run, strField } from '$lib/server/archive/gql.js';
 import { fetchProgram, fetchProjectContext } from '$lib/server/stipend/read.js';
@@ -69,7 +70,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     endDate: params.endDate
   });
   const { months, monthly, total } = terms;
-  const nis = (n: number) => `₪${n.toLocaleString('en-US')}`;
+  // The request is published in the rikma's own currency, like every amount it stores.
+  const money = moneyTextFor(project.currency);
+  const nis = (n: number) => money(n, 'he');
 
   const name = params.name
     ? String(params.name)
@@ -157,7 +160,7 @@ export const publishStipendFundingRequestConfig: ActionConfig = {
   paramSchema: {
     programId: { type: 'string', required: true, description: 'The approved stipend program to fund' },
     months: { type: 'number', required: false, description: "How many months of funding are being asked for. Defaults to the program's budget ÷ monthly ceiling, then 12. An explicit endDate overrides it." },
-    monthlyAmount: { type: 'number', required: false, description: "₪ per month — one cycle. Defaults to the program's monthlyCap, then budget ÷ months." },
+    monthlyAmount: { type: 'number', required: false, description: "Amount per month, in the rikma's currency — one cycle. Defaults to the program's monthlyCap, then budget ÷ months." },
     mashaabimId: { type: 'string', required: false, description: 'Resource template to file it under — enables match suggestions' },
     name: { type: 'string', required: false, description: 'Title of the request' },
     descrip: { type: 'string', required: false, description: 'Body of the request' },
