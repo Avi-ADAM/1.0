@@ -181,6 +181,17 @@ describe('formatReport / parseReport', () => {
     });
   });
 
+  it('marks verify steps as still to check, and still reads the old ✅ mark', () => {
+    const text = formatReport({ phase: 'done', summary: 's', verifySteps: ['Open lesson 2'] });
+    expect(text).toContain('🔍 1. Open lesson 2');
+    expect(text).not.toContain('✅');
+    // Reports already in prod (forum 103) carry ✅.
+    expect(parseReport('[1lev1:report phase=done]\ns\n\n✅ 1. Open lesson 2\n✅ 2. Check sync')?.verifySteps).toEqual([
+      'Open lesson 2',
+      'Check sync'
+    ]);
+  });
+
   it('is null for an ordinary message', () => {
     expect(parseReport('thanks!')).toBeNull();
     expect(parseReport(undefined)).toBeNull();

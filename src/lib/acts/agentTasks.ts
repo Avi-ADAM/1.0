@@ -282,6 +282,10 @@ export function safeLink(s: unknown): string | null {
  * in every language and needs no platform wording of its own — the words are
  * the reporter's.
  */
+const VERIFY_MARK = '🔍';
+/** A verify-step line. `✅` is the mark reports carried until 2026-11-22 and is still read. */
+const VERIFY_LINE = /^(?:🔍|✅) \d+\. /u;
+
 export function formatReport(report: TaskReport): string {
   const phase = (REPORT_PHASES as readonly string[]).includes(report.phase) ? report.phase : 'progress';
   const lines: string[] = [`${REPORT_TAG} phase=${phase}]`];
@@ -293,7 +297,8 @@ export function formatReport(report: TaskReport): string {
     if (kept.length) lines.push('', ...kept.map((s, i) => `${mark(i)} ${s}`));
   };
   list(report.links, () => '🔗', safeLink);
-  list(report.verifySteps, (i) => `✅ ${i + 1}.`, (s) => oneLine(s, REPORT_LIMITS.item) || null);
+  // A step still to check, not a ticked one: ✅ read as "already verified".
+  list(report.verifySteps, (i) => `${VERIFY_MARK} ${i + 1}.`, (s) => oneLine(s, REPORT_LIMITS.item) || null);
   list(report.remaining, () => '⏭', (s) => oneLine(s, REPORT_LIMITS.item) || null);
 
   return lines.join('\n').slice(0, REPORT_LIMITS.total);
@@ -311,7 +316,7 @@ export function parseReport(text: unknown): TaskReport | null {
   const remaining: string[] = [];
   for (const line of rest) {
     if (line.startsWith('🔗 ')) links.push(line.slice(3).trim());
-    else if (/^✅ \d+\. /.test(line)) verifySteps.push(line.replace(/^✅ \d+\. /, '').trim());
+    else if (VERIFY_LINE.test(line)) verifySteps.push(line.replace(VERIFY_LINE, '').trim());
     else if (line.startsWith('⏭ ')) remaining.push(line.slice(2).trim());
     else if (line.trim() || summary.length) summary.push(line);
   }

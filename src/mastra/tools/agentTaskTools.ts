@@ -25,6 +25,7 @@ import { getMcpContext } from '../../lib/server/mcpContext.js';
 import { describeStrapiFailure } from '../../lib/server/mcp/strapiErrors.js';
 import { memberName } from '../../lib/translation/displayName.js';
 import { missionsMapOf } from '../../lib/fulfillment/rows';
+import { calcDeadlineMs, restimeLabel } from '../../lib/server/actions/configs/actionUtils';
 import {
   REPORT_PHASES,
   nextStepFor,
@@ -300,7 +301,10 @@ export const getTaskContextTool = createTool({
         rikma: {
           projectId: pid,
           url: `${SITE}/moach/${pid}`,
+          // The Strapi code ('feh', …) stays for machines; the window is what a reader needs.
           restime: pa.restime ?? null,
+          silenceWindow: restimeLabel(pa.restime, 'en'),
+          silenceWindowHours: calcDeadlineMs(pa.restime ?? 'feh') / 3_600_000,
           repositories: repoRows,
           links: { github: link(pa.githublink), drive: link(pa.drivelink) },
           memberWritten: { name: t.project.name }
