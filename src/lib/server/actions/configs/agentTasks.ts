@@ -236,6 +236,8 @@ const reportTask: ActionExecutionHandler = async (params, context, { strapi }) =
     status: phase === 'done' ? 'pendingValidation' : task.accepted ? task.status : 'inProgress',
     validatorId,
     validationDueAt,
+    // The reporter's own missions the task hangs on: where its hours are saved.
+    missionIds: task.missions.filter((m) => m.holderId === me).map((m) => m.id),
     notifyUserIds: tellValidator ? [validatorId] : []
   };
 };

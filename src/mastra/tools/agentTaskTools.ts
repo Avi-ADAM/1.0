@@ -257,7 +257,7 @@ export const getTaskContextTool = createTool({
 
       const hoursNote =
         onMyMission.length > 0
-          ? `Hours for this task go on your mission "${onMyMission[0].name}" (id ${onMyMission[0].id}): run timerActionTool on it.`
+          ? `Hours for this task go on your mission "${onMyMission[0].name}" (id ${onMyMission[0].id}): run timerActionTool on it with actId ${taskId}, so the hours show on the task.`
           : missions.length > 0
             ? 'This task is not on one of your missions yet: claimTaskTool with missionId links it, or your hours will not count.'
             : 'You hold no running mission in this rikma, so hours on this task would not count. prepareMissionTool proposes one.';
@@ -429,16 +429,24 @@ export const reportTaskTool = createTool({
       }
       const d: any = out.data ?? {};
       const told = (d.notifyUserIds ?? []).length > 0;
+      const missionId: string | null = (d.missionIds ?? [])[0] ?? null;
+      const saveHoursUrl = phase === 'done' && missionId ? `${SITE}/moach/${pid}/progress/${missionId}` : null;
       return {
         success: true,
         taskId: String(taskId),
         phase,
         status: d.status,
         forumId: d.forumId,
+        // When silence validates it, if the validator does not answer first.
+        validationDueAt: d.validationDueAt ?? null,
+        saveHoursUrl,
         message:
           phase === 'done'
-            ? `Reported done. The task now waits for its validator${told ? ', who was told' : ''}. ` +
-              'Hours are filed when the user saves the timer on the site.'
+            ? `Reported done. The task now waits for its validator${told ? ', who was told' : ''}` +
+              (d.validationDueAt ? `; with no answer it is validated by silence at ${d.validationDueAt}. ` : '. ') +
+              (saveHoursUrl
+                ? `Hours are filed when the user saves the timer on the site: ${saveHoursUrl}`
+                : 'Hours are filed when the user saves the timer on the site.')
             : phase === 'blocked'
               ? `Saved in the task thread${told ? '; the validator was told' : ''}.`
               : 'Saved in the task thread.',

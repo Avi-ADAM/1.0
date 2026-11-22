@@ -289,6 +289,26 @@
 מוצגת כטקסט (`src/lib/chat/messageText.ts`: `<br>` ישן הופך לשורה חדשה, ורק קישורי http(s)
 נעשים לחיצים), כולל `postConversationMessageTool` של סוכן.
 
+#### בדיקה מקצה לקצה בפרודקשן (2026-11-22, דרך `1lev1-maya` / `1lev1-dan`, מטלה 142)
+
+אחרי commit `49fe824b` ופריסה ל-Vercel ול-API בשרת. מאיה פתחה את מטלה **142** ("[AW1 בדיקה] באג:
+הכתוביות בשיעור 2 לא מסונכרנות") על משימה 222 של דן. **אפשר לארכב אותה אחרי שהשעון יבשיל.**
+
+| צעד | תוצאה |
+|---|---|
+| F3 `getMissionDetailsTool(222)` | ✅ שם רקמה + המטלות |
+| F2 `getMyUpdatesTool` (דן) | ✅ פריט `waiting` "הועברה אליך ומחכה לאישורך" |
+| `listMyTasksTool` (דן) | ✅ `pendingApproval` / `nextStep: approve` |
+| `getTaskContextTool(142)` | ✅ תיאור, מאמתת, דחיפות, משימה, `recentDone`, הכול תחת `memberWritten` |
+| `claimTaskTool` | ✅ `accepted`, מקושרת ל-222, ברשימה `inProgress` / `do` |
+| `reportTaskTool` plan → done | ✅ `pendingValidation`, נפתח forum 103. ⚠️ התשובה לא החזירה את מועד השתיקה ולא קישור לשמירת שעות — **תוקן** (`validationDueAt`, `saveHoursUrl` → `/moach/<pid>/progress/<missionId>`) |
+| F9 + `waiting` אצל מאיה | ✅ `you:["validator"]`, `silenceApproves: true`, מועד `2026-11-24T00:42Z` |
+| שיחת המטלה | ✅ תגיות `[1lev1:report phase=…]`, קישור וצעדי בדיקה |
+
+**עוד פתוח:** לוודא אחרי 2026-11-24 00:42 UTC שהשתיקה באמת אימתה את 142 (`actValidatedBySilence`).
+הערות קטנות: `rikma.restime` חוזר כקוד גולמי (`"feh"`) ב-`getTaskContextTool`, ו-`readConversationTool`
+מחזיר `kind: "project"` לשיחת מטלה (כך היא בנויה, §שיחת מטלה).
+
 **לא נבנה (בכוונה):** כלי MCP ל"עוד לא עובד". התשובה של המאמת נשארת לחיצה שלו באתר. אם
 יתברר שמאמתים רוצים לענות דרך הסוכן שלהם, `returnTask` כבר מוכן לזה.
 **לא נבדק מקצה לקצה:** כלום לא בפריסה. יש לבדוק אחרי Vercel: שאילתות הקריאה (`validate:qids`
@@ -537,7 +557,7 @@ AW7 — שער החלטה
 | שלב | סטטוס |
 |---|---|
 | AW0 — הרצה יבשה + פסקה ב-skill | 🟡 2026-11-21 — הורץ, ממצאים F1–F9; F1 תוקן בקוד (ממתין ל-Vercel); הפסקה ב-skill פתוחה (המקור לא ב-repo) |
-| AW1 — `listMyTasks` / `getTaskContext` / `claimTask` / `reportTask`, "עוד לא עובד", שעון שתיקה, `actId` בטיימר | 🟡 2026-11-21 — כל AW1 בקוד: ארבעת הכלים, `claimTask`/`reportTask`/`returnTask`, שעון שתיקה, `actId`, F2, F3, התראות שיחת מטלה, הצגת צ'אט כטקסט. 2026-11-22: בדיקות היחידה של AW1 עוברות, אין שגיאות טיפוס בקבצים של AW1, check:i18n / ui-hebrew / script / proxy נקיים. ממתין ל-commit + Vercel ואז הרצה חוזרת של התרחיש דרך `1lev1-maya` / `1lev1-dan` |
+| AW1 — `listMyTasks` / `getTaskContext` / `claimTask` / `reportTask`, "עוד לא עובד", שעון שתיקה, `actId` בטיימר | 🟡 2026-11-21 — כל AW1 בקוד: ארבעת הכלים, `claimTask`/`reportTask`/`returnTask`, שעון שתיקה, `actId`, F2, F3, התראות שיחת מטלה, הצגת צ'אט כטקסט. 2026-11-22: בדיקות היחידה של AW1 עוברות, אין שגיאות טיפוס בקבצים של AW1, check:i18n / ui-hebrew / script / proxy נקיים. 2026-11-22: פרוס (Vercel + API), התרחיש עבר בפרודקשן על מטלה 142; נשאר לוודא שהשתיקה מאמתת (24.11) |
 | AW2 — קונטקסט רקמתי: `getRikmaContextTool` לפי מוקד, ספרי עבודה לתפקיד (`space-doc: playbook`), חיבור סוכן לרקמה | ⏳ (ה-`kind` החדש דורש 1.0b; השכבה הנגזרת לא) |
 | AW3 — `Act.handoffs` + מה לפני / מה אחרי | ⏳ (דורש 1.0b) |
 | AW4 — תבנית באג, "דיווח על בעיה" לכל רקמה, מטלה → issue | ⏳ |
