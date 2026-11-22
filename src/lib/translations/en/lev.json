@@ -646,6 +646,7 @@
     "previousResponse": "Previous response"
   },
   "taskModal": {
+    "openPage": "Open task page",
     "progress": "Progress",
     "createdBy": "Created by",
     "unknown": "Unknown",

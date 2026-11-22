@@ -646,6 +646,7 @@
     "previousResponse": "התגובה הקודמת"
   },
   "taskModal": {
+    "openPage": "לדף המטלה",
     "progress": "התקדמות",
     "createdBy": "יצר את המטלה",
     "unknown": "לא ידוע",

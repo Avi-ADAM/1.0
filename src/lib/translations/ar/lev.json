@@ -646,6 +646,7 @@
     "previousResponse": "الرد السابق"
   },
   "taskModal": {
+    "openPage": "فتح صفحة المهمة",
     "progress": "التقدم",
     "createdBy": "تم الإنشاء بواسطة",
     "unknown": "غير معروف",
