@@ -3,7 +3,8 @@
 > מצב: **tbd**. נכתב 2026-11-23. זה שלב VA של [PLAN_VPS_ONLY](../inprogress/PLAN_VPS_ONLY.md): משימה
 > שעומדת בפני עצמה, ואפשר לעשות אותה **עוד לפני** שהדפים עוזבים את Vercel (V3).
 >
-> **2026-11-23: הקוד של A0–A2 כתוב** (§7), ועדיין לא הוחל בשרת. מה שנשאר הוא רשימת הצעדים בשרת ב-§7.
+> **2026-11-23: A0–A2 חיים בשרת** (§7). Umami רץ ב-`https://pulse.1lev1.com`, והאתר שולח אליו מהדיפלוי הבא
+> של Vercel. נשאר: A3 (משפך ו-Goals בדשבורד), ואחרי שבועיים במקביל, A4.
 
 ## 0. למה
 
@@ -163,16 +164,23 @@ A0 → A1 → A2 → A3          לא תלוי ב-V3, אפשר כבר עכשיו
   `sign_invalid {field:'name'}` גם ל-stub של Umami וגם ל-Vercel. דף הבית לא נבדק בדפדפן (משתמש מחובר
   מופנה ל-`/lev`). את המאזין שלו מכסה `homeCta.test.ts`.
 
-**בשרת, לפי הסדר:**
-1. GoDaddy: רשומת A `pulse` → `91.90.82.93`.
-2. Postgres: `create role umami login password '…'; create database umami owner umami;`
-   (`docker exec -it mastra-postgres psql -U mastra_user -d mastra`).
-3. `.env` של ה-API: `UMAMI_DB_PASSWORD`, `UMAMI_APP_SECRET`, `UMAMI_2FA_KEY` (`openssl rand -hex 32`).
-4. העלאת compose (`deploy-api.ps1` כבר מעלה אותו), ואז
-   `docker compose -f docker-compose.api.yml --profile analytics up -d umami`, ולחכות ל-healthy.
-5. 1.0b: deploy רגיל (render + reload). רק בלוק 80 עולה.
-6. certbot webroot ל-`pulse.1lev1.com`, ואז `touch ~/app/nginx/pulse-tls.on`, render ו-`nginx -s reload`.
-7. `https://pulse.1lev1.com`: לשנות את סיסמת ה-admin הראשונית (ברירת המחדל של Umami היא `admin` / `umami`),
-   ליצור אתר `1lev1.com` ולהעתיק את ה-website id.
-8. Vercel: `PUBLIC_UMAMI_WEBSITE_ID=<id>` ו-redeploy. מאותו רגע הנתונים זורמים לשתי המערכות.
+**בשרת: הוחל 2026-11-23.**
+1. DNS: רשומת A `pulse` → `91.90.82.93` (נוצרה ב-GoDaddy).
+2. Postgres: role ו-DB בשם `umami` על `mastra-postgres`.
+3. `~/api/.env`: `UMAMI_DB_PASSWORD`, `UMAMI_APP_SECRET`, `UMAMI_2FA_KEY` נוצרו בשרת עצמו (גיבוי של ה-.env
+   הקודם ב-`~/api/.env.bak-umami-*`).
+4. `docker compose -f docker-compose.api.yml --profile analytics up -d --no-deps umami`: healthy, כל ה-migrations
+   עברו. משיכת ה-image מ-GHCR נקטעה פעם אחת ב-IPv6 והצליחה בניסיון חוזר.
+5. 1.0b `64a2456`: `git pull` + `render-conf.sh` + `nginx -t` + `nginx -s reload` בלבד (בלי `deploy.ps1`, שמגלגל גם
+   את Strapi). מצב ה-gate נשמר (`closed`).
+6. certbot webroot ל-`pulse.1lev1.com` (מתחדש לבד דרך `reload-docker-nginx.sh`), `touch nginx/pulse-tls.on`,
+   render ו-reload. נבדק: הדשבורד, `/p.js` ו-`/api/heartbeat` מחזירים 200. גם `api` עונה 200, ו-`tovmeod` 403
+   (ה-gate סגור, כמו קודם).
+7. **סיסמת ה-admin הוחלפה בלי להתחבר**: hash של bcrypt נכתב ישירות לטבלה `user`. הסיסמה נמצאת רק ב-
+   `~/api/.umami_admin_password` (`600`). ההתחברות עם `admin` / `umami` מחזירה עכשיו 401. מומלץ להחליף אותה
+   בדשבורד אחרי הכניסה הראשונה.
+8. האתר `1lev1.com` נוצר בטבלה `website` (`recorder_enabled = false`, בלי הקלטת sessions), id
+   `90036726-6c43-46dd-978d-cd2f1122e54e`. ה-id **נמצא בקוד** (`PULSE_WEBSITE_ID` ב-`track.js`) ולא במשתנה של
+   Vercel: הוא לא סוד, ו-`data-domains` כבר מונע שליחה מכל host חוץ מ-1lev1.com. `PUBLIC_UMAMI_WEBSITE_ID` דורס
+   אותו, וערך ריק מכבה.
 9. A3: Funnel ו-Goals בדשבורד.

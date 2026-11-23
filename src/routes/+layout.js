@@ -1,7 +1,7 @@
 import { browser, dev } from '$app/environment';
 import { env as publicEnv } from '$env/dynamic/public';
 import { inject } from '@vercel/analytics';
-import { loadPulse } from '$lib/analytics/track.js';
+import { loadPulse, PULSE_WEBSITE_ID } from '$lib/analytics/track.js';
 import { locale, loadTranslations } from '$lib/translations';
 import { isMobileBuild, installMobileFetchPatch, installApiBasePatch } from '$lib/platform';
 
@@ -15,8 +15,10 @@ if (isMobileBuild) {
   installApiBasePatch(); // no-op unless VITE_API_BASE is set at build time
   inject({ mode: dev ? 'development' : 'production' });
   // In-house analytics (docs/tbd/PLAN_INHOUSE_ANALYTICS.md). Runs beside
-  // Vercel's until stage A4; loads nothing while PUBLIC_UMAMI_WEBSITE_ID is unset.
-  if (browser) loadPulse({ websiteId: publicEnv.PUBLIC_UMAMI_WEBSITE_ID });
+  // Vercel's until stage A4. The id is public by nature (it is in every page),
+  // and the tracker's data-domains ignores any host but 1lev1.com, so dev and
+  // previews send nothing. PUBLIC_UMAMI_WEBSITE_ID overrides it; '' turns it off.
+  if (browser) loadPulse({ websiteId: publicEnv.PUBLIC_UMAMI_WEBSITE_ID ?? PULSE_WEBSITE_ID });
 }
 
 /** @param {string} name */

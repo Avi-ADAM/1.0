@@ -94,6 +94,9 @@ export function beforeSend(_type, payload) {
   }
 }
 
+/** The `1lev1.com` website in our Umami (pulse.1lev1.com). Not a secret. */
+export const PULSE_WEBSITE_ID = '90036726-6c43-46dd-978d-cd2f1122e54e';
+
 /** Global name the script tag points `data-before-send` at. */
 export const BEFORE_SEND_GLOBAL = '__pulseBeforeSend';
 
