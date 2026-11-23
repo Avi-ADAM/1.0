@@ -17,6 +17,8 @@
 
 import type { LanguageStrings } from '$lib/server/actions/types';
 import { levOf, type MaturedNotice } from './matured';
+import { moneyTextFor } from '$lib/server/money/notifyMoney';
+import type { CurrencyCode } from '$lib/money/currencies.js';
 
 type Id = string | number | null | undefined;
 const L = (he: string, en: string, ar: string): LanguageStrings => ({ he, en, ar });
@@ -532,10 +534,14 @@ export function stipendPaymentConfirmed(p: {
   projectId: Id;
   projectName: string;
   amount: number;
+  /** The rikma's currency — the amount is stored in it. Absent ⇒ ILS, as before. */
+  currency?: CurrencyCode;
   moved: boolean;
   recipientId: Id;
   funderId: Id;
 }): MaturedNotice[] {
+  const money = moneyTextFor(p.currency ?? 'ILS');
+  const amt = { he: money(p.amount, 'he'), en: money(p.amount, 'en'), ar: money(p.amount, 'ar') };
   const tail = p.moved
     ? L(' האחוזים עודכנו בהתאם.', ' The shares moved accordingly.', ' وتحدّثت الحصص وفقًا لذلك.')
     : L('', '', '');
@@ -547,9 +553,9 @@ export function stipendPaymentConfirmed(p: {
       to: { userIds: [p.recipientId] },
       title: L('המלגה אושרה מעצמה', 'Your stipend was confirmed automatically', 'تم تأكيد منحتك تلقائيًا'),
       body: L(
-        `לא הגיבו בזמן התגובה של ${p.projectName}, ולכן ₪${p.amount} נרשמו כהתקבלו.${tail.he} אם לא הגיע כסף — אפשר לומר את זה בקלף המלגה ולפתוח את המחזור מחדש.`,
-        `Nobody answered within ${p.projectName}'s response time, so ${p.amount} is recorded as received.${tail.en} If no money actually arrived, say so on the stipend card and the cycle reopens.`,
-        `لم يردّ أحد خلال وقت الاستجابة في ${p.projectName}، لذلك سُجّل المبلغ ${p.amount} كمستلَم.${tail.ar} إن لم يصل المال فعلًا، قل ذلك في بطاقة المنحة لتُفتح الدورة من جديد.`
+        `לא הגיבו בזמן התגובה של ${p.projectName}, ולכן ${amt.he} נרשמו כהתקבלו.${tail.he} אם לא הגיע כסף — אפשר לומר את זה בקלף המלגה ולפתוח את המחזור מחדש.`,
+        `Nobody answered within ${p.projectName}'s response time, so ${amt.en} is recorded as received.${tail.en} If no money actually arrived, say so on the stipend card and the cycle reopens.`,
+        `لم يردّ أحد خلال وقت الاستجابة في ${p.projectName}، لذلك سُجّل المبلغ ${amt.ar} كمستلَم.${tail.ar} إن لم يصل المال فعلًا، قل ذلك في بطاقة المنحة لتُفتح الدورة من جديد.`
       ),
       url
     },
@@ -559,9 +565,9 @@ export function stipendPaymentConfirmed(p: {
       to: { userIds: [p.funderId] },
       title: L('המלגה נרשמה כהתקבלה', 'Your stipend is recorded as received', 'سُجّلت المنحة كمستلَمة'),
       body: L(
-        `לא התקבלה תגובה בזמן, ולכן ₪${p.amount} ב${p.projectName} נסגרו כהתקבלו.${tail.he}`,
-        `No answer came in time, so ${p.amount} in ${p.projectName} closed as received.${tail.en}`,
-        `لم يصل ردّ في الوقت المحدد، لذلك أُغلق المبلغ ${p.amount} في ${p.projectName} كمستلَم.${tail.ar}`
+        `לא התקבלה תגובה בזמן, ולכן ${amt.he} ב${p.projectName} נסגרו כהתקבלו.${tail.he}`,
+        `No answer came in time, so ${amt.en} in ${p.projectName} closed as received.${tail.en}`,
+        `لم يصل ردّ في الوقت المحدد، لذلك أُغلق المبلغ ${amt.ar} في ${p.projectName} كمستلَم.${tail.ar}`
       ),
       url
     }
@@ -789,6 +795,45 @@ export function dealReceiptMatured(p: { sheirutId: Id; projectId: Id; customerId
         'לא הייתה תשובה על המסירה בזמן התגובה של הרקמה, ולכן הקבלה נרשמה.',
         "There was no answer to the delivery within the rikma's response time, so the receipt was recorded.",
         'لم يصل رد على التسليم خلال وقت الاستجابة في الريكما، لذلك سُجّل الاستلام.'
+      ),
+      url
+    }
+  ];
+}
+
+// ── act validation (PLAN_AGENT_WORK AW1) ─────────────────────────────────────
+
+/** A done report its validator did not answer within restime: the task is validated. */
+export function actValidatedBySilence(p: {
+  projectId: Id;
+  actId: Id;
+  name: string;
+  doerIds: Id[];
+  validatorId: Id;
+}): MaturedNotice[] {
+  const url = p.projectId != null && p.actId != null ? `/moach/${p.projectId}/acts/${p.actId}` : moach(p.projectId, 'acts');
+  return [
+    {
+      kind: 'act',
+      intent: 'personal',
+      to: { userIds: p.doerIds },
+      title: L(`המטלה "${p.name}" אומתה בשתיקה`, `The task "${p.name}" was validated by silence`, `تم التحقق من المهمة «${p.name}» بالصمت`),
+      body: L(
+        'לא הייתה תשובה על הדיווח שהמטלה בוצעה בזמן התגובה של הרקמה, ולכן היא נסגרה כמאומתת.',
+        "There was no answer to the done report within the rikma's response time, so the task is closed as validated.",
+        'لم يصل رد على تقرير الإنجاز خلال وقت الاستجابة في الريكما، لذلك أُغلقت المهمة كمُتحقَّق منها.'
+      ),
+      url
+    },
+    {
+      kind: 'act',
+      intent: 'personal',
+      to: { userIds: [p.validatorId] },
+      title: L(`המטלה "${p.name}" אומתה בשתיקה`, `The task "${p.name}" was validated by silence`, `تم التحقق من المهمة «${p.name}» بالصمت`),
+      body: L(
+        'לא הייתה תשובה שלך על הדיווח בזמן התגובה של הרקמה, ולכן המטלה נסגרה כמאומתת. אם משהו עדיין לא עובד, אפשר לפתוח מטלה חדשה ולקשר אליה.',
+        "You did not answer the done report within the rikma's response time, so the task is closed as validated. If something still does not work, open a new task and link to it.",
+        'لم يصل ردّك على التقرير خلال وقت الاستجابة في الريكما، لذلك أُغلقت المهمة كمُتحقَّق منها. إن كان شيء ما زال لا يعمل، يمكن فتح مهمة جديدة والإشارة إليها.'
       ),
       url
     }

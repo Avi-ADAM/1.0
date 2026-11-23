@@ -337,6 +337,7 @@
     <!-- מלגת קיום שמצורפת למשימה — ההשקעה בפרויקט והמלגה זו לצד זו, עם
          ההסתייגות שמדובר בשותפות ולא ביחסי עובד-מעביד. -->
     <MissionStipendOffer
+      {projectId}
       hours={myRound?.noofhours ?? noOfHours}
       perhour={myRound?.perhour ?? perhour}
       {stipendRate}

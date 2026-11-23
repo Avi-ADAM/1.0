@@ -7,6 +7,7 @@
  * without side effects or mutations.
  */
 
+import { rikmaCurrency } from '$lib/money/resolve.js';
 import type {
   PendMissionData,
   InProgressMissionData,
@@ -191,6 +192,9 @@ export function extractFiapp(userData: any): ApprovalData[] {
         // Additional fields
         missname: approval.attributes.missname || '',
         noofhours: approval.attributes.noofhours || 0,
+        // The value the hours were worked at (src/lib/timers/rate.ts): the
+        // approval's own stamp, else its timer's. Null on legacy rows.
+        perhour: approval.attributes.perhour ?? approval.attributes.timer?.data?.attributes?.rate ?? null,
         why: approval.attributes.why || '',
         what: approval.attributes.what || { data: [] },
         // A timer save files its links on the timer (Finiapruval has no column
@@ -2132,6 +2136,7 @@ export function mapSaleData(sheirut: any, projectId: string, userData: any, mode
     projectId: projectId,
     projectName: projectName,
     projectSrc: projectSrc,
+    currency: projectInfo?.attributes?.currencyCode ?? userData.attributes?.projects_1s?.data?.find((p: any) => p.id === projectId)?.attributes?.currencyCode ?? null,
     members: projectInfo?.attributes?.user_1s?.data?.map((u: any) => ({
       id: u.id,
       ...nameFieldsOf(u.attributes), username: u.attributes?.username,
@@ -2342,6 +2347,7 @@ export function extractWishOffers(userData: any): WishOfferData[] {
         missionName,
         hours: covered?.hours ?? omAttrs.noofhours ?? null,
         price: covered?.price ?? pAttrs.total_price ?? omAttrs.perhour ?? null,
+        currency: pAttrs.entryCurrency ?? (pAttrs.project?.data ? rikmaCurrency(pAttrs.project.data) : rAttrs.entryCurrency),
         coveredIdx,
 
         // Coordination chat forum, if one has already been opened

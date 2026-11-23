@@ -1,6 +1,8 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
 import { actionTranslator } from '../actionErrors.js';
+import { moneyTextFor } from '$lib/server/money/notifyMoney.js';
+import { rikmaCurrency } from '$lib/money/resolve.js';
 
 /**
  * A supporter's donation intent → the rikma's members (PLAN_VOLUNTEER_RIKMA §2.2).
@@ -45,6 +47,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   const projAttrs = projInfo?.data?.project?.data?.attributes;
   const memberIds: string[] = (projAttrs?.user_1s?.data ?? []).map((m: any) => String(m.id));
   const projectName: string = projAttrs?.projectName ?? '';
+  // The amounts a donor names are in the rikma's currency, not always shekels.
+  const money = moneyTextFor(rikmaCurrency(projAttrs));
 
   if (memberIds.length === 0) {
     throw new Error('This rikma has no members to receive a donation');
@@ -72,8 +76,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
 
   const t = actionTranslator(context.lang);
   const donor = from?.trim() || t('server.donation.supporter');
-  const amountPart =
-    typeof amount === 'number' && amount > 0 ? ` (${amount}₪)` : '';
+  const hasAmount = typeof amount === 'number' && amount > 0;
+  const amountHe = hasAmount ? ` (${money(amount, 'he')})` : '';
+  const amountEn = hasAmount ? ` (${money(amount, 'en')})` : '';
 
   if (notifier) {
     const details: string[] = [];
@@ -84,8 +89,11 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
           missionHours != null ? Math.round(missionStipendRate * missionHours) : null;
         details.push(
           budget
-            ? t('server.donation.stipendWithBudget', { rate: missionStipendRate, budget })
-            : t('server.donation.stipend', { rate: missionStipendRate })
+            ? t('server.donation.stipendWithBudget', {
+                rate: money(missionStipendRate, context.lang),
+                budget: money(budget, context.lang)
+              })
+            : t('server.donation.stipend', { rate: money(missionStipendRate, context.lang) })
         );
       }
     }
@@ -102,8 +110,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
             ? { he: '💗 מישהו רוצה לממן משימה', en: '💗 Someone wants to fund a mission' }
             : { he: '💗 מישהו רוצה לתרום', en: '💗 Someone wants to donate' },
           body: {
-            he: `${donor} מעוניין/ת לתרום ל"${projectName}"${amountPart}${tail}. תיאמו קבלת הכסף ורשמו את התרומה כדי שתיכנס לחישוב הכיסוי.`,
-            en: `${donor} wants to donate to "${projectName}"${amountPart}${tail}. Coordinate receiving the money and record the donation so it counts toward coverage.`
+            he: `${donor} מעוניין/ת לתרום ל"${projectName}"${amountHe}${tail}. תיאמו קבלת הכסף ורשמו את התרומה כדי שתיכנס לחישוב הכיסוי.`,
+            en: `${donor} wants to donate to "${projectName}"${amountEn}${tail}. Coordinate receiving the money and record the donation so it counts toward coverage.`
           }
         },
         // Addressed to the members: a donor waits to hear back, but no consent clock runs.

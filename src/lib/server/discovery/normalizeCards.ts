@@ -6,6 +6,8 @@
  * to aggregate counts here, never in the browser.
  */
 
+import { rikmaCurrency } from '$lib/money/resolve.js';
+import { normalizeCode, DEFAULT_CURRENCY, type CurrencyCode } from '$lib/money/currencies.js';
 import { resolveLocation } from '../map/normalizeMapItems.js';
 
 type StrapiNode = { id: string | number; attributes?: Record<string, any> | null };
@@ -108,6 +110,7 @@ export type MissionCard = {
   workWays: string[];
   roles: string[];
   concierge: boolean;
+  currency: CurrencyCode;
   projectId: string | null;
   projectName: string | null;
   projectPicUrl: string | null;
@@ -141,6 +144,7 @@ export function normalizeMissionCard(node: StrapiNode): MissionCard | null {
     workWays: namesOf(a.work_ways, 'workWayName'),
     roles: namesOf(a.tafkidims, 'roleDescription'),
     concierge: !!a.ratson?.data || a.source === 'concierge',
+    currency: project ? rikmaCurrency(project) : normalizeCode(ratson?.entryCurrency) ?? DEFAULT_CURRENCY,
     projectId: project ? String(project.id) : null,
     projectName: project?.attributes?.projectName ?? null,
     projectPicUrl: picUrlOf(project?.attributes?.profilePic),
@@ -162,6 +166,7 @@ export type ResourceCard = {
   howMany: number | null;
   recurring: boolean;
   concierge: boolean;
+  currency: CurrencyCode;
   projectId: string | null;
   projectName: string | null;
   projectPicUrl: string | null;
@@ -188,6 +193,7 @@ export function normalizeResourceCard(node: StrapiNode): ResourceCard | null {
     howMany: num(a.howMeny),
     recurring: !!a.recurring,
     concierge: !!a.ratson?.data || a.source === 'concierge',
+    currency: project ? rikmaCurrency(project) : normalizeCode(ratson?.entryCurrency) ?? DEFAULT_CURRENCY,
     projectId: project ? String(project.id) : null,
     projectName: project?.attributes?.projectName ?? null,
     projectPicUrl: picUrlOf(project?.attributes?.profilePic),
@@ -207,6 +213,7 @@ export type ProductCard = {
   kindOf: string | null;
   personal: boolean;
   sellerName: string | null;
+  currency: CurrencyCode;
   projectId: string | null;
   projectName: string | null;
   picUrl: string | null;
@@ -240,6 +247,7 @@ export function normalizeProductCard(node: StrapiNode): ProductCard | null {
     sellerName: personal
       ? (a.owner_user?.data?.attributes?.username ?? null)
       : (project?.attributes?.projectName ?? null),
+    currency: project ? rikmaCurrency(project) : normalizeCode(a.owner_user?.data?.attributes?.currency) ?? DEFAULT_CURRENCY,
     projectId: project ? String(project.id) : null,
     projectName: project?.attributes?.projectName ?? null,
     picUrl: picUrlOf(a.pic),

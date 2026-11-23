@@ -16,10 +16,24 @@
   import { readSaveFiles } from '$lib/timers/saveFiles.js';
   import MonthlyHours from '$lib/components/mission/MonthlyHours.svelte';
   import TimerSessions from '$lib/components/mission/TimerSessions.svelte';
+  import Money from '$lib/components/money/Money.svelte';
+  import { rateEras, timerRate } from '$lib/timers/rate.js';
 
-  let { monter = [], timers = [], hoursassinged = 0, counter = 0 } = $props();
+  let { monter = [], timers = [], hoursassinged = 0, counter = 0, perhour = null } = $props();
 
   let timerGroups = $derived(groupTimersByMonth(timers));
+
+  // A mission whose hourly value changed mid-way has timers on both sides of
+  // the change (the running one is cut at that instant). Only then does each
+  // timer row name the value its hours count at.
+  let mixedRates = $derived(
+    rateEras(
+      (timers ?? []).map((tm) => ({
+        rate: timerRate(tm?.attributes, perhour),
+        hours: Number(tm?.attributes?.totalHours) || 0
+      }))
+    ).length > 1
+  );
 
   let locale = $derived(
     $langStore === 'he'
@@ -106,6 +120,11 @@
                   {roundHours(entry.hours)}
                   {$t('process.timers.hours')}
                 </span>
+                {#if mixedRates && timerRate(attrs, perhour) != null}
+                  <span class="tp-badge tp-badge--rate">
+                    <Money amount={timerRate(attrs, perhour)} /> {$t('common.perhour')}
+                  </span>
+                {/if}
                 {#if attrs.isActive}
                   <span class="tp-badge tp-badge--active">{$t('process.timers.running')}</span>
                 {:else if attrs.appruved}
@@ -152,7 +171,7 @@
   <!-- ── Every recorded sitting: start, stop, length ────────────────────── -->
   {#if timers?.length}
     <div class="tp-block">
-      <TimerSessions {timers} />
+      <TimerSessions {timers} {perhour} />
     </div>
   {/if}
 </div>
@@ -186,6 +205,11 @@
     font-size: 10px;
     font-weight: 600;
     white-space: nowrap;
+  }
+  .tp-badge--rate {
+    background: var(--badge-gold-bg, rgba(217,119,6,.10));
+    color: var(--badge-gold-text, #b45309);
+    gap: 3px;
   }
   .tp-badge--done {
     background: var(--badge-green-bg, rgba(5,150,105,.10));

@@ -1,6 +1,9 @@
 ﻿<script>
   import Money from '$lib/components/money/Money.svelte';
   import { t, locale, isRtl } from '$lib/translations';
+  import { useMoney, useProjectCurrency, useRikmaCurrency } from '$lib/money/context.svelte';
+  import { DEFAULT_CURRENCY, normalizeCode } from '$lib/money/currencies.js';
+  import { currencySymbol } from '$lib/money/format.js';
   /**
    * SiteShareDecision — the single shared decision UI for the per-member site
    * share (PLAN_SITE_SHARE_PER_MEMBER §2/§3). The SAME component renders in all
@@ -18,8 +21,10 @@
     proposed = 0,
     /** The personal share the suggestion was computed from (shown for context). */
     basis = 0,
-    /** Currency symbol for display. */
-    currency = '₪',
+    /** The rikma's currency code; else the card's `projectId`, else the enclosing rikma. */
+    currency = null,
+    /** The rikma this share is in — how a heart card names its currency. */
+    projectId = null,
     /** Existing decision to prefill when re-deciding: { des_status, amount, direction, reason }. */
     initial = null,
     /** Disable controls while the parent's action is in flight. */
@@ -29,6 +34,14 @@
     /** Emitted on confirm/skip: { decision:'decided'|'skipped', amount, direction, reason }. */
     onDecide
   } = $props();
+
+  const money = useMoney();
+  const projectCurrency = useProjectCurrency();
+  const rikmaCurrency = useRikmaCurrency();
+  const code = $derived(
+    normalizeCode(currency) ?? projectCurrency(projectId) ?? rikmaCurrency() ?? DEFAULT_CURRENCY
+  );
+  const symbol = $derived(currencySymbol(code, money.lang));
 
   // Seed the editable form once from `initial` (untrack: we want only its value
   // at mount, not a reactive subscription). Parents remount per decision via
@@ -76,18 +89,18 @@
 <div class="ssd" class:compact dir={$isRtl ? 'rtl' : 'ltr'}>
   <div class="ssd-head">
     <span class="ssd-title">{$t('lev.revenue.siteShareDecision.title')}</span>
-    <span class="ssd-amount"><Money amount={Number(finalAmount)} fraction="full" /></span>
+    <span class="ssd-amount"><Money amount={Number(finalAmount)} currency={code} fraction="full" /></span>
   </div>
 
   <p class="ssd-sub">
-    {$t('lev.revenue.siteShareDecision.sub', { basis: Number(basis).toFixed(2), proposed: Number(proposed).toFixed(2), currency })}
+    {$t('lev.revenue.siteShareDecision.sub', { basis: Number(basis).toFixed(2), proposed: Number(proposed).toFixed(2), currency: symbol })}
   </p>
 
   {#if settled}
     <p class="ssd-settled">
       {initial?.des_status === 'skipped'
         ? $t('lev.revenue.siteShareDecision.skipped')
-        : $t('lev.revenue.siteShareDecision.gave', { amount: Number(initial?.amount || 0).toFixed(2), currency })}
+        : $t('lev.revenue.siteShareDecision.gave', { amount: Number(initial?.amount || 0).toFixed(2), currency: symbol })}
     </p>
   {/if}
 

@@ -84,5 +84,9 @@
   "notify": {
     "openRikma": "Abrir en la rikma",
     "openLev": "Abrir en el Corazón"
+  },
+  "task": {
+    "approve": "La tarea «{{item}}» te fue asignada y espera tu sí",
+    "validate": "La tarea «{{item}}» se reportó como hecha y espera que la revises"
   }
 }

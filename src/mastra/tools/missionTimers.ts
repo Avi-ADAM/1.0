@@ -82,17 +82,22 @@ export const getMissionDetailsTool = createTool({
     }
 
     try {
-      const res = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, isServerRequest, fetchInstance);
+      // Its own read (PLAN_AGENT_WORK F3): 36getMissionTimer is the timer save's
+      // query and carries neither the mission's acts nor its rikma's name, so
+      // this tool always answered "no tasks" and "N/A".
+      const res: any = await sendToSer({ missionId }, 'agentMissionDetails', 0, 0, true, fetchInstance);
       const missionData = res?.data?.mesimabetahalich?.data;
       
-      if (!missionData) {
+      const members = (missionData?.attributes?.project?.data?.attributes?.user_1s?.data ?? []).map((u: any) => String(u.id));
+      // Not found and not yours read the same.
+      if (!missionData || !globalContext.userId || !members.includes(String(globalContext.userId))) {
         return { success: false, error: 'Mission not found' };
       }
 
       const mission = {
         id: missionData.id,
         name: missionData.attributes.name,
-        description: missionData.attributes.description || '',
+        description: missionData.attributes.descrip || '',
         projectId: missionData.attributes.project?.data?.id || null,
         projectName: missionData.attributes.project?.data?.attributes?.projectName || 'N/A',
         isActiveTimer: missionData.attributes.activeTimer?.data?.attributes?.isActive || false,
@@ -103,7 +108,7 @@ export const getMissionDetailsTool = createTool({
         tasks: missionData.attributes.acts?.data?.map(task => ({
           id: task.id,
           name: task.attributes.shem,
-          completed: task.attributes.completed || false
+          completed: task.attributes.naasa === true
         })) || [],
         assignedUsers: missionData.attributes.users?.data?.map(user => ({
           id: user.id,

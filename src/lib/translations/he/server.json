@@ -52,8 +52,8 @@
   "donation": {
     "supporter": "תומך/ת",
     "forMission": "עבור המשימה: {{name}}",
-    "stipend": "למימון מלגת הקיום שלה (₪{{rate}} לשעה)",
-    "stipendWithBudget": "למימון מלגת הקיום שלה (₪{{rate}} לשעה, עד ₪{{budget}})",
+    "stipend": "למימון מלגת הקיום שלה ({{rate}} לשעה)",
+    "stipendWithBudget": "למימון מלגת הקיום שלה ({{rate}} לשעה, עד {{budget}})",
     "contact": "ליצירת קשר: {{contact}}"
   },
   "assistant": {

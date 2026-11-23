@@ -39,6 +39,7 @@ import {
   type SaleClaim
 } from './saleClaimShared.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
+import { rateFlushScopes } from '$lib/server/timers/flushRateChange.js';
 import { moveStock } from '$lib/shop/stock.js';
 import { readStockFlags, writeStock } from '$lib/server/shop/stockFlags.js';
 import type { ProbeRun } from '$lib/server/apiPublic/schemaProbe.js';
@@ -661,7 +662,13 @@ export const voteOnDecisionConfig: ActionConfig = {
   updateStrategy: { type: 'none' },
 
   realtime: {
-    scopes: (p) =>
-      scopeList([scope('project', p.projectId), decisionScope('decision', p.decisionId)]),
+    scopes: (p, r) =>
+      scopeList([
+        scope('project', p.projectId),
+        decisionScope('decision', p.decisionId),
+        // The last yes on an editObject that moved a mission's hourly value
+        // closed its owner's timer — their open tab must re-read it.
+        ...rateFlushScopes(r?.data?.applied?.rateFlush),
+      ]),
   },
 };

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { provideRikmaCurrency } from '$lib/money/context.svelte';
   import Money from '$lib/components/money/Money.svelte';
   import { goto } from '$app/navigation';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
@@ -15,6 +16,7 @@
   import { providerCanApprove } from '$lib/sheirut/quoteState';
 
   let { data } = $props();
+  provideRikmaCurrency(() => data.currency);
 
   const KIND_ICON: Record<string, EntityIconKind> = {
     monthly: 'calendar', yearly: 'date', total: 'star', unlimited: 'endless', daily: 'sunrise'

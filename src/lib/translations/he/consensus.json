@@ -29,7 +29,7 @@
     "roundLabel": "סבב",
     "proposerYou": "אתם",
     "proposerPartner": "דנה",
-    "perHourUnit": "₪ לשעה",
+    "perHourUnit": "{{amount}} לשעה",
     "hoursUnit": "שעות",
     "totalLabel": "סה״כ",
     "windowLabel": "זמן ההחלטה שנותר",
@@ -40,7 +40,7 @@
     "actions": { "approve": "אשר", "discuss": "שוחח", "counter": "הצע נגד" },
     "counterForm": {
       "title": "הגרסה שלכם",
-      "perHourLabel": "תעריף לשעה (₪)",
+      "perHourLabel": "תעריף לשעה",
       "hoursLabel": "מספר שעות",
       "noteLabel": "הערה (רשות)",
       "notePlaceholder": "למה אתם מציעים את זה?",

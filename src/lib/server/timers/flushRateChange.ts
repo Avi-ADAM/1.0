@@ -17,6 +17,7 @@
  */
 
 import { dateField, fields, gqlStr, numField, run, strField, type Exec } from '../archive/gql.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 import { calcDeadlineMs } from '../actions/configs/actionUtils.js';
 import { hoursInMonth } from '$lib/recurring/missionMonths.js';
 import { roundHours, workValue } from '$lib/timers/precision.js';
@@ -34,6 +35,21 @@ export interface FlushResult {
   finnishedMissionId?: string;
   /** Set when the timer was running and was handed straight back. */
   restartedTimerId?: string;
+  /** Whose hours these are — the member whose open tab still shows the old timer. */
+  ownerId?: string;
+  missionId?: string;
+}
+
+/**
+ * The screens a flush changed under someone's feet. The owner's timer store
+ * refreshes only on a `timer:<owner>` publish, and the decision that matured
+ * publishes `voteUpdate`-ish scopes — so without this the owner's tab keeps
+ * ticking the *old* timer, and a Stop pressed there would write the hours worked
+ * after the change back onto the timer that was already closed at the old rate.
+ */
+export function rateFlushScopes(flush: FlushResult | null | undefined): string[] {
+  if (!flush?.flushed) return [];
+  return scopeList([scope('timer', flush.ownerId), scope('mission', flush.missionId)]);
 }
 
 interface TimerSegment {
@@ -156,7 +172,14 @@ export async function flushHoursBeforeRateChange(
       'flushRate:missionCounter',
     );
 
-    const result: FlushResult = { flushed: true, timerId: String(timerNode.id), hours, rate };
+    const result: FlushResult = {
+      flushed: true,
+      timerId: String(timerNode.id),
+      hours,
+      rate,
+      missionId,
+      ...(ownerId ? { ownerId } : {}),
+    };
 
     if (memberIds.length <= 1) {
       // A rikma of one approves by existing — the hours land straight on the

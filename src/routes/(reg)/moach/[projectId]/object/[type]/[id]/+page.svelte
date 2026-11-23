@@ -251,7 +251,7 @@
         {#if type === 'betahalich'}
           <section class="op-card">
             <h2 class="op-card-title">{$t('moach.objectDetail.timers')}</h2>
-            <TimersPanel monter={attrs.monter} timers={attrs.timers?.data ?? []} lang={$lang} />
+            <TimersPanel monter={attrs.monter} timers={attrs.timers?.data ?? []} perhour={attrs.perhour} />
           </section>
         {/if}
       </div>

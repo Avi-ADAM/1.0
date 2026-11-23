@@ -29,7 +29,7 @@
     "roundLabel": "الجولة",
     "proposerYou": "أنتم",
     "proposerPartner": "دانا",
-    "perHourUnit": "₪ للساعة",
+    "perHourUnit": "{{amount}} للساعة",
     "hoursUnit": "ساعات",
     "totalLabel": "الإجمالي",
     "windowLabel": "وقت القرار المتبقي",
@@ -40,7 +40,7 @@
     "actions": { "approve": "وافق", "discuss": "تحدث", "counter": "اقترح بديلاً" },
     "counterForm": {
       "title": "نسختكم",
-      "perHourLabel": "الأجر بالساعة (₪)",
+      "perHourLabel": "الأجر بالساعة",
       "hoursLabel": "عدد الساعات",
       "noteLabel": "ملاحظة (اختياري)",
       "notePlaceholder": "لماذا تقترحون هذا؟",

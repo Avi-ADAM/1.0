@@ -24,16 +24,19 @@
    * @property {string|number|null} [viewerId]
    * @property {(row:any, patch:Record<string, any>) => void} [onPatched] - Optimistic local update.
    * @property {(row:any) => void} [onAssign] - "I'll do it" — opens the mission picker.
+   * @property {(kind:string) => void} [onSettled] - After the server confirmed a write, to read the row back.
    * @property {boolean} [compact] - Icon-only, for the desktop row.
    */
 
   /** @type {Props} */
-  let { row, projectId, viewerId = null, onPatched, onAssign, compact = false } = $props();
+  let { row, projectId, viewerId = null, onPatched, onAssign, onSettled, compact = false } = $props();
 
   let busy = $state(/** @type {string|null} */ (null));
   /** Which action is showing its confirm/edit popover, if any. */
   let openPanel = $state(/** @type {string|null} */ (null));
   let draftProgress = $state(0);
+  /** What is still missing — the validator's "not yet" always says why. */
+  let draftNote = $state('');
 
   let actions = $derived(getQuickActions(row, viewerId));
 
@@ -41,14 +44,19 @@
    * `updateTask` needs the project id to authorize, and the act id to write.
    * `patch` is applied locally first so the row settles immediately; a failed
    * call rolls it back rather than leaving the table lying about state.
+   *
+   * @param {string} kind
+   * @param {Record<string, any>} params
+   * @param {Record<string, any>} patch
+   * @param {import('$lib/client/actionClient').ActionKey} [actionKey]
    */
-  async function run(kind, params, patch) {
+  async function run(kind, params, patch, actionKey = 'updateTask') {
     if (busy) return;
     busy = kind;
     const rollback = Object.fromEntries(Object.keys(patch).map((k) => [k, row?.[k]]));
     onPatched?.(row, patch);
     try {
-      const res = await executeAction('updateTask', {
+      const res = await executeAction(actionKey, {
         id: String(row.id),
         projectId: String(projectId),
         ...params
@@ -56,6 +64,7 @@
       if (!res?.success) throw new Error(res?.error?.message ?? 'action failed');
       openPanel = null;
       toast.success($t('common.status.success'));
+      onSettled?.(kind);
     } catch (err) {
       console.error('[ActQuickActions] %s failed', kind, err);
       onPatched?.(row, rollback);
@@ -83,8 +92,24 @@
       { isAssigned: false, myIshur: false, my: { data: [] } }
     );
 
-  /** The doer reporting the work finished — hands it to the creator to validate. */
-  const done = () => run('done', { naasa: true, status: 100 }, { naasa: true, status: 100 });
+  /**
+   * The doer reporting the work finished — hands it to the creator to validate.
+   * Through `reportTask`, the same path an agent's report takes, so the
+   * creator is told and the silence clock starts (PLAN_AGENT_WORK AW1).
+   */
+  const done = () => run('done', { phase: 'done' }, { naasa: true, status: 100 }, 'reportTask');
+
+  /**
+   * The creator's "not yet": the task goes back to its doer with what is still
+   * missing. A counter with its reason, not a rejection — the note is required.
+   */
+  function sendBack() {
+    const note = draftNote.trim();
+    if (!note) return;
+    run('return', { note }, { naasa: false, status: 90 }, 'returnTask').then(() => {
+      if (!openPanel) draftNote = '';
+    });
+  }
 
   /** The creator confirming the work is done. */
   const validate = () => run('validate', { valiIshur: true }, { valiIshur: true });
@@ -128,7 +153,7 @@
   const publish = () => navigate('publish', buildPublishAsMissionUrl(projectId, row, $lang));
 
   /** Actions that open a panel first rather than firing immediately. */
-  const PANELS = { progress: true, done: true, decline: true };
+  const PANELS = { progress: true, done: true, decline: true, return: true };
 
   function activate(kind) {
     if (PANELS[kind]) {
@@ -148,12 +173,14 @@
     progress: { labelKey: 'tasks.updateProgress', tone: 'primary', icon: 'gauge' },
     done: { labelKey: 'tasks.markDone', tone: 'success', icon: 'flag' },
     validate: { labelKey: 'mission.actsTable.validate', tone: 'success', icon: 'double-check' },
+    return: { labelKey: 'mission.actsTable.notYet', tone: 'muted', icon: 'undo' },
     take: { labelKey: 'mission.actsTable.takeTask', tone: 'primary', icon: 'hand' },
     publish: { labelKey: 'mission.actsTable.publishAsMission', tone: 'accent', icon: 'megaphone' }
   };
 
   const HINTS = {
     decline: 'mission.actsTable.declineHint',
+    return: 'mission.actsTable.notYetHint',
     publish: 'mission.actsTable.publishAsMissionHint'
   };
 
@@ -243,6 +270,24 @@
                   onclick={saveProgress}
                 >
                   {$t('tasks.save')}
+                </button>
+              </div>
+            {:else if kind === 'return'}
+              <label class="act-pop__field">
+                <span>{$t('mission.actsTable.notYetAsk')}</span>
+                <textarea rows="3" maxlength="2000" bind:value={draftNote}></textarea>
+              </label>
+              <div class="act-pop__buttons">
+                <button type="button" class="act-pop__btn" onclick={() => (openPanel = null)}>
+                  {$t('tasks.cancel')}
+                </button>
+                <button
+                  type="button"
+                  class="act-pop__btn act-pop__btn--go"
+                  disabled={busy !== null || !draftNote.trim()}
+                  onclick={sendBack}
+                >
+                  {$t('mission.actsTable.notYetSend')}
                 </button>
               </div>
             {:else}
@@ -415,6 +460,30 @@
 
   :global(.dark) .act-pop__row input[type='range'] {
     accent-color: var(--gold-l);
+  }
+
+  .act-pop__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-weight: 600;
+  }
+
+  .act-pop__field textarea {
+    width: 100%;
+    min-height: 4.5rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 8px;
+    font: inherit;
+    font-weight: 400;
+    resize: vertical;
+    color: inherit;
+    background: transparent;
+    border: 1px solid rgba(15, 23, 42, 0.16);
+  }
+
+  :global(.dark) .act-pop__field textarea {
+    border-color: rgba(255, 255, 255, 0.14);
   }
 
   .act-pop__value {

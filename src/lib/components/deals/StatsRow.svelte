@@ -7,7 +7,7 @@
   import { lang } from '$lib/stores/lang.js';
   import type { DashboardStats } from '$lib/types';
 
-  let { stats }: { stats: DashboardStats } = $props();
+  let { stats, currency }: { stats: DashboardStats; currency: string | null } = $props();
   const fmtMoney = useFormatMoney();
   const money = useMoney();
 </script>
@@ -20,12 +20,14 @@
     iconKind="urgent"
     variant="gold"
   />
-  <StatsCard
-    label={$t('deals.totalPaid')}
-    value={fmtMoney(stats.totalPaid)}
-    sub="{$t('deals.outOf')} {fmtMoney(stats.totalCost)}"
-    icon={currencySymbol(money.currency, money.lang)}
-  />
+  {#if currency}
+    <StatsCard
+      label={$t('deals.totalPaid')}
+      value={fmtMoney(stats.totalPaid, currency)}
+      sub="{$t('deals.outOf')} {fmtMoney(stats.totalCost, currency)}"
+      icon={currencySymbol(money.currency, money.lang)}
+    />
+  {/if}
   <StatsCard
     label={$t('deals.pendingApprovalTitle')}
     value={stats.pendingApprovals}

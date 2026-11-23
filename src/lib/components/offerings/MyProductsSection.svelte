@@ -1,4 +1,6 @@
 <script>
+  import Money from '$lib/components/money/Money.svelte';
+  import { rikmaCurrency } from '$lib/money/resolve.js';
   import { onMount } from 'svelte';
   import Spinner from '$lib/celim/Spinner.svelte';
   import { executeAction } from '$lib/client/actionClient';
@@ -124,7 +126,7 @@
               {product.attributes.name}
             </p>
             <p class="text-xs text-gray-500 dark:text-gray-400 flex flex-wrap gap-x-2">
-              <span>💰 {product.attributes.price}</span>
+              <span>💰 <Money amount={product.attributes.price} currency={product.attributes.projectcreates?.data?.[0] ? rikmaCurrency(product.attributes.projectcreates.data[0]) : product.attributes.owner_user?.data?.attributes?.currency} /></span>
               {#if product.attributes.quant != null}<span>📦 {product.attributes.quant}</span>{/if}
               {#if product.attributes.sp?.data}
                 <span>🔗 {$t('offerings.products.from_resource')}: {product.attributes.sp.data.attributes?.name}</span>

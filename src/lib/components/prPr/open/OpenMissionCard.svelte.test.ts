@@ -87,3 +87,16 @@ describe('OpenMissionCard — staffing badge', () => {
     expect(container.textContent).not.toContain('moach.open.seatsLeft');
   });
 });
+
+it('shows the rate and total in the supplied currency without changing the hours', () => {
+  const { container } = render(OpenMissionCard, {
+    props: {
+      node: { id: '7', attributes: { name: 'Front desk', noofhours: 3, perhour: 25 } },
+      projectId: '3',
+      currency: 'EUR'
+    }
+  });
+  const amounts = [...container.querySelectorAll('bdi')].map((node) => node.textContent ?? '');
+  expect(amounts).toEqual([expect.stringMatching(/75.*€|€.*75/), expect.stringMatching(/25.*€|€.*25/)]);
+  expect(container.textContent).toContain('3 moach.open.hours');
+});

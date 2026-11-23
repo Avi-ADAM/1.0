@@ -215,6 +215,12 @@ function forumTitle(kind: ForumKind, attrs: any, projectName: string): string {
     const [, , title = ''] = subject.split('::');
     return title || projectName || 'Enquiry';
   }
+  // A task's thread (PLAN_AGENT_WORK AW1, `actForumSubject`): rikma-wide like
+  // any 'project' forum — the subject only names it.
+  if (subject.startsWith('ACT::')) {
+    const [, , title = ''] = subject.split('::');
+    return title || projectName || 'Task';
+  }
   return subject || projectName || 'Forum';
 }
 
@@ -289,6 +295,23 @@ export function normalizeForum(entity: any, userId: string): ForumView | null {
       participants: recipients
     }
   };
+}
+
+/**
+ * Who a message in a task's thread is for: the task's doers and its validator.
+ * Who may READ the thread is unchanged — it is a rikma-wide ('project') forum,
+ * like the task itself; this only keeps every message there from notifying the
+ * whole rikma (PLAN_AGENT_WORK AW1). Null for any other forum.
+ */
+export function actThreadRecipients(entity: any): string[] | null {
+  const attrs = entity?.attributes || {};
+  if (forumKind(attrs) !== 'project') return null;
+  const act = entityArray(attrs.acts)[0];
+  if (!act) return null;
+  return uniqueIds([
+    ...entityArray(act.attributes?.my).map((u) => entityId(u)),
+    entityId(act.attributes?.vali?.data)
+  ]);
 }
 
 export function participantIdsForForum(entity: any): string[] {

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Money from '$lib/components/money/Money.svelte';
   import { page } from '$app/state';
   import DiscoveryMap from '$lib/components/location/DiscoveryMap.svelte';
   import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
@@ -179,7 +180,7 @@
             {/if}
             <div class="badges">
               {#if p.price != null}
-                <span class="badge price"><EntityIcon kind="money" size={13} /> {p.price}</span>
+                <span class="badge price"><EntityIcon kind="money" size={13} /> <Money amount={p.price} currency={p.currency} /></span>
               {/if}
               {#if p.personal}
                 <span class="badge">{$t('discover.filter_personal_products')}</span>

@@ -174,6 +174,12 @@ describe('getQuickActions', () => {
     expect(getQuickActions(row, '20')).not.toContain('validate');
   });
 
+  it('offers the creator "not yet" next to validate — a counter, never alone', () => {
+    const row = withAssignee({ myIshur: true, naasa: true });
+    expect(getQuickActions(row, '10')).toEqual(['validate', 'return']);
+    expect(getQuickActions(row, '20')).not.toContain('return');
+  });
+
   it('offers take and publish on an unplaced act', () => {
     expect(getQuickActions(bare(), '77')).toEqual(['take', 'publish']);
   });

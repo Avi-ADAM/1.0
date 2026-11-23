@@ -1,4 +1,5 @@
 <script>
+  import Money from '$lib/components/money/Money.svelte';
   /**
    * One needed resource (`open_mashaabim`, or a `pmash` still awaiting a vote)
    * as a card on the "open for partners" board.
@@ -17,12 +18,13 @@
    * @typedef {Object} Props
    * @property {any} node - Strapi node: `{ id, attributes }`
    * @property {string} projectId
+   * @property {string | null} [currency]
    * @property {string} [projectName]
    * @property {boolean} [pending] - a `pmash` (proposal), not a published open resource
    */
 
   /** @type {Props} */
-  let { node, projectId, projectName = '', pending = false } = $props();
+  let { node, projectId, currency, projectName = '', pending = false } = $props();
 
   let a = $derived(node?.attributes ?? {});
   let excerpt = $derived(htmlExcerpt(a.descrip, 200));
@@ -93,14 +95,14 @@
         class="flex flex-none flex-col items-center rounded-xl border border-mturk/50 bg-slate-800/80 px-2.5 py-1.5 text-mturk"
         title={$t('mash.tota')}
       >
-        <strong class="text-base leading-tight">{fmtNum(totals.total)}</strong>
+        <strong class="text-base leading-tight"><Money amount={totals.total} {currency} {projectId} /></strong>
         {#if totals.cycles !== null}
           <span class="whitespace-nowrap text-[0.65rem] opacity-80">
-            {fmtNum(totals.cycles)} × {fmtNum(totals.price)}
+            {fmtNum(totals.cycles)} × <Money amount={totals.price} {currency} {projectId} />
           </span>
         {:else if totals.quantity !== null}
           <span class="whitespace-nowrap text-[0.65rem] opacity-80">
-            {fmtNum(totals.quantity)} × {fmtNum(totals.price)}
+            {fmtNum(totals.quantity)} × <Money amount={totals.price} {currency} {projectId} />
           </span>
         {/if}
       </div>
@@ -115,13 +117,13 @@
     {#if totals.price !== null}
       <div>
         <dt class="text-gold-l">{$t('mash.shovi')} · {priceUnitLabel}</dt>
-        <dd class="font-bold text-slate-100">{fmtNum(totals.price)}</dd>
+        <dd class="font-bold text-slate-100"><Money amount={totals.price} {currency} {projectId} /></dd>
       </div>
     {/if}
     {#if totals.maxPrice !== null}
       <div>
         <dt class="text-gold-l">{$t('mash.shovile')}</dt>
-        <dd class="font-bold text-slate-100">{fmtNum(totals.maxPrice)}</dd>
+        <dd class="font-bold text-slate-100"><Money amount={totals.maxPrice} {currency} {projectId} /></dd>
       </div>
     {/if}
     {#if totals.quantity !== null}
@@ -133,7 +135,7 @@
     {#if totals.maxTotal !== null && totals.maxTotal !== totals.maxPrice}
       <div>
         <dt class="text-gold-l">{$t('mash.shovilem')}</dt>
-        <dd class="font-bold text-slate-100">{fmtNum(totals.maxTotal)}</dd>
+        <dd class="font-bold text-slate-100"><Money amount={totals.maxTotal} {currency} {projectId} /></dd>
       </div>
     {/if}
   </dl>

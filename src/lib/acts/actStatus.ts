@@ -114,6 +114,8 @@ export function getActProgress(row: ActRowLike | null | undefined): number {
  * - `done`      — the doer reporting the work finished (`naasa`), which hands
  *                 it to the creator to validate.
  * - `validate`  — the creator confirming the work is done (`valiIshur`).
+ * - `return`    — the creator's "not yet": back to the doer with what is still
+ *                 missing (returnTask). A counter with its reason, not a veto.
  * - `take`      — "I'll do it": opens the mission picker, since an act has to
  *                 hang off one of the taker's own missions-in-progress for the
  *                 hours it accrues to count. It does not assign on its own.
@@ -129,6 +131,7 @@ export type ActQuickAction =
   | 'progress'
   | 'done'
   | 'validate'
+  | 'return'
   | 'take'
   | 'publish';
 
@@ -154,7 +157,10 @@ export function getQuickActions(
     actions.push('progress');
     actions.push('done');
   }
-  if (status === 'pendingValidation' && isValidator) actions.push('validate');
+  if (status === 'pendingValidation' && isValidator) {
+    actions.push('validate');
+    actions.push('return');
+  }
   if (status === 'unassigned') {
     actions.push('take');
     actions.push('publish');

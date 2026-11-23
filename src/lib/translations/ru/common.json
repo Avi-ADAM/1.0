@@ -82,7 +82,16 @@
     "saleLabel": "Продажа: {{name}}",
     "saleReport": "Отчёт о продаже",
     "saleReportNamed": "Отчёт о продаже: {{name}}",
-    "meetingCreated": "Встреча создана"
+    "meetingCreated": "Встреча создана",
+    "report": {
+      "plan": "📋 План",
+      "progress": "⏳ Ход работы",
+      "blocked": "⛔ Застряло",
+      "done": "✅ Отмечено как выполнено",
+      "verify": "Как проверить:",
+      "remaining": "Осталось на потом:",
+      "notYet": "↩ Ещё нет"
+    }
   },
   "footer": {
     "brain": "«Мозг» рикм",

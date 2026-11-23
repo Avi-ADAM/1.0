@@ -5,6 +5,7 @@
   import { execFromAdmin } from '$lib/server/archive/exec.js';
   import { fetchObjectChangeDecision, standingOrder, standingRound } from '$lib/server/archive/read.js';
   import { applyStandingVersion, requiredSigners } from '$lib/server/archive/vote.js';
+  import { rateFlushScopes } from '$lib/server/timers/flushRateChange.js';
   import { strapiClient } from '$lib/server/actions';
   import { moveStock } from '$lib/shop/stock.js';
   import { readStockFlags, writeStock } from '$lib/server/shop/stockFlags.js';
@@ -97,7 +98,7 @@
     );
   }
 
-  export async function Decision(id, taid, fetch) {
+  export async function Decision(id, taid, fetch, scopes = []) {
     async function markDone() {
       try {
         await SendToAdmin(
@@ -268,6 +269,8 @@
 
         try {
           const applied = await applyStandingVersion(exec, decision);
+          // A new hourly value closed the owner's running timer: tell their tab.
+          for (const sc of rateFlushScopes(applied.rateFlush)) if (!scopes.includes(sc)) scopes.push(sc);
           if (extra?.onApplied) {
             await extra.onApplied(round).catch((e) =>
               console.error('[timegrama/decision] applied, but the deal did not follow:', { decisionId: id, error: e })

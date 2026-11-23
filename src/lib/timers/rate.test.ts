@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import {
   blendedRate,
+  rateEras,
+  timerRate,
   pickRateRow,
   resolveRate,
   rowRate,
@@ -117,5 +119,27 @@ describe('rowRate', () => {
   it('prefers the row stamp and falls back otherwise', () => {
     expect(rowRate(row('1', 3, 50), 80)).toBe(50);
     expect(rowRate(row('1', 3, null), 80)).toBe(80);
+  });
+});
+
+describe('rateEras / timerRate', () => {
+  it('groups by value, oldest era first, and leaves unknown rates out', () => {
+    const eras = rateEras([
+      { rate: 80, hours: 1, at: 300 },
+      { rate: 50, hours: 2, at: 100 },
+      { rate: 50.0000001, hours: 1, at: 200 },
+      { rate: null, hours: 9, at: 50 },
+    ]);
+    expect(eras.map((e) => [e.rate, e.hours])).toEqual([
+      [50, 3],
+      [80, 1],
+    ]);
+    expect(eras[0].value).toBeCloseTo(150);
+  });
+
+  it('prefers the timer stamp over the mission value', () => {
+    expect(timerRate({ rate: 50 }, 80)).toBe(50);
+    expect(timerRate({ rate: null }, 80)).toBe(80);
+    expect(timerRate({}, null)).toBeNull();
   });
 });

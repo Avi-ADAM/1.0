@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { provideRikmaCurrency } from '$lib/money/context.svelte';
   /**
    * Write a direct offer (PLAN_DIRECT_OFFER P3): who it is for, what, when, where,
    * and the parts you will do at your price. Nothing is sent from here — the next
@@ -29,6 +30,9 @@
   const filledM = $derived(missions.filter((m) => m.name.trim() || m.hours || m.ratePerHour));
   const filledR = $derived(resources.filter((r) => r.name.trim() || r.quantity || r.unitPrice));
   const checked = $derived(cleanLines({ missions: filledM, resources: filledR }));
+  let { data } = $props();
+  provideRikmaCurrency(() => data.userCurrency);
+
   const total = $derived('lines' in checked ? offerTotal(checked.lines) : null);
   const count = $derived(missions.length + resources.length);
 

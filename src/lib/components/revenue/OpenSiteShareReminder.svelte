@@ -89,6 +89,7 @@
             <SiteShareDecision
               proposed={item.proposedAmount}
               basis={item.basisAmount}
+              projectId={item.projectId}
               initial={null}
               busy={busyId === item.contributionId}
               onDecide={(payload) => onDecide(item, payload)}

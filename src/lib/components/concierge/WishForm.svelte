@@ -1,6 +1,7 @@
 <script>
   import { nameOf } from '$lib/translation/memberName';
   import { useFormatMoney, useRikmaCurrency } from '$lib/money/context.svelte';
+  import CurrencySymbol from '$lib/components/money/CurrencySymbol.svelte';
   import { DEFAULT_CURRENCY } from '$lib/money/currencies';
   import Money from '$lib/components/money/Money.svelte';
   import { onMount, onDestroy, tick } from 'svelte';
@@ -2533,7 +2534,8 @@
                     : TRACKS && pricingTrack === 'atCost'
                       ? 'concierge.new.money.atCostAmount'
                       : 'concierge.new.budgetLabel'
-                )}</span
+                )}
+                <CurrencySymbol /></span
               >
               <input
                 type="number"

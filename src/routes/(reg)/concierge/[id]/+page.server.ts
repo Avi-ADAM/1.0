@@ -1,5 +1,5 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
-import { matbeaCode } from '$lib/money/resolve.js';
+import { matbeaCode, rikmaCurrency } from '$lib/money/resolve.js';
 import { error, redirect } from '@sveltejs/kit';
 import { actionViaProxy } from '$lib/server/actionViaProxy.js';
 import { enrichWish, placeKey, EMPTY_ENRICHMENT, type WishEnrichment } from '$lib/server/ai/enrichWish';
@@ -114,6 +114,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
         createdAt: a.createdAt ?? null,
         startDate: a.startDate ?? null,
         finnishDate: a.finnishDate ?? null,
+        currency: a.entryCurrency ?? null,
         totalBounti: typeof a.totalbounti === 'number' ? a.totalbounti : null,
         allowJoin: !!a.allowJoin,
         accessMode: a.access_mode ?? 'private',
@@ -227,7 +228,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
           negoIds: (pa.negos?.data ?? []).map((n: any) => n.id),
           currencyName: pa.matbea?.data?.attributes?.name ?? null,
           currencySymbol: pa.matbea?.data?.attributes?.simbol ?? '₪',
-          currencyCode: matbeaCode(pa.matbea),
+          currencyCode: pa.entryCurrency ?? (project ? rikmaCurrency(project) : a.entryCurrency ?? matbeaCode(pa.matbea)),
           coveredMissions: (pa.covered_missions ?? []).map((c: any) => ({
             id: c.id,
             extractedMissionIdx: c.extracted_mission_idx,

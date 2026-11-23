@@ -29,7 +29,7 @@
     "roundLabel": "Раунд",
     "proposerYou": "Вы",
     "proposerPartner": "Дана",
-    "perHourUnit": "₪/час",
+    "perHourUnit": "{{amount}}/час",
     "hoursUnit": "часов",
     "totalLabel": "Итого",
     "windowLabel": "Осталось времени на решение",
@@ -40,7 +40,7 @@
     "actions": { "approve": "Одобрить", "discuss": "Обсудить", "counter": "Встречное" },
     "counterForm": {
       "title": "Ваша версия",
-      "perHourLabel": "Ставка в час (₪)",
+      "perHourLabel": "Ставка в час",
       "hoursLabel": "Количество часов",
       "noteLabel": "Примечание (необязательно)",
       "notePlaceholder": "Почему вы это предлагаете?",

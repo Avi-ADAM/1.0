@@ -82,7 +82,16 @@
     "saleLabel": "מכירה: {{name}}",
     "saleReport": "דיווח מכירה",
     "saleReportNamed": "דיווח מכירה: {{name}}",
-    "meetingCreated": "הפגישה נוצרה"
+    "meetingCreated": "הפגישה נוצרה",
+    "report": {
+      "plan": "📋 תכנית עבודה",
+      "progress": "⏳ התקדמות",
+      "blocked": "⛔ נתקע",
+      "done": "✅ דיווח: בוצע",
+      "verify": "איך לבדוק:",
+      "remaining": "נשאר להמשך:",
+      "notYet": "↩ עוד לא עובד"
+    }
   },
   "footer": {
     "brain": "מוח הרקמות",

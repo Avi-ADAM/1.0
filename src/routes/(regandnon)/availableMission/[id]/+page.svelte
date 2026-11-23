@@ -1,4 +1,7 @@
 <script>
+  import Money from '$lib/components/money/Money.svelte';
+  import { provideRikmaCurrency } from '$lib/money/context.svelte';
+  import { rikmaCurrency } from '$lib/money/resolve.js';
   import { nameOf } from '$lib/translation/memberName';
   import { toast } from 'svelte-sonner';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
@@ -30,6 +33,7 @@
 
   /** @type {Props} */
   let { alr = $bindable(false), data } = $props();
+  provideRikmaCurrency(() => data.alld?.attributes?.project?.data ? rikmaCurrency(data.alld.attributes.project.data) : data.alld?.attributes?.ratson?.data?.attributes?.entryCurrency);
 
   let success = $state(false);
   function project(x) {
@@ -585,9 +589,7 @@
                         hover($t('common.valph'))}
                       onmouseleave={() => hover('0')}
                     >
-                      {(data.alld.attributes.perhour ?? 0).toLocaleString('en-US', {
-                        maximumFractionDigits: 2
-                      })}
+                      <Money amount={data.alld.attributes.perhour ?? 0} />
                       {$t('pages.availMission.perho')}
                     </span>
                     *
@@ -607,10 +609,7 @@
                     <span
                       onmouseenter={() => hover($t('lev.cards.voteCard.inTotal'))}
                       onmouseleave={() => hover('0')}
-                      >{(
-                        (data.alld.attributes.noofhours ?? 0) *
-                        (data.alld.attributes.perhour ?? 0)
-                      ).toLocaleString('en-US', { maximumFractionDigits: 2 })}
+                      ><Money amount={(data.alld.attributes.noofhours ?? 0) * (data.alld.attributes.perhour ?? 0)} />
                       {data.alld.attributes.iskvua ? $t('pages.availMission.monhly') : ''}
                     </span>
                   </p>

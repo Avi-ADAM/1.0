@@ -1,4 +1,5 @@
 <script>
+  import Money from '$lib/components/money/Money.svelte';
   import { nameOf } from '$lib/translation/memberName';
   /**
    * One open mission (or a mission proposal still awaiting a vote) as a card on
@@ -20,12 +21,13 @@
    * @typedef {Object} Props
    * @property {any} node - Strapi node: `{ id, attributes }`
    * @property {string} projectId
+   * @property {string | null} [currency]
    * @property {string} [projectName]
    * @property {boolean} [pending] - a `pendm` (proposal), not a published open mission
    */
 
   /** @type {Props} */
-  let { node, projectId, projectName = '', pending = false } = $props();
+  let { node, projectId, currency, projectName = '', pending = false } = $props();
 
   let a = $derived(node?.attributes ?? {});
   let excerpt = $derived(htmlExcerpt(a.descrip, 200));
@@ -96,9 +98,9 @@
         class="flex flex-none flex-col items-center rounded-xl border border-gold/50 bg-slate-800/80 px-2.5 py-1.5 text-gold"
         title={$t('moach.open.totalValue')}
       >
-        <strong class="text-base leading-tight">{fmtNum(value)}</strong>
+        <strong class="text-base leading-tight"><Money amount={value} {currency} {projectId} /></strong>
         <span class="whitespace-nowrap text-[0.65rem] opacity-80">
-          {fmtNum(hours)} {$t('moach.open.hours')} × {fmtNum(perhour)}
+          {fmtNum(hours)} {$t('moach.open.hours')} × <Money amount={perhour} {currency} {projectId} />
         </span>
       </div>
     {/if}
@@ -108,6 +110,8 @@
        what it is worth and what someone is paying so it can be done, side by
        side — never merged into one number. -->
   <MissionStipendOffer
+    {currency}
+    {projectId}
     {hours}
     {perhour}
     stipendRate={Number(a.stipendRate) || 0}

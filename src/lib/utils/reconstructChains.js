@@ -29,6 +29,9 @@
  * @property {StrapiEntity[]} finiapruvals
  * @property {string|null} finnishedMissionId     - ID only; loaded lazily
  * @property {StrapiEntity|null} finnishedMission - populated after lazy load
+ * @property {StrapiEntity[]} finnishedMissions   - every loaded row of the mission:
+ *   one per rate era when the rikma changed its hourly value mid-way
+ *   ($lib/timers/rate.ts). `finnishedMission` stays the last of them.
  */
 
 /**
@@ -128,7 +131,8 @@ export function reconstructMissionChains(pmiData, omiData, bmiData, fmiData, act
       acts: [],
       finiapruvals: [],
       finnishedMissionId: null,
-      finnishedMission: null
+      finnishedMission: null,
+      finnishedMissions: []
     };
     chains.push(chain);
     return chain;
@@ -281,6 +285,10 @@ export function reconstructMissionChains(pmiData, omiData, bmiData, fmiData, act
       const chain = chainByBetahalikhId.get(betahalikhId);
       chain.finnishedMission = fm;
       chain.finnishedMissionId = String(fm.id);
+      // A mission priced at two hourly values has a row for each; keep them all.
+      if (!chain.finnishedMissions.some((row) => String(row.id) === String(fm.id))) {
+        chain.finnishedMissions.push(fm);
+      }
     }
     // Orphan finnished_missions (no matching chain) are ignored — they cannot
     // be placed without a mesimabetahalich anchor.

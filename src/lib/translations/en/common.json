@@ -82,7 +82,16 @@
     "saleLabel": "Sale: {{name}}",
     "saleReport": "Sale report",
     "saleReportNamed": "Sale report: {{name}}",
-    "meetingCreated": "Meeting created"
+    "meetingCreated": "Meeting created",
+    "report": {
+      "plan": "📋 Plan",
+      "progress": "⏳ Progress",
+      "blocked": "⛔ Stuck",
+      "done": "✅ Reported done",
+      "verify": "How to check:",
+      "remaining": "Left for later:",
+      "notYet": "↩ Not yet"
+    }
   },
   "footer": {
     "brain": "Rikma brain",

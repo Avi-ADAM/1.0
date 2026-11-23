@@ -141,5 +141,8 @@
     "assignedHoursLabel": "Allocated hours:",
     "completedHoursLabel": "Hours already completed:",
     "close": "Close"
-  }
+  },
+  "sessionsByRate": "By hourly value",
+  "sessionsRateChanged": "This mission's hourly value changed mid-way — each row shows the value its hours count at.",
+  "sessionsAtRate": "hours at"
 }

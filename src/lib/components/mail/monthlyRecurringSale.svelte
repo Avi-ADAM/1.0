@@ -11,6 +11,8 @@
     Section,
     Text
   } from 'svelty-email';
+  // A mail has no money context: the sender passes the rikma's currency.
+  import { formatMoney } from '$lib/money/format.js';
 
   /**
    * Monthly recurring-sale cycle email (PLAN_RECURRING_SALES).
@@ -40,6 +42,7 @@
     expectedAmount = 0,
     monthLabel = '',
     role = 'holder',
+    currency = 'ILS',
     lang = 'he',
     previewText = ''
   }: {
@@ -49,6 +52,8 @@
     expectedAmount?: number;
     monthLabel?: string;
     role?: 'holder' | 'customer';
+    /** The rikma's currency code — the amount is stored in it. */
+    currency?: import('$lib/money/currencies.js').CurrencyCode;
     lang?: string;
     previewText?: string;
   } = $props();
@@ -202,7 +207,7 @@
       {#if expectedAmount}
         <Section style={amountBox}>
           <Text style={amountLabel}>{t.amountLabel}</Text>
-          <Heading style={amountText}>{expectedAmount} ₪</Heading>
+          <Heading style={amountText}>{formatMoney(expectedAmount, currency, lang)}</Heading>
         </Section>
       {/if}
 

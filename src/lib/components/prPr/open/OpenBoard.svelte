@@ -1,4 +1,5 @@
 <script>
+  import { useRikmaCurrency } from '$lib/money/context.svelte';
   /**
    * "Open for partners" — every mission and every needed resource of one rikma
    * that is still looking for someone, in one place.
@@ -40,6 +41,7 @@
     showHeader = true,
     linkToFullBoard = false
   } = $props();
+  const rikmaCurrency = useRikmaCurrency();
 
   let search = $state('');
   let kind = $state(/** @type {'all'|'missions'|'resources'} */ ('all'));
@@ -185,7 +187,7 @@
       {/if}
       <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {#each shownMissions as node (node.id)}
-          <OpenMissionCard {node} {projectId} {projectName} />
+          <OpenMissionCard {node} {projectId} {projectName} currency={rikmaCurrency()} />
         {/each}
       </div>
     </div>
@@ -200,7 +202,7 @@
       {/if}
       <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {#each shownResources as node (node.id)}
-          <OpenResourceCard {node} {projectId} {projectName} />
+          <OpenResourceCard {node} {projectId} {projectName} currency={rikmaCurrency()} />
         {/each}
       </div>
     </div>
@@ -215,12 +217,12 @@
       <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {#if showMissions}
           {#each shownPendms as node (node.id)}
-            <OpenMissionCard {node} {projectId} {projectName} pending={true} />
+            <OpenMissionCard {node} {projectId} {projectName} currency={rikmaCurrency()} pending={true} />
           {/each}
         {/if}
         {#if showResources}
           {#each shownPmashes as node (node.id)}
-            <OpenResourceCard {node} {projectId} {projectName} pending={true} />
+            <OpenResourceCard {node} {projectId} {projectName} currency={rikmaCurrency()} pending={true} />
           {/each}
         {/if}
       </div>

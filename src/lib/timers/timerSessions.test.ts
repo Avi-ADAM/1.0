@@ -142,3 +142,47 @@ describe('buildTimerSessions', () => {
     );
   });
 });
+
+describe('buildTimerSessions — hourly value changed mid-mission', () => {
+  // The member started at 10:00 at ₪50; at 12:00 the rikma's change to ₪80
+  // matured. The server cut the running timer at 12:00 (stamped 50) and handed
+  // back a new one from 12:00 (stamped 80), which is still running at 13:30.
+  const old = timer('700', {
+    saved: true,
+    rate: 50,
+    timers: [{ start: at(2026, 8, 20, 10, 0), stop: at(2026, 8, 20, 12, 0) }]
+  });
+  const fresh = timer('701', {
+    isActive: true,
+    rate: 80,
+    timers: [{ start: at(2026, 8, 20, 12, 0) }]
+  });
+  const now = new Date(2026, 7, 20, 13, 30).getTime();
+
+  it('tags every session with the value its hours count at', () => {
+    const r = buildTimerSessions([old, fresh], now, 80);
+    const byTimer = Object.fromEntries(r.sessions.map((s) => [s.timerId, s.rate]));
+    expect(byTimer).toEqual({ '700': 50, '701': 80 });
+  });
+
+  it('splits the hours into eras, oldest first — X up to the change, Y since', () => {
+    const r = buildTimerSessions([old, fresh], now, 80);
+    expect(r.mixedRates).toBe(true);
+    expect(r.rateEras.map((e) => e.rate)).toEqual([50, 80]);
+    expect(r.rateEras[0].hours).toBeCloseTo(2);
+    expect(r.rateEras[1].hours).toBeCloseTo(1.5);
+    // 2h × 50 + 1.5h × 80 — never 3.5h × 80.
+    expect(r.rateEras[0].value + r.rateEras[1].value).toBeCloseTo(220);
+  });
+
+  it('reads an unstamped timer at the mission value, and says nothing when there is one value', () => {
+    const r = buildTimerSessions(
+      [timer('9', { saved: true, timers: [{ start: at(2026, 8, 1, 9), stop: at(2026, 8, 1, 10) }] })],
+      now,
+      50
+    );
+    expect(r.sessions[0].rate).toBe(50);
+    expect(r.mixedRates).toBe(false);
+    expect(r.rateEras).toHaveLength(1);
+  });
+});

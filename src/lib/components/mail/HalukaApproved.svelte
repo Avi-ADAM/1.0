@@ -11,6 +11,8 @@
     Section,
     Text
   } from 'svelty-email';
+  // A mail has no money context: the sender passes the rikma's currency.
+  import { formatMoney } from '$lib/money/format.js';
 
   // ✅ Svelte 5 syntax - using $props()
   /**
@@ -18,6 +20,7 @@
    * @property {string} [username]
    * @property {number} [amount]
    * @property {boolean} [isReceiving]
+   * @property {string} [currency] - the rikma's currency code; the amount is stored in it
    * @property {string} [lang]
    * @property {string} [previewText]
    */
@@ -27,6 +30,7 @@
     username = '', 
     amount = 0, 
     isReceiving = true, 
+    currency = 'ILS',
     lang = 'he', 
     previewText = '' 
   } = $props();
@@ -192,7 +196,7 @@
       <!-- Amount Box -->
       <Section style={amountBox}>
         <Heading style={amountText}>
-          {amount} ₪
+          {formatMoney(amount, currency, lang)}
         </Heading>
         <Text style={bodyText}>
           {t.receivingBody}

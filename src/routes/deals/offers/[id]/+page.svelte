@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { provideRikmaCurrency } from '$lib/money/context.svelte';
   /** One direct offer, as its provider manages it (PLAN_DIRECT_OFFER P3–P4). */
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/state';
@@ -10,6 +11,7 @@
 
   let { data } = $props();
   const o = $derived(data.offer);
+  provideRikmaCurrency(() => o?.currency);
   const link = $derived(data.linkPath ? `${page.url.origin}${data.linkPath}` : '');
   const whatsapp = $derived(
     link ? `https://wa.me/?text=${encodeURIComponent($t('directOffer.manage.shareText', { name: o.name }) + '\n' + link)}` : ''

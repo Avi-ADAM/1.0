@@ -647,6 +647,7 @@
     "previousResponse": "Respuesta anterior"
   },
   "taskModal": {
+    "openPage": "Abrir página de la tarea",
     "progress": "Progreso",
     "createdBy": "Creada por",
     "unknown": "Desconocido",

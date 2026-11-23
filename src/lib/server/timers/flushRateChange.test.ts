@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { flushHoursBeforeRateChange } from './flushRateChange.js';
+import { flushHoursBeforeRateChange, rateFlushScopes } from './flushRateChange.js';
 
 const NOW = Date.parse('2026-08-20T12:00:00.000Z');
 
@@ -213,5 +213,19 @@ describe('flushHoursBeforeRateChange', () => {
       throw new Error('strapi is down');
     };
     await expect(flush(exec)).resolves.toEqual({ flushed: false });
+  });
+});
+
+describe('rateFlushScopes', () => {
+  it("tells the owner's timer store and the mission page that the timer was cut", async () => {
+    const { exec } = fakeExec();
+    const res = await flush(exec);
+    expect(res.ownerId).toBe('2');
+    expect(rateFlushScopes(res)).toEqual(['timer:2', 'mission:10']);
+  });
+
+  it('publishes nothing when nothing was flushed', () => {
+    expect(rateFlushScopes({ flushed: false })).toEqual([]);
+    expect(rateFlushScopes(null)).toEqual([]);
   });
 });

@@ -1,4 +1,6 @@
 <script>
+  import { DEFAULT_CURRENCY, normalizeCode } from '$lib/money/currencies.js';
+  import { provideRikmaCurrency } from '$lib/money/context.svelte';
   import { nameOf } from '$lib/translation/memberName';
   import Money from '$lib/components/money/Money.svelte';
   import '$lib/styles/concierge.css';
@@ -23,6 +25,7 @@
 
   /** @type {{ data: { wish: any | null; proposals: any[]; loadOk: boolean; uid?: string; isOwner: boolean; enrichment?: any; forumMessages?: any[]; missionTemplates?: any[]; external?: any; bell?: { id: string; name: string; count: number }[]; notices?: import('$lib/notices').Notice[] | null; published?: { missions: { name: string; extractedKey: string | null }[]; resources: { name: string; extractedKey: string | null }[] }; gaps?: { label: string; imp: 'must' | 'nice' }[] | null; stages?: import('$lib/sheirut/dealChain').DealStageView[]; partLines?: Record<string, string[]> | null; pool?: import('$lib/server/maagad/wishPool').WishPoolPanel | null; pricing?: import('$lib/server/wish/pricingTrack').WishPricing | null } }} */
   let { data } = $props();
+  provideRikmaCurrency(() => data.wish?.currency);
 
   // The bell's "expand" (docs/inprogress/PLAN_SMART_NOTICES.md) links to #proposal-<id>.
   // The proposal cards render after SvelteKit's own scroll-to-hash has run, so
@@ -109,6 +112,7 @@
           );
           return {
             proposalId: p.id,
+            currency: p.currencyCode,
             kind: p.kind,
             name: p.proposerName,
             project: p.proposerProject?.name || (p.matanot?.name ?? ''),
@@ -224,6 +228,7 @@
           ? `${matching.proposerName}${matching.proposerProject?.name ? ' · ' + matching.proposerProject.name : ''}`
           : null,
         price: line?.price ?? matching?.totalPrice ?? 0,
+        currency: matching?.currencyCode ?? wish.currency,
         status: matching
           ? matching.status === 'accepted'
             ? 'accepted'
@@ -1661,6 +1666,9 @@
   );
 
   /* ===== Derived ===== */
+  const wishCurrency = $derived(normalizeCode(data.wish?.currency) ?? DEFAULT_CURRENCY);
+  const planCurrencies = $derived(new Set(TOTAL_LINES.filter((line) => line.status !== 'open').map((line) => normalizeCode(line.currency) ?? wishCurrency)));
+  const planCurrency = $derived(planCurrencies.size > 1 ? null : [...planCurrencies][0] ?? wishCurrency);
   const grandTotal = $derived(TOTAL_LINES.reduce((s, l) => s + l.price, 0));
   const coveredPct = $derived(
     TOTAL_LINES.length === 0
@@ -2152,7 +2160,7 @@
                     >{/if}
                   {#if row.need.bestPrice}<span
                       style="font-size:12px;color:var(--cg-goldhi)"
-                      ><Money amount={row.need.bestPrice} /></span
+                      ><Money amount={row.need.bestPrice} currency={row.providers.find((p) => p.price === row.need.bestPrice)?.currency} /></span
                     >{/if}
                   {#if isOwner}
                     <span class="need-tools">
@@ -2230,7 +2238,7 @@
                                   style="color:var(--cg-goldhi);font-size:12px">{$t('concierge.wp.by_quote')}</span
                                 >{:else if m.price != null}<span
                                   style="color:var(--cg-goldhi);font-size:12px"
-                                  ><Money amount={m.price} currency={m.currencyCode} /></span
+                                  ><Money amount={m.price} currency={m.currencyCode ?? DEFAULT_CURRENCY} /></span
                                 >{/if}
                             </div>
                           </div>
@@ -2312,7 +2320,7 @@
                                 >{/if}
                               {#if r.price != null}<span
                                   style="color:var(--cg-goldhi);font-size:12px"
-                                  ><Money amount={r.price} /></span
+                                  ><Money amount={r.price} currency={r.currencyCode ?? DEFAULT_CURRENCY} /></span
                                 >{/if}
                             </div>
                           </div>
@@ -2394,7 +2402,7 @@
                             >{$t('concierge.wp.hours_short', { count: p.hours })} ·
                           </span>{/if}
                         <span style="color:var(--cg-goldhi)"
-                          >{#if p.price == null}{$t('concierge.wp.by_quote')}{:else}<Money amount={p.price} />{/if}</span
+                          >{#if p.price == null}{$t('concierge.wp.by_quote')}{:else}<Money amount={p.price} currency={p.currency} />{/if}</span
                         >
                       </div>
                       {#if p.status === 'rejected'}
@@ -2494,7 +2502,7 @@
                     {/if}
                     {#if isOwner && p.status !== 'rejected' && p.hours && p.price != null && !row.need.isResource && effectivePricingTrack(trackOf(p.proposalId)) === 'atCost'}
                       <p class="neg-deadline">
-                        {$t('concierge.pay_upto_hours')} <Money amount={p.price} />
+                        {$t('concierge.pay_upto_hours')} <Money amount={p.price} currency={p.currency} />
                       </p>
                     {/if}
 
@@ -2515,7 +2523,7 @@
                               )}
                               ·
                             {/if}
-                            {#if c.price != null}<Money amount={c.price} />{/if}
+                            {#if c.price != null}<Money amount={c.price} currency={p.currency} />{/if}
                             {#if c.note}— {c.note}{/if}
                           </p>
                         {/each}
@@ -2662,7 +2670,7 @@
                               style="color:var(--cg-goldhi);font-size:12px">{$t('concierge.wp.by_quote')}</span
                             >{:else if m.price != null}<span
                               style="color:var(--cg-goldhi);font-size:12px"
-                              ><Money amount={m.price} currency={m.currencyCode} /></span
+                              ><Money amount={m.price} currency={m.currencyCode ?? DEFAULT_CURRENCY} /></span
                             >{/if}
                         </div>
                       </div>
@@ -2757,7 +2765,7 @@
                             >{/if}
                           {#if r.price != null}<span
                               style="color:var(--cg-goldhi);font-size:12px"
-                              ><Money amount={r.price} /></span
+                              ><Money amount={r.price} currency={r.currencyCode ?? DEFAULT_CURRENCY} /></span
                             >{/if}
                         </div>
                       </div>
@@ -3038,7 +3046,7 @@
                       ? 'var(--cg-dim)'
                       : 'var(--cg-goldhi)'};white-space:nowrap"
                   >
-                    {#if line.status === 'open'}—{:else}<Money amount={line.price} />{/if}
+                    {#if line.status === 'open'}—{:else}<Money amount={line.price} currency={line.currency} />{/if}
                   </div>
                 </div>
               {/each}
@@ -3052,7 +3060,7 @@
               >
               <span
                 style="font-family:'Sababa','Heebo',sans-serif;font-size:28px;color:var(--cg-goldhi)"
-                ><Money amount={grandTotal} /></span
+                >{#if planCurrency}<Money amount={grandTotal} currency={planCurrency} />{:else}—{/if}</span
               >
             </div>
             <!-- The plan against the budget she gave — nothing compared them before (P0). -->
@@ -3062,12 +3070,12 @@
                 <span>{$t('concierge.total_budget')}</span>
                 <Money amount={budget} />
               </div>
-              {#if grandTotal > budget}
+              {#if planCurrency === wishCurrency && grandTotal > budget}
                 <div class="budget-over" role="status">
                   <div>{$t('concierge.total_over')} <Money amount={grandTotal - budget} /></div>
                   <small>{$t('concierge.total_over_hint')}</small>
                 </div>
-              {:else if grandTotal > 0}
+              {:else if planCurrency === wishCurrency && grandTotal > 0}
                 <div class="budget-ok">{$t('concierge.total_within')}</div>
               {/if}
             {/if}

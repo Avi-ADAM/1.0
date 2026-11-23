@@ -646,6 +646,7 @@
     "previousResponse": "Предыдущий ответ"
   },
   "taskModal": {
+    "openPage": "Открыть страницу задачи",
     "progress": "Прогресс",
     "createdBy": "Создано",
     "unknown": "Неизвестно",

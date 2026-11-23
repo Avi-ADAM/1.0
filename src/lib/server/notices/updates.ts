@@ -25,6 +25,9 @@ import {
   type Notice
 } from '$lib/notices';
 import { hubAskNotices, hubFeedNotices } from '$lib/notices/hub';
+import { taskNotices } from '$lib/notices/task';
+import { taskOf, type TaskRow } from '$lib/acts/agentTasks';
+import { sendToSer } from '$lib/send/sendToSer.js';
 import { loadWishNotices } from '$lib/server/concierge/notices';
 import { loadDealNotices } from '$lib/server/deal/dealNotices';
 import { loadNoticePrefsChecked } from './prefs';
@@ -114,6 +117,23 @@ export function toUpdateRows(list: Notice[], lang: unknown): UpdateRow[] {
 }
 
 /**
+ * Tasks waiting for her yes or her check (PLAN_AGENT_WORK AW1), as notices. The
+ * read is `serviceAdmin` keyed to `uid`, which every caller of loadMyUpdates
+ * already verified (the session, or the MCP key's owner). Never rejects: a
+ * failed read answers null, named in `unavailable`.
+ */
+export async function loadTaskNotices(uid: string, fetch: typeof globalThis.fetch, now?: number): Promise<Notice[] | null> {
+  try {
+    const raw: any = await sendToSer({ uid: String(uid), limit: 150 }, 'agentTasksFor', 0, 0, true, fetch);
+    if (!raw || raw.errors?.length || !raw.data) return null;
+    const rows = (raw.data.acts?.data ?? []).map(taskOf).filter((t: TaskRow | null): t is TaskRow => !!t);
+    return taskNotices(rows, String(uid), now);
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Mission candidacies waiting for her (qid 461 / its twin 462), as notices. A read
  * of its own: when it fails, the other votes still load and this answers null,
  * which the caller names in `unavailable`. Never rejects.
@@ -141,7 +161,7 @@ export async function loadMyUpdates(uid: string, fetch: typeof globalThis.fetch,
   const reads = startDigestReads(uid, { fetch, door, now: opts.now });
   const prefsChecked = loadNoticePrefsChecked(uid, fetch, door);
   const prefsPending = prefsChecked.then((p) => p.prefs);
-  const [hub, work, suggestions, whatsNew, wish, deal, prefsRead, asks] = await Promise.all([
+  const [hub, work, suggestions, whatsNew, wish, deal, prefsRead, asks, tasks] = await Promise.all([
     reads.hub,
     reads.work,
     reads.suggestions,
@@ -149,11 +169,13 @@ export async function loadMyUpdates(uid: string, fetch: typeof globalThis.fetch,
     loadWishNotices(uid, fetch, prefsPending, door),
     loadDealNotices(uid, fetch, prefsPending, door),
     prefsChecked,
-    loadAskNotices(uid, fetch, door, opts.now)
+    loadAskNotices(uid, fetch, door, opts.now),
+    loadTaskNotices(uid, fetch, opts.now)
   ]);
   const prefs = prefsRead.prefs;
   if (hub.error) unavailable.push('rikmaVotes');
   if (asks === null) unavailable.push('missionApplications');
+  if (tasks === null) unavailable.push('tasks');
   if (work.error) unavailable.push('work');
   if (whatsNew.error) unavailable.push('whatsNew');
   if (suggestions.error) unavailable.push('suggestions');
@@ -162,7 +184,11 @@ export async function loadMyUpdates(uid: string, fetch: typeof globalThis.fetch,
   // What she hid could not be read, so hidden notices may show again.
   if (!prefsRead.ok) unavailable.push('hiddenNotices');
 
-  const rikmaVotes = applyDismissals([...hubFeedNotices(hub.value.feed), ...(asks ?? [])], prefs.dismissals, opts.now);
+  const rikmaVotes = applyDismissals(
+    [...hubFeedNotices(hub.value.feed), ...(asks ?? []), ...(tasks ?? [])],
+    prefs.dismissals,
+    opts.now
+  );
   const all = groupNotices(mergeNotices(wish ?? [], deal ?? [], rikmaVotes)).filter((n) =>
     inScope(n, projectId, rikma)
   );

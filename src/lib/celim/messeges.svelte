@@ -4,6 +4,8 @@
   import { slide } from "svelte/transition";
   import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
+  import { parseReport, parseReturn, safeLink } from '$lib/acts/agentTasks';
+  import { messageParts } from '$lib/chat/messageText';
 
 	
 	function isToday(date) {
@@ -72,6 +74,19 @@
 		changed = false,
 		what = null
 	} = $props();
+
+	/**
+	 * A task's report or a validator's "not yet" (PLAN_AGENT_WORK AW1) is drawn as
+	 * text, never through {@html}: it is often an agent's words, and the agent may
+	 * have been reading a customer's. Links are checked again here — the tag can be
+	 * typed into any chat by hand.
+	 */
+	let report = $derived(parseReport(message));
+	let sentBack = $derived(report ? null : parseReturn(message));
+	let reportLinks = $derived((report?.links ?? []).map(safeLink).filter(Boolean));
+	// Any other message is a member's words: text, never {@html}. Only http(s)
+	// links are made clickable (messageText.ts).
+	let parts = $derived(report || sentBack ? [] : messageParts(message));
 	
 </script>
 
@@ -127,7 +142,24 @@
                      class:shadow-md={sentByMe === true}
                      dir="auto" 
                      style="word-break: break-word; overflow-wrap: break-word;"
-                  >{@html message}</span>
+                  >{#if report}
+                     <span class="block font-bold">{$t(`common.chat.report.${report.phase}`)}</span>
+                     {#if report.summary}<span dir="auto" class="block whitespace-pre-line">{report.summary}</span>{/if}
+                     {#each reportLinks as href (href)}
+                        <a class="block underline break-all" {href} target="_blank" rel="noopener noreferrer nofollow">{href}</a>
+                     {/each}
+                     {#if report.verifySteps?.length}
+                        <span class="block mt-1 font-semibold">{$t('common.chat.report.verify')}</span>
+                        <ol class="list-decimal ps-5">{#each report.verifySteps as step, i (i)}<li dir="auto">{step}</li>{/each}</ol>
+                     {/if}
+                     {#if report.remaining?.length}
+                        <span class="block mt-1 font-semibold">{$t('common.chat.report.remaining')}</span>
+                        <ul class="list-disc ps-5">{#each report.remaining as item, i (i)}<li dir="auto">{item}</li>{/each}</ul>
+                     {/if}
+                  {:else if sentBack}
+                     <span class="block font-bold">{$t('common.chat.report.notYet')}</span>
+                     <span dir="auto" class="block whitespace-pre-line">{sentBack.note}</span>
+                  {:else}<span class="whitespace-pre-line">{#each parts as part, i (i)}{#if part.kind === 'link'}<a class="underline break-all" href={part.href} target="_blank" rel="noopener noreferrer nofollow">{part.text}</a>{:else}{part.text}{/if}{/each}</span>{/if}</span>
                </div>
                
                <!-- Timestamp and status -->

@@ -109,6 +109,7 @@
     <SiteShareDecision
       proposed={buble.proposedAmount}
       basis={buble.basisAmount}
+      projectId={buble.projectId}
       initial={null}
       {busy}
       onDecide={(payload) => onDecide(payload)}

@@ -631,8 +631,7 @@ export const searchContentTool = createTool({
 
     try {
       const res: any = await sendToSer(
-        // qj is the same text for the one JSON-typed field (product descriptions).
-        { uid: ctx.userId, q: query.trim(), qj: query.trim(), limit: cap },
+        { uid: ctx.userId, q: query.trim(), limit: cap },
         '324mcpSearchMine',
         0,
         0,

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Money from '$lib/components/money/Money.svelte';
   import { page } from '$app/state';
   import DiscoveryMap from '$lib/components/location/DiscoveryMap.svelte';
   import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
@@ -204,8 +205,8 @@
             </div>
             {#if m.value}
               <div class="value" title={$t('discover.missions_value')}>
-                <strong>{m.value}</strong>
-                <span>{m.hours} {$t('discover.missions_hours')} × {m.perhour}</span>
+                <strong><Money amount={m.value} currency={m.currency} /></strong>
+                <span>{m.hours} {$t('discover.missions_hours')} × <Money amount={m.perhour} currency={m.currency} /></span>
               </div>
             {/if}
           </div>

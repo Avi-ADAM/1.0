@@ -117,7 +117,17 @@
     "validator": "מאשר",
     "actions": "פעולות",
     "markDone": "סימון כבוצע",
-    "validate": "אישור פעולה"
+    "validate": "אישור פעולה",
+    "backToList": "חזרה לרשימת המטלות",
+    "description": "מה צריך לעשות",
+    "noDescription": "אין תיאור.",
+    "relatedLink": "קישור קשור",
+    "thread": "השיחה של המטלה",
+    "threadHint": "כאן נמצאים הדיווחים על המטלה, כולל מה לבדוק, ותשובות \"עוד לא עובד\".",
+    "openThread": "פתיחת השיחה",
+    "noThread": "עוד לא נכתב כלום על המטלה הזאת.",
+    "notFound": "המטלה לא נמצאה.",
+    "silenceValidates": "אם לא תהיה תשובה עד {{date}}, המטלה תאומת בשתיקה."
   },
   "vote": {
     "proposal": "הצעה",
@@ -538,7 +548,9 @@
     "by": "ע״י",
     "start": "התחלה",
     "finish": "סיום",
-    "noEntity": "—"
+    "noEntity": "—",
+    "rateEras": "השעות נספרות ביותר משווי שעה אחד — שווי השעה שונה במהלך המשימה:",
+    "rateEraTotal": "סה״כ"
   },
   "saleLife": {
     "product": "מוצר",

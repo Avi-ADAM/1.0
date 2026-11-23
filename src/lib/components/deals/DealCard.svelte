@@ -70,11 +70,11 @@
   <div class="meta">
     <div class="meta-item">
       <div class="ml">{$t('deals.totalCost')}</div>
-      <div class="mv gold"><Money amount={deal.totalCost} /></div>
+      <div class="mv gold"><Money amount={deal.totalCost} currency={deal.currency} /></div>
     </div>
     <div class="meta-item">
       <div class="ml">{$t('deals.paid')}</div>
-      <div class="mv"><Money amount={deal.paid} /></div>
+      <div class="mv"><Money amount={deal.paid} currency={deal.currency} /></div>
     </div>
     <div class="meta-item">
       <div class="ml">{$t('deals.estimatedEnd')}</div>

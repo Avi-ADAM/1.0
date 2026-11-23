@@ -28,6 +28,7 @@ type Shown = {
   locationHint: string | null;
   provider: { id: string; name: string; pic: string | null } | null;
   projectName: string | null;
+  currency?: string | null;
   lines: { kind: 'mission' | 'resource'; name: string; amount: number | null; price: number | null }[];
   total: number;
 };
@@ -66,6 +67,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
     locationHint: view.locationHint,
     provider: view.provider,
     projectName: view.projectName,
+    currency: view.currency,
     lines: view.lines.map(({ kind, name, amount, price }) => ({ kind, name, amount, price })),
     total: view.total
   };

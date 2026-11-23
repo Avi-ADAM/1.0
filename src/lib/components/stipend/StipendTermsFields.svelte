@@ -1,5 +1,6 @@
 <script>
   import { useFormatMoney } from '$lib/money/context.svelte';
+  import CurrencySymbol from '$lib/components/money/CurrencySymbol.svelte';
   /**
    * The three parameters of a subsistence stipend, in one place
    * (docs/done/PLAN_STIPEND.md §1).
@@ -174,7 +175,7 @@
 
   <!-- Rate -->
   <label class="flex flex-col gap-1">
-    <span class={LABEL}>{$t('stipend.terms.rate')}</span>
+    <span class={LABEL}>{$t('stipend.terms.rate')} <CurrencySymbol /></span>
     <input
       type="number"
       min="0"
@@ -248,7 +249,7 @@
 
       {#if budgetShape === 'total'}
         <label class="flex flex-col gap-1">
-          <span class={LABEL}>{$t('stipend.terms.totalCap')}</span>
+          <span class={LABEL}>{$t('stipend.terms.totalCap')} <CurrencySymbol /></span>
           <input
             type="number"
             min="0"
@@ -261,7 +262,7 @@
         </label>
       {:else}
         <label class="flex flex-col gap-1">
-          <span class={LABEL}>{$t('stipend.terms.monthlyCap')}</span>
+          <span class={LABEL}>{$t('stipend.terms.monthlyCap')} <CurrencySymbol /></span>
           <input
             type="number"
             min="0"
@@ -299,7 +300,7 @@
           <!-- A program already chose its ceiling above; showing a second
                monthlyCap field here would let it contradict itself. -->
           <label class="flex flex-col gap-1">
-            <span class={LABEL}>{$t('stipend.terms.monthlyCap')}</span>
+            <span class={LABEL}>{$t('stipend.terms.monthlyCap')} <CurrencySymbol /></span>
             <input
               type="number"
               min="0"
@@ -311,7 +312,7 @@
         {/if}
         {#if !showBudget}
           <label class="flex flex-col gap-1">
-            <span class={LABEL}>{$t('stipend.terms.totalCap')}</span>
+            <span class={LABEL}>{$t('stipend.terms.totalCap')} <CurrencySymbol /></span>
             <input
               type="number"
               min="0"
@@ -333,7 +334,7 @@
           />
         </label>
         <label class="flex flex-col gap-1">
-          <span class={LABEL}>{$t('stipend.terms.revenueTrigger')}</span>
+          <span class={LABEL}>{$t('stipend.terms.revenueTrigger')} <CurrencySymbol /></span>
           <input
             type="number"
             min="0"

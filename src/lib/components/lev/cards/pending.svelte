@@ -1,4 +1,6 @@
 ﻿<script>
+  import Money from '$lib/components/money/Money.svelte';
+  import { useFormatMoney, useProjectCurrency } from '$lib/money/context.svelte';
   import { isRtl } from '$lib/translations';
   import Chaticon from '../../../celim/chaticon.svelte';
   import { t as trans } from '$lib/translations';
@@ -102,6 +104,8 @@
   // `noofhours` is per person (PLAN_SHIFTS §2.5): the rikma commits to it once
   // for every seat, and that is the value the vote approves.
   let seats = $derived(Math.max(1, Math.floor(Number(howMeny) || 1)));
+  const fmtMoney = useFormatMoney();
+  const projectCurrency = useProjectCurrency();
   let perPerson = $derived((Number(noofhours) || 0) * (Number(perhour) || 0));
   let rikmaValue = $derived(perPerson * seats);
   let user_1s = $derived.by(() => {
@@ -236,7 +240,7 @@
               src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg"
               alt="howmuch"
             />
-            <span>{perhour} {$trans('common.perhour')}</span>
+            <span><Money amount={perhour} {projectId} /> {$trans('common.perhour')}</span>
           </div>
           <span class="text-gray-400 font-bold">*</span>
           <div
@@ -257,9 +261,7 @@
             onmouseleave={() => hover('0')}
           >
             <span
-              >{perPerson.toLocaleString('en-US', {
-                maximumFractionDigits: 2
-              })}
+              ><Money amount={perPerson} {projectId} />
               {seats > 1 ? $trans('shifts.pendm.perPerson') : ''}
               {isKavua ? $trans('lev.cards.common.perMonth') : ''}</span
             >
@@ -271,8 +273,8 @@
           >
             {$trans('mission.form.rikmaTotal', {
               count: seats,
-              value: perPerson.toLocaleString('en-US', { maximumFractionDigits: 2 }),
-              total: rikmaValue.toLocaleString('en-US', { maximumFractionDigits: 2 })
+              value: fmtMoney(perPerson, projectCurrency(projectId)),
+              total: fmtMoney(rikmaValue, projectCurrency(projectId))
             })}
           </p>
         {/if}
@@ -426,6 +428,7 @@
 
       <!-- היסטוריית משא ומתן -->
       <NegotiationHistory
+        {projectId}
         {negopendmissions}
         openmissionName={name}
         {noofhours}

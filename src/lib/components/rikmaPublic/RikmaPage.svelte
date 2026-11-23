@@ -1,4 +1,6 @@
 <script>
+  import Money from '$lib/components/money/Money.svelte';
+  import { rikmaCurrency } from '$lib/money/resolve.js';
   import { nameOf } from '$lib/translation/memberName';
   import { t } from '$lib/translations';
   import Header from '$lib/components/header/header.svelte';
@@ -318,7 +320,7 @@
                   showNote={false}
                 />
                 <p class="text-barbi font-bold text-xl mb-2">
-                  {matanot.attributes.price}
+                  <Money amount={matanot.attributes.price} currency={rikmaCurrency(project)} />
                 </p>
                 {#if matanot.attributes.hiddenFromDiscovery}
                   <!-- Only a member's copy carries this (loadRikmaPage → hiddenProducts). -->

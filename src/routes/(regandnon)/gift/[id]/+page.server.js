@@ -61,6 +61,7 @@ export async function load({ locals, params, fetch, depends }) {
         const ownerNode = meta.owner_user.data;
         personalSeller = {
           id: String(ownerNode.id),
+          currency: ownerNode.attributes?.currency ?? null,
           ...nameFieldsOf(ownerNode.attributes), username: ownerNode.attributes?.username ?? '',
           picUrl:
             ownerNode.attributes?.profilePic?.data?.attributes?.formats?.small?.url ||

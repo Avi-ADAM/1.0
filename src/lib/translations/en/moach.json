@@ -117,7 +117,17 @@
     "validator": "Validator",
     "actions": "Actions",
     "markDone": "Mark Done",
-    "validate": "Validate"
+    "validate": "Validate",
+    "backToList": "Back to the tasks",
+    "description": "What has to be done",
+    "noDescription": "No description.",
+    "relatedLink": "Related link",
+    "thread": "Task thread",
+    "threadHint": "Reports on this task are here, with what to check, and any \"not yet\" answers.",
+    "openThread": "Open the thread",
+    "noThread": "Nothing has been written about this task yet.",
+    "notFound": "Task not found.",
+    "silenceValidates": "With no answer by {{date}}, the task is validated by silence."
   },
   "vote": {
     "proposal": "Proposal",
@@ -538,7 +548,9 @@
     "by": "by",
     "start": "Start",
     "finish": "Finish",
-    "noEntity": "—"
+    "noEntity": "—",
+    "rateEras": "These hours count at more than one hourly value — it was changed during the mission:",
+    "rateEraTotal": "Altogether"
   },
   "saleLife": {
     "product": "Product",

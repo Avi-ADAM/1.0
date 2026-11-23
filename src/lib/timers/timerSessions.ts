@@ -23,6 +23,7 @@ import { segmentsFromTimers } from '$lib/recurring/missionMonths.js';
 import { normalizeSaveLinks } from './saveLinks.js';
 import { readSaveFiles, type SaveFile } from './saveFiles.js';
 import { nameFieldsOf } from '$lib/translation/displayName.js';
+import { rateEras, timerRate, type RateEra } from './rate.js';
 
 const HOUR_MS = 3_600_000;
 
@@ -69,6 +70,13 @@ export type TimerSession = {
   acts: string[];
   /** The segment came from a pre-component Timer (entity `start`/`finnish`). */
   legacy: boolean;
+  /**
+   * The hourly value these hours are priced at — the Timer's `rate` stamp, or
+   * the mission's value for a timer written before stamps existed. When the
+   * rikma changes a mission's value mid-way the running timer is cut at that
+   * instant, so every session sits wholly on one side of the change.
+   */
+  rate: number | null;
 };
 
 export type SessionDay = {
@@ -90,6 +98,10 @@ export type SessionsResult = {
   totalHours: number;
   /** A session is running right now. */
   running: boolean;
+  /** Hours per hourly value, oldest first (src/lib/timers/rate.ts). */
+  rateEras: RateEra[];
+  /** More than one hourly value — the log must say which row is priced how. */
+  mixedRates: boolean;
 };
 
 /** `YYYY-MM-DD` in local time — never through `toISOString()`, which is UTC. */
@@ -129,7 +141,9 @@ function userOf(attrs: any): SessionUser | null {
  */
 export function buildTimerSessions(
   timers: any[] | null | undefined,
-  nowMs: number = Date.now()
+  nowMs: number = Date.now(),
+  /** The mission's current value, for timers that carry no stamp. */
+  fallbackRate: number | null = null
 ): SessionsResult {
   const sessions: TimerSession[] = [];
 
@@ -138,6 +152,7 @@ export function buildTimerSessions(
     const timerId = String(timer?.id ?? attrs?.id ?? '');
     const legacy = !(Array.isArray(attrs.timers) && attrs.timers.length > 0);
     const state = timerState(attrs);
+    const rate = timerRate(attrs, fallbackRate);
     const user = userOf(attrs);
     const note = typeof attrs.saveText === 'string' ? attrs.saveText.trim() : '';
     const links = normalizeSaveLinks(attrs.saveLinks);
@@ -178,7 +193,8 @@ export function buildTimerSessions(
         links,
         files,
         acts,
-        legacy
+        legacy,
+        rate
       });
     });
   }
@@ -202,10 +218,14 @@ export function buildTimerSessions(
       };
     });
 
+  const eras = rateEras(sessions.map((s) => ({ rate: s.rate, hours: s.hours, at: s.startMs })));
+
   return {
     sessions,
     days,
     totalHours: sessions.reduce((sum, s) => sum + s.hours, 0),
-    running: sessions.some((s) => s.running)
+    running: sessions.some((s) => s.running),
+    rateEras: eras,
+    mixedRates: eras.length > 1
   };
 }

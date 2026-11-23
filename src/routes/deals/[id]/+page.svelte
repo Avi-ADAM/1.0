@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { provideRikmaCurrency } from '$lib/money/context.svelte';
   import Money from '$lib/components/money/Money.svelte';
   import { goto, invalidateAll } from '$app/navigation';
   import { toast } from 'svelte-sonner';
@@ -30,6 +31,7 @@
   import { t } from '$lib/translations';
 
   let { data } = $props();
+  provideRikmaCurrency(() => data.sale?.currency);
 
   const sale = $derived(data.sale);
   const kind = $derived(data.kind);

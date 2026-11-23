@@ -1,6 +1,7 @@
 <script>
   import { nameOf } from '$lib/translation/memberName';
   import { t, locale, isRtl } from '$lib/translations';
+  import { page } from '$app/state';
 
   /**
    * @typedef {Object} Props
@@ -11,7 +12,6 @@
 
   /** @type {Props} */
   let { act = null, open = false, onClose } = $props();
-  console.log(act, 'act');
   // ─── helpers ───────────────────────────────────────────────────────────────
 
   function fmtDate(d) {
@@ -77,6 +77,11 @@
 
   const dir = $derived($isRtl ? 'rtl' : 'ltr');
 
+  // The modal is mounted by the moach layout, so the rikma id is in the route.
+  const actPageHref = $derived(
+    act?.id && page.params.projectId ? `/moach/${page.params.projectId}/acts/${act.id}` : null
+  );
+
   const progress = $derived(act?.status ?? 0);
 
   function avatarUrl(attributes) {
@@ -136,6 +141,32 @@
           >
             {$t('lev.taskModal.urgency_' + urgencyKey)}
           </span>
+          <!-- open the task's own page -->
+          {#if actPageHref}
+            <a
+              href={actPageHref}
+              onclick={() => onClose?.()}
+              class="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100
+                     dark:hover:text-zinc-200 dark:hover:bg-zinc-800 transition"
+              aria-label={$t('lev.taskModal.openPage')}
+              title={$t('lev.taskModal.openPage')}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                />
+              </svg>
+            </a>
+          {/if}
           <!-- close -->
           <button
             onclick={onClose}

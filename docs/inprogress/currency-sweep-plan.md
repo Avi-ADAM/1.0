@@ -9,11 +9,12 @@
 > | Batch | State |
 > |---|---|
 > | 1 — moach | ✅ done (commit `67ef3d3c`, report: [batch1-report.md](./batch1-report.md)). Items 1, 2b, 7, 8 moved out (not moach-only), 9 deferred. |
-> | 2 — heart / hub | 🔶 almost done (working tree, not committed — 27 files). Left: items **44** (`WishOfferCard`), **46** (`pending.svelte`), **47b** (`MissionStipendOffer`), **47c** (`BlueprintReview`). |
-> | 3 — public pages, deals, concierge | ⏳ not started — includes items 7 and 8 (`OpenMissionCard`, `OpenResourceCard`). |
-> | 4 — translations, server, mails, Telegram | ⏳ not started — also the `project.finisin.currency` key, unused since batch 1. |
+> | 2 — heart / hub | Display fixes complete, including 44, 46, 47b and 47c. [Report](./batch2-report.md); full type-check gate open. |
+> | 3 — public pages, deals, concierge | Display fixes complete, including 7 and 8. [Report](./batch3-report.md); full verification gate open. |
+> | 4 — translations, server, mails, Telegram | ✅ done — [report](./batch4-report.md). Unused keys left in place: `revenue.amount`, `revenue.amountOpt`, `project.currency`, `project.finisin.currency`. |
 >
-> Measured after batch 2 (2026-11-19): audit = **69 files / 82 lines** (after batch 1: 88 / 132; baseline 96 / 142).
+> Latest audit: **59 files / 59 lines** after batch 3; **69 / 81** after finishing batch 2.
+> Earlier batch-2 handover measurement (2026-11-19): **69 files / 82 lines** (after batch 1: 88 / 132; baseline 96 / 142).
 > `npm run check` = 1218 errors after batch 2 — same as the baseline (re-run 2026-11-19; every error in the batch-2 files is old type noise, none from the money changes). Money tests green.
 >
 > **Don't rewrite shorthand props to silence the audit.** The audit flags a
@@ -158,7 +159,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
   - **Do NOT wrap** `a.noofhours` (hours count).
   - Verify: `npm run check` — no new errors.
 
-- [ ] 7. **`src/lib/components/prPr/open/OpenMissionCard.svelte`** — lines 99, 112
+- [x] 7. **`src/lib/components/prPr/open/OpenMissionCard.svelte`** — lines 99, 112
   - **STATUS 2026-11-19:** NOT done — do it together with Batch 3 (`availableMission`). Add the optional `currency` prop described here.
   - `{fmtNum(value)}` → `<Money amount={value} />`.
   - In the sub-line `{fmtNum(hours)} × {fmtNum(perhour)}`, wrap `fmtNum(perhour)` →
@@ -172,7 +173,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
     forward a `currency` prop from its caller.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 8. **`src/lib/components/prPr/open/OpenResourceCard.svelte`** — lines 96, 99, 103, 118
+- [x] 8. **`src/lib/components/prPr/open/OpenResourceCard.svelte`** — lines 96, 99, 103, 118
   - **STATUS 2026-11-19:** NOT done — do it together with Batch 3 (`availiableResorce`). Same prop.
   - `{fmtNum(totals.total)}` → `<Money amount={totals.total} />`.
   - `{fmtNum(totals.price)}` → `<Money amount={totals.price} />`.
@@ -400,8 +401,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
   - Add `projectId={buble.projectId}`.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 44. **`src/lib/components/lev/cards/WishOfferCard.svelte`** (existing `<Money>` without `projectId`)
-  - **STATUS 2026-11-19 (batch 2):** NOT done. `<Money amount={buble.price} />` with no currency — a wish proposal belongs to no rikma, so on the heart it falls to ILS. By the brief's table: the proposal's `entryCurrency`, else the proposing rikma's `currencyCode`. Check what `buble` carries (levProcessors) before adding to a qid.
+- [x] 44. **`src/lib/components/lev/cards/WishOfferCard.svelte`** (existing `<Money>` without `projectId`)
   - Per the spec table: "a wish proposal, by the table" — currency source is
     `entryCurrency` on the ratson/ratson-proposal row. If `buble.entryCurrency`
     is available use `currency={buble.entryCurrency}`, else fall back to
@@ -415,8 +415,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
   - Add `import Money from '$lib/components/money/Money.svelte';`.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 46. **`src/lib/components/lev/cards/pending.svelte`** — lines 239, 432
-  - **STATUS 2026-11-19 (batch 2):** NOT done. Line ~239 still prints `{perhour}` bare — wrap it in `<Money amount={perhour} projectId={buble.projectId} />` (or the card's `projectId` prop). And the `<NegotiationHistory>` call (~line 428) does not pass `{projectId}`, so its formatted amounts fall back to ILS on the heart — add it (reqtojoin.svelte:580 does it already).
+- [x] 46. **`src/lib/components/lev/cards/pending.svelte`** — lines 239, 432
   - Wrap bare money amounts with `<Money amount={x} projectId={buble.projectId} />`.
   - `NegotiationHistory` invoked here: confirm `projectId={buble.projectId}` is
     passed to it.
@@ -429,14 +428,14 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
   - Confirm `LevCard.svelte` passes `projectId` to these cards; add if missing.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 47b. **`src/lib/components/stipend/MissionStipendOffer.svelte`** (2 `<Money>` with no currency source)
+- [x] 47b. **`src/lib/components/stipend/MissionStipendOffer.svelte`** (2 `<Money>` with no currency source)
   - It has no `projectId` / `currency` prop. Rendered by `lev/cards/sugestmi` (heart — no rikma context) and by `prPr/open/OpenMissionCard` + `availableMission/[id]` (batch 3), plus `moach/…/progress/[missionId]` (fine).
   - Add an optional `projectId` prop, pass it to both `<Money>`, and pass `{projectId}` from `sugestmi`.
 
-- [ ] 47c. **`src/lib/components/assistant/BlueprintReview.svelte`** line ~561
+- [x] 47c. **`src/lib/components/assistant/BlueprintReview.svelte`** line ~561
   - `{fmt(s.value)}{#if currency}{' '}{currency}{/if}` prints the number and then the bare code ("1,200 USD"). Switch to `useFormatMoney`: `fmtMoney(s.value, currency || 'ILS')` — same as `RikmaPreview` after batch 1.
 
-- [ ] 48. **Batch 2 gate**
+- [ ] 48. **Batch 2 gate** — full type check blocked by sandbox memory; see report.
   - Run `node scripts/audit-money-display.mjs` → all lev/ paths should be clear
     or dramatically reduced.
   - Run `npm run check` → no new errors.
@@ -452,42 +451,42 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
 
 ### Discovery pages (availableMission, availiableResorce, maagad, gift, user/[id])
 
-- [ ] 49. **`src/routes/api/send/qids.js` — qid `283discoverMissions`**
+- [x] 49. **`src/routes/api/send/qids.js` — qid `283discoverMissions`**
   - In the `project { data { id attributes { … } } }` block, add `currencyCode`
     after `projectName`.
   - Run `npm run validate:qids` → must pass.
   - **Report**: `283discoverMissions` now selects `currencyCode`.
 
-- [ ] 50. **`src/lib/server/discovery/normalizeCards.ts` — `normalizeMissionCard`**
+- [x] 50. **`src/lib/server/discovery/normalizeCards.ts` — `normalizeMissionCard`**
   - Add `currencyCode: string | null` to the `MissionCard` interface.
   - Read `rikmaCurrency(project?.attributes)` and store it as `currency` on the
     normalised card (import `rikmaCurrency` from `$lib/money/resolve.js`).
 
-- [ ] 51. **`src/routes/(regandnon)/availableMission/+page.svelte`** — line 207
+- [x] 51. **`src/routes/(regandnon)/availableMission/+page.svelte`** — line 207
   - In the value badge: `<strong>{m.value}</strong>` → `<Money amount={m.value} currency={m.currency} />`.
   - `{m.perhour}` → `<Money amount={m.perhour} currency={m.currency} />`.
   - Add `import Money from '$lib/components/money/Money.svelte';`.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 52. **`src/routes/api/send/qids.js` — qid `284discoverResources`**
+- [x] 52. **`src/routes/api/send/qids.js` — qid `284discoverResources`**
   - Add `currencyCode` to the project attributes block.
   - Run `npm run validate:qids` → must pass.
   - **Report**: `284discoverResources` now selects `currencyCode`.
 
-- [ ] 53. **`src/lib/server/discovery/normalizeCards.ts` — `normalizeResourceCard`**
+- [x] 53. **`src/lib/server/discovery/normalizeCards.ts` — `normalizeResourceCard`**
   - Same as item 50 for the resource card: add `currency` from `rikmaCurrency`.
 
-- [ ] 54. **`src/routes/(regandnon)/availiableResorce/+page.svelte`** — line 181
+- [x] 54. **`src/routes/(regandnon)/availiableResorce/+page.svelte`** — line 181
   - Wrap the bare price/amount with `<Money amount={x} currency={m.currency} />`.
   - Add import if not present.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 55. **`src/routes/api/send/qids.js` — qid `51GetOpenMissionById`**
+- [x] 55. **`src/routes/api/send/qids.js` — qid `51GetOpenMissionById`**
   - In `project { data { id attributes { … } } }`, add `currencyCode`.
   - Run `npm run validate:qids` → must pass.
   - **Report**: `51GetOpenMissionById` now selects `currencyCode`.
 
-- [ ] 56. **`src/routes/(regandnon)/availableMission/[id]/+page.svelte`** — money amounts
+- [x] 56. **`src/routes/(regandnon)/availableMission/[id]/+page.svelte`** — money amounts
   - In the page script: `const currency = rikmaCurrency(data.alld?.openMission?.data?.attributes?.project?.data?.attributes)`.
   - Wrap bare `{perhour}` and total amounts with `<Money amount={x} currency={currency} />`.
   - Existing `<Money>` tags (e.g. in `NegoM`): `NegoM` only renders in this page
@@ -502,18 +501,18 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
   - Add imports: `Money`, `rikmaCurrency`, `provideRikmaCurrency`.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 57. **`src/routes/api/send/qids.js` — qid `50GetOpenMashaabimById`**
+- [x] 57. **`src/routes/api/send/qids.js` — qid `50GetOpenMashaabimById`**
   - Add `currencyCode` to the project attributes block.
   - Run `npm run validate:qids` → must pass.
   - **Report**: `50GetOpenMashaabimById` now selects `currencyCode`.
 
-- [ ] 58. **`src/routes/(regandnon)/availiableResorce/[id]/+page.svelte`** — lines 438, 459
+- [x] 58. **`src/routes/(regandnon)/availiableResorce/[id]/+page.svelte`** — lines 438, 459
   - Derive `currency` from `data.alld?.openMashaabim?.data?.attributes?.project?.data?.attributes`.
   - Call `provideRikmaCurrency(() => currency)`.
   - Wrap bare amounts with `<Money amount={x} currency={currency} />`.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 59. **`src/routes/(regandnon)/maagad/[id]/+page.svelte`** — lines 459, 469, 470
+- [x] 59. **`src/routes/(regandnon)/maagad/[id]/+page.svelte`** — lines 459, 469, 470
   - The maagad page shows suggestions from multiple projects. The demand
     (`ratson`) itself may not have a project. The spec says: "a wish without a
     rikma — ILS". Use `rikmaCurrency(p.project?.attributes)` per item (the data
@@ -524,7 +523,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
   - Add imports: `Money`, `rikmaCurrency`.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 60. **`src/routes/(regandnon)/gift/+page.svelte`** — line 182 and **`src/routes/(regandnon)/gift/[id]/+page.svelte`** — line 544
+- [x] 60. **`src/routes/(regandnon)/gift/+page.svelte`** — line 182 and **`src/routes/(regandnon)/gift/[id]/+page.svelte`** — line 544
   - Find the qid(s) used by these loaders. Grep: `sendToSer … gift`.
   - Add `currencyCode` to the product's project attributes in those qids.
   - Run `npm run validate:qids` after each.
@@ -532,7 +531,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
   - **Report** which qids were touched.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 61. **`src/routes/(regandnon)/user/[id]/+page.svelte`** — line 209
+- [x] 61. **`src/routes/(regandnon)/user/[id]/+page.svelte`** — line 209
   - Per spec: "the item's project if it has one; a personal item — the person's `User.currency`, else ILS".
   - Find the user page loader's qid. Add `currencyCode` to the project selection
     if not present. Run `npm run validate:qids`.
@@ -544,48 +543,48 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
 
 ### RikmaPage, Storefront, Offerings
 
-- [ ] 62. **`src/lib/components/rikmaPublic/RikmaPage.svelte`** — lines 321, 344
+- [x] 62. **`src/lib/components/rikmaPublic/RikmaPage.svelte`** — lines 321, 344
   - Determine the currency source: the rikma's own project row is in the page
     data. Use `rikmaCurrency(data.project?.data?.attributes)` or the equivalent.
   - Wrap bare amounts with `<Money amount={x} currency={currency} />`.
   - Add imports.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 63. **`src/lib/components/offerings/UserStorefront.svelte`** — lines 67, 93
+- [x] 63. **`src/lib/components/offerings/UserStorefront.svelte`** — lines 67, 93
   - Per spec: use item's project currency if it exists, else `User.currency`, else ILS.
   - Wrap bare amounts accordingly.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 64. **`src/lib/components/offerings/MyProductsSection.svelte`** — line 127
+- [x] 64. **`src/lib/components/offerings/MyProductsSection.svelte`** — line 127
   - Same currency logic as above.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 65. **`src/lib/components/offerings/MyResourcesEditor.svelte`** — line 495
+- [x] 65. **`src/lib/components/offerings/MyResourcesEditor.svelte`** — line 495
   - Same currency logic as above.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 66. **`src/lib/components/main/ProductPeek.svelte`** — lines 301, 346
+- [x] 66. **`src/lib/components/main/ProductPeek.svelte`** — lines 301, 346
   - Find the project's currency from the product row's project attributes.
   - Wrap bare amounts with `<Money amount={x} currency={currency} />`.
   - Verify: `npm run check` — no new errors.
 
 ### Project pages
 
-- [ ] 67. **`src/routes/(regandnon)/project/[id]/join/+page.svelte`** — the form inputs for `mPerhour` and `rPrice`
+- [x] 67. **`src/routes/(regandnon)/project/[id]/join/+page.svelte`** — the form inputs for `mPerhour` and `rPrice`
   - These are **input fields** (the user types a number); do not wrap the bound
     variable. The spec rule: `pages.mPerhour` and `pages.rPrice` labels have
     `(₪)` baked in — that is a Batch 4 (C10) translation fix. For this batch,
     add a `<CurrencySymbol>` next to each input after removing the symbol from
     the translation (coordinate with Batch 4).
 
-- [ ] 68. **`src/routes/(regandnon)/project/[id]/support/+page.svelte`** — the `<Money>` tags (audit shows `₪3` = 3 `<Money>` already wrapped but no `currency`/`projectId`)
+- [x] 68. **`src/routes/(regandnon)/project/[id]/support/+page.svelte`** — the `<Money>` tags (audit shows `₪3` = 3 `<Money>` already wrapped but no `currency`/`projectId`)
   - These are on a known project page. Use
     `currency={rikmaCurrency(data.project?.data?.attributes)}` on each `<Money>`.
   - Verify: `npm run check` — no new errors.
 
 ### Deals
 
-- [ ] 69. **`src/routes/deals/[id]/+page.svelte`** — the two `<Money amount={totalCost} />` and `<Money amount={paid} />` on lines 373–379
+- [x] 69. **`src/routes/deals/[id]/+page.svelte`** — the two `<Money amount={totalCost} />` and `<Money amount={paid} />` on lines 373–379
   - `fetchSingleDeal` does not currently return `currencyCode`. Add it:
     find the qid used by `fetchSingleDeal` in
     `src/lib/server/deals/dealsQueries.ts`, add `currencyCode` to the
@@ -597,13 +596,13 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
   - **Report** which qid was touched.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 70. **`src/lib/components/deals/ResourcePanel.svelte`** — the `<Money amount={r.cost} />` on line 22
+- [x] 70. **`src/lib/components/deals/ResourcePanel.svelte`** — the `<Money amount={r.cost} />` on line 22
   - `ResourcePanel` renders inside the deals `[id]` page. Once `provideRikmaCurrency`
     is called there (item 69), `<Money>` with no `currency`/`projectId` picks it
     up from context — no change needed in `ResourcePanel` itself. Confirm this
     is the case.
 
-- [ ] 71. **`src/routes/deals/[id]/+page.svelte` other `<Money>` tags** (request/[id], offers/[id], offers/new)
+- [x] 71. **`src/routes/deals/[id]/+page.svelte` other `<Money>` tags** (request/[id], offers/[id], offers/new)
   - `routes/deals/request/[id]/+page.svelte` — `<Money>` tags on lines 230–241.
     After `provideRikmaCurrency` is set at the deals layout level (or per-page):
     confirm they pick it up. If not, add `projectId` from the page's data.
@@ -614,7 +613,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
     Pass `currency={data.userCurrency ?? 'ILS'}` from page data.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 72. **`src/routes/deals/sales-center/+page.svelte`** — line 354
+- [x] 72. **`src/routes/deals/sales-center/+page.svelte`** — line 354
   - `{product.attributes.price} {$t('pages.salesCenter.shekel')}` →
     `<Money amount={product.attributes.price} projectId={projectId} />`.
   - Remove the `{$t('pages.salesCenter.shekel')}` interpolation from markup
@@ -627,7 +626,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
 
 ### Concierge
 
-- [ ] 73. **`src/routes/(reg)/concierge/+page.svelte`** — lines 550, 673
+- [x] 73. **`src/routes/(reg)/concierge/+page.svelte`** — lines 550, 673
   - `{w.budget}` is already formatted by `fmtBudget()` which calls
     `fmtMoney(+n)`. `fmtMoney` = `useFormatMoney()`. At this point
     `fmtMoney` has no currency code — it uses whatever the context provides,
@@ -642,14 +641,14 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
   - **Report** the qid touched.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 74. **`src/routes/(reg)/concierge/[id]/+page.svelte`** — line 2510
+- [x] 74. **`src/routes/(reg)/concierge/[id]/+page.svelte`** — line 2510
   - Find the bare amount and the currency source (the ratson row or the rikma
     proposal's project). Wrap with `<Money amount={x} currency={code} />` or
     use `fmt(x, code)` if inside a string.
   - Add imports as needed.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 75. **Batch 3 gate**
+- [ ] 75. **Batch 3 gate** — full type check blocked by sandbox memory; QID validator matches base failures.
   - Run `node scripts/audit-money-display.mjs` → public-page and deals paths
     should be clear.
   - Run `npm run check` → no new errors.
@@ -670,7 +669,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
 > `{{amount}}` placeholder and format with `fmt(x, code)` at the call site.
 > Keys with **no call site**: leave the key in place, note in the report.
 
-- [ ] 76. **`stipend.terms.rate`** — path: `src/lib/translations/*/stipend.json`
+- [x] 76. **`stipend.terms.rate`** — path: `src/lib/translations/*/stipend.json`
   - Current he: `"rate": "תעריף המלגה (₪ לשעה)"`.
   - Remove `₪` from all 5 locales (the parenthetical, keep the Hebrew label).
   - Call sites: `StipendTermsFields.svelte`, `MissionStipendSection.svelte`,
@@ -682,41 +681,41 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
     `₪` from the label text.
   - Verify: `npm run check` and `npm run check:i18n`.
 
-- [ ] 77. **`stipend.terms.monthlyCap`** — `src/lib/translations/*/stipend.json`
+- [x] 77. **`stipend.terms.monthlyCap`** — `src/lib/translations/*/stipend.json`
   - Same approach as `rate`: remove `₪` from label, add `<CurrencySymbol>`.
   - Call sites: `StipendTermsFields.svelte`.
   - Verify: `npm run check` and `npm run check:i18n`.
 
-- [ ] 78. **`stipend.terms.totalCap`** — same file
+- [x] 78. **`stipend.terms.totalCap`** — same file
   - Same approach.
   - Call sites: `StipendTermsFields.svelte`, `StipendDecisionCard.svelte`,
     `StipendFundingRequestDialog.svelte`.
   - Verify.
 
-- [ ] 79. **`stipend.terms.revenueTrigger`** — same file
+- [x] 79. **`stipend.terms.revenueTrigger`** — same file
   - Same approach.
   - Call sites: `StipendTermsFields.svelte`.
   - Verify.
 
-- [ ] 80. **`stipend.confirmation.howMuchArrived`** — same file
+- [x] 80. **`stipend.confirmation.howMuchArrived`** — same file
   - Current he: `"howMuchArrived": "כמה באמת הגיע (₪)"`.
   - Remove `₪`. Find call sites (`grep -rn "howMuchArrived" src`). Add
     `<CurrencySymbol>` next to the input.
   - Verify.
 
-- [ ] 81. **`pages.mPerhour`** and **`pages.rPrice`** — `src/lib/translations/*/pages.json`
+- [x] 81. **`pages.mPerhour`** and **`pages.rPrice`** — `src/lib/translations/*/pages.json`
   - Call sites: `routes/(regandnon)/project/[id]/join/+page.svelte` (confirmed).
   - Remove `(₪)` from the label string in all 5 locales.
   - In the join page: add `<CurrencySymbol currency={projectCurrency} />` next
     to each input (coordinate with item 67).
   - Verify.
 
-- [ ] 82. **`pages.shekel`** — `src/lib/translations/*/pages.json`
+- [x] 82. **`pages.shekel`** — `src/lib/translations/*/pages.json`
   - This key is used in `routes/deals/sales-center/+page.svelte` (item 72).
   - After item 72 removes it from markup, delete the key from all 5 locales.
   - Verify: `npm run check:i18n`.
 
-- [ ] 83. **`consensus.demo.perHourUnit`** — `src/lib/translations/*/consensus.json`
+- [x] 83. **`consensus.demo.perHourUnit`** — `src/lib/translations/*/consensus.json`
   - Current he: `"perHourUnit": "₪ לשעה"`.
   - This appears inline as `{demo.current.valuePerHour} {$t('consensus.demo.perHourUnit')}`.
   - Switch to a placeholder: change all 5 locale strings to e.g. `"{{amount}} לשעה"` / `"{{amount}} per hour"`.
@@ -727,14 +726,14 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
     for the demo.)
   - Verify.
 
-- [ ] 84. **`consensus.demo.counterForm.perHourLabel`** — same file
+- [x] 84. **`consensus.demo.counterForm.perHourLabel`** — same file
   - Current he: `"perHourLabel": "תעריף לשעה (₪)"`.
   - Remove `₪` from all 5 locales.
   - Call site: `routes/(regandnon)/consensus/+page.svelte`. Add
     `<CurrencySymbol currency="ILS" />` next to the input.
   - Verify.
 
-- [ ] 85. **`concierge.new.budgetLabel`** — `src/lib/translations/*/concierge.json`
+- [x] 85. **`concierge.new.budgetLabel`** — `src/lib/translations/*/concierge.json`
   - Current he: `"budgetLabel": "תקציב (₪)"`.
   - Remove `₪` from all 5 locales.
   - Call site: `src/lib/components/concierge/WishForm.svelte` (line ~2536).
@@ -742,17 +741,17 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
     budget input.
   - Verify.
 
-- [ ] 86. **`concierge.new.money.fixedAmount`** and **`concierge.new.money.atCostAmount`** — same file
+- [x] 86. **`concierge.new.money.fixedAmount`** and **`concierge.new.money.atCostAmount`** — same file
   - Same pattern as `budgetLabel`.
   - Verify.
 
-- [ ] 87. **`revenue.amount`** and **`revenue.amountOpt`** — `src/lib/translations/*/revenue.json`
+- [x] 87. **`revenue.amount`** and **`revenue.amountOpt`** — `src/lib/translations/*/revenue.json`
   - Both have `(₪)` baked in.
   - Call sites: `grep -rn "revenue\.amount" src` → **no call sites found in
     initial search**. Leave the keys in place and note in the report:
     "revenue.amount and revenue.amountOpt have no call sites."
 
-- [ ] 88. **`project.currency`** — `src/lib/translations/*/project.json`
+- [x] 88. **`project.currency`** — `src/lib/translations/*/project.json`
   - Current he: `"currency": "₪"`. This is used as a column header label.
   - Call sites: `grep -rn "project\.currency" src` — found in
     `src/lib/server/actions/configs/proposeStipendPledge.ts` (not a translation
@@ -763,7 +762,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
   - If a call site exists: remove `₪` from all 5 locales and add
     `<CurrencySymbol>` at the call site.
 
-- [ ] 89. **`server.stipend`** and **`server.stipendWithBudget`** — `src/lib/translations/*/server.json`
+- [x] 89. **`server.stipend`** and **`server.stipendWithBudget`** — `src/lib/translations/*/server.json`
   - Current he: `"stipend": "למימון מלגת הקיום שלה (₪{{rate}} לשעה)"`.
   - The symbol is inside a sentence (the `₪` before `{{rate}}`). Switch to
     passing an already-formatted amount: change the template to
@@ -779,7 +778,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
 
 ### C11 — Server files
 
-- [ ] 90. **`src/lib/server/actions/configs/proposeStipendProgram.ts`** — lines 215–362
+- [x] 90. **`src/lib/server/actions/configs/proposeStipendProgram.ts`** — lines 215–362
   - Pattern: `₪${terms.X}` → `m(terms.X, lang)` where
     `m = moneyTextFor(rikmaCode)`.
   - At the top of the action's run function (before the first notification
@@ -803,7 +802,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
     `'₪ ceiling per cycle'` → `'Ceiling per cycle (in the rikma\'s currency)'`.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 91. **`src/lib/server/actions/configs/publishStipendFundingRequest.ts`** — lines 72–82
+- [x] 91. **`src/lib/server/actions/configs/publishStipendFundingRequest.ts`** — lines 72–82
   - Remove the local `nis()` helper.
   - Add at the top of the run function:
     ```ts
@@ -816,7 +815,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
   - For the AI param description `'₪ per month'` → `'per month (in the rikma\'s currency)'`.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 92. **`src/lib/server/actions/configs/requestDonation.ts`** — line ~76
+- [x] 92. **`src/lib/server/actions/configs/requestDonation.ts`** — line ~76
   - `${amount}₪` → `moneyTextFor(rikmaCurrency(projectAttrs))(amount, context.lang)`.
   - For the `server.stipend*` translation fix (item 89): the action already
     calls `sendToSer … missionDonationTarget`. Find that qid, add `currencyCode`
@@ -825,7 +824,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
   - Derive `const projectCurrency = rikmaCurrency(oma?.project?.data?.attributes)`.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 93. **`src/lib/server/notifications/maturedNotices.ts`** — lines 550, 562
+- [x] 93. **`src/lib/server/notifications/maturedNotices.ts`** — lines 550, 562
   - `stipendPaymentConfirmed` signature currently: `{ projectId, projectName, amount, … }`.
   - Add `currency?: CurrencyCode` to the parameter type (optional, default
     `'ILS'` for backward compat).
@@ -840,7 +839,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
 
 ### Mails
 
-- [ ] 94. **`src/lib/components/mail/HalukaApproved.svelte`** — line 195
+- [x] 94. **`src/lib/components/mail/HalukaApproved.svelte`** — line 195
   - Add `currency` prop (default `'ILS'`) to the component's `$props()`.
   - Import `formatMoney` from `$lib/money/format.js`.
   - Replace `{amount} ₪` with `{formatMoney(amount, currency, lang ?? 'he')}`.
@@ -850,7 +849,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
     to the template props when available.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 95. **`src/lib/components/mail/monthlyRecurringSale.svelte`** (audit shows `₪1`, meaning 1 `<Money>` or 1 `₪` symbol)
+- [x] 95. **`src/lib/components/mail/monthlyRecurringSale.svelte`** (audit shows `₪1`, meaning 1 `<Money>` or 1 `₪` symbol)
   - Add `currency` prop (default `'ILS'`).
   - Import `formatMoney` from `$lib/money/format.js`.
   - Replace every `{amount} ₪` or `{amount}₪` with
@@ -859,14 +858,14 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
     Pass the rikma's currency code when sending.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 96. **`src/lib/components/mail/monthlyResourceActive.svelte`** (same, `₪1`)
+- [x] 96. **`src/lib/components/mail/monthlyResourceActive.svelte`** (same, `₪1`)
   - Same pattern as `monthlyRecurringSale`.
   - Find sender. Pass currency.
   - Verify: `npm run check` — no new errors.
 
 ### Telegram
 
-- [ ] 97. **`src/lib/server/telegram/botTexts.js`** — `salePricePrompt` in all 5 languages (lines 103, 246, 389, 532, 675)
+- [x] 97. **`src/lib/server/telegram/botTexts.js`** — `salePricePrompt` in all 5 languages (lines 103, 246, 389, 532, 675)
   - Remove `(₪)` from each `salePricePrompt` string.
   - Add `{{currency}}` placeholder: e.g. `'שלח/י מחיר ליחידה ({{currency}}):'`.
   - Verify the file exports a function that accepts variables and check how
@@ -876,7 +875,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
     "botTexts.js does not support runtime substitution; ₪ removed from prompts
     but dynamic symbol not yet injected."
 
-- [ ] 98. **`src/routes/api/newTelegram/+server.js`** — lines 321, 326
+- [x] 98. **`src/routes/api/newTelegram/+server.js`** — lines 321, 326
   - Lines: `` `${sale.each} ₪` `` and `` `${total} ₪` ``.
   - Check whether `sale.projectId` is available at this point (it is — confirmed
     from the `pendingSale` state map which carries `projectId`).
@@ -891,7 +890,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
   - **Report**: `saleCenterUserProducts` now selects `currencyCode`.
   - Verify: `npm run check` — no new errors.
 
-- [ ] 99. **Batch 4 gate**
+- [x] 99. **Batch 4 gate**
   - `node scripts/audit-money-display.mjs` — remaining lines should all be
     confirmed non-money numbers or out-of-scope items (list each with reason).
   - `grep -rn "₪" src --include="*.svelte" --include="*.ts" --include="*.js" | grep -v translations` — only comments, out-of-scope files (`$lib/money/**`, `externalOffers.ts`, `/api/chat`), and `$lib/crypto/money.ts`.
@@ -929,7 +928,7 @@ Confirmed **not** moach-only (move to Batch 2 treatment):
 
 ## QID change log (fill in as work proceeds)
 
-> **As of 2026-11-19 none of these has been changed** — this is the list of PLANNED qid changes for Batch 3, not a record of what was done. Move a row to "done" only after `npm run validate:qids` passes.
+> See the [Batch 2](./batch2-report.md) and [Batch 3](./batch3-report.md) reports for actual QID changes. The table below records the original plan; `missionDonationTarget` is still a Batch 4 item.
 
 | QID key | File | Field added |
 |---|---|---|
