@@ -4,7 +4,7 @@
 > שעומדת בפני עצמה, ואפשר לעשות אותה **עוד לפני** שהדפים עוזבים את Vercel (V3).
 >
 > **2026-11-23: A0–A2 חיים בשרת** (§7). Umami רץ ב-`https://pulse.1lev1.com`, והאתר שולח אליו מהדיפלוי הבא
-> של Vercel. נשאר: A3 (משפך ו-Goals בדשבורד), ואחרי שבועיים במקביל, A4.
+> של Vercel, ו-A3 (משפכים ו-Goals) מוגדר. נשאר: A4, אחרי שבועיים במקביל ל-Vercel.
 
 ## 0. למה
 
@@ -184,3 +184,11 @@ A0 → A1 → A2 → A3          לא תלוי ב-V3, אפשר כבר עכשיו
    Vercel: הוא לא סוד, ו-`data-domains` כבר מונע שליחה מכל host חוץ מ-1lev1.com. `PUBLIC_UMAMI_WEBSITE_ID` דורס
    אותו, וערך ריק מכבה.
 9. A3: Funnel ו-Goals בדשבורד.
+
+**A3: הוגדר 2026-11-23** (דרך ה-API של Umami, `POST /api/websites/{id}/funnels` ו-`/goals`):
+- **שני משפכים ולא אחד.** רוב החותמים לא פותחים את ההסכמה המורחבת. בשרשרת אחת ארוכה הם היו נראים כמו נשירה.
+  - "הצטרפות: בית → חתימה": `/` → `/hascama` → `sign_try` → `sign_ok`, חלון של 120 דקות.
+  - "הסכמה מורחבת: יציאה וחזרה": `/hascama` → `agreement_out` → `agreement_back` → `sign_ok`, חלון של 1440
+    דקות (קריאה של ההסכמה המלאה יכולה לקחת זמן).
+- **Goals:** `home_cta`, הדף `/hascama`, `agreement_out`, `agreement_back`, `sign_try`, `sign_invalid`, `sign_ok`. ב-
+  `sign_invalid` הפירוט לפי השדה נמצא ב-Events → Properties (`field`).
