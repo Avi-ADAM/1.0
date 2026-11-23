@@ -264,7 +264,10 @@ export function chainEngines(engines: TranslateEngine[]): TranslateEngine {
                 return await engine(items, targets);
             } catch (err) {
                 last = err;
-                if (!(err instanceof TranslateEngineError) || !err.retryable) throw err;
+                // 404 = this model is gone for our key (Google retires them
+                // with a 404, not a 410) — the next model may well answer.
+                const modelGone = err instanceof TranslateEngineError && err.status === 404;
+                if (!(err instanceof TranslateEngineError) || !(err.retryable || modelGone)) throw err;
             }
         }
         throw last ?? new TranslateEngineError('no engine configured');

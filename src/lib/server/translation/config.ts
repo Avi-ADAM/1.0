@@ -137,7 +137,10 @@ export function limits(): TranslateLimits {
         batch: num(env.TRANSLATE_BATCH, 25),
         onDemandShare: Number.isFinite(share) && share >= 0 && share <= 1 ? share : 0.3,
         model: env.TRANSLATE_MODEL || 'gemini-2.5-flash-lite',
-        fallbackModels: (env.TRANSLATE_FALLBACK_MODELS ?? 'gemini-2.5-flash')
+        // Probed 2026-11-23 with the prod key: 2.5-flash is 404 ("no longer
+        // available to new users"); flash-lite-latest answers while the 3.x
+        // non-lite models 503.
+        fallbackModels: (env.TRANSLATE_FALLBACK_MODELS ?? 'gemini-flash-lite-latest,gemini-3.8-flash')
             .split(',')
             .map((s) => s.trim())
             .filter(Boolean)

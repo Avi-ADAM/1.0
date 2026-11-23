@@ -198,6 +198,15 @@ describe('chainEngines', () => {    const answer = async (items: TranslateItem[]
         expect(out).toHaveLength(2);
     });
 
+    it('moves on when a model is retired (404)', async () => {
+        const gone = vi.fn(async () => {
+            throw new TranslateEngineError('HTTP 404: no longer available', { status: 404 });
+        });
+        const second = vi.fn(answer);
+        await chainEngines([gone as never, second as never])(ITEMS, TARGETS);
+        expect(second).toHaveBeenCalledTimes(1);
+    });
+
     it('does not spend a second request on a non-retryable failure', async () => {
         const broken = vi.fn(async () => {
             throw new TranslateEngineError('bad batch shape');
