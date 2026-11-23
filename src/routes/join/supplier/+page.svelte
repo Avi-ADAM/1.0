@@ -2,7 +2,8 @@
   /join/supplier — "supplier in a minute" (docs/inprogress/PLAN_SUPPLIER_GROWTH.md SG1).
 
   Built for the supplier who arrives from a search and has never heard of a
-  rikma. The page asks for one thing — a link or a sentence — and a service
+  rikma. The page asks for one thing — a link, a sentence, or the catalog and
+  photos they already have — and a service
   area, shows them their own card *before* any account, and only then asks for
   a name and an email. That saves the draft (/api/join/supplier → the same
   prepareSignup an agent uses) and sends them to the studio: the full review
@@ -15,14 +16,23 @@
   import { track } from '$lib/analytics/track.js';
   import LocationPicker from '$lib/components/location/LocationPicker.svelte';
   import { previewProducts } from '$lib/assistant/supplierJoin';
+  import { downscaleImage } from '$lib/media/downscaleImage.js';
 
   /** Same floor as /api/analyze-business. */
   const MIN_TEXT = 50;
 
   /** @type {'source' | 'loading' | 'preview' | 'saving'} */
   let step = $state('source');
-  /** @type {'url' | 'text'} */
+  /** @type {'url' | 'text' | 'files'} */
   let mode = $state('url');
+  /** Catalog, price list, photos — read by the server, never stored (readDocuments.ts). */
+  /** @type {File[]} */
+  let files = $state([]);
+  /** Same limits as the server (DOC_LIMITS), so a person hears it before uploading. */
+  const MAX_FILES = 6;
+  const MAX_TOTAL = 15 * 1024 * 1024;
+  const ACCEPT = '.pdf,.docx,.txt,.csv,image/jpeg,image/png,image/webp,image/heic,.heic';
+  let preparing = $state(false);
   let url = $state('');
   let text = $state('');
   /** @type {import('$lib/components/location/LocationPicker.svelte').LocationValue} */
@@ -40,7 +50,11 @@
   });
   const urlOk = $derived(/^https?:\/\/[^\s/]+\.[^\s]+$/i.test(normalizedUrl));
   const textOk = $derived(text.trim().length >= MIN_TEXT);
-  const sourceOk = $derived(mode === 'url' ? urlOk : textOk);
+  const filesBytes = $derived(files.reduce((n, f) => n + f.size, 0));
+  const filesOk = $derived(files.length > 0 && files.length <= MAX_FILES && filesBytes <= MAX_TOTAL);
+  const sourceOk = $derived(mode === 'url' ? urlOk : mode === 'text' ? textOk : filesOk && !preparing);
+  /** Files the server could not read, by name. */
+  const unreadable = $derived(/** @type {{ name: string }[]} */ (analysis?.documents?.problems ?? []).map((p) => p.name));
   const emailOk = $derived(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()));
   const contactOk = $derived(name.trim().length > 0 && emailOk);
 
@@ -69,7 +83,52 @@
   /** @param {number} status */
   function messageFor(status) {
     if (status === 429) return $t('supplierJoin.errors.rateLimited');
+    if (status === 422) return $t('supplierJoin.errors.files');
+    if (status === 413) return $t('supplierJoin.errors.filesTooLarge');
     return $t('supplierJoin.errors.analyze');
+  }
+
+  /** @param {Event} e */
+  async function addFiles(e) {
+    const input = /** @type {HTMLInputElement} */ (e.currentTarget);
+    const picked = Array.from(input.files ?? []);
+    input.value = '';
+    if (!picked.length) return;
+    preparing = true;
+    error = '';
+    const shrunk = await Promise.all(picked.map((f) => downscaleImage(f)));
+    const next = [...files, ...shrunk];
+    if (next.length > MAX_FILES) error = $t('supplierJoin.errors.filesTooMany', { count: MAX_FILES });
+    files = next.slice(0, MAX_FILES);
+    if (files.reduce((n, f) => n + f.size, 0) > MAX_TOTAL) error = $t('supplierJoin.errors.filesTooLarge');
+    preparing = false;
+  }
+
+  /** @param {number} i */
+  function removeFile(i) {
+    files = files.filter((_, j) => j !== i);
+    error = '';
+  }
+
+  /** @param {number} bytes */
+  function size(bytes) {
+    return bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  }
+
+  function analyzeRequest() {
+    if (mode === 'files') {
+      const form = new FormData();
+      for (const f of files) form.append('files', f, f.name);
+      if (text.trim()) form.append('text', text.trim());
+      if (urlOk) form.append('url', normalizedUrl);
+      form.append('lang', $locale ?? 'he');
+      return { method: 'POST', body: form };
+    }
+    return {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(mode === 'url' ? { url: normalizedUrl, lang: $locale } : { text: text.trim(), lang: $locale })
+    };
   }
 
   async function analyze() {
@@ -78,11 +137,7 @@
     step = 'loading';
     track('business_analyze', { entry: 'join', source: mode });
     try {
-      const res = await fetch('/api/analyze-business', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(mode === 'url' ? { url: normalizedUrl, lang: $locale } : { text: text.trim(), lang: $locale })
-      });
+      const res = await fetch('/api/analyze-business', analyzeRequest());
       const body = await res.json().catch(() => ({}));
       const ok = res.ok && body?.ok !== false && !!body?.blueprint;
       track('business_analyzed', {
@@ -117,7 +172,7 @@
           name: name.trim(),
           email: email.trim(),
           lang: $locale,
-          sourceText: mode === 'url' ? normalizedUrl : text.trim(),
+          sourceText: mode === 'url' ? normalizedUrl : mode === 'files' ? [text.trim(), ...files.map((f) => f.name)].filter(Boolean).join('\n') : text.trim(),
           blueprint: analysis.blueprint,
           area: serviceArea()
         })
@@ -188,6 +243,9 @@
         <button type="button" role="tab" aria-selected={mode === 'url'} class:active={mode === 'url'} onclick={() => (mode = 'url')}>
           {$t('supplierJoin.form.tabUrl')}
         </button>
+        <button type="button" role="tab" aria-selected={mode === 'files'} class:active={mode === 'files'} onclick={() => (mode = 'files')}>
+          {$t('supplierJoin.form.tabFiles')}
+        </button>
         <button type="button" role="tab" aria-selected={mode === 'text'} class:active={mode === 'text'} onclick={() => (mode = 'text')}>
           {$t('supplierJoin.form.tabText')}
         </button>
@@ -197,6 +255,26 @@
         <label class="sj-label" for="sj-url">{$t('supplierJoin.form.urlLabel')}</label>
         <input id="sj-url" class="sj-input" type="url" dir="ltr" inputmode="url" autocomplete="url" placeholder="https://" bind:value={url} disabled={step === 'loading'} />
         <p class="sj-hint">{$t('supplierJoin.form.urlHint')}</p>
+      {:else if mode === 'files'}
+        <label class="sj-label" for="sj-files">{$t('supplierJoin.form.filesLabel')}</label>
+        <label class="sj-drop" class:busy={preparing}>
+          <input id="sj-files" type="file" multiple accept={ACCEPT} onchange={addFiles} disabled={step === 'loading' || preparing || files.length >= MAX_FILES} />
+          <span>{preparing ? $t('supplierJoin.form.filesPreparing') : $t('supplierJoin.form.filesPick')}</span>
+        </label>
+        <p class="sj-hint">{$t('supplierJoin.form.filesHint', { count: MAX_FILES })}</p>
+        {#if files.length}
+          <ul class="sj-files">
+            {#each files as f, i (f.name + i)}
+              <li>
+                <span class="sj-fname" dir="auto">{f.name}</span>
+                <span class="sj-fsize">{size(f.size)}</span>
+                <button type="button" class="sj-x" aria-label={$t('supplierJoin.form.filesRemove')} onclick={() => removeFile(i)} disabled={step === 'loading'}>×</button>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+        <label class="sj-label" for="sj-note">{$t('supplierJoin.form.filesNoteLabel')}</label>
+        <textarea id="sj-note" class="sj-input" rows="2" placeholder={$t('supplierJoin.form.filesNotePlaceholder')} bind:value={text} disabled={step === 'loading'}></textarea>
       {:else}
         <label class="sj-label" for="sj-text">{$t('supplierJoin.form.textLabel')}</label>
         <textarea id="sj-text" class="sj-input" rows="5" placeholder={$t('supplierJoin.form.textPlaceholder')} bind:value={text} disabled={step === 'loading'}></textarea>
@@ -232,6 +310,9 @@
         {/if}
         {#if moreCount > 0}
           <p class="sj-hint">{$t('supplierJoin.preview.more', { count: moreCount })}</p>
+        {/if}
+        {#if unreadable.length}
+          <p class="sj-hint warn">{$t('supplierJoin.preview.unreadable', { files: unreadable.join(', ') })}</p>
         {/if}
       </article>
       <button type="button" class="sj-link" onclick={startOver} disabled={step === 'saving'}>{$t('supplierJoin.preview.again')}</button>
@@ -372,7 +453,7 @@
   }
   .sj-tabs {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.5rem;
     margin-bottom: 0.5rem;
   }
@@ -417,6 +498,67 @@
   }
   .sj-hint.center {
     text-align: center;
+  }
+  .sj-hint.warn {
+    color: var(--rose);
+  }
+  .sj-drop {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 5.5rem;
+    border: 2px dashed var(--gold);
+    border-radius: 1rem;
+    background: var(--ivory);
+    color: var(--ink);
+    font-weight: 600;
+    text-align: center;
+    padding: 1rem;
+    cursor: pointer;
+  }
+  .sj-drop.busy {
+    opacity: 0.6;
+  }
+  .sj-drop input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .sj-files {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.3rem;
+  }
+  .sj-files li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--line);
+    border-radius: 0.6rem;
+    padding: 0.35rem 0.6rem;
+    background: #fff;
+  }
+  .sj-fname {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .sj-fsize {
+    color: var(--ink-soft);
+    font-size: 0.8rem;
+  }
+  .sj-x {
+    border: none;
+    background: none;
+    font-size: 1.2rem;
+    line-height: 1;
+    color: var(--ink-soft);
+    cursor: pointer;
   }
   .sj-area {
     margin-top: 0.5rem;

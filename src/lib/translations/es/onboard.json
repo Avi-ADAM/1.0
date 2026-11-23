@@ -256,7 +256,11 @@
       "can_continue": "✓ Se puede continuar",
       "min_chars": "Alcanza al menos {{count}}",
       "analyzing": "✨ Analizando el texto...",
-      "working": "Lev está trabajando..."
+      "working": "Lev está trabajando...",
+      "files_label": "O sube un catálogo, lista de precios o fotos",
+      "files_hint": "PDF, Word o imágenes, hasta {{count}} archivos. Solo se leen, no se guardan.",
+      "files_remove": "Quitar archivo",
+      "files_error": "No pudimos leer los archivos. Prueba un PDF con texto, una foto más nítida, o descríbelo con palabras."
     },
     "seed_plan": {
       "label": "Prepárame también un plan inicial para la rikma",

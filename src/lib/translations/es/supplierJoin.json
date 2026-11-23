@@ -6,7 +6,7 @@
   "hero": {
     "kicker": "Para proveedores y profesionales",
     "title": "Tu ficha, lista en un minuto",
-    "sub": "Danos tu web o cuéntanos en una frase lo que haces. Preparamos tu ficha, la ves y solo entonces decides."
+    "sub": "Danos tu web, sube un catálogo o fotos, o cuéntanos en una frase lo que haces. Preparamos tu ficha, la ves y solo entonces decides."
   },
   "promises": {
     "p1": "Sin comisión por contacto directo",
@@ -29,7 +29,15 @@
     "textHint": "Al menos {{count}} caracteres",
     "areaLabel": "¿Dónde das servicio?",
     "areaHelper": "Marca un punto y un radio, o elige online. Solo te propondremos a clientes a los que llegas.",
-    "submit": "Prepárame la ficha"
+    "submit": "Prepárame la ficha",
+    "tabFiles": "Tengo un catálogo",
+    "filesLabel": "Catálogo, lista de precios o fotos",
+    "filesPick": "Elige archivos o haz una foto",
+    "filesPreparing": "Preparando los archivos…",
+    "filesHint": "PDF, Word o imágenes, hasta {{count}} archivos. Solo se leen, no se guardan.",
+    "filesRemove": "Quitar archivo",
+    "filesNoteLabel": "¿Algo que añadir? (opcional)",
+    "filesNotePlaceholder": "p. ej.: los precios incluyen IVA, envíos solo en el norte…"
   },
   "loading": {
     "title": "Preparando tu ficha…",
@@ -40,7 +48,8 @@
     "products": "Servicios que encontramos",
     "noProducts": "No encontramos servicios definidos. Podrás añadirlos en el siguiente paso.",
     "more": "Más elementos en el borrador, para editar en el siguiente paso: {{count}}",
-    "again": "Empezar de nuevo"
+    "again": "Empezar de nuevo",
+    "unreadable": "No pudimos leer: {{files}}"
   },
   "contact": {
     "title": "Casi listo: ¿quién eres?",
@@ -53,6 +62,9 @@
   "errors": {
     "analyze": "No pudimos leerlo. Prueba otra dirección o descríbelo con palabras.",
     "rateLimited": "Demasiados intentos en poco tiempo. Vuelve a intentarlo en una hora.",
-    "save": "No pudimos guardar. Revisa tu nombre y correo e inténtalo de nuevo."
+    "save": "No pudimos guardar. Revisa tu nombre y correo e inténtalo de nuevo.",
+    "files": "No pudimos leer los archivos. Prueba un PDF con texto, una foto más nítida, o descríbelo con palabras.",
+    "filesTooLarge": "Los archivos son demasiado grandes (15MB en total como máximo).",
+    "filesTooMany": "Hasta {{count}} archivos."
   }
 }

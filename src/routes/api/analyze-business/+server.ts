@@ -1,6 +1,8 @@
 // POST /api/analyze-business
 // Signed-in members, or a guest from /join/supplier (stricter limits, see POST).
-// Body: { url: string } OR { text: string }, plus optional { lang, withPlan }
+// Body: { url: string } OR { text: string }, plus optional { lang, withPlan } —
+// or multipart/form-data with `files` (a catalog, price list, photos; read by
+// $lib/server/planning/readDocuments, never stored) and optional url / text / lang.
 // Returns: { ok, name, desc, details, vals[], plan, blueprint } — the pre-fill
 // payload for /me?action=createproject, the starter planning boards the member
 // will review row by row after approving the rikma (PLAN_ONBOARDING Track B),
@@ -29,6 +31,7 @@ import { keepRichHtml, textToParagraphs } from '$lib/prefill/richHtml';
 import { PROFIT_IDS, type ProjectDraft } from '$lib/prefill/projectDraft';
 import { RateLimiter, callerKey } from '$lib/server/translation/rateLimit';
 import { takeGuestAnalyze } from '$lib/server/assistant/publicQuota.js';
+import { readDocuments, realReadDeps, type UploadedDoc, type DocProblem } from '$lib/server/planning/readDocuments';
 import { env } from '$env/dynamic/private';
 
 const MIN_TEXT = 50;
@@ -48,6 +51,7 @@ const PER_DAY = 25;
 const limiter = new RateLimiter();
 
 type Lang = 'he' | 'en' | 'ar' | 'ru' | 'es';
+type SourceHint = 'url' | 'text' | 'docs';
 type ExtractedBusiness = {
   name: string;
   desc: string;
@@ -114,7 +118,7 @@ function makeAgent(id: string, instructions: string): Agent {
 
 async function extractWithGemini(
   text: string,
-  sourceHint: 'url' | 'text',
+  sourceHint: SourceHint,
   lang: Lang
 ): Promise<ExtractedBusiness> {
   const agent = makeAgent(
@@ -123,7 +127,13 @@ async function extractWithGemini(
   );
 
   const langName = LANG_NAMES[lang];
-  const prompt = `Analyze the following ${sourceHint === 'url' ? 'webpage text' : 'free-text description'} and return JSON ONLY:
+  const what =
+    sourceHint === 'url'
+      ? 'webpage text'
+      : sourceHint === 'docs'
+        ? "business's own material (its uploaded catalog, price list or photos, transcribed; maybe its website and a few words of its own)"
+        : 'free-text description';
+  const prompt = `Analyze the following ${what} and return JSON ONLY:
 {
   "name":    "",   // project/business name (a few words, in ${langName})
   "desc":    "",   // short public description (1-2 sentences, in ${langName})
@@ -220,18 +230,56 @@ export const POST: RequestHandler = async ({ request, cookies, locals, getClient
   }
 
   let body: { url?: string; text?: string; lang?: string; withPlan?: boolean };
+  /** Uploaded documents (multipart only): a catalog, a price list, photos. */
+  let docs: UploadedDoc[] = [];
+  const isMultipart = (request.headers.get('content-type') ?? '').includes('multipart/form-data');
   try {
-    body = await request.json();
+    if (isMultipart) {
+      const form = await request.formData();
+      const str = (k: string) => {
+        const v = form.get(k);
+        return typeof v === 'string' ? v : undefined;
+      };
+      body = { url: str('url'), text: str('text'), lang: str('lang'), withPlan: str('withPlan') !== 'false' };
+      for (const f of form.getAll('files')) {
+        if (typeof f === 'string') continue;
+        docs.push({ name: f.name || 'file', mimeType: f.type || '', bytes: new Uint8Array(await f.arrayBuffer()) });
+      }
+    } else {
+      body = await request.json();
+    }
   } catch {
-    throw error(400, 'Invalid JSON body');
+    throw error(400, 'Invalid request body');
   }
 
   const lang = pickLang(body.lang, cookies.get('lang'));
   let inputText: string;
-  let sourceHint: 'url' | 'text';
+  let sourceHint: SourceHint;
   let sourceUrl: string | null = null;
+  let documents: { read: number; problems: DocProblem[] } | null = null;
 
-  if (body.url && body.url.trim()) {
+  if (docs.length) {
+    // Documents, with the site and a few words beside them when given. Each
+    // part is labelled, so the model knows a price list from a homepage.
+    const read = await readDocuments(docs, lang, realReadDeps);
+    documents = { read: read.read, problems: read.problems };
+    const parts: string[] = [];
+    if (body.url && /^https?:\/\//i.test(body.url.trim())) {
+      // The documents are the point here; an unreadable site must not cost them.
+      const site = await fetchUrlText(body.url.trim()).catch(() => '');
+      if (site) {
+        parts.push(`## From the business website\n${site}`);
+        sourceUrl = body.url.trim();
+      }
+    }
+    if (body.text?.trim()) parts.push(`## In the owner's words\n${body.text.trim().slice(0, MAX_TEXT)}`);
+    if (read.text) parts.push(`## From the uploaded documents\n${read.text}`);
+    inputText = parts.join('\n\n');
+    if (inputText.length < MIN_TEXT) {
+      return json({ ok: false, reason: 'unreadable-documents', documents, message: 'Could not read the documents.' }, { status: 422 });
+    }
+    sourceHint = 'docs';
+  } else if (body.url && body.url.trim()) {
     const u = body.url.trim();
     if (!/^https?:\/\//i.test(u)) {
       throw error(400, 'URL must start with http(s)://');
@@ -243,7 +291,7 @@ export const POST: RequestHandler = async ({ request, cookies, locals, getClient
     inputText = body.text.trim().slice(0, MAX_TEXT);
     sourceHint = 'text';
   } else {
-    throw error(400, `Provide either url or text (at least ${MIN_TEXT} chars).`);
+    throw error(400, `Provide either url, text (at least ${MIN_TEXT} chars) or files.`);
   }
 
   const extracted = await extractWithGemini(inputText, sourceHint, lang);
@@ -277,6 +325,7 @@ export const POST: RequestHandler = async ({ request, cookies, locals, getClient
     ...extracted,
     plan,
     blueprint,
+    ...(documents ? { documents } : {}),
     planBoardCount: plan?.boards.length ?? 0,
     planItemCount
   });

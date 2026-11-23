@@ -192,10 +192,14 @@ SG0 → SG1 (הכי גדול בהשפעה, הכי קטן בקוד: כניסה ח
 | 2026-11-23 | **SG0:** אירועי משפך ברשימה הסגורה של `track` — `supplier_entry` (`entry: join/onboard`), `business_analyze`, `business_analyzed` (`ok`, `reason`, `products`), `supplier_prepared`, `blueprint_review` (`mode: member/studio`), `blueprint_created` (`rows`). מחוברים ב-`/onboard/business` (+`url`, `describe`), ב-`BlueprintReview` ובדף החדש | `src/lib/analytics/track.js` |
 | 2026-11-23 | **SG1, שרת:** `/api/analyze-business` פתוח לאורח — 3 לשעה לכתובת, 100 ביום לכל הפלטפורמה (`takeGuestAnalyze`), נסגר עם `ASSISTANT_MCP_ENABLED=false`, לא כותב כלום. `POST /api/join/supplier` — שם + אימייל + השרטוט + אזור השירות → `prepareSignup` (`intent:'business'`) → מחזיר את קישור ה-**studio** (עריכה מלאה כאורח, ובסופה הסכמה + סיסמה). מחובר מקבל 409 ומופנה ל-`/onboard/business` | `publicQuota.ts`, `src/routes/api/join/supplier/`, `src/lib/assistant/supplierJoin.ts` |
 | 2026-11-23 | **SG1, דף:** `/join/supplier` (ציבורי, מחובר מופנה ל-`/onboard/business`) — קישור או משפט + `LocationPicker` → תצוגה מקדימה של הכרטיס (שם, תיאור, שירותים ומחירים) → שם + אימייל → studio. namespace `supplierJoin` × 5, מוגבל ל-`/join`; `src/routes/join` נוסף ל-`ROOTS` של `check:ui-hebrew`; ב-sitemap | `src/routes/join/supplier/` |
+| 2026-11-23 | **SG1, מסמכים:** קטלוג, מחירון, Word, CSV או תמונות, עד 6 קבצים ועד 15MB ביחד. הקבצים לא נשמרים. PDF עם שכבת טקסט ו-Word נקראים מקומית, בלי קריאה למודל. תמונות ו-PDF סרוק עוברים ל-Gemini (רק Gemini, כי שאר הספקים בשרשרת לא קוראים קבצים) בקריאה **אחת** לכולם, שמעתיקה שירותים, מחירים, אזור ופרטי קשר. `/api/analyze-business` מקבל `multipart/form-data` עם `files` ולצידם url/text, מסמן כל חלק לפי המקור שלו, ומחזיר `documents.problems` לפי שם קובץ. אם לא נקרא כלום מוחזר 422. תמונות מוקטנות בדפדפן ל-1600px JPEG. לשונית "יש לי קטלוג" ב-`/join/supplier`, ובחירת קבצים ב-`/onboard/business/describe` | `src/lib/server/planning/readDocuments.ts`, `src/lib/media/downscaleImage.js` |
 
 **סטייה מ-§SG1:** במקום להפנות ל-`/hascama?agent=` הדף מפנה ל-studio (`/preview/rikma/studio/<token>`), שכבר קיים ומאפשר לאורח לערוך את כל הטיוטה לפני החתימה. הספק רואה ערך עוד לפני שהוא פותח חשבון. "N משאלות פתוחות באזור שלך" עוד לא נבנה: זה יבוא בהמשך עם SG4.
 
 **לפני שמפרסמים את הקישור:**
 1. בדיקת עשן בפרודקשן: אתר אמיתי של ספק, ואחריו studio ← הרשמה ← אישור מייל ← "ליצור". לוודא שהמוצרים מופיעים ב-`/gift`, ושה-`location` של הרקמה נשמר.
 2. ב-Umami (A3): להוסיף משפך ספק לפי האירועים שלמעלה.
-3. לתמחר: כל ניתוח של אורח הוא שתי קריאות למודל. התקרה היומית (100) היא שמגבילה את ההוצאה.
+3. לתמחר: כל ניתוח של אורח הוא שתי קריאות למודל, ושלוש כשיש תמונות או PDF סרוק. התקרה היומית (100) היא שמגבילה את ההוצאה.
+4. קריאת התמונות דרך Gemini לא נבדקה מול המודל האמיתי, כי אין מפתח בסביבת הפיתוח. לבדוק עם צילום של מחירון אמיתי, ועם PDF סרוק.
+5. אם `www` מעביר את `/api` דרך Vercel, יש שם תקרה של כ-4.5MB לגוף הבקשה. לבדוק עם קטלוג PDF של 8MB.
+6. **בהמשך:** תמונות מהקטלוג כתמונות של המוצרים. עכשיו הן רק נקראות, ולא נשמרות כמדיה.
