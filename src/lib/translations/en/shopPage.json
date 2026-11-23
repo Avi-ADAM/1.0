@@ -42,7 +42,9 @@
     "p2_d": "Consume the rikma's public REST API from any stack (Next, Astro, SvelteKit, WordPress) or drop in a snippet to report sales automatically after checkout.",
     "p3_badge": "AI Agents · MCP",
     "p3_t": "Manage your shop via AI agent",
-    "p3_d": "12 dedicated shop MCP tools let Claude or any MCP-compatible AI agent check inventory, create products, update stock, and advance orders in natural conversation."
+    "p3_d": "12 dedicated shop MCP tools let Claude or any MCP-compatible AI agent check inventory, create products, update stock, and advance orders in natural conversation.",
+    "lighter": "Don't need a whole store, just for customers to find you?",
+    "lighterCta": "A supplier card in a minute"
   },
   "template": {
     "eyebrow": "◈ 1 · The Ready-Made Shop Starter (1lev1-shop-starter) ◈",

@@ -124,7 +124,9 @@
     "shop_t": "Your own shop, jointly owned",
     "shop_d": "How a rikma opens a shop, manages products and orders, and splits every sale by consent.",
     "broken_t": "The deal that broke",
-    "broken_d": "Why the job market wears all of us out, from employees to freelancers, and what a new social contract looks like."
+    "broken_d": "Why the job market wears all of us out, from employees to freelancers, and what a new social contract looks like.",
+    "supplier_t": "A supplier card in a minute",
+    "supplier_d": "Have a defined service? A link, a catalog or a sentence, and customers looking for it will find you."
   },
   "back": "Back to the homepage"
 }

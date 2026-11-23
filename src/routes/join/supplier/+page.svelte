@@ -68,6 +68,20 @@
 
   onMount(() => track('supplier_entry', { entry: 'join' }));
 
+  /*
+   * Other doors, for the reader this page is not quite for. Shown only before
+   * they start (step 'source'), under the card, so a supplier who is here for
+   * the card never has to read them. The first one is still for suppliers:
+   * what people near them are already asking for.
+   */
+  /** @type {[string, string][]} key → href */
+  const OTHER = [
+    ['demand', '/demand'],
+    ['shop', '/shop'],
+    ['partnership', '/partnership'],
+    ['order', '/made-for-you']
+  ];
+
   /** The picker's value as the endpoint's service area. */
   function serviceArea() {
     const online = area.location_mode === 'online' || !!area.isOnline;
@@ -332,6 +346,22 @@
       <p class="sj-hint center">{$t('supplierJoin.contact.note')}</p>
     {/if}
   </section>
+
+  {#if step === 'source'}
+    <nav class="sj-other" aria-labelledby="sj-other-title">
+      <h2 id="sj-other-title">{$t('supplierJoin.other.title')}</h2>
+      <ul>
+        {#each OTHER as [key, href] (key)}
+          <li>
+            <a {href} data-sveltekit-prefetch>
+              <strong>{$t(`supplierJoin.other.${key}_t`)}</strong>
+              <span>{$t(`supplierJoin.other.${key}_d`)}</span>
+            </a>
+          </li>
+        {/each}
+      </ul>
+    </nav>
+  {/if}
 </main>
 
 <style>
@@ -368,7 +398,8 @@
   }
   .sj-hero,
   .sj-steps,
-  .sj-card {
+  .sj-card,
+  .sj-other {
     max-width: 640px;
     margin-inline: auto;
   }
@@ -620,6 +651,50 @@
     gap: 1rem;
     border-bottom: 1px solid var(--line);
     padding-bottom: 0.3rem;
+  }
+  .sj-other {
+    margin-top: 2.5rem;
+  }
+  .sj-other h2 {
+    font-size: 1rem;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+  }
+  .sj-other ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+  @media (min-width: 560px) {
+    .sj-other ul {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .sj-other a {
+    display: grid;
+    gap: 0.15rem;
+    height: 100%;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--line);
+    border-radius: 0.9rem;
+    background: transparent;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .sj-other a:hover,
+  .sj-other a:focus-visible {
+    background: var(--paper);
+    border-color: var(--gold);
+  }
+  .sj-other strong {
+    font-size: 0.95rem;
+  }
+  .sj-other span {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
   }
   .sj-price {
     color: var(--gold);

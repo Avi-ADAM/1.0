@@ -761,7 +761,10 @@
             <b>{$t('home.concierge.providerTitle')}</b>
             <span class="hm-muted">{$t('home.concierge.providerShort')}</span>
           </div>
-          <a href={registerHref($locale, '/concierge')} class="hm-textlink">
+          <!-- The supplier's own door (PLAN_SUPPLIER_GROWTH SG1): their card from a
+               link, a catalog or a sentence, seen before any account. A member
+               landing there is sent on to /onboard/business. -->
+          <a href="/join/supplier" class="hm-textlink" data-sveltekit-prefetch>
             {$t('home.concierge.providerCta')} <span aria-hidden="true">{arrow}</span>
           </a>
         </div>

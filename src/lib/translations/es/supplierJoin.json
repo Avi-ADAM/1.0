@@ -66,5 +66,16 @@
     "files": "No pudimos leer los archivos. Prueba un PDF con texto, una foto más nítida, o descríbelo con palabras.",
     "filesTooLarge": "Los archivos son demasiado grandes (15MB en total como máximo).",
     "filesTooMany": "Hasta {{count}} archivos."
+  },
+  "other": {
+    "title": "¿Vienes por otra cosa?",
+    "demand_t": "Qué piden ahora cerca de ti",
+    "demand_d": "Quienes buscan lo mismo se unen, y puedes hacerles una sola oferta.",
+    "shop_t": "Necesitas una tienda completa",
+    "shop_d": "Stock, pedidos, envíos y pagos, en tu web o en la nuestra.",
+    "partnership_t": "Buscas socios, no solo clientes",
+    "partnership_d": "Por ejemplo, un fotógrafo y un DJ que venden un paquete y reparten los ingresos de común acuerdo.",
+    "order_t": "¿Vienes a encargar algo?",
+    "order_d": "Escribes lo que necesitas y los proveedores te hacen ofertas. Es el conserje."
   }
 }

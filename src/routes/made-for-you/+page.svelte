@@ -224,6 +224,8 @@
     <h2>{$t('madeForYou.final.title')}</h2>
     <p>{$t('madeForYou.final.sub')}</p>
     <a href={composer} class="mfy-btn">{$t('madeForYou.final.cta')}</a>
+    <!-- The other side of the same concierge: whoever answers these wishes. -->
+    <a href="/join/supplier" class="mfy-link mfy-supplier">{$t('madeForYou.final.supplier')}</a>
   </section>
 </main>
 
@@ -790,6 +792,13 @@
     margin: 0.75rem 0 2rem;
     color: var(--ink-soft);
     font-size: 1.1rem;
+  }
+  .mfy-supplier {
+    display: block;
+    width: fit-content;
+    margin: 1.75rem auto 0;
+    font-weight: 400;
+    color: var(--ink-soft);
   }
 
   /* ── Motion ── */

@@ -212,7 +212,8 @@
     <div class="banner-ctas">
       <a class="cta" href="/wish/new"><EntityIcon kind="wish" size={14} /> {$t('discover.concierge_cta')}</a>
       {#if !data.isLoggedIn}
-        <a class="cta ghost" href="/signup">{$t('discover.join_banner_cta')}</a>
+        <!-- On the products directory the guest worth inviting is the one with a product. -->
+        <a class="cta ghost" href="/join/supplier">{$t('discover.gift_supplier_cta')}</a>
       {/if}
     </div>
   </aside>

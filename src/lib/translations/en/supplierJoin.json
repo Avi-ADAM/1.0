@@ -66,5 +66,16 @@
     "files": "We couldn't read the files. Try a PDF with text, a sharper photo, or describe it in words.",
     "filesTooLarge": "The files are too large (15MB together at most).",
     "filesTooMany": "Up to {{count}} files."
+  },
+  "other": {
+    "title": "Here for something else?",
+    "demand_t": "What people near you are asking for",
+    "demand_d": "People looking for the same thing join up, and you can make them one offer.",
+    "shop_t": "You need a full store",
+    "shop_d": "Stock, orders, delivery and payment, on your own site or ours.",
+    "partnership_t": "You want partners, not just customers",
+    "partnership_d": "Say a photographer and a DJ selling one package and splitting the income by agreement.",
+    "order_t": "Came to order something?",
+    "order_d": "Write what you need and suppliers make offers. That's the concierge."
   }
 }
