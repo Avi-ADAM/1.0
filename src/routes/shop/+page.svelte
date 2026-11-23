@@ -219,6 +219,11 @@
         </a>
       {/each}
     </section>
+    <!-- The lighter door, for someone who wants to be found rather than run a store. -->
+    <p class="sp-lighter">
+      {$t('shopPage.paths.lighter')}
+      <a href="/join/supplier" data-sveltekit-prefetch>{$t('shopPage.paths.lighterCta')}</a>
+    </p>
 
     <!-- ============ 1. STARTER TEMPLATE ============ -->
     <section id="template" class="sp-band">
@@ -880,6 +885,17 @@
   }
 
   /* ===== 3 Paths Strip ==================================================== */
+  .sp-lighter {
+    margin: 12px 0 0;
+    text-align: center;
+    font-size: 15px;
+    color: var(--hm-ink2);
+  }
+  .sp-lighter a {
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
   .sp-paths {
     display: grid;
     grid-template-columns: 1fr;

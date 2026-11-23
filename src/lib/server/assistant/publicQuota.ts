@@ -44,3 +44,19 @@ export function takeSign(ip: string): { ok: boolean; retryAfterSeconds?: number 
   const a = perAddress.take(`sign:${callerKey(undefined, ip)}`, SIGN_PER_HOUR, HOUR);
   return a.ok ? { ok: true } : { ok: false, retryAfterSeconds: Math.ceil(a.retryAfterMs / 1000) };
 }
+
+/*
+ * A guest drafting their business on /join/supplier (docs/inprogress/PLAN_SUPPLIER_GROWTH.md SG1).
+ * Unlike the doors above, this one spends two model calls, so the platform ceiling
+ * bounds money, not rows: a few drafts an hour per address, a hard daily cap overall.
+ */
+export const GUEST_ANALYZE_PER_HOUR = 3;
+export const GUEST_ANALYZE_PER_DAY = 100;
+
+export function takeGuestAnalyze(ip: string): { ok: boolean; retryAfterSeconds?: number } {
+  const a = perAddress.take(`guestAnalyze:${callerKey(undefined, ip)}`, GUEST_ANALYZE_PER_HOUR, HOUR);
+  if (!a.ok) return { ok: false, retryAfterSeconds: Math.ceil(a.retryAfterMs / 1000) };
+  const d = platform.take('guestAnalyze:all', GUEST_ANALYZE_PER_DAY, DAY);
+  if (!d.ok) return { ok: false, retryAfterSeconds: Math.ceil(d.retryAfterMs / 1000) };
+  return { ok: true };
+}

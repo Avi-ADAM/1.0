@@ -124,7 +124,9 @@
     "shop_t": "Tu propia tienda, en propiedad compartida",
     "shop_d": "Cómo una rikma abre una tienda, gestiona productos y pedidos y reparte cada venta por consenso.",
     "broken_t": "El trato que se rompió",
-    "broken_d": "Por qué el mercado laboral nos agota a todos, de asalariados a freelancers, y cómo sería un nuevo contrato social."
+    "broken_d": "Por qué el mercado laboral nos agota a todos, de asalariados a freelancers, y cómo sería un nuevo contrato social.",
+    "supplier_t": "Ficha de proveedor en un minuto",
+    "supplier_d": "¿Tienes un servicio definido? Un enlace, un catálogo o una frase, y quienes lo buscan te encontrarán."
   },
   "back": "Volver a la página de inicio"
 }

@@ -28,7 +28,22 @@ export const EVENTS = Object.freeze({
   /** The form stopped them, and where. */
   sign_invalid: ['field'],
   /** /api/chezin accepted the signature. */
-  sign_ok: ['full']
+  sign_ok: ['full'],
+
+  // The supplier funnel (docs/inprogress/PLAN_SUPPLIER_GROWTH.md SG0). `entry` names
+  // the door: `join` = the public /join/supplier, `onboard` = signed in.
+  /** Opened a supplier door. */
+  supplier_entry: ['entry'],
+  /** Asked for a draft of their business; `source` = url | text. */
+  business_analyze: ['entry', 'source'],
+  /** The draft came back (`ok`), or did not and why (`reason`). */
+  business_analyzed: ['entry', 'ok', 'reason', 'products'],
+  /** A guest left name + email and was sent on to the studio. */
+  supplier_prepared: ['ok'],
+  /** The one review screen opened; `mode` = member | studio. */
+  blueprint_review: ['mode'],
+  /** "Create" on it succeeded. */
+  blueprint_created: ['rows']
 });
 
 /** Long enough for an enum, too short for an address or a token. */

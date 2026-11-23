@@ -96,7 +96,9 @@
   const READING = [
     ['rikma', 'noboss', '/no-boss'],
     ['store', 'shop', '/shop'],
-    ['document', 'broken', '/broken-deal']
+    ['document', 'broken', '/broken-deal'],
+    // The freelancer who sells a defined service: their card, found by customers.
+    ['product', 'supplier', '/join/supplier']
   ];
 
   /** @type {{ icon: import('$lib/celim/icons/entityIcons').EntityIconKind, count: number, key: string, href: string }[]} */
@@ -434,7 +436,7 @@
     <h2 class="text-rose-700 dark:text-gold font-bold text-2xl sm:text-xl mb-4 text-center">
       {$t('freelance.reading.title')}
     </h2>
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       {#each READING as [icon, key, href] (key)}
         <a
           {href}

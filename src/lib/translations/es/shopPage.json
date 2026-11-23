@@ -42,7 +42,9 @@
     "p2_d": "Consume la REST API pública de la rikma desde cualquier tecnología (Next, Astro, SvelteKit, WordPress) o inserta un fragmento de código para reportar ventas automáticamente tras el pago.",
     "p3_badge": "AI Agents · MCP",
     "p3_t": "Gestionar la tienda con un agente de IA",
-    "p3_d": "12 herramientas MCP dedicadas permiten a Claude o a cualquier agente compatible consultar inventario, crear productos, actualizar stock y avanzar pedidos en conversación natural."
+    "p3_d": "12 herramientas MCP dedicadas permiten a Claude o a cualquier agente compatible consultar inventario, crear productos, actualizar stock y avanzar pedidos en conversación natural.",
+    "lighter": "¿No necesitas una tienda entera, solo que los clientes te encuentren?",
+    "lighterCta": "Ficha de proveedor en un minuto"
   },
   "template": {
     "eyebrow": "◈ 1 · La plantilla de tienda lista (1lev1-shop-starter) ◈",

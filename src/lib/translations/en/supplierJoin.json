@@ -1,0 +1,81 @@
+{
+  "meta": {
+    "title": "Suppliers: join in a minute · 1💗1",
+    "description": "A link to your site or one sentence about your business, your service area, and your supplier card is ready. No commission on direct contact, and customers looking for exactly you."
+  },
+  "hero": {
+    "kicker": "For suppliers and professionals",
+    "title": "Your card, ready in a minute",
+    "sub": "Give us your website, upload a catalog or photos, or tell us in a sentence what you do. We draft your card, you see it, and only then do you decide."
+  },
+  "promises": {
+    "p1": "No commission on direct contact",
+    "p2": "Customers already looking for you",
+    "p3": "Nothing is published without your yes"
+  },
+  "steps": {
+    "label": "Joining steps",
+    "s1": "Tell us about the business",
+    "s2": "See your card",
+    "s3": "Sign and publish"
+  },
+  "form": {
+    "tabUrl": "I have a website",
+    "tabText": "I'll describe it",
+    "urlLabel": "Your business website",
+    "urlHint": "A site, landing page or business page. If we can't read it, describe it in words instead.",
+    "textLabel": "What you do, for whom, and at what price",
+    "textPlaceholder": "e.g. Event photographer in the north, weddings and bar mitzvahs, packages from ₪4,500 including an album…",
+    "textHint": "At least {{count}} characters",
+    "areaLabel": "Where do you serve?",
+    "areaHelper": "Pick a point and a radius, or choose online. We'll only suggest you to customers you can reach.",
+    "submit": "Draft my card",
+    "tabFiles": "I have a catalog",
+    "filesLabel": "Catalog, price list or photos",
+    "filesPick": "Choose files or take a photo",
+    "filesPreparing": "Preparing the files…",
+    "filesHint": "PDF, Word or images, up to {{count}} files. Files are only read, never stored.",
+    "filesRemove": "Remove file",
+    "filesNoteLabel": "Anything to add? (optional)",
+    "filesNotePlaceholder": "e.g. prices include VAT, delivery in the north only…"
+  },
+  "loading": {
+    "title": "Drafting your card…",
+    "sub": "Reading what you sent and lining up services and prices. Up to half a minute."
+  },
+  "preview": {
+    "title": "This is how your card will look",
+    "products": "Services we found",
+    "noProducts": "We found no defined services. You can add them in the next step.",
+    "more": "More items in the draft, to edit in the next step: {{count}}",
+    "again": "Start over",
+    "unreadable": "We couldn't read: {{files}}"
+  },
+  "contact": {
+    "title": "Almost there: who are you?",
+    "sub": "Next you can edit everything: services, prices, photos and area. The card is published only after you sign the agreement.",
+    "name": "Your name",
+    "email": "Email",
+    "submit": "Save and continue to editing",
+    "note": "The next page is your full editor. Its link is valid for 24 hours, and at its end you open an account with this email."
+  },
+  "errors": {
+    "analyze": "We couldn't read that. Try another address, or describe it in words.",
+    "rateLimited": "Too many tries in a short time. Please try again in an hour.",
+    "save": "We couldn't save. Check your name and email and try again.",
+    "files": "We couldn't read the files. Try a PDF with text, a sharper photo, or describe it in words.",
+    "filesTooLarge": "The files are too large (15MB together at most).",
+    "filesTooMany": "Up to {{count}} files."
+  },
+  "other": {
+    "title": "Here for something else?",
+    "demand_t": "What people near you are asking for",
+    "demand_d": "People looking for the same thing join up, and you can make them one offer.",
+    "shop_t": "You need a full store",
+    "shop_d": "Stock, orders, delivery and payment, on your own site or ours.",
+    "partnership_t": "You want partners, not just customers",
+    "partnership_d": "Say a photographer and a DJ selling one package and splitting the income by agreement.",
+    "order_t": "Came to order something?",
+    "order_d": "Write what you need and suppliers make offers. That's the concierge."
+  }
+}

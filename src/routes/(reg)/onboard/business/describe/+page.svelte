@@ -10,6 +10,8 @@
   import { t, locale } from '$lib/translations';
   import { stashSeedPlan } from '$lib/onboard/seedPlanHandoff.js';
   import { openBusinessImport } from '$lib/onboard/businessImport.js';
+  import { track } from '$lib/analytics/track.js';
+  import { downscaleImage } from '$lib/media/downscaleImage.js';
 
   onMount(() => showFoot.set(false));
   onDestroy(() => showFoot.set(true));
@@ -22,8 +24,46 @@
    */
   let withPlan = $state(true);
 
+  /**
+   * A catalog, a price list or photos to draft from (PLAN_SUPPLIER_GROWTH SG1).
+   * Read by the server and dropped (readDocuments.ts); same limits as there.
+   */
+  /** @type {File[]} */
+  let files = $state([]);
+  const MAX_FILES = 6;
+  const MAX_TOTAL = 15 * 1024 * 1024;
+  let preparing = $state(false);
+
   let charCount = $derived(text.trim().length);
-  let canSubmit = $derived(charCount >= 60);
+  let filesOk = $derived(files.length > 0 && files.reduce((n, f) => n + f.size, 0) <= MAX_TOTAL);
+  let canSubmit = $derived((charCount >= 60 || filesOk) && !preparing);
+
+  /** @param {Event} e */
+  async function addFiles(e) {
+    const input = /** @type {HTMLInputElement} */ (e.currentTarget);
+    const picked = Array.from(input.files ?? []);
+    input.value = '';
+    if (!picked.length) return;
+    preparing = true;
+    files = [...files, ...(await Promise.all(picked.map((f) => downscaleImage(f))))].slice(0, MAX_FILES);
+    preparing = false;
+  }
+
+  function request() {
+    if (!files.length) {
+      return {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text.trim(), lang: $locale, withPlan })
+      };
+    }
+    const form = new FormData();
+    for (const f of files) form.append('files', f, f.name);
+    if (text.trim()) form.append('text', text.trim());
+    form.append('lang', $locale ?? 'he');
+    form.append('withPlan', String(withPlan));
+    return { method: 'POST', body: form };
+  }
 
   function toMeWithPrefill(data) {
     const params = new URLSearchParams();
@@ -41,13 +81,17 @@
     submitting = true;
     error = '';
     try {
-      const res = await fetch('/api/analyze-business', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text.trim(), lang: $locale, withPlan })
-      });
+      track('business_analyze', { entry: 'onboard', source: files.length ? 'files' : 'text' });
+      const res = await fetch('/api/analyze-business', request());
       const body = await res.json().catch(() => ({}));
+      track('business_analyzed', {
+        entry: 'onboard',
+        ok: res.ok && body?.ok !== false,
+        reason: res.ok ? undefined : String(res.status),
+        products: body?.blueprint?.products?.length ?? 0
+      });
       if (!res.ok || body?.ok === false) {
+        if (res.status === 422) throw new Error($t('onboard.business.describe_page.files_error'));
         throw new Error(body?.message ?? $t('common.errorStatus', { status: res.status }));
       }
       sessionStorage.setItem('onboard.businessResult', JSON.stringify(body));
@@ -120,6 +164,30 @@
       </div>
     </div>
 
+    <div class="field">
+      <label class="field-label" for="biz-files">{$t('onboard.business.describe_page.files_label')}</label>
+      <input
+        id="biz-files"
+        type="file"
+        multiple
+        accept=".pdf,.docx,.txt,.csv,image/jpeg,image/png,image/webp,image/heic,.heic"
+        onchange={addFiles}
+        disabled={submitting || preparing || files.length >= MAX_FILES}
+      />
+      <div class="char-count">{$t('onboard.business.describe_page.files_hint', { count: MAX_FILES })}</div>
+      {#each files as f, i (f.name + i)}
+        <div class="file-row">
+          <span dir="auto">{f.name}</span>
+          <button
+            type="button"
+            class="file-x"
+            aria-label={$t('onboard.business.describe_page.files_remove')}
+            onclick={() => (files = files.filter((_, j) => j !== i))}>×</button
+          >
+        </div>
+      {/each}
+    </div>
+
     <label class="plan-opt">
       <input type="checkbox" bind:checked={withPlan} />
       <span>
@@ -156,6 +224,19 @@
 </ScreenFrame>
 
 <style>
+  .file-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 0.9rem;
+  }
+  .file-x {
+    border: none;
+    background: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: inherit;
+  }
   .content {
     width: 100%;
     display: flex;

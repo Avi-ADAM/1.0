@@ -91,6 +91,8 @@ const PAGES = [
   { path: '/freelance', lastmod: '2026-11-14T00:00:00+00:00', priority: '0.85', changefreq: 'monthly' },
   // The concierge, for customers who come to order something made for them.
   { path: '/made-for-you', lastmod: '2026-09-23T00:00:00+00:00', priority: '0.85', changefreq: 'monthly' },
+  // "Supplier in a minute" (PLAN_SUPPLIER_GROWTH SG1): the supplier's public door.
+  { path: '/join/supplier', lastmod: '2026-11-23T00:00:00+00:00', priority: '0.80', changefreq: 'monthly' },
   { path: '/shop', lastmod: '2026-10-20T00:00:00+00:00', priority: '0.85', changefreq: 'monthly' },
   { path: '/mcp', lastmod: '2026-09-28T00:00:00+00:00', priority: '0.60', changefreq: 'monthly' },
   { path: '/privacy',lastmod: '2026-09-27T00:00:00+00:00', priority: '0.30', changefreq: 'yearly' },

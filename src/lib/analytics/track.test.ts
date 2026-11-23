@@ -26,6 +26,21 @@ describe('sanitize', () => {
     expect(sanitize('sign_ok', { full: true })).toEqual({ full: true });
     expect(sanitize('agreement_out', { from: 'infobox' })).toEqual({ from: 'infobox' });
   });
+
+  it('the supplier funnel carries enums and counts, never what the supplier typed', () => {
+    expect(sanitize('business_analyze', { entry: 'join', source: 'url', url: 'https://dana.co.il' })).toEqual({
+      entry: 'join',
+      source: 'url'
+    });
+    expect(sanitize('business_analyzed', { entry: 'join', ok: false, reason: '429', products: 3, name: 'Dana' })).toEqual({
+      entry: 'join',
+      ok: false,
+      reason: '429',
+      products: 3
+    });
+    expect(sanitize('supplier_prepared', { ok: true, email: 'd@x.co' })).toEqual({ ok: true });
+    expect(sanitize('blueprint_review', { mode: 'studio' })).toEqual({ mode: 'studio' });
+  });
 });
 
 describe('track', () => {
