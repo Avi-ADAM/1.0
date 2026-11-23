@@ -1,5 +1,7 @@
-import { dev } from '$app/environment';
+import { browser, dev } from '$app/environment';
+import { env as publicEnv } from '$env/dynamic/public';
 import { inject } from '@vercel/analytics';
+import { loadPulse } from '$lib/analytics/track.js';
 import { locale, loadTranslations } from '$lib/translations';
 import { isMobileBuild, installMobileFetchPatch, installApiBasePatch } from '$lib/platform';
 
@@ -12,6 +14,9 @@ if (isMobileBuild) {
 } else {
   installApiBasePatch(); // no-op unless VITE_API_BASE is set at build time
   inject({ mode: dev ? 'development' : 'production' });
+  // In-house analytics (docs/tbd/PLAN_INHOUSE_ANALYTICS.md). Runs beside
+  // Vercel's until stage A4; loads nothing while PUBLIC_UMAMI_WEBSITE_ID is unset.
+  if (browser) loadPulse({ websiteId: publicEnv.PUBLIC_UMAMI_WEBSITE_ID });
 }
 
 /** @param {string} name */

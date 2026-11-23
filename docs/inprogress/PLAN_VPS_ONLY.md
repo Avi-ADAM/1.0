@@ -114,6 +114,7 @@
 ### מה מפסידים
 - preview deploy לכל push, ו-rollback בלחיצה. כאן במקומם: תגית image קודמת + `deploy` (§5).
 - `@vercel/analytics`, שבשימוש ב-`src/routes/+layout.js` וב-`src/lib/components/main/amana.svelte`.
+  החלופה היא שלב VA (Umami על השרת), שחייב לעלות **לפני** V5.
 - השרת הופך לנקודת כשל אחת לכל האתר. זה כמעט ממילא המצב, כי בלי ה-API האתר לא עובד.
 - CDN והגנת DDoS לדפים, שהיום Vercel נותן. ב-0.4 בקשות בשנייה (§1) nginx מגיש את הקבצים
   הסטטיים בלי מאמץ. אם יהיה צורך, Cloudflare הוא שלב נפרד ואופציונלי (§V4).
@@ -274,6 +275,17 @@ nginx (app-nginx-1, :443)
 לדף הבית, `/lev`, `/moach/<id>`, `/r/<slug>`, `/concierge`, `/gift/<id>`; התחברות; העלאת קובץ;
 MCP OAuth (`/oauth/token`, CSRF ב-`$lib/server/csrf.js`). מעבר ב-`npm run check:proxy`.
 
+### VA — אנליטיקס על השרת שלנו (משימה נפרדת, לפני V5)
+
+תכנית מלאה: [PLAN_INHOUSE_ANALYTICS](../tbd/PLAN_INHOUSE_ANALYTICS.md). בקצרה: **Umami** (קוד פתוח, MIT)
+כשירות ב-`docker-compose.api.yml` על ה-Postgres הקיים, ב-`pulse.1lev1.com`, בלי עוגיות, ולכן בלי באנר
+ובלי צד שלישי בהצהרת הפרטיות. מעבר לצפיות, מכשירים, מדינות ודשבורד, יש בו גם **משפך ההצטרפות**: דף הבית →
+לחיצה → `/hascama` → יציאה להסכמה המורחבת → חזרה (`agreed=true`) → ניסיון חתימה → חתימה.
+
+לא תלוי ב-V3: אפשר להקים אותו כבר עכשיו, בזמן שהדפים עוד ב-Vercel, ולהריץ שבועיים במקביל ל-Vercel
+Analytics. **הוא חייב לרוץ לפני V5**, אחרת אין נתוני בסיס לשבוע של המעבר. ההסרה של Vercel Analytics
+(A4) נעשית בתוך V6.
+
 ### V4 — Cloudflare (אופציונלי, נדחה — 2026-11-18)
 
 **הוחלט לא לעשות את זה כחלק מהמעבר.** V5 עובד ישירות מול GoDaddy, וה-rollback (רשומה אחת,
@@ -312,8 +324,8 @@ TTL של 60 שניות) עובד שם באותה מידה. מה Cloudflare הי�
 
 ### V6 — ניקוי (אחרי שהמעבר יציב)
 
-- `@vercel/analytics`: להסיר מ-`+layout.js` ומ-`amana.svelte`, או להחליף ב-Cloudflare Web Analytics
-  (סקריפט אחד, בלי cookies).
+- `@vercel/analytics`: להסיר מ-`+layout.js` ומ-`amana.svelte`. החלופה כבר רצה מ-VA (Umami), וזה שלב A4
+  שלו, כולל עדכון `privacy.json` בחמש השפות.
 - `svelte.config.js`: ענף `ADAPTER=vercel` ו-`@sveltejs/adapter-vercel` יוצאים.
 - `ssrApiBase.js` / `SSR_API_BASE`: אפשר להשאיר (ריק = בתוך התהליך) או להסיר.
 - `relay/host.ts`: מבוסס על `RELAY_HOST` (V3).
@@ -345,7 +357,8 @@ TTL של 60 שניות) עובד שם באותה מידה. מה Cloudflare הי�
 ```
 V0 (Postgres)  ──►  V1 (Strapi ×3)        יכול לעלות לבד, שיפור מיידי גם עם Vercel
 V2 (API בלי השבתה)                         בלתי תלוי
-V3 (web) ──► V5 (DNS ב-GoDaddy) ──► V6
+VA (Umami) ─────────┐                      בלתי תלוי ב-V3, חייב לרוץ לפני V5
+V3 (web) ───────────┴──► V5 (DNS ב-GoDaddy) ──► V6 (כולל A4: הסרת Vercel Analytics)
 V4 (Cloudflare)                            אופציונלי, אחרי V5, רק אם יש סיבה
 ```
 

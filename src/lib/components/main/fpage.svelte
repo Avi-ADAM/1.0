@@ -39,6 +39,8 @@
   import { seedShares, PALETTE } from '$lib/components/main/splitSeed.js';
   import { Head } from 'svead';
   import { onMount } from 'svelte';
+  import { track } from '$lib/analytics/track.js';
+  import { homeCtaOf } from '$lib/analytics/homeCta.js';
 
   const image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`;
 
@@ -305,6 +307,23 @@
     videoOpen = true;
   }
 
+  /* --- analytics: which control a home visit ended on (PLAN_INHOUSE_ANALYTICS §2).
+     One capture listener on the root instead of an onclick per link, so a CTA
+     added later is counted without anyone remembering to. */
+  /** @type {HTMLDivElement | undefined} */
+  let homeRoot = $state();
+  $effect(() => {
+    const root = homeRoot;
+    if (!root) return;
+    /** @param {MouseEvent} e */
+    const onClick = (e) => {
+      const cta = homeCtaOf(e.target);
+      if (cta) track('home_cta', { cta });
+    };
+    root.addEventListener('click', onClick, { capture: true });
+    return () => root.removeEventListener('click', onClick, { capture: true });
+  });
+
   onMount(() => {
     if (!statsLoaded) loadStats();
     onScroll();
@@ -345,7 +364,7 @@
   </span>
 {/snippet}
 
-<div class="hm" class:hm-plaindisplay={$locale === 'ar'} dir={$isRtl ? 'rtl' : 'ltr'}>
+<div bind:this={homeRoot} class="hm" class:hm-plaindisplay={$locale === 'ar'} dir={$isRtl ? 'rtl' : 'ltr'}>
   <!-- ============ HEADER ============ -->
   <header class="hm-header">
     <a href="/" class="hm-home" aria-label={$t('home.nav.homeAria')}>{@render logo(28)}</a>
@@ -403,7 +422,7 @@
         <a href={regHref} class="hm-btn hm-btn-primary hm-btn-lg">
           {$t('home.sections.ctaTop')} <span aria-hidden="true">{arrow}</span>
         </a>
-        <button type="button" class="hm-btn hm-btn-outline hm-btn-lg" onclick={() => (demoOpen = true)}>
+        <button type="button" data-cta="demo" class="hm-btn hm-btn-outline hm-btn-lg" onclick={() => (demoOpen = true)}>
           {$t('demo.button')}
         </button>
         <a href="#demo" class="hm-textlink">{$t('home.split.ctaSecondary')} ↓</a>
@@ -467,7 +486,7 @@
       </div>
       <div class="hm-pill-row">
         <a href="#demo" class="hm-btn hm-btn-outline">{$t('home.audience.a3')}</a>
-        <button type="button" class="hm-btn hm-btn-soft" onclick={() => (demoOpen = true)}>
+        <button type="button" data-cta="demo" class="hm-btn hm-btn-soft" onclick={() => (demoOpen = true)}>
           {$t('home.audience.a4')} · {$t('demo.button')}
         </button>
       </div>
@@ -725,7 +744,7 @@
             bind:value={wishText}
             placeholder={$t('home.concierge.wishPlaceholder')}
           />
-          <button type="submit" class="hm-btn hm-btn-primary">{$t('home.concierge.customerCta')}</button>
+          <button type="submit" data-cta="wish" class="hm-btn hm-btn-primary">{$t('home.concierge.customerCta')}</button>
         </form>
         <p class="hm-flow">{$t('home.concierge.flow')}</p>
         <div class="hm-pill-row">
@@ -876,7 +895,7 @@
     <p>{$t('home.sections.ctaFinalSub')}</p>
     <div class="hm-pill-row">
       <a href={regHref} class="hm-btn hm-btn-final hm-btn-lg">{$t('home.cta.register')}</a>
-      <button type="button" class="hm-btn hm-btn-final-outline hm-btn-lg" onclick={() => (demoOpen = true)}>
+      <button type="button" data-cta="demo" class="hm-btn hm-btn-final-outline hm-btn-lg" onclick={() => (demoOpen = true)}>
         {$t('demo.button')}
       </button>
       <a href="/login" class="hm-textlink">{$t('home.cta.login')}</a>
@@ -915,7 +934,7 @@
      far end of the page. Sits just above the site's bottom nav. -->
 <div class="hm-pinned" dir={$isRtl ? 'rtl' : 'ltr'}>
   <a href={regHref}>{$t('home.bottomCta.register')}</a>
-  <button type="button" onclick={() => (demoOpen = true)}>{$t('home.bottomCta.demo')}</button>
+  <button type="button" data-cta="demo" onclick={() => (demoOpen = true)}>{$t('home.bottomCta.demo')}</button>
   <a href="/login">{$t('home.bottomCta.login')}</a>
 </div>
 

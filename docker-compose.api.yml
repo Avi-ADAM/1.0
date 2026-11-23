@@ -29,6 +29,10 @@
 #                               MASTRA_DB_URL=postgresql://mastra_user:<same>@postgres:5432/mastra
 #                               AXIOM_TOKEN=xaat-...     (vector service, below)
 #                               AXIOM_DATASET=vps-docker
+#                               UMAMI_DB_PASSWORD=...    (umami service; same value as the
+#                                                         `umami` role in postgres)
+#                               UMAMI_APP_SECRET=...     (openssl rand -hex 32)
+#                               UMAMI_2FA_KEY=...        (openssl rand -hex 32)
 #
 # Nothing here publishes a host port: nginx (app-nginx-1, the Strapi repo's
 # compose) terminates TLS and reaches the API over app-network. The old
@@ -154,6 +158,50 @@ services:
       timeout: 5s
       retries: 5
       start_period: 20s
+    networks:
+      - app-network
+
+  # ---- Web analytics (Umami) ----
+  # In-house replacement for Vercel Analytics, docs/tbd/PLAN_INHOUSE_ANALYTICS.md.
+  # Cookieless (a session is a daily-salted hash of IP+UA), so it needs no
+  # consent banner and is not a third party in the privacy page. It keeps its
+  # data in its own `umami` database on the postgres service above — created
+  # once by hand (plan §A0), never by this file.
+  #
+  # Reached only through nginx (pulse.1lev1.com, the Strapi repo's template),
+  # which forwards X-Forwarded-For: without it every visitor geolocates to the
+  # proxy and the country breakdown is meaningless. No host port.
+  #
+  # Pinned: Umami ships security fixes often (3.4.1 is one) — bump deliberately.
+  #
+  # Own profile, and `:-` (not `:?`) on its secrets: api-switch.sh runs compose
+  # against this whole file on every API deploy, and a `:?` variable missing
+  # from a server's .env would fail that deploy, not just this service. Start it
+  # with `docker compose -f docker-compose.api.yml --profile analytics up -d umami`.
+  umami:
+    profiles: ["analytics"]
+    image: ghcr.io/umami-software/umami:3.4.1
+    container_name: umami
+    restart: unless-stopped
+    init: true
+    environment:
+      - DATABASE_URL=postgresql://umami:${UMAMI_DB_PASSWORD:-}@postgres:5432/umami
+      - APP_SECRET=${UMAMI_APP_SECRET:-}
+      - TWO_FACTOR_ENCRYPTION_KEY=${UMAMI_2FA_KEY:-}
+      # The dashboard is ours only; nothing else should call home.
+      - DISABLE_TELEMETRY=1
+      - DISABLE_UPDATES=1
+    mem_limit: 384m
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/api/heartbeat >/dev/null || curl -fs http://127.0.0.1:3000/api/heartbeat >/dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    logging: *json-log
     networks:
       - app-network
 

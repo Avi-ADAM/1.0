@@ -24,7 +24,7 @@
   import { useProgress } from '@threlte/extras';
   const { progress } = useProgress();
   import { Head } from 'svead';
-  import { track } from '@vercel/analytics';
+  import { track } from '$lib/analytics/track.js';
   import { page } from '$app/stores';
 
   $effect(() => {
@@ -49,6 +49,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('agreed') === 'true') {
       agreedToFullAgreement = true;
+      track('agreement_back');
     }
 
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -168,8 +169,22 @@
     return valid;
   }
 
+  /**
+   * The first field the form stopped on, for the `sign_invalid` funnel step.
+   * Only the field's name leaves — never what was typed into it.
+   */
+  function firstInvalidField() {
+    if (formErrors.name) return 'name';
+    if (formErrors.email) return 'email';
+    if (erorims) return 'country';
+    if (formErrors.agreement) return 'terms';
+    return 'other';
+  }
+
   // Function to navigate to agreement site
-  function goToAgreementSite() {
+  /** @param {'button' | 'infobox'} [from] */
+  function goToAgreementSite(from = 'button') {
+    track('agreement_out', { from });
     if (formName) sessionStorage.setItem('pendingName', formName);
     if (formEmail) sessionStorage.setItem('pendingEmail', formEmail);
     if (selected.length > 0)
@@ -229,10 +244,11 @@
    */
   async function handleSubmit(event) {
     event?.preventDefault();
-    track('tryToSign', {}, { flags: ['tryToSign'] });
+    track('sign_try', { full: agreedToFullAgreement });
     nameuse = false;
 
     if (!validate()) {
+      track('sign_invalid', { field: firstInvalidField() });
       setTimeout(() => {
         animateScroll.scrollToTop();
       }, 0);
@@ -246,6 +262,7 @@
     const ownSignature =
       readSignupCookie('un') === jjj && readSignupCookie('email') === mail;
     if (fpp.includes(jjj) && !ownSignature) {
+      track('sign_invalid', { field: 'taken' });
       nameuse = true;
       animateScroll.scrollToTop();
       return;
@@ -274,6 +291,7 @@
       const result = await response.json();
 
       if (result.alreadySigned) {
+        track('sign_invalid', { field: 'already' });
         g = false;
         erorim.st = true;
         erorim.login = true;
@@ -310,6 +328,8 @@
       linkos.set(
         `ref=true&id=${chezinId}&con=${countries}&un=${formName}&em=${mail}`
       );
+
+      track('sign_ok', { full: agreedToFullAgreement });
 
       // The id also rides in the URL: /signup's load bounces back to /hascama
       // when it finds no `fpval`, and the cookie does not always survive.
@@ -580,7 +600,7 @@
             <!-- Full Agreement Button -->
             <button
               type="button"
-              onclick={goToAgreementSite}
+              onclick={() => goToAgreementSite('button')}
               class="agreement-btn-full"
             >
               <span class="btn-icon"><EntityIcon kind="wish" size={15} /></span>
@@ -639,7 +659,7 @@
                       href="https://agreement.1lev1.com/hascama"
                       onclick={(e) => {
                         e.preventDefault();
-                        goToAgreementSite();
+                        goToAgreementSite('infobox');
                       }}>{@html $t('home.amana.agreement.fullAgreementLink')}</a
                     >{$t('home.amana.agreement.fullAgreementDesc')}
                   </li>
