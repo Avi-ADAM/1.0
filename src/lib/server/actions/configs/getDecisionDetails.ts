@@ -38,6 +38,7 @@ const KIND_LABELS: Record<string, { he: string; en: string }> = {
   address:   { he: 'כתובת חדשה לרקמה', en: 'A new address for the rikma' },
   look:      { he: 'מראה חדש לדף הציבורי', en: 'A new look for the public page' },
   event:     { he: 'פרסום אירוע של הרקמה', en: 'Publishing a rikma event' },
+  playbook:  { he: 'עדכון ספר העבודה של הרקמה', en: "Updating the rikma's playbook" },
 };
 
 const LICENSE_LABELS: Record<string, { he: string; en: string }> = {
@@ -133,6 +134,27 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
           currentValue: '',
           newValue: String(ev.attributes?.title ?? ''),
           previewHref: eventPath({ id: String(projectId), slug: current?.slug }, String(ev.attributes?.slug ?? '')),
+        },
+        updateStrategy: { type: 'none' },
+      };
+    }
+  }
+
+  // PLAN_AGENT_WORK AW2 — the playbook as it is, and the text on the table.
+  if (kind === 'playbook') {
+    const pbRes = await strapi
+      .execute('playbookDecision', { id: String(decisionId) }, undefined, context.fetch)
+      .catch(() => null);
+    const d = pbRes?.data?.decision?.data?.attributes;
+    const onRikma = (d?.projects?.data ?? []).some((p: any) => String(p.id) === String(projectId));
+    if (onRikma) {
+      return {
+        data: {
+          kind: 'playbook',
+          fieldLabel: KIND_LABELS.playbook,
+          currentValue: String(d.playbookDoc?.data?.attributes?.body ?? ''),
+          newValue: String(d.newPlaybook ?? ''),
+          roleName: d.playbookRole?.data?.attributes?.roleDescription ?? null,
         },
         updateStrategy: { type: 'none' },
       };

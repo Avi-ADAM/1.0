@@ -975,7 +975,8 @@
       "generic": "A decision awaiting your signature",
       "address": "A new address for the rikma",
       "look": "A new look for the public page",
-      "event": "Publishing a rikma event"
+      "event": "Publishing a rikma event",
+      "playbook": "Updating the rikma's playbook"
     },
     "sub": {
       "stipendFrom": "Funded by {{name}}",

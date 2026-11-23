@@ -10,6 +10,7 @@ import { cleanInput, newProspect } from '$lib/growth/prospect';
 import { identityKeys } from '$lib/growth/dedupe';
 import { fileRepository, hashKeys, memoryRepository, setGrowthRepositoryForTests } from './repo';
 import { checkGrowthOperator } from './operator';
+import { strapiRepository, toStrapi } from './strapiRepo';
 import { draftOutreach, researchProspect } from './agent';
 import { growthConfigs } from '../actions/configs/growth';
 
@@ -47,6 +48,68 @@ describe('file repository', () => {
     const keys = [...(await repo.knownKeys())];
     expect(keys.join()).not.toContain('secret');
     expect(keys).toContain(hashKeys(['email:secret@a.co'])[0]);
+  });
+});
+
+/** A tiny in-memory stand-in for Strapi's growthProspects GraphQL, qid by qid. */
+function fakeStrapi() {
+  const rows: { id: number; attributes: Record<string, any> }[] = [];
+  let seq = 0;
+  const page = (list: typeof rows, start: number, limit: number) => ({ data: { growthProspects: { data: list.slice(start, start + limit) } } });
+  const execute = vi.fn(async (qid: string, v: any) => {
+    switch (qid) {
+      case 'growthProspects':
+      case 'growthProspectKeys':
+        return page(rows, v.start, v.limit);
+      case 'growthProspectByUid':
+        return page(rows.filter((r) => r.attributes.uid === v.uid), 0, 1);
+      case 'growthProspectCreate':
+        rows.push({ id: ++seq, attributes: structuredClone(v.data) });
+        return { data: { createGrowthProspect: { data: { id: String(seq) } } } };
+      case 'growthProspectUpdate': {
+        const r = rows.find((x) => String(x.id) === v.id)!;
+        r.attributes = { ...r.attributes, ...structuredClone(v.data) };
+        return { data: { updateGrowthProspect: { data: { id: v.id } } } };
+      }
+    }
+    throw new Error(qid);
+  });
+  return { rows, client: { execute } };
+}
+
+describe('strapi repository', () => {
+  it('round-trips a prospect by its app id and serialises updates', async () => {
+    const f = fakeStrapi();
+    const repo = strapiRepository(async () => f.client);
+    const p = make('A', { email: 'a@a.co', city: 'Haifa' });
+    await repo.insert([p, make('B')]);
+    expect(f.rows).toHaveLength(2);
+    const back = await repo.get(p.id);
+    expect(back).toMatchObject({ id: p.id, name: 'A', email: 'a@a.co', city: 'Haifa', stage: p.stage, dedupeKeys: p.dedupeKeys });
+    await Promise.all(
+      Array.from({ length: 10 }, (_, i) => repo.update(p.id, (x) => ({ ...x, notes: `${x.notes ?? ''}${i},` })))
+    );
+    expect((await repo.get(p.id))?.notes?.split(',').filter(Boolean)).toHaveLength(10);
+    expect(await repo.update('nope', (x) => x)).toBeNull();
+    expect((await repo.list()).map((x) => x.name).sort()).toEqual(['A', 'B']);
+    expect([...(await repo.knownKeys())]).toEqual(expect.arrayContaining(p.dedupeKeys));
+  });
+
+  it('walks every page and never lets an update change the id', async () => {
+    const f = fakeStrapi();
+    const repo = strapiRepository(async () => f.client);
+    const many = Array.from({ length: 450 }, (_, i) => make(`N${i}`));
+    for (const m of many) f.rows.push({ id: f.rows.length + 1, attributes: toStrapi(m) });
+    expect(await repo.list()).toHaveLength(450);
+    const first = many[0];
+    const moved = await repo.update(first.id, (x) => ({ ...x, id: 'other' }));
+    expect(moved?.id).toBe(first.id);
+    expect(f.rows[0].attributes.uid).toBe(first.id);
+  });
+
+  it('a GraphQL error is an error, not an empty pipeline', async () => {
+    const repo = strapiRepository(async () => ({ execute: async () => ({ errors: [{ message: 'Forbidden access' }] }) }));
+    await expect(repo.list()).rejects.toThrow(/Forbidden access/);
   });
 });
 

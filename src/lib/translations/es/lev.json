@@ -976,7 +976,8 @@
       "generic": "Una decisión espera tu firma",
       "address": "Nueva dirección para la rikma",
       "look": "Nuevo aspecto para la página pública",
-      "event": "Publicar un evento de la rikma"
+      "event": "Publicar un evento de la rikma",
+      "playbook": "Actualizar el manual de trabajo de la rikma"
     },
     "sub": {
       "stipendFrom": "Financiado por {{name}}",

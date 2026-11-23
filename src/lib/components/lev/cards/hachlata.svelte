@@ -549,6 +549,27 @@
               {newValue}
             </p>
           </div>
+        {:else if kind === 'playbook'}
+          <!-- A playbook is long, multi-line text: shown whole, scrollable, never struck through (PLAN_AGENT_WORK AW2) -->
+          {#if currentValue}
+            <details class="flex flex-col gap-1">
+              <summary class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide cursor-pointer">
+                📌 {$t('lev.hachlata.current')}
+              </summary>
+              <p dir="auto" class="mt-1 text-gray-600 dark:text-gray-400 text-sm bg-white dark:bg-gray-800 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 whitespace-pre-line max-h-48 overflow-y-auto">
+                {currentValue}
+              </p>
+            </details>
+          {/if}
+          <div class="flex flex-col gap-1">
+            <span class="text-xs font-semibold text-barbi dark:text-mpink uppercase tracking-wide flex items-center gap-1">
+              <span>✨</span>
+              {$t('lev.hachlata.proposed')}
+            </span>
+            <p dir="auto" class="text-gray-800 dark:text-gray-100 text-sm bg-barbi/5 dark:bg-mpink/10 px-3 py-2 rounded-lg border border-barbi/30 dark:border-mpink/30 whitespace-pre-line max-h-72 overflow-y-auto">
+              {newValue}
+            </p>
+          </div>
         {:else}
           <!-- Before → After display for all other kinds -->
           {#if currentValue}

@@ -180,7 +180,8 @@ Customer-demand gaps ("customers ask for event services, no venues") need the co
 
 ## 10. Missing backend functionality (documented, not invented)
 
-1. **A Strapi `growth-prospect` content type** to replace the file store, with an `activity` component or a `growth-activity` collection mirroring `lead-activity`. Its fields mirror `Prospect`: research/profile/outreach as JSON, `dedupeKeys` as JSON of hashes, `stage` as an enum of §8.2. It needs serviceAdmin-only qids (`growthProspects`, `growthProspectById`, `growthProspectCreate`, `growthProspectUpdate`) and `qidsAccess` entries. Then implement `ProspectRepository` over it and delete `fileRepository`.
+1. **The Strapi `growth-prospect` content type — built (2026-11-24).** `1.0b`: `src/api/growth-prospect/`. Scalars a list needs are columns (`uid` = the app's prospect id, unique; `name`, contact, place, `category`, `lang`, `stage` / `furthest` as enums of §8.2, `stageChangedAt`, `followUpAt`, `nextAction`, `createdByUid`, `openedAt`); research, profile, outreach, onboarding, sources, `fieldSources`, the hashed `dedupeKeys` and the activity log are JSON. The activity log stays a JSON array on the row (bounded by `withActivity`), not a separate collection: the repository contract is read-modify-write of one prospect, and nothing reads activity across prospects. Qids in `src/routes/api/send/qidsGrowth.js` (`growthProspectsSchema`, `growthProspects`, `growthProspectByUid`, `growthProspectKeys`, `growthProspectCreate`, `growthProspectUpdate`), all `serviceAdmin` in `qidsAccess.js`. `src/lib/server/growth/strapiRepo.ts` implements `ProspectRepository` over them; `GROWTH_STORE=strapi` selects it (compose default), `file` / unset keeps the file store as the fallback.
+   **After deploying 1.0b — by hand in the admin:** API Tokens → the server's token: `growth-prospect` find / findOne / create / update (no delete). The Authenticated role needs **nothing** — no session ever reads it. Then in 1.0main `npm run types:update` and `npm run validate:qids`. Deploy 1.0b **before** the API image, or every /growth screen fails loudly (a GraphQL error is thrown, never shown as an empty pipeline).
 2. **A claim callback.** When a draft prepared by `prepareSignup` is claimed (the assistant session leaves `pending`), nothing tells the pipeline. The fix is to store the assistant-session id on the prospect and, when it is claimed, advance it to `joined`, from the claim path in `server/assistant/receive.ts` / the signup handler. Until then, the operator sets `onboardingStarted` / `joined` by hand.
 3. **A demand read model.** Counts of open wishes and missing-provider wishes per category and region, for §9.2.
 4. **"Active provider" signal.** Phase 1 sets it by hand. Phase 2 could derive it from the claimed rikma having at least one product and at least one proposal or sale in the last N days.
@@ -199,7 +200,7 @@ Customer-demand gaps ("customers ask for event services, no venues") need the co
   - manual stages with the do-not-contact rules;
   - onboarding link through `prepareSignup`;
   - a basic network intelligence page from pipeline data.
-- **Phase 2:** automated discovery sources (§10.5), the claim callback (§10.2), demand signals (§10.3), the Strapi store (§10.1).
+- **Phase 2:** automated discovery sources (§10.5), the claim callback (§10.2), demand signals (§10.3). The Strapi store (§10.1) is built.
 - **Phase 3:**
   - a scheduled job that lists due follow-ups (a digest for the operator; **still never sending to businesses**);
   - gap analysis against demand;
@@ -210,7 +211,7 @@ Customer-demand gaps ("customers ask for event services, no venues") need the co
 
 ```
 src/lib/growth/                 pure: types, stages, dedupe, csv, prospect, research, profile, outreach, insights, client
-src/lib/server/growth/          config, operator, repo, agent
+src/lib/server/growth/          config, operator, repo, strapiRepo, agent
 src/lib/server/actions/configs/growth.ts
 src/lib/components/growth/      StageChip, OriginBadge, SourceBadge, ProspectForm, CsvImport, ResearchPanel, ProfilePanel, OutreachPanel, ActivityPanel
 src/routes/(reg)/growth/        overview, discover, pipeline (?view=research|profiles|outreach|…), b/[id], intelligence, settings

@@ -14,7 +14,7 @@
   "access": {
     "not_configured": {
       "title": "El agente de crecimiento aún no está activado",
-      "body": "Necesita un lugar donde guardar sus registros (GROWTH_STATE_DIR en el servidor). Hasta entonces no se guarda ni se muestra nada."
+      "body": "Necesita un lugar donde guardar sus registros (GROWTH_STORE=strapi en el servidor, o una carpeta GROWTH_STATE_DIR). Hasta entonces no se guarda ni se muestra nada."
     },
     "not_signed_in": {
       "title": "Inicia sesión primero",
@@ -403,7 +403,7 @@
   "settings": {
     "config": "Configuración",
     "operators": "Operadores: miembros de la rikma #{{project}} (se puede restringir con GROWTH_OPERATOR_IDS).",
-    "storage": "Registros: GROWTH_STATE_DIR en el servidor, un solo archivo, nunca en el navegador.",
+    "storage": "Registros: en el servidor — la colección growth-prospect de Strapi (o un solo archivo en GROWTH_STATE_DIR), nunca en el navegador.",
     "model": "IA: la cadena de modelos de la plataforma, llamada solo desde el servidor. Sin modelo se usan plantillas estándar.",
     "env": "Estos ajustes viven en el entorno del servidor, no en esta página.",
     "rules": "Reglas que sigue el agente",

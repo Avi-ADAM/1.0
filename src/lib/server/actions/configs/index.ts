@@ -50,6 +50,7 @@ import { setRikmaCurrencyConfig } from './setRikmaCurrency.js';
 import { completeMissionConfig } from './completeMission.js';
 import { chatActions } from './chat.js';
 import { agentTaskActions } from './agentTasks.js';
+import { playbookActions } from './playbooks.js';
 import { assistantActions } from './assistantSessions.js';
 import { maagadActions } from './maagad.js';
 import { departurePricingActions } from './departurePricing.js';
@@ -349,6 +350,9 @@ export function registerAllActions(): void {
 
   // Taking and reporting on a task, for agents (PLAN_AGENT_WORK AW1)
   agentTaskActions.forEach(registerAction);
+
+  // Rikma playbooks, changed only by consent (PLAN_AGENT_WORK AW2)
+  playbookActions.forEach(registerAction);
 
   // Assistant sessions — rikma import, living lists (PLAN_AI_SIGNUP_CONCIERGE)
   assistantActions.forEach(registerAction);
@@ -739,6 +743,7 @@ export {
   completeMissionConfig,
   chatActions,
   agentTaskActions,
+  playbookActions,
   maagadActions,
   departurePricingActions,
   forumReadActions,

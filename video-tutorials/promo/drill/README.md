@@ -30,3 +30,16 @@ node promo/render.mjs drill --stills --at=3.2,10.8,17.5
 
 - [ ] ₪9,600, 8% ו-7 דקות הם המחשה
 - [ ] קישור בתיאור: עמוד שמסביר איך מביאים משאב לרקמה, לא סתם עמוד הבית
+
+## English (`index.en.html`)
+
+```bash
+node promo/render.mjs drill --lang en      # -> out/promo/drill-en.mp4
+../../OpenMontage/.venv/Scripts/python.exe promo/drill/narrate.py --lang en --engine gemini   # -> assets/narration/en/
+```
+
+- **The name on screen is 1💗1, not 1lev1.** "lev" is a Hebrew transliteration; the heart is the international form. Only the address button keeps `1lev1.com`, because that is what people type. Spoken: "one love one".
+- ₪9,600 became $2,600 (same illustration, 8% stays).
+- **English voice: Gemini TTS, Charon** (2026-11-22). The ElevenLabs key in OpenMontage/.env is invalid and fal returns 403, so the English series uses Charon throughout, not Adam. Stay with the same voice across every video in the series.
+- The scenes are timed to the English narration's pauses (silencedetect, in the comments in `seek`). `vol: 1.25` brings it to the Hebrew version's loudness (RMS -21.1 dBFS).
+- When `assets/narration/en/*.mp3` is missing, `render.mjs` skips it and renders silent.

@@ -22,6 +22,7 @@
   import { tellMatured } from '$lib/server/notifications/matured';
   import { matureRuleDecision } from '$lib/server/fulfillment/consent';
   import { matureDealReceipt } from '$lib/server/deal/receipt';
+  import { applyPlaybookDecision } from '$lib/server/playbooks/store';
   import { applyStandingPromoDecision, fetchPromoDecision } from '$lib/server/promotions/decision';
   import {
     decisionAwaitsCustomer,
@@ -67,6 +68,14 @@
           kind: a.kind,
           error: e
         });
+      }
+    } else if (a.kind === 'playbook') {
+      // PLAN_AGENT_WORK AW2 — the same applier as the unanimous-vote path.
+      try {
+        const out = await applyPlaybookDecision((qid, vars) => strapiClient.execute(qid, vars), String(decisionId), String(projectId));
+        if (!out.applied) console.warn('[timegrama/decision] playbook proposal matured but was not applied:', { decisionId, reason: out.reason });
+      } catch (e) {
+        console.error('[timegrama/decision] playbook proposal matured but was not applied:', { decisionId, error: e });
       }
     } else if (a.kind === 'event') {
       // PLAN_EVENTS_WEBINARS — the same applier as the unanimous-vote path.

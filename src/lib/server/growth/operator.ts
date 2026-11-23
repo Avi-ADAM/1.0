@@ -9,7 +9,7 @@
  * function, so the screen and the writes cannot disagree.
  */
 
-import { growthOperatorIds, growthProjectId, growthStateDir } from './config';
+import { growthOperatorIds, growthProjectId, growthStoreKind } from './config';
 
 export type OperatorCheck =
   | { ok: true; projectId: string }
@@ -23,7 +23,7 @@ export async function checkGrowthOperator(
   fetchFn: typeof fetch,
   strapi: { execute: Execute }
 ): Promise<OperatorCheck> {
-  if (!growthStateDir()) return { ok: false, reason: 'not_configured' };
+  if (!growthStoreKind()) return { ok: false, reason: 'not_configured' };
   if (!userId || !jwt) return { ok: false, reason: 'not_signed_in' };
   const allow = growthOperatorIds();
   if (allow.length && !allow.includes(String(userId))) return { ok: false, reason: 'not_operator' };

@@ -78,8 +78,10 @@ x-sveltekit-api: &sveltekit-api
       # demand log. In the container's own filesystem every deploy would wipe
       # them — the backfill restarting from page 1 and the day's quota forgotten.
       - TRANSLATE_STATE_DIR=${TRANSLATE_STATE_DIR:-/data/translate-state}
-      # Lev Growth Agent's prospect store (docs/inprogress/PLAN_GROWTH_AGENT.md §8.3).
-      # Unset ⇒ the /growth screens say the module is off and keep nothing.
+      # Lev Growth Agent's prospect store (docs/inprogress/PLAN_GROWTH_AGENT.md §8.3, §10.1).
+      # strapi = the growth-prospect collection (needs 1.0b deployed first);
+      # file = one JSON file in GROWTH_STATE_DIR (the volume below).
+      - GROWTH_STORE=${GROWTH_STORE:-strapi}
       - GROWTH_STATE_DIR=${GROWTH_STATE_DIR:-/data/growth-state}
     # /etc/docker/daemon.json sets the same caps globally, but only for
     # containers created AFTER a daemon restart — declaring it here means the

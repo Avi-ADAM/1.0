@@ -1,11 +1,12 @@
 /**
  * Where prospects are kept (docs/inprogress/PLAN_GROWTH_AGENT.md §3.4, §10).
  *
- * Phase 1 keeps them in one JSON file under GROWTH_STATE_DIR — the /api
- * service is one long-running container on the VPS (as /api/vision-preview and
- * the translation governor already assume), so one process owns the file. The
- * Strapi content-type this should become is specified in §10.1; everything
- * outside this file talks to `ProspectRepository`, so moving is one module.
+ * Two stores behind one contract, chosen by GROWTH_STORE (config.ts):
+ *  - `strapi` — the `growth-prospect` collection (§10.1, strapiRepo.ts);
+ *  - `file` — one JSON file under GROWTH_STATE_DIR. The /api service is one
+ *    long-running container on the VPS (as /api/vision-preview and the
+ *    translation governor already assume), so one process owns the file.
+ * Everything outside this module talks to `ProspectRepository`.
  *
  * Writes are serialised through one promise chain and land by write-then-rename,
  * so a crash mid-write leaves the previous file, never half of one.
@@ -18,7 +19,8 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Prospect } from '$lib/growth/types';
-import { growthStateDir } from './config';
+import { growthStateDir, growthStoreKind } from './config';
+import { strapiRepository } from './strapiRepo';
 
 export interface ProspectRepository {
   list(): Promise<Prospect[]>;
@@ -108,16 +110,23 @@ export function fileRepository(dir: string): ProspectRepository {
   return makeRepo(read, write);
 }
 
-let shared: { dir: string; repo: ProspectRepository } | null = null;
+let shared: { key: string; repo: ProspectRepository } | null = null;
 let override: ProspectRepository | null = null;
 
 /** The configured store, or null when the module is off. */
 export function growthRepository(): ProspectRepository | null {
   if (override) return override;
-  const dir = growthStateDir();
-  if (!dir) return null;
-  if (!shared || shared.dir !== dir) shared = { dir, repo: fileRepository(dir) };
-  return shared.repo;
+  const kind = growthStoreKind();
+  if (!kind) return null;
+  const key = kind === 'strapi' ? 'strapi' : `file:${growthStateDir()}`;
+  if (shared?.key === key) return shared.repo;
+  const repo =
+    kind === 'strapi'
+      ? // Lazy: the action system imports this module, so the client cannot be a static import.
+        strapiRepository(async () => (await import('$lib/server/actions/index.js')).strapiClient)
+      : fileRepository(growthStateDir());
+  shared = { key, repo };
+  return repo;
 }
 
 /** Tests only. */

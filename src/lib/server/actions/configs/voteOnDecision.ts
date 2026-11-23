@@ -29,6 +29,7 @@ import { signPromoDecision } from '$lib/server/promotions/decision';
 import { applyIdentityDecision } from '$lib/server/rikmaIdentity/identity.js';
 import { decisionToAmend, amendToStrapiWrite, type Amend } from '$lib/consent/specs/projectAmend';
 import { applyEventDecision } from '$lib/server/events/publish';
+import { applyPlaybookDecision } from '$lib/server/playbooks/store';
 import { calcDeadlineMs } from './actionUtils.js';
 import {
   fetchSaleClaim,
@@ -505,6 +506,19 @@ const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { 
         amend = res.amend;
       } catch (e) {
         console.error('[voteOnDecision:identity] approved but not applied:', { decisionId, kind, error: e });
+      }
+    } else if (kind === 'playbook') {
+      // PLAN_AGENT_WORK AW2 — the same applier the restime-silence path uses,
+      // which re-checks that the playbook is still this rikma's.
+      try {
+        const out = await applyPlaybookDecision(
+          (qid, vars) => strapi.execute(qid, vars, undefined, context.fetch),
+          String(decisionId),
+          String(projectId),
+        );
+        if (!out.applied) console.warn('[voteOnDecision:playbook] approved but not applied:', { decisionId, reason: 'reason' in out ? out.reason : null });
+      } catch (e) {
+        console.error('[voteOnDecision:playbook] approved but not applied:', { decisionId, error: e });
       }
     } else if (kind === 'event') {
       // PLAN_EVENTS_WEBINARS — the same applier the restime-silence path uses.

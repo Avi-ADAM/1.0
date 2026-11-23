@@ -1,4 +1,5 @@
 // Renders a promo animation (promo/<name>/index.html) frame by frame into an mp4.
+//   node promo/render.mjs drill --lang en        -> promo/drill/index.en.html -> out/promo/drill-en.mp4
 //   node promo/render.mjs god-partner            -> out/promo/god-partner.mp4
 //   node promo/render.mjs god-partner --stills   -> a few PNG stills only (quick check)
 // The page exposes window.seek(t) and window.DURATION; every frame is a seek + screenshot,
@@ -17,6 +18,10 @@ if (!name) { console.error('usage: node promo/render.mjs <name> [--stills] [--fp
 const stills = process.argv.includes('--stills');
 const fpsArg = process.argv.indexOf('--fps');
 const FPS = fpsArg > 0 ? +process.argv[fpsArg + 1] : 30;
+const langArg = process.argv.indexOf('--lang');
+const LANG = langArg > 0 ? process.argv[langArg + 1] : 'he';
+const PAGE = LANG === 'he' ? 'index.html' : `index.${LANG}.html`;
+const STEM = LANG === 'he' ? name : `${name}-${LANG}`;
 
 const FFMPEG = process.env.FFMPEG
   || [resolve(ROOT, '../../OpenMontage/remotion-composer/node_modules/@remotion/compositor-win32-x64-msvc/ffmpeg.exe')]
@@ -36,7 +41,7 @@ try { browser = await launch(); } catch (e) {
   browser = await chromium.launch({ executablePath: exe, args: ['--force-color-profile=srgb', '--hide-scrollbars'] });
 }
 const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
-await page.goto(pathToFileURL(join(HERE, name, 'index.html')).href + '?render=1', { waitUntil: 'networkidle' });
+await page.goto(pathToFileURL(join(HERE, name, PAGE)).href + '?render=1', { waitUntil: 'networkidle' });
 await page.evaluate(() => document.fonts.ready);
 const duration = await page.evaluate(() => window.DURATION);
 
@@ -44,16 +49,20 @@ if (stills) {
   const times = (process.argv.find(a => a.startsWith('--at=')) || '--at=2,4.4,5,9.8,14.8,20,24').slice(5).split(',').map(Number);
   for (const t of times) {
     await page.evaluate(t => window.seek(t), t);
-    await page.screenshot({ path: join(outDir, `${name}-t${t}.png`) });
+    await page.screenshot({ path: join(outDir, `${STEM}-t${t}.png`) });
   }
   console.log('stills ->', outDir);
 } else {
-  const out = join(outDir, `${name}.mp4`);
+  const out = join(outDir, `${STEM}.mp4`);
   // optional soundtrack the page declares:
   //   window.AUDIO = [{ src, in, dur, at = 0, vol = 1, fadeIn = 0, fadeOut = 0 }, …]  (src relative to the page)
   // each slice is cut from its source, faded, placed at `at` and mixed.
   let tracks = await page.evaluate(() => window.AUDIO || []);
   if (!Array.isArray(tracks)) tracks = [tracks];
+  // a narration not generated yet (e.g. a new language) is skipped, so the picture can be reviewed silent
+  const missing = tracks.filter(a => !existsSync(join(HERE, name, a.src)));
+  if (missing.length) console.warn('no audio yet, skipped:', missing.map(a => a.src).join(', '));
+  tracks = tracks.filter(a => !missing.includes(a));
   const aIn = tracks.flatMap(a => ['-ss', String(a.in), '-t', String(a.dur), '-i', join(HERE, name, a.src)]);
   const chains = tracks.map((a, k) => {
     const v = a.vol ?? 1, fi = a.fadeIn || 0, fo = a.fadeOut || 0, ms = Math.round((a.at || 0) * 1000);

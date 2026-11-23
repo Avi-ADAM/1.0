@@ -29,7 +29,8 @@ const PROPOSED_FIELD: Record<string, string> = {
   newFlink: 'newFlink',
   newWlink: 'newWlink',
   timtoM: 'timtoM',
-  codeLicense: 'newCodeLicense'
+  codeLicense: 'newCodeLicense',
+  playbook: 'newPlaybook'
 };
 
 const KIND_WORDS: Record<string, string> = {
@@ -46,6 +47,7 @@ const KIND_WORDS: Record<string, string> = {
   address: 'A new address for the rikma',
   look: 'A new look for the public page',
   event: 'Publish a rikma event',
+  playbook: "Update the rikma's playbook (getPlaybookTool shows it)",
   archiveObject: 'Remove a rikma object',
   editObject: 'Change a rikma object',
   saleClaim: 'Confirm who holds the money of a sale',

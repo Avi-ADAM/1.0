@@ -26,7 +26,7 @@ export interface SubjectNotice {
 /** Decision kinds that change a field of the rikma — each has a label in `lev.list.decision`. */
 const FIELD_DECISIONS = new Set([
   'name', 'pubdes', 'prides', 'newFlink', 'newWlink', 'timtoM',
-  'vallueadd', 'vallueles', 'pic', 'codeLicense', 'address', 'look'
+  'vallueadd', 'vallueles', 'pic', 'codeLicense', 'address', 'look', 'playbook'
 ]);
 
 type Rel = { data?: any } | null | undefined;

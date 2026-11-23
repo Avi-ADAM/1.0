@@ -401,7 +401,9 @@ const FIELD_DECISIONS = new Set([
   'address',
   'look',
   // PLAN_EVENTS_WEBINARS
-  'event'
+  'event',
+  // PLAN_AGENT_WORK AW2
+  'playbook'
 ]);
 
 /**

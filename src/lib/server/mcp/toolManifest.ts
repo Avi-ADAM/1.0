@@ -73,6 +73,8 @@ import {
   openRikmaConversationTool
 } from '../../../mastra/tools/forumTools';
 import { listMyTasksTool, getTaskContextTool, claimTaskTool, reportTaskTool } from '../../../mastra/tools/agentTaskTools';
+import { getRikmaContextTool } from '../../../mastra/tools/rikmaContextTool';
+import { getPlaybookTool, proposePlaybookUpdateTool } from '../../../mastra/tools/playbookTools';
 import {
   proposeRikmaBlueprintTool,
   getAssistantTool,
@@ -276,6 +278,11 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   // it themselves, and the two writes are actions with the real checks.
   listMyTasksTool: { tool: listMyTasksTool, title: "List my tasks", tier: 'read', project: 'scope', scopedOutput: ['tasks'] },
   getTaskContextTool: { tool: getTaskContextTool, title: "Get a task with its context", tier: 'read' },
+  // AW2: projectId guards the rikma; missionId its own rikma; lead/process/act/product ids are checked inside.
+  getRikmaContextTool: { tool: getRikmaContextTool, title: "Get a rikma's working context", tier: 'read', project: 'member', mission: 'member', scopedKeyNeeds: 'projectId' },
+  getPlaybookTool: { tool: getPlaybookTool, title: "Read a rikma playbook", tier: 'read', project: 'member', scopedKeyNeeds: 'projectId' },
+  // Opens a rikma-wide Decision that waits for the members (or writes directly in a rikma of one).
+  proposePlaybookUpdateTool: { tool: proposePlaybookUpdateTool, title: "Propose a playbook change", tier: 'consentWrite', project: 'member', scopedKeyNeeds: 'projectId' },
   // Binds only the caller: an act handed to them, or open to their role, becomes theirs.
   claimTaskTool: { tool: claimTaskTool, title: "Take a task", tier: 'selfWrite', mission: 'member' },
   // "done" hands the act to its validator, whose check is awaited - consent lands on them.

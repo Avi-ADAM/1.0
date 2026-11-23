@@ -814,6 +814,14 @@ export const qidsAccess = {
   // Order automation (PLAN_SHOP_OPERATIONS A1, qidsFulfillment.js): the fulfillment
   // actions and the engine only — a rule switched on through /api/send would land
   // work on someone who never agreed to it.
+  // Lev Growth Agent (PLAN_GROWTH_AGENT §10.1, qidsGrowth.js): a prospect holds a
+  // business's phone and email — only the growth actions, after the operator check.
+  'growthProspectsSchema': { allow: ['serviceAdmin'] },
+  'growthProspects': { allow: ['serviceAdmin'] },
+  'growthProspectByUid': { allow: ['serviceAdmin'] },
+  'growthProspectKeys': { allow: ['serviceAdmin'] },
+  'growthProspectCreate': { allow: ['serviceAdmin'] },
+  'growthProspectUpdate': { allow: ['serviceAdmin'] },
   // Shipping (PLAN_SHOP_SHIPPING, qidsShipping.js): run by the shipping actions,
   // the quote endpoint and the orders API after their own checks. An order's
   // shipping record sits beside the buyer's address — never a session's to read.
@@ -830,6 +838,14 @@ export const qidsAccess = {
   'fulfillmentStepCreate': { allow: ['serviceAdmin'] },
   'fulfillmentStepUpdate': { allow: ['serviceAdmin'] },
   'fulfillmentMissions': { allow: ['serviceAdmin'] },
+  // PLAN_AGENT_WORK AW2 (qidsPlaybooks.js): the playbook action, its maturation and the MCP tools only.
+  'playbooksOfProject': { allow: ['serviceAdmin'] },
+  'playbookOpenDecisions': { allow: ['serviceAdmin'] },
+  'playbookDecision': { allow: ['serviceAdmin'] },
+  'playbookCreate': { allow: ['serviceAdmin'] },
+  'playbookUpdate': { allow: ['serviceAdmin'] },
+  'playbookDecisionCreate': { allow: ['serviceAdmin'] },
+  'playbookDecisionArchive': { allow: ['serviceAdmin'] },
   // PLAN_AGENT_WORK AW1 (qidsAgentTasks.js): the MCP task tools and claimTask/reportTask only.
   'agentTasksFor': { allow: ['serviceAdmin'] },
   'agentTaskById': { allow: ['serviceAdmin'] },

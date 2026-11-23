@@ -3,8 +3,10 @@ import { assistantQids } from './qidsAssistant.js';
 import { shopEditorQids } from './qidsShopEditor.js';
 import { fulfillmentQids } from './qidsFulfillment.js';
 import { agentTaskQids } from './qidsAgentTasks.js';
+import { playbookQids } from './qidsPlaybooks.js';
 import { shippingQids } from './qidsShipping.js';
 import { eventsQids } from './qidsEvents.js';
+import { growthQids } from './qidsGrowth.js';
 
 /**
  * "Not archived by a rikma decision" (PLAN_OBJECT_ARCHIVAL).
@@ -18938,8 +18940,10 @@ ${PROMO_DECISION_FIELDS}
   ...shopEditorQids,
   ...fulfillmentQids,
   ...agentTaskQids,
+  ...playbookQids,
   ...shippingQids,
-  ...eventsQids
+  ...eventsQids,
+  ...growthQids
 };
 
 // The daily digest's service twin of 85 — the same query text with `$uid` for

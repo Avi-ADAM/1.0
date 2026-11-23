@@ -70,7 +70,7 @@ const realtime = { scopes: () => scopeList([scope('project', growthProjectId())]
 
 function repo(): ProspectRepository {
   const r = growthRepository();
-  if (!r) throw new ActionError('NOT_CONFIGURED', 'The Growth Agent is not configured (GROWTH_STATE_DIR)');
+  if (!r) throw new ActionError('NOT_CONFIGURED', 'The Growth Agent is not configured (GROWTH_STORE / GROWTH_STATE_DIR)');
   return r;
 }
 

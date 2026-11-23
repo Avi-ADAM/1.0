@@ -14,7 +14,7 @@
   "access": {
     "not_configured": {
       "title": "The Growth Agent is not switched on",
-      "body": "It needs a place to keep its records (GROWTH_STATE_DIR on the server). Until then nothing is stored and nothing is shown."
+      "body": "It needs a place to keep its records (GROWTH_STORE=strapi on the server, or a GROWTH_STATE_DIR folder). Until then nothing is stored and nothing is shown."
     },
     "not_signed_in": {
       "title": "Sign in first",
@@ -403,7 +403,7 @@
   "settings": {
     "config": "Configuration",
     "operators": "Operators: members of rikma #{{project}} (optionally narrowed by GROWTH_OPERATOR_IDS).",
-    "storage": "Records: GROWTH_STATE_DIR on the server, one file, never in the browser.",
+    "storage": "Records: on the server — the growth-prospect collection in Strapi (or one file in GROWTH_STATE_DIR), never in the browser.",
     "model": "AI: the platform's model chain, called from the server only. Without a model, standard templates are used.",
     "env": "These settings live in the server's environment, not on this page.",
     "rules": "Rules the agent keeps",

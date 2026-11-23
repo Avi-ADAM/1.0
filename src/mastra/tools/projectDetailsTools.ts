@@ -18,6 +18,7 @@ import { sendToSer } from '../../lib/send/sendToSer';
 import { getMcpContext } from '../../lib/server/mcpContext.js';
 import { isHiddenProject } from '../../lib/server/discovery/hiddenProjects.js';
 import { describeStrapiFailure } from '../../lib/server/mcp/strapiErrors.js';
+import { stripHtml } from '../../lib/utils/stripHtml';
 
 const SITE = 'https://www.1lev1.com';
 
@@ -96,8 +97,9 @@ export function shapeProjectDetails(project: any, userId: string): ProjectDetail
     url: `${SITE}/project/${project.id}`,
     values: rows(a.vallues).map((v) => localized(v, 'valueName')).filter(Boolean),
     memberWritten: {
-      publicDescription: a.publicDescription ?? '',
-      descripFor: isMember ? (a.descripFor ?? '') : ''
+      // Rich text from the editor; an agent wants the words, not the markup (AW0 F7).
+      publicDescription: stripHtml(a.publicDescription),
+      descripFor: isMember ? stripHtml(a.descripFor) : ''
     },
     links
   };
