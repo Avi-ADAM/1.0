@@ -248,6 +248,36 @@ export function geminiEngine(opts: GeminiOptions): TranslateEngine {
 }
 
 /**
+ * Try each engine in turn while the failure is retryable (429/5xx/transport).
+ * A non-retryable failure (bad shape, no key) is thrown at once: a second
+ * model would not fix it and would only spend another request.
+ *
+ * Exists because the `-lite` models answer 503 "high demand" for hours at a
+ * time, and a backfill that stops on the first one buys nothing that day.
+ */
+export function chainEngines(engines: TranslateEngine[]): TranslateEngine {
+    if (engines.length === 1) return engines[0];
+    return async function translateChain(items, targets) {
+        let last: unknown;
+        for (const engine of engines) {
+            try {
+                return await engine(items, targets);
+            } catch (err) {
+                last = err;
+                if (!(err instanceof TranslateEngineError) || !err.retryable) throw err;
+            }
+        }
+        throw last ?? new TranslateEngineError('no engine configured');
+    };
+}
+
+/** The primary model, then each fallback — one chain, the shape every caller wants. */
+export function geminiChain(opts: Omit<GeminiOptions, 'model'> & { models: string[] }): TranslateEngine {
+    const models = [...new Set(opts.models.filter(Boolean))];
+    return chainEngines(models.map((model) => geminiEngine({ ...opts, model })));
+}
+
+/**
  * Pack strings into batches of at most `size`, the way `TRANSLATE_BATCH` means
  * it: requests are the scarce resource, so a batch is filled before a second
  * one is opened.

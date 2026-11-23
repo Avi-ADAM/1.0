@@ -1409,3 +1409,67 @@ the §7.4 surface proper.
   an empty string, never a guess.
 - A Hebrew reader sees `ברוך בבאיוף` regardless.
 - Searching `Babayof` finds them.
+
+## 19. The shared catalog through the cache — ar / ru / es *(stage A built 2026-11-23)*
+
+§1's table put skills, roles, work-ways and values in T2, Strapi's own i18n,
+and §2.1 kept them there. That holds for `he` and `en` — those are curated
+rows we own. It never covered the other three: the rows exist in the default
+locale (English) plus one Hebrew localization, so an Arabic, Russian or
+Spanish reader read the English base name — or, through `oneLangAdj` /
+`langAdjast`, which applied the localization whenever `lang != 'en'`, the
+**Hebrew** one.
+
+A catalog name is a short string reused on thousands of cards — exactly what a
+content-addressed cache is good at — so the three missing locales now come
+from the cache, while `he` / `en` keep their Strapi rows.
+
+### 19.1 Stage A — what is built
+
+- **Manifest** (`fields.js`): `skill.skillName`, `tafkidim.roleDescription`,
+  `workWay.workWayName`, `vallue.valueName`. Source = the English base field,
+  never the Hebrew localization.
+- **Surface** `vocabulary` (`config.ts`). Off unless `TRANSLATE_SURFACES`
+  includes it (or is `*`).
+- **Walker**: four sources `vocab:skill|tafkidim|workWay|vallue` in
+  `backfillSources.ts`, qids `482vocabSkills` … `485vocabValues`
+  (serviceAdmin). Strings come from `vocabStrings` in
+  `src/lib/server/translation/vocab.ts` — the same builder the endpoint uses.
+- **Read**: `GET /api/translate/vocab?locale=ar|ru|es` → `{ source → text }`
+  for the whole catalog, real translations only (`isRealTranslation`), memoised
+  30 min. Never buys anything.
+- **Client**: `$lib/translation/vocab.svelte.ts` — `ensureVocab(lang)` (root
+  layout, on every language change; localStorage-backed), `vocabName(base,
+  lang)` with the English base as fallback. Wired into `applyLocalization`,
+  `oneLangAdj` and `langAdjast`; the last two now apply the Hebrew
+  localization only for `he`.
+- **No "machine translation" mark on a chip.** §9.1 is about a member's words;
+  the catalog is ours, short, and reviewable as a list.
+
+### 19.2 Not yet (stage B)
+
+- ~110 inline `lang === 'he' ? localizations.data[0]… : base` sites in ~40
+  files. They show English to ar/ru/es readers until moved onto `vocabName`.
+- `VocabSelector` — its options *are* names and `existsInCatalog` compares
+  names, so translating labels there would make a picked translated label look
+  new and create a duplicate row. Needs an id-based option model first.
+- Server-rendered pages (`availableMission/[id]` calls `langAdjast` in its
+  loader) get English for ar/ru/es: the map lives on the client.
+- Retiring the Groq auto-localization (`/api/translations`) and the
+  `localizations { … }` sub-selections, once nothing reads them.
+
+### 19.3 Also fixed the same day
+
+- **The daily backfill had never bought anything.** The route read an absent
+  `budget` as `Number(null) === 0`, so every scheduled run (which sends no
+  `budget`) stopped on `budget` before the first request — 359 strings
+  outstanding for five days. Absent now means "the governor decides".
+- **`-lite` 503s.** `TRANSLATE_FALLBACK_MODELS` (default `gemini-2.5-flash`)
+  is tried when the primary model answers 429/5xx (`geminiChain`), and a run
+  skips a busy batch instead of stopping, up to three in a row.
+
+### 19.4 Turning it on
+
+Add `vocabulary` to `TRANSLATE_SURFACES` on the VPS (the backfill) **and** on
+Vercel (the endpoint the pages call). The first run after that buys the
+catalog in a handful of requests; `?status=1` shows the `vocab:*` cursors.

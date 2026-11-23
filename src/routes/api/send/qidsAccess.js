@@ -1032,6 +1032,10 @@ export const qidsAccess = {
   'eventRegistrationsForCron': { allow: ['serviceAdmin'] },
   'eventLeadCustomer': { allow: ['serviceAdmin'] },
   '481backfillEvents': { allow: ['serviceAdmin'] },
+  '482vocabSkills': { allow: ['serviceAdmin'] },
+  '483vocabRoles': { allow: ['serviceAdmin'] },
+  '484vocabWorkWays': { allow: ['serviceAdmin'] },
+  '485vocabValues': { allow: ['serviceAdmin'] },
   'mcpMyApplications': { allow: ['serviceAdmin'] }, // MCP listMyApplicationsTool; the tool passes the key owner
   'findableByAgentsFor': { allow: ['serviceAdmin'] }, // /me/settings/mcp loader, with locals.uid
   'nameScriptsFor': { allow: ['serviceAdmin'] }, // /me/settings loader, with locals.uid

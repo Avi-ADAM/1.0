@@ -1,23 +1,29 @@
 <script module>
+    import { isCatalogLocale, vocabName } from '$lib/translation/vocab.svelte';
+
+    /**
+     * he → Strapi's Hebrew localization; en → the base rows as they are;
+     * ar/ru/es → the translation-cache catalog (PLAN_UGC_TRANSLATION §19),
+     * falling back to the English base name.
+     */
+    const PAIRS = [['skills', 'skillName'], ['tafkidims', 'roleDescription'], ['work_ways', 'workWayName']]
+
     export function langAdjast (datar,lang){
-            if (lang != "en" ){
-              for (let i = 0; i < datar.skills?.data.length; i++){
-                if (datar.skills.data[i].attributes.localizations.data.length > 0){
-                datar.skills.data[i].attributes.skillName = datar.skills.data[i].attributes.localizations.data[0].attributes.skillName
-                }
-              }
-              for (let i = 0; i < datar.tafkidims?.data.length; i++){
-                if (datar.tafkidims.data[i].attributes.localizations.data.length > 0){
-                datar.tafkidims.data[i].attributes.roleDescription = datar.tafkidims.data[i].attributes.localizations.data[0].attributes.roleDescription
-                }
-              }
-              for (let i = 0; i < datar.work_ways?.data.length; i++){
-                if (datar.work_ways.data[i].attributes.localizations.data.length > 0){
-                datar.work_ways.data[i].attributes.workWayName = datar.work_ways.data[i].attributes.localizations.data[0].attributes.workWayName
+            if (!datar) return datar
+            for (const [coll, field] of PAIRS){
+              const rows = datar[coll]?.data
+              if (!Array.isArray(rows)) continue
+              for (let i = 0; i < rows.length; i++){
+                const a = rows[i]?.attributes
+                if (!a) continue
+                if (lang == "he"){
+                  const loc = a.localizations?.data?.[0]?.attributes?.[field]
+                  if (loc) a[field] = loc
+                } else if (isCatalogLocale(lang) && a[field]){
+                  a[field] = vocabName(a[field], lang)
                 }
               }
             }
-            datar = datar
             return datar
         }
 </script>

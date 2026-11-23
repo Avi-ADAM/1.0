@@ -115,6 +115,13 @@ export interface TranslateLimits {
     onDemandShare: number;
     /** Model id. Cheapest that handles he/ar reliably. */
     model: string;
+    /**
+     * Tried in order when `model` answers 429/5xx. `-lite` models 503 under
+     * load for long stretches ("high demand"), and a backfill that stops on the
+     * first one buys nothing that day. `TRANSLATE_FALLBACK_MODELS=` (empty)
+     * turns it off.
+     */
+    fallbackModels: string[];
 }
 
 /**
@@ -129,7 +136,11 @@ export function limits(): TranslateLimits {
         rpd: num(env.TRANSLATE_RPD, 200),
         batch: num(env.TRANSLATE_BATCH, 25),
         onDemandShare: Number.isFinite(share) && share >= 0 && share <= 1 ? share : 0.3,
-        model: env.TRANSLATE_MODEL || 'gemini-2.5-flash-lite'
+        model: env.TRANSLATE_MODEL || 'gemini-2.5-flash-lite',
+        fallbackModels: (env.TRANSLATE_FALLBACK_MODELS ?? 'gemini-2.5-flash')
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean)
     };
 }
 

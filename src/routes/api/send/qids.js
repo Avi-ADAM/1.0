@@ -18152,6 +18152,34 @@ ${PROMO_DECISION_FIELDS}
     }
   }`,
 
+  // The shared catalog for /api/translate/vocab and the translation backfill
+  // (PLAN_UGC_TRANSLATION §19). Default locale only — the English base name is
+  // the source string; Strapi's Hebrew localization is not read here.
+  '482vocabSkills': `query VocabSkills($page: Int = 1, $pageSize: Int = 200) {
+    skills(pagination: { page: $page, pageSize: $pageSize }, sort: "id:asc") {
+      data { id attributes { skillName } }
+      meta { pagination { page pageSize pageCount total } }
+    }
+  }`,
+  '483vocabRoles': `query VocabRoles($page: Int = 1, $pageSize: Int = 200) {
+    tafkidims(pagination: { page: $page, pageSize: $pageSize }, sort: "id:asc") {
+      data { id attributes { roleDescription } }
+      meta { pagination { page pageSize pageCount total } }
+    }
+  }`,
+  '484vocabWorkWays': `query VocabWorkWays($page: Int = 1, $pageSize: Int = 200) {
+    workWays(pagination: { page: $page, pageSize: $pageSize }, sort: "id:asc") {
+      data { id attributes { workWayName } }
+      meta { pagination { page pageSize pageCount total } }
+    }
+  }`,
+  '485vocabValues': `query VocabValues($page: Int = 1, $pageSize: Int = 200) {
+    vallues(pagination: { page: $page, pageSize: $pageSize }, sort: "id:asc") {
+      data { id attributes { valueName } }
+      meta { pagination { page pageSize pageCount total } }
+    }
+  }`,
+
   // PLAN_MCP_TOOLS_V2 M1/M2 — what an external agent needs to know about a rikma
   // before it plans anything: identity, links, members (usernames only), and the
   // titles of what is open or running. Service path only: the MCP guard checks

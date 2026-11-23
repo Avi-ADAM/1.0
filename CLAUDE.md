@@ -209,6 +209,10 @@ says which.
   is the only predicate for that distinction — `!!hit.text` is the bug.
 - The inverse regression to watch for: routing **UI** text through this to avoid
   adding a JSON key. `$t()` stays the only path for anything the platform says.
+- The shared catalog (skills, roles, work-ways, values) rides the same cache for
+  **ar / ru / es only** (§19): `vocabName(base, lang)` from
+  `$lib/translation/vocab.svelte.ts`, English base as the source and fallback;
+  `he` / `en` keep Strapi's own rows.
 
 ## Terminology — the group is a **rikma**, in every language
 

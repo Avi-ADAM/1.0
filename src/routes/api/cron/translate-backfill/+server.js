@@ -39,7 +39,7 @@ import { sendToSer } from '$lib/send/sendToSer.js';
 import { limits, readsCache, stateDir, writeEnabled, apiKey } from '$lib/server/translation/config.js';
 import { serverGovernor } from '$lib/server/translation/governor.js';
 import { fileGovernorStore } from '$lib/server/translation/governorStore.js';
-import { geminiEngine } from '$lib/server/translation/gemini.js';
+import { geminiChain } from '$lib/server/translation/gemini.js';
 import { runBackfill } from '$lib/server/translation/backfill.js';
 import { loadBackfillState, saveBackfillState } from '$lib/server/translation/backfillStore.js';
 import { BACKFILL_SOURCES, activeSources } from '$lib/server/translation/backfillSources.js';
@@ -101,7 +101,11 @@ export async function GET({ url, fetch }) {
   }
 
   const dry = url.searchParams.has('dry');
-  const budgetRaw = Number(url.searchParams.get('budget'));
+  // `Number(null)` is 0, not NaN: reading an absent `budget` that way made the
+  // scheduler's call (which sends none) a zero-request run that stopped on
+  // "budget" every morning. Absent means "the governor decides", i.e. Infinity.
+  const budgetParam = url.searchParams.get('budget');
+  const budgetRaw = budgetParam === null || budgetParam.trim() === '' ? NaN : Number(budgetParam);
   const budget = Number.isFinite(budgetRaw) && budgetRaw >= 0 ? budgetRaw : Infinity;
   const only = list(url.searchParams.get('only'));
   const wanted = list(url.searchParams.get('locales')).filter((l) => LOCALES.includes(/** @type {any} */ (l)));
@@ -166,7 +170,9 @@ export async function GET({ url, fetch }) {
       // Hebrew-majority corpus read by a Hebrew-majority audience it is the
       // most common render on the site turning from a permanent miss into a
       // hit, for free (§15.3.5).
-      engine: writeEnabled() ? geminiEngine({ apiKey: apiKey(), model: cfg.model }) : undefined,
+      engine: writeEnabled()
+        ? geminiChain({ apiKey: apiKey(), models: [cfg.model, ...cfg.fallbackModels] })
+        : undefined,
       enabled: readsCache,
       state,
       demand,

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { geminiEngine, buildPrompt, chunk, TranslateEngineError } from './gemini.js';
+import { geminiEngine, buildPrompt, chunk, chainEngines, TranslateEngineError } from './gemini.js';
 import type { TranslateItem } from './gemini.js';
 import type { Locale } from '$lib/translation/types.js';
 
@@ -181,5 +181,29 @@ describe('chunk', () => {
     it('survives a nonsense size rather than looping forever', () => {
         expect(chunk([1, 2], 0)).toEqual([[1], [2]]);
         expect(chunk([], 25)).toEqual([]);
+    });
+});
+
+describe('chainEngines', () => {    const answer = async (items: TranslateItem[]) =>
+        items.map((i) => ({ id: i.id, detected: 'he', out: { en: 'x' } }));
+
+    it('falls through to the next model on a retryable failure', async () => {
+        const busy = vi.fn(async () => {
+            throw new TranslateEngineError('HTTP 503', { status: 503, retryable: true });
+        });
+        const second = vi.fn(answer);
+        const out = await chainEngines([busy as never, second as never])(ITEMS, TARGETS);
+        expect(busy).toHaveBeenCalledTimes(1);
+        expect(second).toHaveBeenCalledTimes(1);
+        expect(out).toHaveLength(2);
+    });
+
+    it('does not spend a second request on a non-retryable failure', async () => {
+        const broken = vi.fn(async () => {
+            throw new TranslateEngineError('bad batch shape');
+        });
+        const second = vi.fn(answer);
+        await expect(chainEngines([broken as never, second as never])(ITEMS, TARGETS)).rejects.toThrow('bad batch shape');
+        expect(second).not.toHaveBeenCalled();
     });
 });

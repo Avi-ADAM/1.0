@@ -508,3 +508,52 @@ describe('the cursor', () => {
         expect(state.sources.openMission.page).toBe(4);
     });
 });
+
+const { TranslateEngineError } = await import('./gemini.js');
+
+describe('a busy engine (429/503) is skipped, not fatal', () => {
+    it('skips one busy batch and keeps filling the rest', async () => {
+        const io = fakeIO();
+        const ok = fakeEngine();
+        let first = true;
+        const flaky = async (items: never, targets: never) => {
+            if (first) {
+                first = false;
+                throw new TranslateEngineError('HTTP 503: high demand', { status: 503, retryable: true });
+            }
+            return ok(items, targets);
+        };
+
+        const report = await runBackfill({
+            io,
+            governor: openGovernor(),
+            engine: flaky as never,
+            enabled: all,
+            state: emptyBackfillState(),
+            batch: 1
+        });
+
+        expect(report.stopped).not.toBe('error');
+        expect(ok.calls.length).toBeGreaterThan(0);
+        expect(io.stored.length).toBeGreaterThan(0);
+    });
+
+    it('gives up after three busy answers in a row', async () => {
+        const io = fakeIO();
+        const busy = async () => {
+            throw new TranslateEngineError('HTTP 503: high demand', { status: 503, retryable: true });
+        };
+
+        const report = await runBackfill({
+            io,
+            governor: openGovernor(),
+            engine: busy as never,
+            enabled: all,
+            state: emptyBackfillState(),
+            batch: 1
+        });
+
+        expect(report.stopped).toBe('error');
+        expect(report.requests).toBe(3);
+    });
+});

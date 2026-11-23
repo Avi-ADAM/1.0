@@ -33,12 +33,15 @@ import { hashSource } from '$lib/translation/normalize.js';
 import { detectLang } from '$lib/translation/detect.js';
 import { activeSources, stringsForNode, type BackfillSource } from './backfillSources.js';
 import type { Governor } from './governor.js';
-import type { TranslateEngine } from './gemini.js';
+import { TranslateEngineError, type TranslateEngine } from './gemini.js';
 import { fillTranslations, type FillInput } from './fill.js';
 import type { DemandEntry } from './demand.js';
 import type { SurfaceKey } from './config.js';
 import type { Locale, TranslatableString, TranslationMode } from '$lib/translation/types.js';
 import type { CacheRowInput } from '$lib/server/actions/configs/cacheTranslations.js';
+
+/** Retryable engine failures in a row before a run gives up for the day. */
+const MAX_RETRYABLE_IN_A_ROW = 3;
 
 const LOCALES: Locale[] = ['he', 'en', 'ar', 'ru', 'es'];
 
@@ -350,6 +353,8 @@ export async function runBackfill(opts: BackfillOptions): Promise<BackfillReport
     });
     log(`${needEngine.length} string(s) need the engine`);
 
+    let retryableStreak = 0;
+
     for (let i = 0; i < needEngine.length; i += batch) {
         if (report.requests >= budget) {
             report.stopped = 'budget';
@@ -391,13 +396,22 @@ export async function runBackfill(opts: BackfillOptions): Promise<BackfillReport
                 hits: 0
             });
         } catch (err) {
-            // Transport failure. The request is already counted, which is
-            // correct, and stopping is right: whatever broke will break again
-            // in a hundred milliseconds and eat the rest of the day's budget.
-            log(`engine failed, stopping: ${err instanceof Error ? err.message : err}`);
+            // The request is already counted, which is correct. A retryable
+            // failure (429/5xx after the whole model chain) is skipped up to
+            // MAX_RETRYABLE_IN_A_ROW times — a "high demand" 503 is often one
+            // batch's bad luck. Anything else, or a streak, stops: whatever
+            // broke will break again and eat the rest of the day's budget.
+            const msg = err instanceof Error ? err.message : String(err);
+            const retryable = err instanceof TranslateEngineError && err.retryable;
+            if (retryable && ++retryableStreak < MAX_RETRYABLE_IN_A_ROW) {
+                log(`engine busy (${retryableStreak}/${MAX_RETRYABLE_IN_A_ROW}), skipping this batch: ${msg.slice(0, 120)}`);
+                continue;
+            }
+            log(`engine failed, stopping: ${msg}`);
             report.stopped = 'error';
             break;
         }
+        retryableStreak = 0;
 
         report.unfilled += filled.unfilled.length;
         if (filled.rows.length === 0) continue;

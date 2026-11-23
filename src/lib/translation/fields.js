@@ -116,6 +116,35 @@ export const TRANSLATABLE = {
             // structured JSON to a translator is how markup gets invented; a
             // block-aware collector is its own piece of work, not this one's.
         }
+    },
+
+    // ── The shared catalog (T2), for the three locales Strapi has no row for ──
+    //
+    // Skills, roles, work-ways and values live in Strapi's default locale
+    // (English) with one Hebrew localization. `he` and `en` keep reading
+    // Strapi; `ar` / `ru` / `es` had nothing and fell back to English. These
+    // entries let the backfill buy those three from the English base name, and
+    // `/api/translate/vocab` serve them (see `src/lib/translation/vocab.svelte.ts`).
+    // The source is always the **English base** field, never the Hebrew
+    // localization — the curated row, and the one every reader can hash.
+    skill: {
+        entity: 'Skill',
+        fields: { skillName: { mode: 'translate', max: 120 } }
+    },
+
+    tafkidim: {
+        entity: 'Tafkidim',
+        fields: { roleDescription: { mode: 'translate', max: 120 } }
+    },
+
+    workWay: {
+        entity: 'WorkWay',
+        fields: { workWayName: { mode: 'translate', max: 120 } }
+    },
+
+    vallue: {
+        entity: 'Vallue',
+        fields: { valueName: { mode: 'translate', max: 120 } }
     }
 
     // Deliberately absent, with reasons:

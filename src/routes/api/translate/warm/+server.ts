@@ -33,7 +33,7 @@ import { flatFields } from '$lib/translation/fields.js';
 import { limits, warmLimits, writeEnabled, apiKey, stateDir } from '$lib/server/translation/config.js';
 import { serverGovernor } from '$lib/server/translation/governor.js';
 import { fileGovernorStore } from '$lib/server/translation/governorStore.js';
-import { geminiEngine, TranslateEngineError } from '$lib/server/translation/gemini.js';
+import { geminiChain, TranslateEngineError } from '$lib/server/translation/gemini.js';
 import { fillTranslations, type FillInput } from '$lib/server/translation/fill.js';
 import { warmLimiter, callerKey } from '$lib/server/translation/rateLimit.js';
 import type { Locale, TranslationMode } from '$lib/translation/types.js';
@@ -90,7 +90,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals, getClientAd
     }
 
     const cfg = limits();
-    const engine = geminiEngine({ apiKey: apiKey(), model: cfg.model });
+    const engine = geminiChain({ apiKey: apiKey(), models: [cfg.model, ...cfg.fallbackModels] });
 
     let filled;
     try {

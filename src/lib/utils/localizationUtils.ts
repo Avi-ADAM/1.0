@@ -3,12 +3,13 @@
  *
  * Vocabulary entries (skills, roles, workways, values) are stored in Strapi's
  * default locale — English — and `localizations.data[0]` holds the Hebrew
- * version. So the localized name is applied only for a Hebrew reader; every
- * other reader keeps the base (English) name. This is the same rule
- * VocabSelector, hevel and oneLangAdj follow.
+ * version. A Hebrew reader gets that localization, an English reader the base
+ * name, and ar/ru/es the translation-cache catalog (PLAN_UGC_TRANSLATION §19,
+ * $lib/translation/vocab.svelte.ts) with the base name as fallback.
  */
 import { get } from 'svelte/store';
 import { lang as langStore } from '$lib/stores/lang.js';
+import { isCatalogLocale, vocabName } from '$lib/translation/vocab.svelte';
 
 const FIELDS = ['skillName', 'roleDescription', 'workWayName', 'valueName'] as const;
 
@@ -39,7 +40,24 @@ export function applyLocalization(entityContainer: any, lang?: string): any {
     }
 
     const readerLang = lang ?? get(langStore);
-    // The only localization these queries carry is Hebrew; anyone else reads the base name.
+
+    // ar / ru / es: Strapi has no row; the translation-cache catalog does
+    // (PLAN_UGC_TRANSLATION §19), with the English base name as fallback.
+    if (isCatalogLocale(readerLang)) {
+        const translated = items.map((item) => {
+            if (!item?.attributes) return item;
+            const newAttributes = { ...item.attributes };
+            for (const field of FIELDS) {
+                if (typeof newAttributes[field] === 'string') {
+                    newAttributes[field] = vocabName(newAttributes[field], readerLang);
+                }
+            }
+            return { ...item, attributes: newAttributes };
+        });
+        return isWrapper ? { data: translated } : translated;
+    }
+
+    // The only localization these queries carry is Hebrew; English reads the base name.
     if (readerLang !== 'he') {
         return isWrapper ? { data: items } : items;
     }

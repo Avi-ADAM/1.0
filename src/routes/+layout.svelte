@@ -46,6 +46,7 @@ onMessage(messaging, (payload) => {
   import { addMes } from '$lib/stores/pendMisMes.js';
   import { forumStore } from '$lib/stores/forumStore';
   import { MoneyState, provideMoney, ensureRates } from '$lib/money/context.svelte';
+  import { ensureVocab } from '$lib/translation/vocab.svelte';
 
   /**
    * @typedef {Object} Props
@@ -75,6 +76,12 @@ onMessage(messaging, (payload) => {
   });
   onMount(() => {
     void ensureRates(money);
+  });
+
+  // Skills / roles / work-ways / values for ar·ru·es readers come from the
+  // translation-cache catalog (PLAN_UGC_TRANSLATION §19); no-op for he/en.
+  $effect(() => {
+    ensureVocab($lang);
   });
 
   // The bottom bar, for the rest of the site.

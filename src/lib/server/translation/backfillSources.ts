@@ -59,6 +59,7 @@ import {
     eventPageGroups
 } from './surfaces.js';
 import { toEventView } from '$lib/events/model';
+import { VOCAB_KINDS, vocabStrings } from './vocab.js';
 import type { SurfaceKey } from './config.js';
 import type { TranslatableString } from '$lib/translation/types.js';
 
@@ -238,6 +239,27 @@ const rikmaEventSource: BackfillSource = {
 };
 
 /**
+ * The shared catalog (§19) — one source per vocabulary collection, all
+ * feeding the `vocabulary` surface. Strings come from `vocabStrings`, the
+ * same builder `/api/translate/vocab` hashes with.
+ *
+ * Tier 1 like the directories: a skill chip is on every public card, and the
+ * whole catalog is a few hundred short strings — a handful of requests.
+ */
+const VOCAB_SOURCES: BackfillSource[] = VOCAB_KINDS.map((kind) => ({
+    key: `vocab:${kind.entityKey}`,
+    label: `catalog — ${kind.collection} (${kind.field}), for ar/ru/es readers`,
+    qid: kind.qid,
+    surfaces: ['vocabulary'],
+    tier: 1,
+    rowsOf: pagedRows(kind.collection),
+    totalOf: pagedTotal(kind.collection),
+    strings(node: unknown): SourceGroup[] {
+        return [{ surface: 'vocabulary', strings: vocabStrings(kind, [node]) }];
+    }
+}));
+
+/**
  * Every source, tier order. `--only` filters this list by `key`.
  *
  * All are tier 1 — public and anonymous — and within a tier the order is
@@ -248,7 +270,8 @@ export const BACKFILL_SOURCES: BackfillSource[] = [
     openMashaabimSource,
     projectSource,
     matanotSource,
-    rikmaEventSource
+    rikmaEventSource,
+    ...VOCAB_SOURCES
 ];
 
 export function sourceByKey(key: string): BackfillSource | null {
