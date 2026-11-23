@@ -150,8 +150,8 @@ routes listed there.
 > localised in `docs/inprogress/PLAN_EN_READINESS.md` and fails on Hebrew left
 > there. Add a screen to its `ROOTS` when you finish localising it, so it stays
 > clean; a single finished component in a folder that is not clean yet goes in
-> `FILES`. After stages 4–5 it covers 177 components in 20 roots plus one
-> single file.
+> `FILES`. It now covers 186 components in 21 roots plus eight
+> single files.
 
 Interpolation is `$t('ns.key', { count })` against `"… {{count}} …"`. A few
 older call sites substitute by hand instead — `$t(k).replace('{restime}', v)` —

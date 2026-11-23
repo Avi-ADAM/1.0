@@ -14,7 +14,8 @@
    */
   import { t } from '$lib/translations';
   import { executeAction } from '$lib/client/actionClient';
-  import { untrack } from 'svelte';
+  import { untrack, onMount } from 'svelte';
+  import { track } from '$lib/analytics/track.js';
   import Button from '$lib/celim/ui/button.svelte';
   import BlueprintRowDetail from './BlueprintRowDetail.svelte';
   import BlueprintRikmaFields from './BlueprintRikmaFields.svelte';
@@ -55,6 +56,9 @@
 
   /** @type {Props} */
   let { session, onConflict, studio } = $props();
+
+  // The supplier funnel (PLAN_SUPPLIER_GROWTH SG0): the review screen opened.
+  onMount(() => track('blueprint_review', { mode: studio ? 'studio' : 'member' }));
 
   const GROUPS = ['products', 'rikmaMissions', 'rikmaResources', 'partners'];
 
@@ -405,6 +409,7 @@
       return;
     }
     result = res.data;
+    track('blueprint_created', { rows: selectedExisting.length + selectedNew.length });
   }
 
   // ── A read-only link for partners (§4.4) ──

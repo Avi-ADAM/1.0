@@ -10,6 +10,7 @@
   import { t, locale } from '$lib/translations';
   import { stashSeedPlan } from '$lib/onboard/seedPlanHandoff.js';
   import { openBusinessImport } from '$lib/onboard/businessImport.js';
+  import { track } from '$lib/analytics/track.js';
 
   onMount(() => showFoot.set(false));
   onDestroy(() => showFoot.set(true));
@@ -41,12 +42,19 @@
     submitting = true;
     error = '';
     try {
+      track('business_analyze', { entry: 'onboard', source: 'text' });
       const res = await fetch('/api/analyze-business', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: text.trim(), lang: $locale, withPlan })
       });
       const body = await res.json().catch(() => ({}));
+      track('business_analyzed', {
+        entry: 'onboard',
+        ok: res.ok && body?.ok !== false,
+        reason: res.ok ? undefined : String(res.status),
+        products: body?.blueprint?.products?.length ?? 0
+      });
       if (!res.ok || body?.ok === false) {
         throw new Error(body?.message ?? $t('common.errorStatus', { status: res.status }));
       }

@@ -8,8 +8,12 @@
   import { onMount, onDestroy } from 'svelte';
   import { showFoot } from '$lib/stores/showFoot.js';
   import { t } from '$lib/translations';
+  import { track } from '$lib/analytics/track.js';
 
-  onMount(() => showFoot.set(false));
+  onMount(() => {
+    showFoot.set(false);
+    track('supplier_entry', { entry: 'onboard' });
+  });
   onDestroy(() => showFoot.set(true));
   let selected = $state(/** @type {'url' | 'describe' | 'manual'} */ ('url'));
   let going = $state(false);

@@ -52,7 +52,9 @@ const ROOTS = [
     'src/lib/components/shop',
     // The assistant's rich cards are mounted by the global bot popup.
     'src/lib/chat',
-    'src/routes/about'
+    'src/routes/about',
+    // "Supplier in a minute" (PLAN_SUPPLIER_GROWTH SG1), born localised.
+    'src/routes/join'
 ];
 
 /**

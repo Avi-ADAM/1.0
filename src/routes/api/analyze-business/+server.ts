@@ -1,4 +1,5 @@
 // POST /api/analyze-business
+// Signed-in members, or a guest from /join/supplier (stricter limits, see POST).
 // Body: { url: string } OR { text: string }, plus optional { lang, withPlan }
 // Returns: { ok, name, desc, details, vals[], plan, blueprint } — the pre-fill
 // payload for /me?action=createproject, the starter planning boards the member
@@ -27,6 +28,8 @@ import { seedPlanToBlueprint } from '$lib/assistant/fromSeedPlan.js';
 import { keepRichHtml, textToParagraphs } from '$lib/prefill/richHtml';
 import { PROFIT_IDS, type ProjectDraft } from '$lib/prefill/projectDraft';
 import { RateLimiter, callerKey } from '$lib/server/translation/rateLimit';
+import { takeGuestAnalyze } from '$lib/server/assistant/publicQuota.js';
+import { env } from '$env/dynamic/private';
 
 const MIN_TEXT = 50;
 const MAX_TEXT = 6000;
@@ -35,8 +38,8 @@ const SITE_CHARS = 8000;
 
 /*
  * Every call spends two model calls, and since the creation form offers it to
- * every member it is no longer an onboarding-only door: signed-in members only,
- * a few drafts an hour each. In-process, like /api/vision-preview — /api runs
+ * every member it is no longer an onboarding-only door: a few drafts an hour
+ * per member. Guests have their own, tighter door (takeGuestAnalyze). In-process, like /api/vision-preview — /api runs
  * as one container on the VPS.
  */
 const HOUR = 60 * 60 * 1000;
@@ -184,18 +187,35 @@ export const POST: RequestHandler = async ({ request, cookies, locals, getClient
   // Same test as the (reg) layout that hosts every caller: a session cookie.
   // `uid` can be false for one request while identity is unreachable, which
   // must not lock a signed-in member out — they fall back to the address key.
-  if (!locals.tok) throw error(401, 'Sign in to draft a rikma.');
-  const who = callerKey(locals.uid || undefined, getClientAddress());
-  for (const [key, max, win] of [
-    [`h:${who}`, PER_HOUR, HOUR],
-    [`d:${who}`, PER_DAY, 24 * HOUR]
-  ] as const) {
-    const r = limiter.take(key, max, win);
-    if (!r.ok) {
+  //
+  // A guest may draft too, from /join/supplier (docs/inprogress/PLAN_SUPPLIER_GROWTH.md SG1):
+  // nothing is written here, the draft goes back to the browser and becomes a
+  // pending session only through /api/join/supplier. Guests get a tighter
+  // per-address limit and a platform-wide daily cap, because every call spends
+  // two model calls; the assistant's public kill switch closes this door too.
+  const guest = !locals.tok;
+  if (guest) {
+    if (env.ASSISTANT_MCP_ENABLED === 'false') throw error(401, 'Sign in to draft a rikma.');
+    const q = takeGuestAnalyze(getClientAddress());
+    if (!q.ok) {
       return json(
         { ok: false, reason: 'rate-limited', message: 'Too many drafts - try again later.' },
-        { status: 429, headers: { 'Retry-After': String(Math.ceil(r.retryAfterMs / 1000)) } }
+        { status: 429, headers: { 'Retry-After': String(q.retryAfterSeconds ?? 60) } }
       );
+    }
+  } else {
+    const who = callerKey(locals.uid || undefined, getClientAddress());
+    for (const [key, max, win] of [
+      [`h:${who}`, PER_HOUR, HOUR],
+      [`d:${who}`, PER_DAY, 24 * HOUR]
+    ] as const) {
+      const r = limiter.take(key, max, win);
+      if (!r.ok) {
+        return json(
+          { ok: false, reason: 'rate-limited', message: 'Too many drafts - try again later.' },
+          { status: 429, headers: { 'Retry-After': String(Math.ceil(r.retryAfterMs / 1000)) } }
+        );
+      }
     }
   }
 
@@ -231,7 +251,7 @@ export const POST: RequestHandler = async ({ request, cookies, locals, getClient
   // The starter boards. Best-effort by design - see the file header.
   let plan: { boards: unknown[]; sourceUrl: string | null } | null = null;
   let planItemCount = 0;
-  if (body.withPlan !== false) {
+  if (guest || body.withPlan !== false) {
     const seed = await generateSeedPlan(
       inputText,
       async (system, user) => {

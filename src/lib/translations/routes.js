@@ -30,6 +30,8 @@ export const ROUTED = {
     // one long-form page, its own namespace, routed to that page alone.
     about: at('/about'),
     onboard: at('/onboard'),
+    // "Supplier in a minute" (docs/inprogress/PLAN_SUPPLIER_GROWTH.md SG1): the guest door.
+    supplierJoin: at('/join'),
     // The picture upload link an agent hands out (MCP createUploadSession).
     upload: at('/upload'),
     tasks: at('/myacts', /\/moach\/[^/]+\/acts/),

@@ -1,11 +1,11 @@
 # PLAN — צמיחת ספקים: "ספק בדקה", ורטיקל אירועים ודף ספק שאורח יכול לפנות אליו
 
-> נכתב: 2026-11-23. סטטוס: **tbd** — תכנית, בלי קוד.
+> נכתב: 2026-11-23. סטטוס: **SG0 + SG1 בנויים (2026-11-23), ממתינים ל-deploy ולבדיקת עשן** — ראו §7.
 > נולד מהשוואה ל-simcha-events.co.il (אינדקס ספקי אירועים שאוסף מאות ספקים).
 > נשען על ולא מחליף: [PLAN_AI_SIGNUP_CONCIERGE](../inprogress/PLAN_AI_SIGNUP_CONCIERGE.md) ·
 > [PLAN_CONCIERGE_LOCAL_PROVIDERS](../inprogress/PLAN_CONCIERGE_LOCAL_PROVIDERS.md) ·
 > [PLAN_CONCIERGE_EXTERNAL_SOURCES](../inprogress/PLAN_CONCIERGE_EXTERNAL_SOURCES.md) ·
-> [PLAN_LEADS](../inprogress/PLAN_LEADS.md) · [PLAN_INHOUSE_ANALYTICS](./PLAN_INHOUSE_ANALYTICS.md) ·
+> [PLAN_LEADS](../inprogress/PLAN_LEADS.md) · [PLAN_INHOUSE_ANALYTICS](../tbd/PLAN_INHOUSE_ANALYTICS.md) ·
 > [PLAN_DAILY_DIGEST](../inprogress/PLAN_DAILY_DIGEST.md).
 
 ---
@@ -182,3 +182,20 @@ SG6 תלוי בשיחה עם השותף; את SG1–SG4 בונים בלי קשר
 ## 6. סדר מומלץ
 
 SG0 → SG1 (הכי גדול בהשפעה, הכי קטן בקוד: כניסה חדשה מעל צינור קיים) → SG2 → SG3 → SG4 → SG5 → SG6.
+
+---
+
+## 7. יומן ביצוע
+
+| תאריך | מה נכנס | איפה |
+|---|---|---|
+| 2026-11-23 | **SG0:** אירועי משפך ברשימה הסגורה של `track` — `supplier_entry` (`entry: join/onboard`), `business_analyze`, `business_analyzed` (`ok`, `reason`, `products`), `supplier_prepared`, `blueprint_review` (`mode: member/studio`), `blueprint_created` (`rows`). מחוברים ב-`/onboard/business` (+`url`, `describe`), ב-`BlueprintReview` ובדף החדש | `src/lib/analytics/track.js` |
+| 2026-11-23 | **SG1, שרת:** `/api/analyze-business` פתוח לאורח — 3 לשעה לכתובת, 100 ביום לכל הפלטפורמה (`takeGuestAnalyze`), נסגר עם `ASSISTANT_MCP_ENABLED=false`, לא כותב כלום. `POST /api/join/supplier` — שם + אימייל + השרטוט + אזור השירות → `prepareSignup` (`intent:'business'`) → מחזיר את קישור ה-**studio** (עריכה מלאה כאורח, ובסופה הסכמה + סיסמה). מחובר מקבל 409 ומופנה ל-`/onboard/business` | `publicQuota.ts`, `src/routes/api/join/supplier/`, `src/lib/assistant/supplierJoin.ts` |
+| 2026-11-23 | **SG1, דף:** `/join/supplier` (ציבורי, מחובר מופנה ל-`/onboard/business`) — קישור או משפט + `LocationPicker` → תצוגה מקדימה של הכרטיס (שם, תיאור, שירותים ומחירים) → שם + אימייל → studio. namespace `supplierJoin` × 5, מוגבל ל-`/join`; `src/routes/join` נוסף ל-`ROOTS` של `check:ui-hebrew`; ב-sitemap | `src/routes/join/supplier/` |
+
+**סטייה מ-§SG1:** במקום להפנות ל-`/hascama?agent=` הדף מפנה ל-studio (`/preview/rikma/studio/<token>`), שכבר קיים ומאפשר לאורח לערוך את כל הטיוטה לפני החתימה. הספק רואה ערך עוד לפני שהוא פותח חשבון. "N משאלות פתוחות באזור שלך" עוד לא נבנה: זה יבוא בהמשך עם SG4.
+
+**לפני שמפרסמים את הקישור:**
+1. בדיקת עשן בפרודקשן: אתר אמיתי של ספק, ואחריו studio ← הרשמה ← אישור מייל ← "ליצור". לוודא שהמוצרים מופיעים ב-`/gift`, ושה-`location` של הרקמה נשמר.
+2. ב-Umami (A3): להוסיף משפך ספק לפי האירועים שלמעלה.
+3. לתמחר: כל ניתוח של אורח הוא שתי קריאות למודל. התקרה היומית (100) היא שמגבילה את ההוצאה.

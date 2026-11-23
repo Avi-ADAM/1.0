@@ -1,0 +1,58 @@
+{
+  "meta": {
+    "title": "Proveedores: únete en un minuto · 1💗1",
+    "description": "Un enlace a tu web o una frase sobre tu negocio, tu zona de servicio, y tu ficha de proveedor está lista. Sin comisión por contacto directo, y clientes que buscan justo lo tuyo."
+  },
+  "hero": {
+    "kicker": "Para proveedores y profesionales",
+    "title": "Tu ficha, lista en un minuto",
+    "sub": "Danos tu web o cuéntanos en una frase lo que haces. Preparamos tu ficha, la ves y solo entonces decides."
+  },
+  "promises": {
+    "p1": "Sin comisión por contacto directo",
+    "p2": "Clientes que ya te buscan",
+    "p3": "Nada se publica sin tu sí"
+  },
+  "steps": {
+    "label": "Pasos para unirte",
+    "s1": "Cuéntanos del negocio",
+    "s2": "Mira tu ficha",
+    "s3": "Firma y publica"
+  },
+  "form": {
+    "tabUrl": "Tengo una web",
+    "tabText": "Lo cuento con palabras",
+    "urlLabel": "La web de tu negocio",
+    "urlHint": "Una web, landing o página de empresa. Si no podemos leerla, descríbelo con palabras.",
+    "textLabel": "Qué haces, para quién y a qué precio",
+    "textPlaceholder": "p. ej.: Fotógrafa de eventos en el norte, bodas y bar mitzvás, paquetes desde 4.500 ₪ con álbum…",
+    "textHint": "Al menos {{count}} caracteres",
+    "areaLabel": "¿Dónde das servicio?",
+    "areaHelper": "Marca un punto y un radio, o elige online. Solo te propondremos a clientes a los que llegas.",
+    "submit": "Prepárame la ficha"
+  },
+  "loading": {
+    "title": "Preparando tu ficha…",
+    "sub": "Leemos lo que enviaste y ordenamos servicios y precios. Hasta medio minuto."
+  },
+  "preview": {
+    "title": "Así se verá tu ficha",
+    "products": "Servicios que encontramos",
+    "noProducts": "No encontramos servicios definidos. Podrás añadirlos en el siguiente paso.",
+    "more": "Más elementos en el borrador, para editar en el siguiente paso: {{count}}",
+    "again": "Empezar de nuevo"
+  },
+  "contact": {
+    "title": "Casi listo: ¿quién eres?",
+    "sub": "A continuación podrás editarlo todo: servicios, precios, fotos y zona. La ficha se publica solo después de que firmes el acuerdo.",
+    "name": "Tu nombre",
+    "email": "Correo electrónico",
+    "submit": "Guardar y seguir editando",
+    "note": "La página siguiente es tu editor completo. Su enlace vale 24 horas, y al final abres una cuenta con este correo."
+  },
+  "errors": {
+    "analyze": "No pudimos leerlo. Prueba otra dirección o descríbelo con palabras.",
+    "rateLimited": "Demasiados intentos en poco tiempo. Vuelve a intentarlo en una hora.",
+    "save": "No pudimos guardar. Revisa tu nombre y correo e inténtalo de nuevo."
+  }
+}
