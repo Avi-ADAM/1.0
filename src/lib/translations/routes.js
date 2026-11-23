@@ -112,6 +112,9 @@ export const ROUTED = {
     rikmaImport: at(/\/moach\/(?:[^/]+\/)?import\//, '/preview/rikma', '/assistant/receive'),
     // The profile / wish list panel (PLAN_AI_SIGNUP_CONCIERGE §6, §7).
     assistant: at('/onboard/assistant', '/concierge'),
+    // Lev Growth Agent (docs/inprogress/PLAN_GROWTH_AGENT.md) — the platform team's
+    // business-acquisition screens. One route tree, one namespace.
+    growth: at('/growth'),
     // The rikma's API page — one route, one namespace, nowhere else.
     rikmaApi: at(/\/moach\/[^/]+\/api/),
     // The rikma's code tab, plus the GitHub account card on the settings page.

@@ -196,6 +196,7 @@ import { addAskChatEntryConfig } from './addAskChatEntry.js';
 import { createSaleConfig } from './createSale.js';
 import { createPaidOrderConfig } from './createPaidOrder.js';
 import { createLeadConfig } from './createLead.js';
+import { growthConfigs } from './growth.js';
 import {
   saveEventConfig,
   proposeEventConfig,
@@ -571,6 +572,8 @@ export function registerAllActions(): void {
   registerAction(createPaidOrderConfig);
   // Leads — the first stage of a sale (PLAN_LEADS L1)
   registerAction(createLeadConfig);
+  // Lev Growth Agent — business acquisition (docs/inprogress/PLAN_GROWTH_AGENT.md)
+  for (const c of growthConfigs) registerAction(c);
   // Rikma events — webinars, workshops (PLAN_EVENTS_WEBINARS W2)
   registerAction(saveEventConfig);
   registerAction(proposeEventConfig);

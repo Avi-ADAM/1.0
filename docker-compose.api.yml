@@ -78,6 +78,9 @@ x-sveltekit-api: &sveltekit-api
       # demand log. In the container's own filesystem every deploy would wipe
       # them — the backfill restarting from page 1 and the day's quota forgotten.
       - TRANSLATE_STATE_DIR=${TRANSLATE_STATE_DIR:-/data/translate-state}
+      # Lev Growth Agent's prospect store (docs/inprogress/PLAN_GROWTH_AGENT.md §8.3).
+      # Unset ⇒ the /growth screens say the module is off and keep nothing.
+      - GROWTH_STATE_DIR=${GROWTH_STATE_DIR:-/data/growth-state}
     # /etc/docker/daemon.json sets the same caps globally, but only for
     # containers created AFTER a daemon restart — declaring it here means the
     # rotation is real from the next `up -d`, with no daemon bounce.
@@ -92,6 +95,7 @@ x-sveltekit-api: &sveltekit-api
       # it out for a backup without touching the container.
       - space-docs:/data/space-docs
       - translate-state:/data/translate-state
+      - growth-state:/data/growth-state
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
       interval: 30s
@@ -288,6 +292,9 @@ volumes:
   space-docs:
   # Derivable (a lost cursor only restarts the walk), so no backup needed.
   translate-state:
+  # The Growth Agent's pipeline: research, drafts and the outreach log. Not
+  # derivable from Strapi — back it up like space-docs.
+  growth-state:
   mastra-pgdata:
   vector-data:
   # What has already run — the record that stops a month being closed twice and

@@ -1,0 +1,454 @@
+{
+  "title": "Lev Growth Agent",
+  "subtitle": "Find, research and invite independent businesses — the agent prepares, you decide.",
+  "nav": {
+    "overview": "Overview",
+    "discover": "Discover businesses",
+    "research": "Research queue",
+    "profiles": "Profile preparation",
+    "outreach": "Outreach",
+    "pipeline": "Acquisition pipeline",
+    "intelligence": "Network intelligence",
+    "settings": "Settings"
+  },
+  "access": {
+    "not_configured": {
+      "title": "The Growth Agent is not switched on",
+      "body": "It needs a place to keep its records (GROWTH_STATE_DIR on the server). Until then nothing is stored and nothing is shown."
+    },
+    "not_signed_in": {
+      "title": "Sign in first",
+      "body": "The Growth Agent is for the platform team. Sign in with your account."
+    },
+    "not_operator": {
+      "title": "This area is for the platform team",
+      "body": "Only members of the platform's own rikma operate the Growth Agent."
+    },
+    "check_failed": {
+      "title": "We could not check your access",
+      "body": "The check did not get an answer. Try again in a minute."
+    }
+  },
+  "common": {
+    "cancel": "Cancel",
+    "noteOptional": "Note (optional)",
+    "working": "Working…"
+  },
+  "stage": {
+    "discovered": "Discovered",
+    "researching": "Researching",
+    "researched": "Research completed",
+    "profilePrepared": "Profile prepared",
+    "awaitingApproval": "Awaiting approval",
+    "invitationReady": "Invitation ready",
+    "invitationSent": "Invitation sent",
+    "interested": "Interested",
+    "onboardingStarted": "Onboarding started",
+    "joined": "Joined",
+    "activeProvider": "Active provider",
+    "declined": "Declined",
+    "doNotContact": "Do not contact"
+  },
+  "tiles": {
+    "discovered": "Discovered businesses",
+    "researched": "Researched",
+    "awaitingProfileApproval": "Profiles awaiting approval",
+    "invitationsReady": "Invitations ready to send",
+    "invitationsSent": "Invitations sent",
+    "interested": "Interested",
+    "registered": "Registered providers",
+    "active": "Active providers",
+    "followUpsDue": "Follow-ups due"
+  },
+  "overview": {
+    "next": "Recommended next actions",
+    "allClear": "Nothing is waiting for you right now.",
+    "empty": "No businesses in the pipeline yet.",
+    "start": "Add the first business",
+    "open": "Open",
+    "funnel": "Conversion funnel",
+    "funnelRule": "Each business counts at every step it reached, even if it later declined. The percentage is the share of the previous step.",
+    "recent": "Recent activity",
+    "noActivity": "No activity yet."
+  },
+  "next": {
+    "research": "Not researched yet: {{count}}.",
+    "approveProfiles": "Waiting for profile approval: {{count}}.",
+    "draftOutreach": "Approved profiles without an approved invitation: {{count}}.",
+    "sendInvitations": "Approved invitations ready for you to send: {{count}}.",
+    "followUps": "Follow-ups due: {{count}}.",
+    "interestedNotJoined": "Expressed interest but haven't completed onboarding: {{count}}.",
+    "newInCategory": "New {{category}} businesses discovered this week: {{count}}.",
+    "newInCategoryRegion": "New {{category}} businesses discovered in {{region}} this week: {{count}}.",
+    "activate": "Joined — check whether they are active providers: {{count}}."
+  },
+  "discover": {
+    "addTitle": "Add a business",
+    "addBody": "Record a business you found. Write only what you saw, and say where you saw it.",
+    "autoTitle": "Automated discovery",
+    "autoBody": "Searching sources automatically is the next phase. When it arrives, every result will carry its source and pass the same duplicate check:",
+    "sources": {
+      "places": "Google Maps / Places — when an API key is configured",
+      "websites": "Public business websites",
+      "directories": "Public business directories, under their terms",
+      "social": "Public social pages, only where their terms permit",
+      "network": "Businesses already in the 1💗1 network"
+    },
+    "rules": "Never invent a business or a contact detail. Never collect private data. Respect each source's terms and the outreach laws that apply."
+  },
+  "form": {
+    "name": "Business name",
+    "website": "Website",
+    "email": "Public email",
+    "phone": "Public phone",
+    "country": "Country",
+    "city": "City",
+    "region": "Region",
+    "category": "Category",
+    "services": "Services",
+    "keywords": "Keywords",
+    "size": "Size",
+    "notes": "Notes",
+    "lang": "Language",
+    "sourceKind": "Where you found it",
+    "sourceLabel": "Source name",
+    "sourceUrl": "Source link",
+    "listHint": "Separate with commas",
+    "sourceRule": "The source is recorded next to every detail you enter.",
+    "add": "Add business",
+    "save": "Save",
+    "openExisting": "Open the existing record"
+  },
+  "source": {
+    "from": "Source:",
+    "none": "No source recorded",
+    "manual": "Entered by hand",
+    "csv": "CSV import",
+    "website": "Business website",
+    "network": "1💗1 network",
+    "places": "Maps / Places",
+    "directory": "Directory",
+    "social": "Social page"
+  },
+  "csv": {
+    "title": "Import from CSV",
+    "body": "Up to {{max}} rows. A header row is required; columns are matched by name (Hebrew, English or Arabic). Duplicates are skipped and listed.",
+    "pick": "Choose a CSV file",
+    "found": "Rows with a name: {{count}}",
+    "columns": "Columns recognised",
+    "missingName": "Rows without a name (skipped): {{lines}}",
+    "tooMany": "Only the first {{max}} rows will be read.",
+    "import": "Import {{count}} rows",
+    "imported": "Imported: {{count}}",
+    "duplicates": "Skipped as duplicates: {{count}}",
+    "invalid": "Rows with a problem: {{count}}",
+    "line": "Line {{line}}",
+    "dupInFile": "repeats an earlier line",
+    "dupInStore": "already in the pipeline",
+    "goResearch": "Go to the research queue"
+  },
+  "pipeline": {
+    "views": "Views",
+    "search": "Search name, place, category…",
+    "stage": "Stage",
+    "anyStage": "Any stage",
+    "anyCategory": "Any category",
+    "sort": "Sort",
+    "byPriority": "By priority",
+    "byUpdated": "Recently updated",
+    "byName": "By name",
+    "noneHere": "No businesses in this view.",
+    "place": "Place",
+    "research": "Research",
+    "priority": "Priority",
+    "followUp": "Follow-up",
+    "verifiedOf": "{{verified}} of {{total}} claims verified"
+  },
+  "view": {
+    "all": "All",
+    "research": "To research",
+    "profiles": "Profiles to approve",
+    "outreach": "Invitations",
+    "followups": "Follow-ups due",
+    "interested": "Interested",
+    "joined": "Joined",
+    "closed": "Closed"
+  },
+  "viewHint": {
+    "all": "Every business in the pipeline.",
+    "research": "Not researched yet, or the last research failed.",
+    "profiles": "Researched, with a profile to prepare or approve.",
+    "outreach": "Approved profiles whose invitation has not been sent.",
+    "followups": "A follow-up date has arrived.",
+    "interested": "Said yes — onboarding not finished.",
+    "joined": "Joined or active providers.",
+    "closed": "Declined or asked not to be contacted. No outreach is possible."
+  },
+  "confidence": {
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
+  },
+  "reason": {
+    "gap": "Fills a gap ({{value}} active)",
+    "complements": "Complements {{value}} providers",
+    "quality": "Well sourced ({{value}}% verified)",
+    "contact": "Has a public contact",
+    "lowConfidence": "Low confidence ({{value}}% verified)",
+    "noResearch": "Not researched"
+  },
+  "detail": {
+    "changeStage": "Change stage…",
+    "reasonRequired": "Why? (required)",
+    "apply": "Apply",
+    "record": "Business record",
+    "sources": "How it entered the pipeline"
+  },
+  "research": {
+    "title": "Business intelligence",
+    "run": "Research this business",
+    "rerun": "Research again",
+    "running": "Researching…",
+    "empty": "No research yet. The agent reads the business's own public website and reports what it found, with evidence for every claim.",
+    "confidence": "Confidence",
+    "status": {
+      "done": "Complete",
+      "partial": "Partial",
+      "failed": "Failed"
+    },
+    "read": "Page read:",
+    "summary": "What it does",
+    "services": "Services",
+    "products": "Products",
+    "coverage": "Geographic coverage",
+    "contacts": "Contact details found on the site",
+    "useContact": "Use",
+    "inUse": "In use",
+    "contactsRule": "Found on the page by pattern, not by the AI. Use one only if it is the business's public contact.",
+    "aiAnswers": "The agent's suggestions — interpretation, not facts",
+    "whyJoin": "Why should this business join 1💗1?",
+    "requests": "Which customer requests could it fulfil?",
+    "collaboration": "Could it collaborate with other providers?",
+    "complementary": "Complementary businesses",
+    "customers": "Potential customers",
+    "keywords": "Categories and search keywords",
+    "missing": "Missing information",
+    "verified": "Verified",
+    "unverified": "Not verified"
+  },
+  "problem": {
+    "site": "The website could not be read",
+    "model": "The AI step did not run"
+  },
+  "missing": {
+    "website": "No website",
+    "email": "No public email",
+    "phone": "No public phone",
+    "services": "Services are not clear",
+    "coverage": "Coverage area is not stated"
+  },
+  "origin": {
+    "verified": "Verified",
+    "suggested": "AI suggestion",
+    "edited": "Edited by you",
+    "ai": "AI draft",
+    "verifiedHint": "From the operator's record or evidence found on the business's page",
+    "suggestedHint": "Proposed by the agent — check before approving",
+    "editedHint": "A person changed this field",
+    "aiHint": "Written by the agent — read before approving"
+  },
+  "profile": {
+    "title": "Proposed 1💗1 profile",
+    "approved": "Approved by you",
+    "emptyResearched": "Draft the profile from the research.",
+    "emptyNoResearch": "You can draft a profile from the record alone, but research first gives the owner a better start.",
+    "generate": "Draft the profile",
+    "regenerate": "Draft again",
+    "regenerateConfirm": "Drafting again replaces the current profile, including your edits. Continue?",
+    "edit": "Edit",
+    "approve": "Approve this profile",
+    "approveRule": "Approving means you stand behind this draft as the one to show the owner. Nothing is published: only the owner can publish it.",
+    "editRule": "Any change withdraws an earlier approval.",
+    "onePerLine": "One per line",
+    "preview": "Preview — how the owner will first see it",
+    "previewRule": "The owner reviews, corrects and decides. Without their authorisation nothing appears on 1💗1.",
+    "f": {
+      "title": "Business title",
+      "description": "Description",
+      "coverage": "Geographic coverage",
+      "website": "Website",
+      "services": "Services",
+      "products": "Products",
+      "categories": "Categories",
+      "keywords": "Search keywords",
+      "social": "Social links",
+      "capabilities": "Relevant capabilities"
+    }
+  },
+  "outreach": {
+    "title": "Outreach and onboarding",
+    "generate": "Draft invitations",
+    "regenerate": "Draft again",
+    "needsProfile": "Approve the profile before approving an invitation.",
+    "variants": "Message variants",
+    "kind": {
+      "friendly": "Friendly",
+      "professional": "Professional",
+      "whatsapp": "Short WhatsApp",
+      "email": "Email"
+    },
+    "origin": {
+      "ai": "AI draft",
+      "template": "Standard template",
+      "edited": "Edited"
+    },
+    "subject": "Subject",
+    "body": "Message",
+    "linkHint": "{{token}} is replaced with the owner's review link.",
+    "approve": "Approve this message",
+    "approved": "Approved",
+    "closed": {
+      "declined": "This business declined",
+      "doNotContact": "This business asked not to be contacted"
+    },
+    "closedBody": "No messages, links or follow-ups. To reopen, change the stage and state why."
+  },
+  "onboarding": {
+    "title": "The owner's review link",
+    "body": "Prepares the profile as a draft the owner can review, correct, and then create — or not. Requires an approved profile and the business's public email.",
+    "prepare": "Prepare the link",
+    "renew": "Prepare a new link",
+    "preview": "Public preview",
+    "manage": "Owner's review link",
+    "expires": "Valid until {{date}}",
+    "hasAccount": "This email already has a 1💗1 account: the link hands the draft to that account."
+  },
+  "send": {
+    "title": "Send — from your own app",
+    "copy": "Copy message",
+    "copied": "Copied",
+    "whatsapp": "Open WhatsApp",
+    "email": "Open email draft",
+    "rule": "Opening WhatsApp or an email draft does not send anything, and does not tell us it was delivered or read.",
+    "noLink": "No review link yet — the message will go without one.",
+    "didYouSend": "Did you send it?",
+    "yesSent": "Yes, mark as contacted",
+    "notYet": "Not yet",
+    "markManually": "I contacted them another way",
+    "channel": "Channel",
+    "markContacted": "Mark as contacted"
+  },
+  "channel": {
+    "whatsapp": "WhatsApp",
+    "email": "Email",
+    "phone": "Phone",
+    "inPerson": "In person",
+    "other": "Other"
+  },
+  "response": {
+    "title": "Record their response",
+    "record": "Record",
+    "interested": "Interested",
+    "notNow": "Not now",
+    "declined": "Declined",
+    "doNotContact": "Asked not to be contacted",
+    "noAnswer": "No answer",
+    "question": "Asked a question",
+    "dncConfirm": "This closes outreach for this business and erases its email and phone. Its identity is kept only so it is never imported again. Continue?"
+  },
+  "followUp": {
+    "title": "Follow-up",
+    "date": "Follow-up date",
+    "next": "Next step",
+    "save": "Save",
+    "rule": "A reminder for you. Nothing is sent automatically."
+  },
+  "log": {
+    "title": "Activity history",
+    "notePlaceholder": "Add a note…",
+    "add": "Add",
+    "you": "you",
+    "system": "system"
+  },
+  "activity": {
+    "created": "Added",
+    "imported": "Imported",
+    "edited": "Edited",
+    "stage": "Stage",
+    "note": "Note",
+    "research": "Researched",
+    "profile": "Profile drafted",
+    "profileApproved": "Profile approved",
+    "outreachDrafted": "Invitations drafted",
+    "outreachApproved": "Invitation approved",
+    "contacted": "Contacted",
+    "response": "Response",
+    "followUp": "Follow-up set",
+    "onboarding": "Review link prepared"
+  },
+  "intel": {
+    "gaps": "Gaps in the provider network",
+    "noGaps": "No gaps stand out in the data yet.",
+    "wanted": "{{category}}: named as a needed partner by {{count}} joined providers, and none is active.",
+    "thin": "{{category}}: {{count}} active providers.",
+    "thinRegion": "{{category}} in {{region}}: {{count}} active providers.",
+    "rule": "From the pipeline's own records. Customer demand from the concierge will join these signals in the next phase.",
+    "recruitNext": "Who to work on next",
+    "coverage": "Coverage by category and region",
+    "inPipeline": "In pipeline",
+    "joined": "Joined",
+    "active": "Active",
+    "metricRule": "Success is useful coverage by active providers and real customer matches — not the number of registrations."
+  },
+  "settings": {
+    "config": "Configuration",
+    "operators": "Operators: members of rikma #{{project}} (optionally narrowed by GROWTH_OPERATOR_IDS).",
+    "storage": "Records: GROWTH_STATE_DIR on the server, one file, never in the browser.",
+    "model": "AI: the platform's model chain, called from the server only. Without a model, standard templates are used.",
+    "env": "These settings live in the server's environment, not on this page.",
+    "rules": "Rules the agent keeps",
+    "rule": {
+      "noInvent": "Never invents a business, a fact or a contact detail.",
+      "sources": "Records the source of every fact; verified and suggested are always marked.",
+      "noAutoSend": "Sends nothing. Every message is approved and sent by a person.",
+      "consent": "Never accepts, signs or publishes on a business owner's behalf.",
+      "dnc": "Never contacts a business that declined or asked not to be contacted.",
+      "privacy": "Reads only public business pages; never private data.",
+      "terms": "Skips sources whose terms forbid automated reading (social networks)."
+    },
+    "dncTitle": "Do-not-contact list ({{count}})",
+    "dncBody": "These businesses keep only a hashed identity, so a future import will recognise and skip them.",
+    "declinedCount": "Declined: {{count}}"
+  },
+  "lang": {
+    "he": "Hebrew",
+    "en": "English",
+    "ar": "Arabic"
+  },
+  "errors": {
+    "NAME_REQUIRED": "A name is required.",
+    "BAD_EMAIL": "That email address doesn't look right.",
+    "BAD_PHONE": "That phone number doesn't look right.",
+    "BAD_WEBSITE": "The website must be an http(s) address.",
+    "BAD_SOURCE_URL": "The source link must be an http(s) address.",
+    "DUPLICATE": "This business is already in the pipeline.",
+    "CLOSED_DOOR": "This business declined or asked not to be contacted.",
+    "REASON_REQUIRED": "Say why you are reopening a business that asked not to be contacted.",
+    "SAME_STAGE": "It is already at that stage.",
+    "PROFILE_NOT_APPROVED": "Approve the profile first.",
+    "EMAIL_REQUIRED": "Add the business's public email first.",
+    "NO_PROFILE": "Draft the profile first.",
+    "TEXT_REQUIRED": "Write something first.",
+    "BAD_DATE": "Choose a date within the next year.",
+    "BAD_FIELD": "One of the fields is not valid.",
+    "EMPTY_FILE": "The file is empty.",
+    "FILE_TOO_LARGE": "The file is too large (1 MB at most).",
+    "NO_NAME_COLUMN": "No name column was found in the header row.",
+    "RATE_LIMITED": "Too many links prepared — try again later.",
+    "NOT_CONFIGURED": "The Growth Agent is not configured on the server.",
+    "NOT_FOUND": "This business is no longer in the pipeline.",
+    "self": "That is your own email — the link is for the business owner.",
+    "unverified": "We could not confirm this email right now. Try again.",
+    "generic": "Something went wrong. Try again."
+  }
+}

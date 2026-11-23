@@ -1,0 +1,271 @@
+/* ─── Lev Growth Agent (docs/inprogress/PLAN_GROWTH_AGENT.md §10) ───
+   Built on the seller screens' tokens and parts (shop.css: sh-card, sh-btn,
+   sh-chip, sh-input …) so it reads in all four fills; only the layout is new.
+   Every class is `gr-` prefixed for the same reason shop.css prefixes `sh-`. */
+
+.gr-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 16px 96px;
+  display: grid;
+  gap: 16px;
+  background: var(--sh-page);
+  min-height: 100vh;
+}
+.gr-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+}
+.gr-title {
+  font-family: var(--sh-display);
+  font-size: 26px;
+  font-weight: 800;
+}
+.gr-sub {
+  font-size: 14px;
+}
+.gr-nav {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.gr-nav::-webkit-scrollbar {
+  display: none;
+}
+.gr-nav a {
+  text-decoration: none;
+}
+.gr-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+.gr-cols {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 960px) {
+  .gr-cols {
+    grid-template-columns: 1fr 1fr;
+  }
+  .gr-cols-3 {
+    grid-template-columns: 1.05fr 1fr 1fr;
+  }
+}
+.gr-card {
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  min-width: 0;
+}
+.gr-card h2 {
+  font-size: 17px;
+  font-weight: 800;
+}
+.gr-card h3 {
+  font-size: 14px;
+  font-weight: 700;
+}
+.gr-tile {
+  padding: 14px;
+  display: grid;
+  gap: 4px;
+  text-decoration: none;
+  color: inherit;
+}
+.gr-tile .gr-num {
+  font-family: var(--sh-display);
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--sh-gold);
+  line-height: 1;
+}
+.gr-tile .gr-lbl {
+  font-size: 13px;
+  color: var(--sh-muted);
+}
+.gr-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.gr-between {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+.gr-form {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+.gr-form .gr-wide {
+  grid-column: 1 / -1;
+}
+.gr-textarea {
+  min-height: 110px;
+  padding: 10px 12px;
+  line-height: 1.5;
+  resize: vertical;
+  font-family: inherit;
+}
+.gr-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.gr-list li {
+  font-size: 14px;
+  color: var(--sh-ink);
+}
+.gr-muted {
+  color: var(--sh-muted);
+  font-size: 13px;
+}
+.gr-small {
+  font-size: 12px;
+}
+.gr-error {
+  color: #b91c1c;
+  font-size: 14px;
+}
+:root.dark .gr-error,
+html.dark .gr-error {
+  color: #fca5a5;
+}
+.gr-ok {
+  color: var(--sh-ok-ink);
+  font-size: 14px;
+}
+.gr-funnel {
+  display: grid;
+  gap: 6px;
+}
+.gr-funnel-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 170px) 1fr auto;
+  gap: 10px;
+  align-items: center;
+  font-size: 13px;
+}
+.gr-bar {
+  height: 22px;
+  border-radius: 6px;
+  background: var(--sh-card-2);
+  border: 1px solid var(--sh-line);
+  overflow: hidden;
+}
+.gr-bar > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--sh-gold), color-mix(in srgb, var(--sh-accent) 70%, var(--sh-gold)));
+  min-width: 2px;
+}
+.gr-claim {
+  display: grid;
+  gap: 3px;
+  padding: 8px 10px;
+  border-radius: var(--sh-radius-sm);
+  background: var(--sh-card-2);
+  border: 1px solid var(--sh-line);
+}
+.gr-claim q,
+.gr-quote {
+  font-size: 12px;
+  color: var(--sh-muted);
+  font-style: italic;
+}
+.gr-ai {
+  border-inline-start: 3px solid var(--sh-info-ink);
+  padding-inline-start: 10px;
+}
+.gr-preview {
+  padding: 16px;
+  border-radius: var(--sh-radius-lg);
+  border: 1px dashed var(--sh-gold-line);
+  display: grid;
+  gap: 8px;
+}
+.gr-preview h3 {
+  font-family: var(--sh-display);
+  font-size: 22px;
+}
+.gr-msg {
+  white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 1.55;
+  padding: 12px;
+  border-radius: var(--sh-radius-sm);
+  background: var(--sh-card-2);
+  border: 1px solid var(--sh-line);
+  color: var(--sh-ink);
+  overflow-wrap: anywhere;
+}
+.gr-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  max-height: 420px;
+  overflow: auto;
+}
+.gr-log li {
+  display: grid;
+  gap: 2px;
+  font-size: 13px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--sh-line);
+}
+.gr-link {
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+.gr-table td,
+.gr-table th {
+  padding: 8px 10px;
+  text-align: start;
+  font-size: 14px;
+  border-bottom: 1px solid var(--sh-line);
+  vertical-align: top;
+}
+.gr-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.gr-table th {
+  font-size: 12px;
+  color: var(--sh-muted);
+  font-weight: 700;
+}
+.gr-table-wrap {
+  overflow-x: auto;
+}
+.gr-nav a[aria-current='page'] {
+  background: var(--sh-gold);
+  border-color: var(--sh-gold);
+  color: var(--sh-card);
+  font-weight: 700;
+}
+.gr-cols-3 {
+  align-items: start;
+}
+.gr-ai p {
+  font-size: 14px;
+  color: var(--sh-ink);
+}
+.gr-ai h3 {
+  margin-top: 6px;
+}

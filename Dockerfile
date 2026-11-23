@@ -66,7 +66,7 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
 # Mount points for the named volumes in docker-compose.api.yml. A fresh named
 # volume takes the owner of the directory it is mounted over — and a path the
 # image does not have is created root-owned, which USER node cannot write.
-RUN mkdir -p /data/space-docs /data/translate-state && chown -R node:node /data
+RUN mkdir -p /data/space-docs /data/translate-state /data/growth-state && chown -R node:node /data
 
 USER node
 

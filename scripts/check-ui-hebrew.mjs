@@ -52,7 +52,10 @@ const ROOTS = [
     'src/lib/components/shop',
     // The assistant's rich cards are mounted by the global bot popup.
     'src/lib/chat',
-    'src/routes/about'
+    'src/routes/about',
+    // Lev Growth Agent — localised from the start (docs/inprogress/PLAN_GROWTH_AGENT.md).
+    'src/routes/(reg)/growth',
+    'src/lib/components/growth'
 ];
 
 /**

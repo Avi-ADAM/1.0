@@ -1,0 +1,454 @@
+{
+  "title": "Agente de crecimiento Lev",
+  "subtitle": "Encontramos, investigamos e invitamos a negocios independientes: el agente prepara y tú decides.",
+  "nav": {
+    "overview": "Resumen",
+    "discover": "Descubrir negocios",
+    "research": "Cola de investigación",
+    "profiles": "Preparación de perfiles",
+    "outreach": "Contacto",
+    "pipeline": "Embudo de captación",
+    "intelligence": "Inteligencia de red",
+    "settings": "Ajustes"
+  },
+  "access": {
+    "not_configured": {
+      "title": "El agente de crecimiento aún no está activado",
+      "body": "Necesita un lugar donde guardar sus registros (GROWTH_STATE_DIR en el servidor). Hasta entonces no se guarda ni se muestra nada."
+    },
+    "not_signed_in": {
+      "title": "Inicia sesión primero",
+      "body": "El agente de crecimiento es para el equipo de la plataforma. Inicia sesión con tu cuenta."
+    },
+    "not_operator": {
+      "title": "Esta zona es para el equipo de la plataforma",
+      "body": "Solo los miembros de la rikma propia de la plataforma operan el agente de crecimiento."
+    },
+    "check_failed": {
+      "title": "No pudimos comprobar tu acceso",
+      "body": "La comprobación no obtuvo respuesta. Inténtalo de nuevo en un minuto."
+    }
+  },
+  "common": {
+    "cancel": "Cancelar",
+    "noteOptional": "Nota (opcional)",
+    "working": "Trabajando…"
+  },
+  "stage": {
+    "discovered": "Descubierto",
+    "researching": "En investigación",
+    "researched": "Investigación completada",
+    "profilePrepared": "Perfil preparado",
+    "awaitingApproval": "Pendiente de aprobación",
+    "invitationReady": "Invitación lista",
+    "invitationSent": "Invitación enviada",
+    "interested": "Interesado",
+    "onboardingStarted": "Alta iniciada",
+    "joined": "Se unió",
+    "activeProvider": "Proveedor activo",
+    "declined": "Rechazó",
+    "doNotContact": "No contactar"
+  },
+  "tiles": {
+    "discovered": "Negocios descubiertos",
+    "researched": "Investigados",
+    "awaitingProfileApproval": "Perfiles pendientes de aprobación",
+    "invitationsReady": "Invitaciones listas para enviar",
+    "invitationsSent": "Invitaciones enviadas",
+    "interested": "Interesados",
+    "registered": "Proveedores registrados",
+    "active": "Proveedores activos",
+    "followUpsDue": "Seguimientos pendientes"
+  },
+  "overview": {
+    "next": "Próximas acciones recomendadas",
+    "allClear": "Ahora mismo no hay nada esperándote.",
+    "empty": "Todavía no hay negocios en el embudo.",
+    "start": "Añadir el primer negocio",
+    "open": "Abrir",
+    "funnel": "Embudo de conversión",
+    "funnelRule": "Cada negocio cuenta en cada paso que alcanzó, aunque después rechazara. El porcentaje es la parte del paso anterior.",
+    "recent": "Actividad reciente",
+    "noActivity": "Todavía no hay actividad."
+  },
+  "next": {
+    "research": "Negocios sin investigar: {{count}}.",
+    "approveProfiles": "Negocios esperando la aprobación del perfil: {{count}}.",
+    "draftOutreach": "Perfiles aprobados sin invitación aprobada: {{count}}.",
+    "sendInvitations": "Invitaciones aprobadas y listas para que las envíes: {{count}}.",
+    "followUps": "Seguimientos pendientes: {{count}}.",
+    "interestedNotJoined": "Negocios que mostraron interés pero no completaron el alta: {{count}}.",
+    "newInCategory": "Esta semana se descubrieron {{count}} negocios nuevos de {{category}}.",
+    "newInCategoryRegion": "Esta semana se descubrieron {{count}} negocios nuevos de {{category}} en {{region}}.",
+    "activate": "Se unieron {{count}} negocios: comprueba si ya son proveedores activos."
+  },
+  "discover": {
+    "addTitle": "Añadir un negocio",
+    "addBody": "Registra un negocio que encontraste. Escribe solo lo que viste y di dónde lo viste.",
+    "autoTitle": "Descubrimiento automático",
+    "autoBody": "La búsqueda automática en fuentes es la siguiente fase. Cuando llegue, cada resultado llevará su fuente y pasará la misma comprobación de duplicados:",
+    "sources": {
+      "places": "Google Maps / Places, cuando haya una clave de API",
+      "websites": "Sitios web públicos de negocios",
+      "directories": "Directorios públicos de negocios, según sus condiciones",
+      "social": "Páginas públicas en redes, solo donde sus condiciones lo permitan",
+      "network": "Negocios que ya están en la red de 1💗1"
+    },
+    "rules": "Nunca inventamos un negocio ni un dato de contacto. Nunca recopilamos datos privados. Respetamos las condiciones de cada fuente y las leyes de contacto aplicables."
+  },
+  "form": {
+    "name": "Nombre del negocio",
+    "website": "Sitio web",
+    "email": "Correo público",
+    "phone": "Teléfono público",
+    "country": "País",
+    "city": "Ciudad",
+    "region": "Región",
+    "category": "Categoría",
+    "services": "Servicios",
+    "keywords": "Palabras clave",
+    "size": "Tamaño",
+    "notes": "Notas",
+    "lang": "Idioma",
+    "sourceKind": "Dónde lo encontraste",
+    "sourceLabel": "Nombre de la fuente",
+    "sourceUrl": "Enlace a la fuente",
+    "listHint": "Separados por comas",
+    "sourceRule": "La fuente se registra junto a cada dato que introduces.",
+    "add": "Añadir negocio",
+    "save": "Guardar",
+    "openExisting": "Abrir el registro existente"
+  },
+  "source": {
+    "from": "Fuente:",
+    "none": "Sin fuente registrada",
+    "manual": "Introducido a mano",
+    "csv": "Importación CSV",
+    "website": "Sitio del negocio",
+    "network": "Red 1💗1",
+    "places": "Mapas / Places",
+    "directory": "Directorio",
+    "social": "Página en redes"
+  },
+  "csv": {
+    "title": "Importar desde CSV",
+    "body": "Hasta {{max}} filas. Se necesita una fila de encabezados; las columnas se reconocen por su nombre (hebreo, inglés o árabe). Los duplicados se omiten y se listan.",
+    "pick": "Elegir un archivo CSV",
+    "found": "Filas con nombre: {{count}}",
+    "columns": "Columnas reconocidas",
+    "missingName": "Filas sin nombre (omitidas): {{lines}}",
+    "tooMany": "Solo se leerán las primeras {{max}} filas.",
+    "import": "Importar {{count}} filas",
+    "imported": "Importados: {{count}}",
+    "duplicates": "Omitidos por duplicados: {{count}}",
+    "invalid": "Filas con algún problema: {{count}}",
+    "line": "Línea {{line}}",
+    "dupInFile": "repite una línea anterior",
+    "dupInStore": "ya está en el embudo",
+    "goResearch": "Ir a la cola de investigación"
+  },
+  "pipeline": {
+    "views": "Vistas",
+    "search": "Buscar por nombre, lugar, categoría…",
+    "stage": "Etapa",
+    "anyStage": "Cualquier etapa",
+    "anyCategory": "Cualquier categoría",
+    "sort": "Orden",
+    "byPriority": "Por prioridad",
+    "byUpdated": "Actualizados recientemente",
+    "byName": "Por nombre",
+    "noneHere": "No hay negocios en esta vista.",
+    "place": "Lugar",
+    "research": "Investigación",
+    "priority": "Prioridad",
+    "followUp": "Seguimiento",
+    "verifiedOf": "{{verified}} de {{total}} afirmaciones verificadas"
+  },
+  "view": {
+    "all": "Todos",
+    "research": "Por investigar",
+    "profiles": "Perfiles por aprobar",
+    "outreach": "Invitaciones",
+    "followups": "Seguimientos",
+    "interested": "Interesados",
+    "joined": "Se unieron",
+    "closed": "Cerrados"
+  },
+  "viewHint": {
+    "all": "Todos los negocios del embudo.",
+    "research": "Aún sin investigar, o la última investigación falló.",
+    "profiles": "Investigados, con un perfil por preparar o aprobar.",
+    "outreach": "Perfiles aprobados cuya invitación no se ha enviado.",
+    "followups": "Llegó la fecha de seguimiento.",
+    "interested": "Dijeron que sí; el alta no está completa.",
+    "joined": "Se unieron o son proveedores activos.",
+    "closed": "Rechazaron o pidieron no ser contactados. No se puede contactar."
+  },
+  "confidence": {
+    "high": "Alta",
+    "medium": "Media",
+    "low": "Baja"
+  },
+  "reason": {
+    "gap": "Cubre un hueco ({{value}} activos)",
+    "complements": "Complementa a {{value}} proveedores",
+    "quality": "Bien documentado ({{value}}% verificado)",
+    "contact": "Tiene un contacto público",
+    "lowConfidence": "Confianza baja ({{value}}% verificado)",
+    "noResearch": "Sin investigar"
+  },
+  "detail": {
+    "changeStage": "Cambiar etapa…",
+    "reasonRequired": "¿Por qué? (obligatorio)",
+    "apply": "Aplicar",
+    "record": "Ficha del negocio",
+    "sources": "Cómo entró en el embudo"
+  },
+  "research": {
+    "title": "Inteligencia del negocio",
+    "run": "Investigar este negocio",
+    "rerun": "Investigar de nuevo",
+    "running": "Investigando…",
+    "empty": "Todavía no hay investigación. El agente lee el sitio web público del negocio e informa de lo que encontró, con pruebas para cada afirmación.",
+    "confidence": "Confianza",
+    "status": {
+      "done": "Completa",
+      "partial": "Parcial",
+      "failed": "Falló"
+    },
+    "read": "Página leída:",
+    "summary": "A qué se dedica",
+    "services": "Servicios",
+    "products": "Productos",
+    "coverage": "Cobertura geográfica",
+    "contacts": "Datos de contacto encontrados en el sitio",
+    "useContact": "Usar",
+    "inUse": "En uso",
+    "contactsRule": "Encontrados en la página por patrón, no por la IA. Úsalos solo si son el contacto público del negocio.",
+    "aiAnswers": "Sugerencias del agente: interpretación, no hechos",
+    "whyJoin": "¿Por qué debería este negocio unirse a 1💗1?",
+    "requests": "¿Qué solicitudes de clientes podría atender?",
+    "collaboration": "¿Podría colaborar con otros proveedores?",
+    "complementary": "Negocios complementarios",
+    "customers": "Clientes potenciales",
+    "keywords": "Categorías y palabras de búsqueda",
+    "missing": "Información que falta",
+    "verified": "Verificado",
+    "unverified": "Sin verificar"
+  },
+  "problem": {
+    "site": "No se pudo leer el sitio web",
+    "model": "El paso de IA no se ejecutó"
+  },
+  "missing": {
+    "website": "Sin sitio web",
+    "email": "Sin correo público",
+    "phone": "Sin teléfono público",
+    "services": "Los servicios no están claros",
+    "coverage": "No se indica la zona de trabajo"
+  },
+  "origin": {
+    "verified": "Verificado",
+    "suggested": "Sugerencia de IA",
+    "edited": "Editado por ti",
+    "ai": "Borrador de IA",
+    "verifiedHint": "Del registro del operador o de una prueba encontrada en la página del negocio",
+    "suggestedHint": "Propuesto por el agente: revísalo antes de aprobar",
+    "editedHint": "Una persona cambió este campo",
+    "aiHint": "Escrito por el agente: léelo antes de aprobar"
+  },
+  "profile": {
+    "title": "Perfil propuesto en 1💗1",
+    "approved": "Aprobado por ti",
+    "emptyResearched": "Prepara el perfil a partir de la investigación.",
+    "emptyNoResearch": "Puedes preparar un perfil solo con el registro, pero investigar antes da al propietario un mejor comienzo.",
+    "generate": "Preparar el perfil",
+    "regenerate": "Preparar de nuevo",
+    "regenerateConfirm": "Preparar de nuevo sustituye el perfil actual, incluidas tus ediciones. ¿Continuar?",
+    "edit": "Editar",
+    "approve": "Aprobar este perfil",
+    "approveRule": "Aprobar significa que respaldas este borrador para mostrárselo al propietario. No se publica nada: solo el propietario puede publicarlo.",
+    "editRule": "Cualquier cambio retira una aprobación anterior.",
+    "onePerLine": "Uno por línea",
+    "preview": "Vista previa: así lo verá el propietario por primera vez",
+    "previewRule": "El propietario lo revisa, lo corrige y decide. Sin su autorización no aparece nada en 1💗1.",
+    "f": {
+      "title": "Nombre del negocio",
+      "description": "Descripción",
+      "coverage": "Cobertura geográfica",
+      "website": "Sitio web",
+      "services": "Servicios",
+      "products": "Productos",
+      "categories": "Categorías",
+      "keywords": "Palabras de búsqueda",
+      "social": "Enlaces a redes",
+      "capabilities": "Capacidades relevantes"
+    }
+  },
+  "outreach": {
+    "title": "Contacto y alta",
+    "generate": "Redactar invitaciones",
+    "regenerate": "Redactar de nuevo",
+    "needsProfile": "Aprueba el perfil antes de aprobar una invitación.",
+    "variants": "Variantes del mensaje",
+    "kind": {
+      "friendly": "Cercano",
+      "professional": "Profesional",
+      "whatsapp": "WhatsApp breve",
+      "email": "Correo"
+    },
+    "origin": {
+      "ai": "Borrador de IA",
+      "template": "Plantilla estándar",
+      "edited": "Editado"
+    },
+    "subject": "Asunto",
+    "body": "Mensaje",
+    "linkHint": "{{token}} se sustituye por el enlace de revisión del propietario.",
+    "approve": "Aprobar este mensaje",
+    "approved": "Aprobado",
+    "closed": {
+      "declined": "Este negocio rechazó",
+      "doNotContact": "Este negocio pidió no ser contactado"
+    },
+    "closedBody": "Sin mensajes, enlaces ni seguimientos. Para reabrir, cambia la etapa e indica el motivo."
+  },
+  "onboarding": {
+    "title": "Enlace de revisión del propietario",
+    "body": "Prepara el perfil como un borrador que el propietario puede revisar, corregir y luego crear, o no. Requiere un perfil aprobado y el correo público del negocio.",
+    "prepare": "Preparar el enlace",
+    "renew": "Preparar un enlace nuevo",
+    "preview": "Vista pública",
+    "manage": "Enlace de revisión del propietario",
+    "expires": "Válido hasta el {{date}}",
+    "hasAccount": "Este correo ya tiene una cuenta en 1💗1: el enlace entrega el borrador a esa cuenta."
+  },
+  "send": {
+    "title": "Enviar desde tu propia aplicación",
+    "copy": "Copiar mensaje",
+    "copied": "Copiado",
+    "whatsapp": "Abrir WhatsApp",
+    "email": "Abrir borrador de correo",
+    "rule": "Abrir WhatsApp o un borrador de correo no envía nada, ni indica que se haya entregado o leído.",
+    "noLink": "Todavía no hay enlace de revisión: el mensaje saldrá sin él.",
+    "didYouSend": "¿Lo enviaste?",
+    "yesSent": "Sí, marcar como contactado",
+    "notYet": "Todavía no",
+    "markManually": "Contacté de otra forma",
+    "channel": "Canal",
+    "markContacted": "Marcar como contactado"
+  },
+  "channel": {
+    "whatsapp": "WhatsApp",
+    "email": "Correo",
+    "phone": "Teléfono",
+    "inPerson": "En persona",
+    "other": "Otro"
+  },
+  "response": {
+    "title": "Registrar su respuesta",
+    "record": "Registrar",
+    "interested": "Interesados",
+    "notNow": "Ahora no",
+    "declined": "Rechazaron",
+    "doNotContact": "Pidieron no ser contactados",
+    "noAnswer": "Sin respuesta",
+    "question": "Hicieron una pregunta",
+    "dncConfirm": "Esto cierra el contacto con este negocio y borra su correo y su teléfono. Su identidad se conserva solo para no volver a importarlo. ¿Continuar?"
+  },
+  "followUp": {
+    "title": "Seguimiento",
+    "date": "Fecha de seguimiento",
+    "next": "Siguiente paso",
+    "save": "Guardar",
+    "rule": "Un recordatorio para ti. No se envía nada automáticamente."
+  },
+  "log": {
+    "title": "Historial de actividad",
+    "notePlaceholder": "Añadir una nota…",
+    "add": "Añadir",
+    "you": "tú",
+    "system": "sistema"
+  },
+  "activity": {
+    "created": "Añadido",
+    "imported": "Importado",
+    "edited": "Editado",
+    "stage": "Etapa",
+    "note": "Nota",
+    "research": "Investigado",
+    "profile": "Perfil preparado",
+    "profileApproved": "Perfil aprobado",
+    "outreachDrafted": "Invitaciones redactadas",
+    "outreachApproved": "Invitación aprobada",
+    "contacted": "Contactado",
+    "response": "Respuesta",
+    "followUp": "Seguimiento fijado",
+    "onboarding": "Enlace de revisión preparado"
+  },
+  "intel": {
+    "gaps": "Huecos en la red de proveedores",
+    "noGaps": "Todavía no se ven huecos claros en los datos.",
+    "wanted": "{{category}}: {{count}} proveedores que se unieron lo nombraron como socio necesario, y no hay ninguno activo.",
+    "thin": "{{category}}: {{count}} proveedores activos.",
+    "thinRegion": "{{category}} en {{region}}: {{count}} proveedores activos.",
+    "rule": "A partir de los registros del propio embudo. La demanda de clientes del conserje se sumará a estas señales en la siguiente fase.",
+    "recruitNext": "Con quién trabajar ahora",
+    "coverage": "Cobertura por categoría y región",
+    "inPipeline": "En el embudo",
+    "joined": "Se unieron",
+    "active": "Activos",
+    "metricRule": "El éxito es una cobertura útil de proveedores activos y coincidencias reales con clientes, no el número de registros."
+  },
+  "settings": {
+    "config": "Configuración",
+    "operators": "Operadores: miembros de la rikma #{{project}} (se puede restringir con GROWTH_OPERATOR_IDS).",
+    "storage": "Registros: GROWTH_STATE_DIR en el servidor, un solo archivo, nunca en el navegador.",
+    "model": "IA: la cadena de modelos de la plataforma, llamada solo desde el servidor. Sin modelo se usan plantillas estándar.",
+    "env": "Estos ajustes viven en el entorno del servidor, no en esta página.",
+    "rules": "Reglas que sigue el agente",
+    "rule": {
+      "noInvent": "Nunca inventa un negocio, un hecho ni un dato de contacto.",
+      "sources": "Registra la fuente de cada hecho; lo verificado y lo sugerido siempre se marcan.",
+      "noAutoSend": "No envía nada. Cada mensaje lo aprueba y lo envía una persona.",
+      "consent": "Nunca acepta, firma ni publica en nombre del propietario de un negocio.",
+      "dnc": "Nunca contacta a un negocio que rechazó o pidió no ser contactado.",
+      "privacy": "Solo lee páginas públicas de negocios; nunca datos privados.",
+      "terms": "Omite las fuentes cuyas condiciones prohíben la lectura automática (redes sociales)."
+    },
+    "dncTitle": "Lista de no contactar ({{count}})",
+    "dncBody": "De estos negocios solo se guarda una identidad cifrada con hash, para que una importación futura los reconozca y los omita.",
+    "declinedCount": "Rechazaron: {{count}}"
+  },
+  "lang": {
+    "he": "Hebreo",
+    "en": "Inglés",
+    "ar": "Árabe"
+  },
+  "errors": {
+    "NAME_REQUIRED": "El nombre es obligatorio.",
+    "BAD_EMAIL": "Esa dirección de correo no parece correcta.",
+    "BAD_PHONE": "Ese número de teléfono no parece correcto.",
+    "BAD_WEBSITE": "El sitio web debe ser una dirección http(s).",
+    "BAD_SOURCE_URL": "El enlace a la fuente debe ser una dirección http(s).",
+    "DUPLICATE": "Este negocio ya está en el embudo.",
+    "CLOSED_DOOR": "Este negocio rechazó o pidió no ser contactado.",
+    "REASON_REQUIRED": "Indica por qué reabres un negocio que pidió no ser contactado.",
+    "SAME_STAGE": "Ya está en esa etapa.",
+    "PROFILE_NOT_APPROVED": "Primero aprueba el perfil.",
+    "EMAIL_REQUIRED": "Primero añade el correo público del negocio.",
+    "NO_PROFILE": "Primero prepara el perfil.",
+    "TEXT_REQUIRED": "Primero escribe algo.",
+    "BAD_DATE": "Elige una fecha dentro del próximo año.",
+    "BAD_FIELD": "Uno de los campos no es válido.",
+    "EMPTY_FILE": "El archivo está vacío.",
+    "FILE_TOO_LARGE": "El archivo es demasiado grande (1 MB como máximo).",
+    "NO_NAME_COLUMN": "No se encontró una columna de nombre en la fila de encabezados.",
+    "RATE_LIMITED": "Se prepararon demasiados enlaces; inténtalo más tarde.",
+    "NOT_CONFIGURED": "El agente de crecimiento no está configurado en el servidor.",
+    "NOT_FOUND": "Este negocio ya no está en el embudo.",
+    "self": "Es tu propio correo: el enlace es para el propietario del negocio.",
+    "unverified": "No pudimos confirmar este correo ahora. Inténtalo de nuevo.",
+    "generic": "Algo salió mal. Inténtalo de nuevo."
+  }
+}
