@@ -429,3 +429,18 @@ export const growthSetStageTool = createTool({
     return { success: true, ...result, page: pageOf(id) };
   }
 });
+
+export const growthCheckActiveTool = createTool({
+  id: 'growthCheckActive',
+  description:
+    'Growth Agent (platform team only): check whether businesses that created their rikma are ACTIVE providers - at ' +
+    'least one live product, and at least one sale or wish proposal in the last 60 days. A joined business that is active ' +
+    'moves to activeProvider by itself; an active provider that went quiet is only flagged in its log (the operator ' +
+    'decides). Pass id for one business, or omit it for all of them. Reads totals only.',
+  inputSchema: z.object({ id: z.string().optional().describe('One business id; omit for all that created a rikma.') }),
+  execute: async ({ id }) => {
+    const { result, refusal } = await run('growthCheckActive', id ? { id } : {});
+    if (refusal) return refusal;
+    return { success: true, ...result };
+  }
+});

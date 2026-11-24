@@ -393,6 +393,19 @@ const prepareOnboarding: ActionExecutionHandler = async (params, context) => {
   return { id: p.id, expiresAt: r.expiresAt };
 };
 
+// ─── active providers (§10.4) ────────────────────────────────────────────────
+
+const checkActive: ActionExecutionHandler = async (params, context) => {
+  const [{ checkActiveProviders }, { strapiClient }] = await Promise.all([
+    import('$lib/server/growth/activeProviders'),
+    import('../index.js')
+  ]);
+  const id = params.id ? String(params.id) : undefined;
+  if (id) await load(id);
+  // The operator asked: re-read now, even if the daily run already did.
+  return checkActiveProviders(repo(), strapiClient, { fetch: context.fetch, id, force: true });
+};
+
 // ─── configs ─────────────────────────────────────────────────────────────────
 
 const base = { authRules, access: ['user' as const], realtime };
@@ -477,6 +490,15 @@ export const growthConfigs: ActionConfig[] = [
       kind: { type: 'string', required: false, description: OUTREACH_KINDS.join(' · ') },
       subject: { type: 'string', required: false, description: 'Email subject' },
       body: { type: 'string', required: false, description: 'The approved text' }
+    }
+  },
+  {
+    ...base,
+    key: 'growthCheckActive',
+    description: "Growth Agent: check whether joined businesses' rikmas are active (products + recent sales or proposals)",
+    graphqlOperation: checkActive,
+    paramSchema: {
+      id: { type: 'string', required: false, description: 'One business; omit for every business that created a rikma' }
     }
   },
   {

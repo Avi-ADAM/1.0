@@ -390,7 +390,9 @@
     "followUp": "Follow-up set",
     "onboarding": "Review link prepared",
     "claimed": "The owner took the draft",
-    "rikmaCreated": "The owner created a rikma"
+    "rikmaCreated": "The owner created a rikma",
+    "activeDetected": "Detected as active",
+    "inactiveDetected": "Went quiet (flagged, stage unchanged)"
   },
   "intel": {
     "gaps": "Gaps in the provider network",
@@ -470,5 +472,12 @@
     "gap": "{{category}}: {{wishes}} customers are asking, {{active}} active providers.",
     "gapRegion": "{{category}} in {{region}}: {{wishes}} customers are asking, {{active}} active providers.",
     "unanswered": "{{count}} without any proposal"
+  },
+  "active": {
+    "yes": "Active provider: {{products}} products, {{sales}} sales and {{proposals}} proposals in the last {{days}} days.",
+    "no": "Not active yet: {{products}} products, {{sales}} sales and {{proposals}} proposals in the last {{days}} days.",
+    "checkedAt": "checked {{date}}",
+    "never": "The rikma's activity was not checked yet.",
+    "check": "Check now"
   }
 }

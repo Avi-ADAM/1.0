@@ -312,3 +312,40 @@ export function applyOwnerEvent(p: Prospect, e: OwnerEvent, now: string): Prospe
   );
   return advance(n, 'joined', null, now);
 }
+
+/** The window an active provider's sales or proposals count in (§10.4). */
+export const ACTIVE_DAYS = 60;
+
+export interface RikmaActivity {
+  products: number;
+  sales: number;
+  proposals: number;
+}
+
+/** Active = it offers something AND someone dealt with it lately. */
+export function isActiveRikma(a: RikmaActivity): boolean {
+  return a.products > 0 && (a.sales > 0 || a.proposals > 0);
+}
+
+/**
+ * Records an activity check of the rikma a business created (§10.4).
+ * `joined` + active ⇒ `activeProvider`, by the system. The reverse is never
+ * automatic: an active provider whose rikma went quiet is flagged once in the
+ * log and stays where it is — the operator decides. Closed stages only store
+ * the numbers.
+ */
+export function applyActivityCheck(p: Prospect, a: RikmaActivity, now: string, days = ACTIVE_DAYS): Prospect {
+  const o = p.onboarding;
+  if (!o?.rikmaId) return p;
+  const active = isActiveRikma(a);
+  const prev = o.activityCheck ?? null;
+  const check = { checkedAt: now, days, products: a.products, sales: a.sales, proposals: a.proposals, active };
+  let n: Prospect = { ...p, onboarding: { ...o, activityCheck: check } };
+  const summary = `${a.products} · ${a.sales} · ${a.proposals}`;
+  if (active && p.stage === 'joined') {
+    n = advance(withActivity(n, { at: now, by: null, kind: 'activeDetected', text: summary }), 'activeProvider', null, now);
+  } else if (!active && p.stage === 'activeProvider' && prev?.active !== false) {
+    n = withActivity(n, { at: now, by: null, kind: 'inactiveDetected', text: summary });
+  }
+  return n;
+}

@@ -158,6 +158,18 @@
         {#if ob.hasAccount}<li class="gr-muted">{$t('growth.onboarding.hasAccount')}</li>{/if}
         {#if ob.rikmaId}
           <li><strong>{$t('growth.onboarding.rikmaCreated', { date: new Date(ob.rikmaCreatedAt ?? ob.claimedAt ?? ob.preparedAt).toLocaleDateString() })}</strong> · <a class="gr-link" href={`/moach/${ob.rikmaId}`}>{$t('growth.onboarding.openRikma')}</a></li>
+          <li>
+            {#if ob.activityCheck}
+              {@const ac = ob.activityCheck}
+              <span class={ac.active ? '' : 'gr-muted'}
+                >{$t(ac.active ? 'growth.active.yes' : 'growth.active.no', { products: ac.products, sales: ac.sales, proposals: ac.proposals, days: ac.days })}</span
+              >
+              <span class="gr-muted"> · {$t('growth.active.checkedAt', { date: new Date(ac.checkedAt).toLocaleDateString() })}</span>
+            {:else}
+              <span class="gr-muted">{$t('growth.active.never')}</span>
+            {/if}
+            <button class="sh-btn sh-btn-quiet" onclick={() => call('growthCheckActive', {})} disabled={busy}>{$t('growth.active.check')}</button>
+          </li>
         {:else if ob.claimedAt}
           <li><strong>{$t('growth.onboarding.claimed', { date: new Date(ob.claimedAt).toLocaleDateString() })}</strong></li>
         {/if}

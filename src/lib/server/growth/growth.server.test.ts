@@ -190,7 +190,7 @@ describe('growth actions', () => {
   afterEach(() => setGrowthRepositoryForTests(null));
 
   it('every action is operator-only and publishes a realtime scope', () => {
-    expect(growthConfigs.length).toBe(8);
+    expect(growthConfigs.length).toBe(9);
     for (const c of growthConfigs) {
       expect(c.authRules.map((r) => r.type)).toEqual(['jwt', 'custom']);
       expect(c.access).toEqual(['user']);
@@ -352,5 +352,77 @@ describe('demand loader (§10.3)', () => {
     const failing = { execute: vi.fn(async () => ({ errors: [{ message: 'Forbidden' }] })) };
     expect(await loadDemand(failing)).toBeNull();
     clearDemandCache();
+  });
+});
+
+describe('active-provider signal (§10.4)', () => {
+  const T0 = Date.parse('2026-11-24T08:00:00.000Z');
+
+  function joined(stage: any, extra: Record<string, any> = {}) {
+    const p = make(`Biz ${stage}`, { email: `${stage}@b.co` });
+    return {
+      ...p,
+      stage,
+      furthest: stage,
+      onboarding: { preparedAt: NOW, preparedBy: 'u1', email: 'x@b.co', expiresAt: NOW, hasAccount: false, rikmaId: '77', ...extra }
+    };
+  }
+  const strapiWith = (products: number, sales: number, proposals: number) => ({
+    execute: vi.fn(async (qid: string, v: any) => {
+      expect(qid).toBe('growthRikmaActivity');
+      expect(v.pid).toBe('77');
+      const t = (n: number) => ({ meta: { pagination: { total: n } } });
+      return { data: { matanots: t(products), sales: t(sales), ratsonProposals: t(proposals) } };
+    })
+  });
+
+  it('joined + a product + a recent sale or proposal => activeProvider, by the system', async () => {
+    const { checkActiveProviders } = await import('./activeProviders');
+    const p = joined('joined');
+    const repo = memoryRepository([p]);
+    const r = await checkActiveProviders(repo, strapiWith(2, 0, 1), { now: T0 });
+    expect(r.becameActive).toEqual([p.id]);
+    const back = (await repo.get(p.id))!;
+    expect(back.stage).toBe('activeProvider');
+    expect(back.onboarding?.activityCheck).toMatchObject({ products: 2, sales: 0, proposals: 1, active: true, days: 60 });
+    expect(back.activity.map((a) => a.kind)).toContain('activeDetected');
+  });
+
+  it('products without customers are not active; a recent check is skipped unless forced', async () => {
+    const { checkActiveProviders } = await import('./activeProviders');
+    const p = joined('joined');
+    const repo = memoryRepository([p]);
+    const s = strapiWith(3, 0, 0);
+    await checkActiveProviders(repo, s, { now: T0 });
+    expect((await repo.get(p.id))!.stage).toBe('joined');
+    const again = await checkActiveProviders(repo, s, { now: T0 + 3600_000 });
+    expect(again).toMatchObject({ checked: 0, skipped: 1 });
+    await checkActiveProviders(repo, s, { now: T0 + 3600_000, force: true });
+    expect(s.execute).toHaveBeenCalledTimes(2);
+  });
+
+  it('a quiet active provider is flagged once and never demoted; closed and rikma-less ones are left alone', async () => {
+    const { checkActiveProviders } = await import('./activeProviders');
+    const a = joined('activeProvider');
+    const closed = joined('declined');
+    const noRikma = { ...joined('joined'), onboarding: { ...joined('joined').onboarding, rikmaId: null } };
+    const repo = memoryRepository([a, closed, noRikma]);
+    const s = strapiWith(1, 0, 0);
+    const r1 = await checkActiveProviders(repo, s, { now: T0, force: true });
+    expect(r1.flaggedInactive).toEqual([a.id]);
+    expect(r1.checked).toBe(1);
+    await checkActiveProviders(repo, s, { now: T0 + 1000, force: true });
+    const back = (await repo.get(a.id))!;
+    expect(back.stage).toBe('activeProvider');
+    expect(back.activity.filter((x) => x.kind === 'inactiveDetected')).toHaveLength(1);
+  });
+
+  it('a failed read is reported, not recorded', async () => {
+    const { checkActiveProviders } = await import('./activeProviders');
+    const p = joined('joined');
+    const repo = memoryRepository([p]);
+    const r = await checkActiveProviders(repo, { execute: vi.fn(async () => ({ errors: [{ message: 'Forbidden' }] })) }, { now: T0 });
+    expect(r.failed).toHaveLength(1);
+    expect((await repo.get(p.id))!.onboarding?.activityCheck).toBeUndefined();
   });
 });

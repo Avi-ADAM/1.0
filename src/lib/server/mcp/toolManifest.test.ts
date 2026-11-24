@@ -74,7 +74,8 @@ describe('MCP tool manifest', () => {
       'growthSaveBusinessTool',
       'growthImportCsvTool',
       'growthLogTool',
-      'growthSetStageTool'
+      'growthSetStageTool',
+      'growthCheckActiveTool'
     ];
     for (const [name, entry] of entries) {
       if (entry.tier === 'read' || entry.tier === 'prepare') continue;

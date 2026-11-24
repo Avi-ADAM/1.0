@@ -75,5 +75,30 @@ export const growthQids = {
         }
       }
     }
+  }`,
+
+  // Is a joined business an ACTIVE provider (§10.4)? Three totals for the rikma
+  // its owner created: live products, effective sales and wish proposals since
+  // $since. Totals only. lifecycle/holderStatus: null = legacy = counts.
+  'growthRikmaActivity': `query GrowthRikmaActivity($pid: ID!, $since: DateTime!) {
+    matanots(
+      filters: {
+        projectcreates: { id: { eq: $pid } }
+        or: [{ lifecycle: { null: true } }, { lifecycle: { ne: "archived" } }]
+      }
+      pagination: { limit: 1 }
+    ) { meta { pagination { total } } }
+    sales(
+      filters: {
+        project: { id: { eq: $pid } }
+        createdAt: { gte: $since }
+        or: [{ holderStatus: { null: true } }, { holderStatus: { in: ["self", "confirmed"] } }]
+      }
+      pagination: { limit: 1 }
+    ) { meta { pagination { total } } }
+    ratsonProposals(
+      filters: { project: { id: { eq: $pid } }, createdAt: { gte: $since } }
+      pagination: { limit: 1 }
+    ) { meta { pagination { total } } }
   }`
 };

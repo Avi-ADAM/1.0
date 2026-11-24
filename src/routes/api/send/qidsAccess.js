@@ -824,6 +824,8 @@ export const qidsAccess = {
   'growthProspectUpdate': { allow: ['serviceAdmin'] },
   // Open wishes reduced to counts for the growth operators (server/growth/demand.ts).
   'growthDemandWishes': { allow: ['serviceAdmin'] },
+  // Totals for a joined business's rikma — the active-provider signal (server/growth/activeProviders.ts).
+  'growthRikmaActivity': { allow: ['serviceAdmin'] },
   // Shipping (PLAN_SHOP_SHIPPING, qidsShipping.js): run by the shipping actions,
   // the quote endpoint and the orders API after their own checks. An order's
   // shipping record sits beside the buyer's address — never a session's to read.

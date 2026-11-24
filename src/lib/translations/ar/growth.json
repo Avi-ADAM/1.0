@@ -390,7 +390,9 @@
     "followUp": "حُدّدت متابعة",
     "onboarding": "أُعدّ رابط المراجعة",
     "claimed": "أخذ صاحب العمل المسودة",
-    "rikmaCreated": "أنشأ صاحب العمل ريكما"
+    "rikmaCreated": "أنشأ صاحب العمل ريكما",
+    "activeDetected": "اكتُشف أنه نشط",
+    "inactiveDetected": "توقّف عن النشاط (تم التنبيه، المرحلة لم تتغيّر)"
   },
   "intel": {
     "gaps": "فجوات في شبكة مقدّمي الخدمات",
@@ -470,5 +472,12 @@
     "gap": "{{category}}: {{wishes}} عملاء يطلبون، {{active}} مزوّدين نشطين.",
     "gapRegion": "{{category}} في {{region}}: {{wishes}} عملاء يطلبون، {{active}} مزوّدين نشطين.",
     "unanswered": "{{count}} بلا أي عرض"
+  },
+  "active": {
+    "yes": "مزوّد نشط: {{products}} منتجات و{{sales}} مبيعات و{{proposals}} عروض في آخر {{days}} يومًا.",
+    "no": "ليس نشطًا بعد: {{products}} منتجات و{{sales}} مبيعات و{{proposals}} عروض في آخر {{days}} يومًا.",
+    "checkedAt": "فُحص في {{date}}",
+    "never": "لم يُفحص نشاط الريكما بعد.",
+    "check": "افحص الآن"
   }
 }

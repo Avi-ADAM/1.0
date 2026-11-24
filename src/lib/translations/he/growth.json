@@ -390,7 +390,9 @@
     "followUp": "נקבע מעקב",
     "onboarding": "הוכן קישור לעיון",
     "claimed": "בעל העסק לקח את הטיוטה",
-    "rikmaCreated": "בעל העסק יצר רקמה"
+    "rikmaCreated": "בעל העסק יצר רקמה",
+    "activeDetected": "זוהה כפעיל",
+    "inactiveDetected": "השתתק (סומן, השלב לא השתנה)"
   },
   "intel": {
     "gaps": "פערים ברשת נותני השירות",
@@ -470,5 +472,12 @@
     "gap": "{{category}}: {{wishes}} לקוחות מבקשים, {{active}} ספקים פעילים.",
     "gapRegion": "{{category}} ב{{region}}: {{wishes}} לקוחות מבקשים, {{active}} ספקים פעילים.",
     "unanswered": "{{count}} בלי אף הצעה"
+  },
+  "active": {
+    "yes": "ספק פעיל: {{products}} מוצרים, {{sales}} מכירות ו-{{proposals}} הצעות ב-{{days}} הימים האחרונים.",
+    "no": "עדיין לא פעיל: {{products}} מוצרים, {{sales}} מכירות ו-{{proposals}} הצעות ב-{{days}} הימים האחרונים.",
+    "checkedAt": "נבדק ב-{{date}}",
+    "never": "הפעילות של הרקמה עוד לא נבדקה.",
+    "check": "לבדוק עכשיו"
   }
 }

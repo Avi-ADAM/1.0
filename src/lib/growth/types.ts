@@ -140,6 +140,19 @@ export interface OnboardingLink {
   /** The owner created their rikma from it. */
   rikmaCreatedAt?: string | null;
   rikmaId?: string | null;
+  /** The last active-provider check of that rikma (§10.4). */
+  activityCheck?: ActivityCheck | null;
+}
+
+/** What the rikma a business created has done lately — totals only (§10.4). */
+export interface ActivityCheck {
+  checkedAt: string;
+  /** The window the sales and proposals count in. */
+  days: number;
+  products: number;
+  sales: number;
+  proposals: number;
+  active: boolean;
 }
 
 export type ContactChannel = 'whatsapp' | 'email' | 'phone' | 'inPerson' | 'other';
@@ -164,7 +177,9 @@ export type ActivityKind =
   | 'followUp'
   | 'onboarding'
   | 'claimed'
-  | 'rikmaCreated';
+  | 'rikmaCreated'
+  | 'activeDetected'
+  | 'inactiveDetected';
 
 export interface Activity {
   id: string;

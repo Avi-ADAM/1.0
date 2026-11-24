@@ -135,6 +135,7 @@ import {
   growthPrepareOnboardingTool,
   growthLogTool,
   growthSetStageTool,
+  growthCheckActiveTool,
   growthMcpEnabled
 } from '../../../mastra/tools/growthTools';
 
@@ -429,7 +430,8 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   growthOutreachTool: { tool: growthOutreachTool, title: 'Growth: draft or approve an invitation', tier: 'prepare', ai: true, audience: 'growthOperators', enabled: growthMcpEnabled },
   growthPrepareOnboardingTool: { tool: growthPrepareOnboardingTool, title: "Growth: prepare the owner's join link", tier: 'prepare', audience: 'growthOperators', enabled: growthMcpEnabled },
   growthLogTool: { tool: growthLogTool, title: 'Growth: log contact, response or follow-up', tier: 'selfWrite', destructive: true, audience: 'growthOperators', enabled: growthMcpEnabled },
-  growthSetStageTool: { tool: growthSetStageTool, title: 'Growth: set a stage', tier: 'selfWrite', destructive: true, audience: 'growthOperators', enabled: growthMcpEnabled }
+  growthSetStageTool: { tool: growthSetStageTool, title: 'Growth: set a stage', tier: 'selfWrite', destructive: true, audience: 'growthOperators', enabled: growthMcpEnabled },
+  growthCheckActiveTool: { tool: growthCheckActiveTool, title: 'Growth: check active providers', tier: 'selfWrite', audience: 'growthOperators', enabled: growthMcpEnabled }
 };
 
 /** Whether an entry is switched on at all (feature flags). */

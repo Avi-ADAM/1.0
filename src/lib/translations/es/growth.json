@@ -390,7 +390,9 @@
     "followUp": "Seguimiento fijado",
     "onboarding": "Enlace de revisión preparado",
     "claimed": "El dueño tomó el borrador",
-    "rikmaCreated": "El dueño creó una rikma"
+    "rikmaCreated": "El dueño creó una rikma",
+    "activeDetected": "Detectado como activo",
+    "inactiveDetected": "Se quedó quieto (marcado, la etapa no cambió)"
   },
   "intel": {
     "gaps": "Huecos en la red de proveedores",
@@ -470,5 +472,12 @@
     "gap": "{{category}}: {{wishes}} clientes lo piden, {{active}} proveedores activos.",
     "gapRegion": "{{category}} en {{region}}: {{wishes}} clientes lo piden, {{active}} proveedores activos.",
     "unanswered": "{{count}} sin ninguna propuesta"
+  },
+  "active": {
+    "yes": "Proveedor activo: {{products}} productos, {{sales}} ventas y {{proposals}} propuestas en los últimos {{days}} días.",
+    "no": "Aún no activo: {{products}} productos, {{sales}} ventas y {{proposals}} propuestas en los últimos {{days}} días.",
+    "checkedAt": "revisado el {{date}}",
+    "never": "La actividad de la rikma aún no se revisó.",
+    "check": "Revisar ahora"
   }
 }
