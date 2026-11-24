@@ -29,6 +29,7 @@ import {
   cleanInput,
   forgetContact,
   keysOf,
+  mergeEdit,
   newProspect,
   setStage,
   withActivity
@@ -98,7 +99,10 @@ const now = () => new Date().toISOString();
 
 const saveProspect: ActionExecutionHandler = async (params, context) => {
   const at = now();
-  const c = cleanInput((params.prospect ?? {}) as ProspectInput, context.userId, at);
+  const raw = (params.prospect ?? {}) as ProspectInput;
+  // An edit is a patch: fields it does not carry keep the record's values.
+  const current = params.id ? await load(params.id) : null;
+  const c = cleanInput(current ? mergeEdit(current, raw) : raw, context.userId, at);
   if (c.ok === false) {
     const refusal = c as Extract<typeof c, { ok: false }>;
     throw new ActionError('VALIDATION_FAILED', refusal.code, { field: refusal.field });
@@ -106,8 +110,7 @@ const saveProspect: ActionExecutionHandler = async (params, context) => {
   const keys = hashKeys(keysOf(c.value));
   const store = repo();
 
-  if (params.id) {
-    const current = await load(params.id);
+  if (current) {
     // Another record already holds one of the new keys: the edit would merge two businesses silently.
     const others = (await store.list()).filter((p) => p.id !== current.id);
     const taken = others.find((p) => p.dedupeKeys.some((k) => keys.includes(k)));
@@ -418,7 +421,7 @@ export const growthConfigs: ActionConfig[] = [
     graphqlOperation: saveProspect,
     paramSchema: {
       id: { type: 'string', required: false, description: 'Edit this prospect; omit to add one' },
-      prospect: { type: 'object', required: true, description: 'name, website, email, phone, city, region, country, category, services, keywords, size, notes, lang, sourceKind, sourceLabel, sourceUrl' }
+      prospect: { type: 'object', required: true, description: 'On an edit, only the fields sent change (absent = kept, null/"" = cleared). name, website, email, phone, city, region, country, category, services, keywords, size, notes, lang, sourceKind, sourceLabel, sourceUrl' }
     }
   },
   {

@@ -244,12 +244,17 @@ export const growthSaveBusinessTool = createTool({
     'Growth Agent (platform team only): add a business to the pipeline, or edit one (pass id). Only public details, ' +
     'each with where it came from (sourceKind / sourceLabel / sourceUrl) - never invent an email or phone. A business ' +
     'that is already there (same site, phone, email, or name + city) is not added twice: you get its id back with ' +
-    'duplicated:true. A business that asked not to be contacted stays recognised and is never re-added.',
+    'duplicated:true. A business that asked not to be contacted stays recognised and is never re-added. ' +
+    'An edit is a patch: send only the fields that change - every field you leave out keeps its value ' +
+    '(send "" - or [] for services/keywords - to clear one on purpose).',
   inputSchema: z.object({
     id: z.string().optional().describe('Edit this business; omit to add one.'),
-    business: prospectInput
+    business: prospectInput.extend({
+      name: z.string().min(1).max(200).optional().describe('Business name. Required when adding; on an edit, omit to keep it.')
+    })
   }),
   execute: async ({ id, business }) => {
+    if (!id && !business.name) return { success: false, message: 'A new business needs a name.' };
     const { result, refusal } = await run('growthSaveProspect', { ...(id ? { id } : {}), prospect: business });
     if (refusal) return refusal;
     return { success: true, ...result, page: pageOf(String(result.id)) };

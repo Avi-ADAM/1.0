@@ -108,6 +108,43 @@ describe('growth MCP tools', () => {
     expect(one.business.page).toContain(`/growth/b/${a.id}`);
   });
 
+  it('an edit changes only the fields it sends', async () => {
+    const a = await call(growthSaveBusinessTool, {
+      business: {
+        name: 'Olive Catering',
+        website: 'https://olive.example',
+        city: 'Haifa',
+        category: 'catering',
+        services: ['events', 'weddings'],
+        notes: 'Met at the fair',
+        lang: 'en'
+      }
+    });
+    const edit = await call(growthSaveBusinessTool, { id: a.id, business: { phone: '050-7654321' } });
+    expect(edit.success).toBe(true);
+    const { business: b } = await call(growthGetBusinessTool, { id: a.id });
+    expect(b).toMatchObject({
+      name: 'Olive Catering',
+      category: 'catering',
+      services: ['events', 'weddings'],
+      notes: 'Met at the fair',
+      lang: 'en',
+      contact: { phone: '050-7654321' },
+      place: { city: 'Haifa' }
+    });
+    expect(b.contact.website).toContain('olive.example');
+
+    // An empty value clears on purpose.
+    await call(growthSaveBusinessTool, { id: a.id, business: { notes: '', services: [] } });
+    const { business: c } = await call(growthGetBusinessTool, { id: a.id });
+    expect(c.notes).toBeNull();
+    expect(c.services).toEqual([]);
+    expect(c.contact.phone).toBe('050-7654321');
+
+    const noName = await call(growthSaveBusinessTool, { business: { phone: '050-1111111' } });
+    expect(noName.success).toBe(false);
+  });
+
   it('do-not-contact forgets the contact details and closes outreach', async () => {
     const a = await call(growthSaveBusinessTool, { business: { name: 'Quiet', email: 'q@q.example', phone: '050-1234567' } });
     const r = await call(growthLogTool, { id: a.id, kind: 'response', response: 'doNotContact' });

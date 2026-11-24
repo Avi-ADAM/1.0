@@ -172,6 +172,25 @@ export function newProspect(c: CleanInput, dedupeKeys: string[], by: string | nu
   });
 }
 
+const EDITABLE = [
+  'name', 'website', 'email', 'phone', 'country', 'city', 'region', 'category',
+  'services', 'keywords', 'size', 'notes', 'lang'
+] as const;
+
+/**
+ * An edit changes only the fields it carries. A key that is absent (or
+ * `undefined`) keeps the record's value; `null` or `''` clears it on purpose.
+ * Without this, adding a phone through a partial edit wiped the website,
+ * services and notes of every business it touched.
+ */
+export function mergeEdit(p: Prospect, patch: Partial<ProspectInput>): ProspectInput {
+  const out: Record<string, unknown> = { ...patch };
+  for (const f of EDITABLE) {
+    if (patch[f] === undefined) out[f] = p[f];
+  }
+  return out as unknown as ProspectInput;
+}
+
 /** An operator's edit: changed contact fields get the edit as their source. */
 export function applyEdit(p: Prospect, c: CleanInput, dedupeKeys: string[], by: string, now: string): Prospect {
   const fieldSources = { ...p.fieldSources };
