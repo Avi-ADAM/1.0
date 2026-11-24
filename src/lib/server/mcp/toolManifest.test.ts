@@ -67,7 +67,14 @@ describe('MCP tool manifest', () => {
       // A task is named by its id: the tool reads its rikma and checks the key
       // scope itself, and the reportTask action checks the caller is its assignee
       // and a member of that rikma (PLAN_AGENT_WORK AW1).
-      'reportTaskTool'
+      'reportTaskTool',
+      // Growth Agent: no projectId input — the rikma is GROWTH_PROJECT_ID. Each
+      // tool checks the key scope on it and the operator rule itself, and every
+      // write is a growth* action with its own operator rule (growthTools.ts).
+      'growthSaveBusinessTool',
+      'growthImportCsvTool',
+      'growthLogTool',
+      'growthSetStageTool'
     ];
     for (const [name, entry] of entries) {
       if (entry.tier === 'read' || entry.tier === 'prepare') continue;

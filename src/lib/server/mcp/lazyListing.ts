@@ -18,6 +18,7 @@ import { createTool } from '@mastra/core/tools';
 import {
   MCP_TOOL_MANIFEST,
   entryEnabled,
+  entryPublic,
   mcpAnnotations,
   mcpDescription,
   tierAllowed
@@ -34,7 +35,7 @@ export const SIGN_IN_REQUIRED = {
 /** Names of the tools a no-scope key sees — the set a sign-in unlocks. */
 export function signInToolNames(): string[] {
   return Object.entries(MCP_TOOL_MANIFEST)
-    .filter(([, entry]) => entryEnabled(entry) && tierAllowed(entry.tier, []))
+    .filter(([, entry]) => entryEnabled(entry) && entryPublic(entry) && tierAllowed(entry.tier, []))
     .map(([name]) => name);
 }
 

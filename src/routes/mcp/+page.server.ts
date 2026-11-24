@@ -9,6 +9,7 @@ import {
   MCP_TOOL_MANIFEST,
   MCP_WRITE_SCOPE,
   entryEnabled,
+  entryPublic,
   mcpAnnotations,
   type McpManifestEntry
 } from '$lib/server/mcp/toolManifest';
@@ -104,7 +105,7 @@ function noAccountDoc(name: string, tool: any): ToolDoc {
 
 export const load: PageServerLoad = ({ fetch }) => {
   const tools = Object.entries(MCP_TOOL_MANIFEST)
-    .filter(([, entry]) => entryEnabled(entry))
+    .filter(([, entry]) => entryEnabled(entry) && entryPublic(entry))
     .map(([name, entry]) => toolDoc(name, entry));
   const noAccount = Object.entries(noAccountTools('', fetch)).map(([name, tool]) => noAccountDoc(name, tool));
   return { tools, noAccount, endpoint: MCP_ENDPOINT };

@@ -31,6 +31,7 @@ import {
 import { mcpInstructions } from '$lib/server/mcp/instructions';
 import { getPlatformInfoTool, noAccountTools, noAccountToolNames } from '$lib/server/mcp/publicTools';
 import { assistantMcpEnabled } from '../../../mastra/tools/assistantTools';
+import { growthMcpEnabled } from '../../../mastra/tools/growthTools';
 import { normalizeApiKeyScopes } from '$lib/server/apiKeys';
 import { fetchUserLang, resolveMcpLang } from '$lib/server/mcp/lang';
 import { mcpAppResources, mcpUiMeta } from '$lib/server/mcp/apps';
@@ -164,6 +165,21 @@ const WRAPPED_TOOLS: Record<string, any> = Object.fromEntries(
 );
 
 
+/** Whether the key's owner operates the Growth Agent — false whenever the module is off or the check fails. */
+async function isGrowthOperator(userId: string, fetchFn: typeof fetch): Promise<boolean> {
+    if (!growthMcpEnabled()) return false;
+    try {
+        const [{ checkGrowthOperator }, { strapiClient }, { adminToken }] = await Promise.all([
+            import('$lib/server/growth/operator'),
+            import('$lib/server/actions/index.js'),
+            import('$lib/server/adminToken')
+        ]);
+        return (await checkGrowthOperator(userId, adminToken(), fetchFn, strapiClient)).ok;
+    } catch {
+        return false;
+    }
+}
+
 /**
  * The JSON-RPC body, read from a clone so the transport still gets the
  * original stream. Unparseable ⇒ null, which calls no tool and so meets no
@@ -263,10 +279,14 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
         const ops = keyOps(user);
         toolsToExpose = { howToConnect }; // included even in auth mode for convenience
         const withheld: string[] = [];
+        // The platform team's own tools are listed only to them (each tool
+        // re-checks on every call; this keeps everyone else's list clean).
+        const growthOperator = await isGrowthOperator(user.id.toString(), svelteFetch);
         for (const [name, entry] of Object.entries(MCP_TOOL_MANIFEST)) {
             // A tool switched off by env is simply absent — not a refusal the
             // agent has to discover by calling it.
             if (!entryEnabled(entry)) continue;
+            if (entry.audience === 'growthOperators' && !growthOperator) continue;
             if (tierAllowed(entry.tier, ops)) toolsToExpose[name] = WRAPPED_TOOLS[name];
             else withheld.push(name);
         }

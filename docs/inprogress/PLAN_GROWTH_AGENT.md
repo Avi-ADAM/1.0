@@ -1,7 +1,8 @@
 # PLAN — Lev Growth Agent: finding, researching and inviting businesses
 
-> **Status (2026-11-23): Phase 1 is built (not deployed).** The `/growth` screens and their
-> eight actions are in the code. Phase 2 (automated discovery, demand signals, a claim
+> **Status (2026-11-24): Phase 1 is built (not deployed), plus MCP (§8.5).** The `/growth`
+> screens and their eight actions are in the code, and the same pipeline can be operated from
+> Claude through ten MCP tools. Phase 2 (automated discovery, demand signals, a claim
 > callback) and Phase 3 (follow-up automation, analytics) are not. §10 lists the backend
 > pieces that are missing.
 
@@ -160,6 +161,34 @@ The `/growth` layout and every action's `custom` auth rule call this same functi
 
 All of them: `access: ['user']`, `jwt` + `custom` operator rule, realtime scope `project:<growth rikma>`.
 
+### 8.5 MCP — operating the pipeline from Claude (built 2026-11-24)
+`src/mastra/tools/growthTools.ts`, registered in `toolManifest.ts` with `audience: 'growthOperators'`:
+
+| Tool | Tier | Runs |
+|---|---|---|
+| `growthOverviewTool` | read | counts, funnel, next actions, gaps, businesses by priority (view / text filter) |
+| `growthGetBusinessTool` | read | one full record: contacts + sources, research, profile, outreach, onboarding, activity |
+| `growthSaveBusinessTool` | selfWrite | `growthSaveProspect` |
+| `growthImportCsvTool` | selfWrite | `growthImportProspects` |
+| `growthResearchTool` | prepare · ai | `growthResearch` |
+| `growthProfileTool` | prepare | `growthProfile` (generate / edit / approve) |
+| `growthOutreachTool` | prepare · ai | `growthOutreach` (generate / approve) |
+| `growthPrepareOnboardingTool` | prepare | `growthPrepareOnboarding` |
+| `growthLogTool` | selfWrite · destructive | `growthLogActivity` |
+| `growthSetStageTool` | selfWrite · destructive | `growthSetStage` |
+
+- **Who sees them.** `/api/mcp` lists them only when the key's owner passes `checkGrowthOperator`
+  (and the module is on, `growthMcpEnabled`). They are absent from the public `/mcp` reference
+  and from the anonymous listing (`entryPublic`). The listing is not the gate: every tool
+  re-runs the operator check, and a key limited to other rikmas is refused on the growth rikma.
+- **Writes are the actions.** The tools call `actionService.executeAction('growth*', …)`, so the
+  closed doors, dedupe and activity log are exactly the screens' ones. The membership lookup
+  runs under the server token, keyed to the caller's own id.
+- **Still no sending.** Descriptions tell the agent: approve a profile or message only on the
+  operator's yes; `contacted` only on their word that they sent it.
+- Setup: the operator creates an API key at `/me/settings/mcp` (or uses the OAuth connector) and connects `https://1lev1.com/api/mcp`
+  in Claude; nothing else is needed.
+
 ## 9. Dashboard and network intelligence (`lib/growth/insights.ts`)
 
 - **Tiles:** discovered, researched, profiles awaiting approval, invitations ready, sent, interested, registered (`furthest ≥ joined`), active, follow-ups due.
@@ -217,9 +246,11 @@ src/lib/components/growth/      StageChip, OriginBadge, SourceBadge, ProspectFor
 src/routes/(reg)/growth/        overview, discover, pipeline (?view=research|profiles|outreach|…), b/[id], intelligence, settings
 src/lib/styles/growth.css
 src/lib/translations/*/growth.json
+src/mastra/tools/growthTools.ts  MCP tools (§8.5)
 ```
 
 Tests:
 - `src/lib/growth/growth.test.ts`: pure rules, including the blueprint against the real `BlueprintInputSchema`.
 - `src/lib/server/growth/growth.server.test.ts`: file store, operator check, research and outreach agent, and the actions end to end on a memory store, including the do-not-contact doors.
 - `src/lib/components/growth/panels.svelte.test.ts`: the panels render.
+- `src/mastra/tools/growthTools.test.ts`: the MCP tools — operator-only, key scope, dedupe, do-not-contact.

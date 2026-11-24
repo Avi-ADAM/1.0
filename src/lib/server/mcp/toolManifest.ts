@@ -124,6 +124,19 @@ import {
   setProductCategoriesTool,
   createRikmaProductsBatchTool
 } from '../../../mastra/tools/shopCatalogTools';
+import {
+  growthOverviewTool,
+  growthGetBusinessTool,
+  growthSaveBusinessTool,
+  growthImportCsvTool,
+  growthResearchTool,
+  growthProfileTool,
+  growthOutreachTool,
+  growthPrepareOnboardingTool,
+  growthLogTool,
+  growthSetStageTool,
+  growthMcpEnabled
+} from '../../../mastra/tools/growthTools';
 
 export interface McpManifestEntry extends McpToolPolicy {
   tool: { id: string; [k: string]: any };
@@ -146,6 +159,18 @@ export interface McpManifestEntry extends McpToolPolicy {
    * result. One of `MCP_APP_URIS` in ./apps; the text result is unchanged.
    */
   ui?: string;
+  /**
+   * Listed only to this audience. `growthOperators` = members of the growth
+   * rikma (checkGrowthOperator): the platform team's own tools, absent from the
+   * public reference and from everyone else's tool list. Each tool still
+   * re-checks on every call — the listing is not the gate.
+   */
+  audience?: 'growthOperators';
+}
+
+/** Whether an entry belongs in the public reference and the anonymous listing. */
+export function entryPublic(entry: Pick<McpManifestEntry, 'audience'>): boolean {
+  return !entry.audience;
 }
 
 /** Public reference for every tool, generated from this manifest (src/routes/mcp). */
@@ -389,7 +414,22 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   // tool checks the caller made it and the key reaches that rikma.
   createUploadSessionTool: { tool: createUploadSessionTool, title: 'Create a picture upload link', tier: 'selfWrite', project: 'member' },
   getUploadSessionTool: { tool: getUploadSessionTool, title: 'Read an upload link', tier: 'read' },
-  uploadMediaFromUrlTool: { tool: uploadMediaFromUrlTool, title: 'Upload a picture from a URL', tier: 'selfWrite', project: 'member' }
+  uploadMediaFromUrlTool: { tool: uploadMediaFromUrlTool, title: 'Upload a picture from a URL', tier: 'selfWrite', project: 'member' },
+
+  // --- Growth Agent (PLAN_GROWTH_AGENT §8.5): the platform team's business-acquisition
+  // pipeline. No projectId input — the rikma is GROWTH_PROJECT_ID — so each tool checks
+  // the key scope on that rikma and the operator rule itself, and every write is a
+  // growth* action with its own operator rule. Nothing in it contacts a business.
+  growthOverviewTool: { tool: growthOverviewTool, title: 'Growth: pipeline overview', tier: 'read', audience: 'growthOperators', enabled: growthMcpEnabled },
+  growthGetBusinessTool: { tool: growthGetBusinessTool, title: 'Growth: read a business', tier: 'read', audience: 'growthOperators', enabled: growthMcpEnabled },
+  growthSaveBusinessTool: { tool: growthSaveBusinessTool, title: 'Growth: add or edit a business', tier: 'selfWrite', audience: 'growthOperators', enabled: growthMcpEnabled },
+  growthImportCsvTool: { tool: growthImportCsvTool, title: 'Growth: import businesses (CSV)', tier: 'selfWrite', audience: 'growthOperators', enabled: growthMcpEnabled },
+  growthResearchTool: { tool: growthResearchTool, title: 'Growth: research a business', tier: 'prepare', ai: true, audience: 'growthOperators', enabled: growthMcpEnabled },
+  growthProfileTool: { tool: growthProfileTool, title: 'Growth: draft or approve a profile', tier: 'prepare', audience: 'growthOperators', enabled: growthMcpEnabled },
+  growthOutreachTool: { tool: growthOutreachTool, title: 'Growth: draft or approve an invitation', tier: 'prepare', ai: true, audience: 'growthOperators', enabled: growthMcpEnabled },
+  growthPrepareOnboardingTool: { tool: growthPrepareOnboardingTool, title: "Growth: prepare the owner's join link", tier: 'prepare', audience: 'growthOperators', enabled: growthMcpEnabled },
+  growthLogTool: { tool: growthLogTool, title: 'Growth: log contact, response or follow-up', tier: 'selfWrite', destructive: true, audience: 'growthOperators', enabled: growthMcpEnabled },
+  growthSetStageTool: { tool: growthSetStageTool, title: 'Growth: set a stage', tier: 'selfWrite', destructive: true, audience: 'growthOperators', enabled: growthMcpEnabled }
 };
 
 /** Whether an entry is switched on at all (feature flags). */
