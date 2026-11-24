@@ -304,6 +304,28 @@ const JOBS = [
     onSuccess(state, now) {
       state.lastDay = dayKey(now);
     }
+  },
+  {
+    name: 'growth-active',
+    description: 'Growth Agent — joined → activeProvider from the rikma’s own activity',
+    // PLAN_GROWTH_AGENT §10.4. Reads three totals per business that created a
+    // rikma and records them; contacts nobody, never demotes. Daily is the
+    // pace the plan wants; the endpoint itself skips anything checked in the
+    // last 20h, and answers 204 when the Growth module has no store.
+    path: CRON_SECRET
+      ? `/api/cron/growth-active?key=${encodeURIComponent(CRON_SECRET)}`
+      : '/api/cron/growth-active',
+    timeoutMs: num('SCHEDULER_GROWTH_ACTIVE_TIMEOUT_SECONDS', 300) * 1000,
+    due(now, state) {
+      const hour = num('SCHEDULER_GROWTH_ACTIVE_HOUR', 7);
+      const day = dayKey(now);
+      if (state.lastDay === day) return null;
+      if (now.getHours() < hour) return null;
+      return `${day} not run yet`;
+    },
+    onSuccess(state, now) {
+      state.lastDay = dayKey(now);
+    }
   }
 ];
 

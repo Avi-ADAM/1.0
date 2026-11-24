@@ -16,6 +16,7 @@ until this existed both ran only when somebody remembered to call them:
 | `orders` | `GET /api/cron/orders` | every hour | cancels arranged-payment orders still `pendingPayment` past their `expiresAt` |
 | `signup-nudge` | `GET /api/cron/signup-nudge` | every hour | one thank-you mail, with a signed link to continue, to whoever signed on the way into the site and stopped before an account. Reports only until `SIGNUP_NUDGE_SEND=true`. Needs `CRON_SECRET` (fails closed) |
 | `assistant-cleanup` | `GET /api/cron/assistant-cleanup` | daily at 06:00 | deletes agent-prepared signups nobody claimed within 14 days |
+| `growth-active` | `GET /api/cron/growth-active` | daily at 07:00 | Growth Agent: records each recruited rikma's totals, `joined` → `activeProvider` when it is active (PLAN_GROWTH_AGENT §10.4) |
 
 Every job is safe to run more often than needed: `timegrama` skips clocks that
 have not arrived, `monthi` writes only what actually changed, `maagad` refuses
@@ -97,7 +98,7 @@ node scheduler.mjs --run monthi --dry
 ```
 
 `--dry` is dry for every job. `monthi` and `translate-backfill` run against
-`?dry=1`; `timegrama`, `maagad`, `shifts` and `assistant-cleanup` have no preview mode, so they are logged and
+`?dry=1`; `timegrama`, `maagad`, `shifts`, `assistant-cleanup` and `growth-active` have no preview mode, so they are logged and
 **not called** rather than quietly matured for real. And a dry run never marks a month closed, so previewing
 the close cannot make the real one skip itself.
 
