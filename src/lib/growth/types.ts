@@ -132,6 +132,14 @@ export interface OnboardingLink {
   expiresAt: string;
   /** The recipient already had an account: the link hands the draft to it. */
   hasAccount: boolean;
+  /** The pending assistant session the link opens — how its claim is recognised (§10.2). */
+  sessionId?: string | null;
+  /** The owner took the draft into their account (signup claim or receive link). */
+  claimedAt?: string | null;
+  claimedBy?: string | null;
+  /** The owner created their rikma from it. */
+  rikmaCreatedAt?: string | null;
+  rikmaId?: string | null;
 }
 
 export type ContactChannel = 'whatsapp' | 'email' | 'phone' | 'inPerson' | 'other';
@@ -154,7 +162,9 @@ export type ActivityKind =
   | 'contacted'
   | 'response'
   | 'followUp'
-  | 'onboarding';
+  | 'onboarding'
+  | 'claimed'
+  | 'rikmaCreated';
 
 export interface Activity {
   id: string;

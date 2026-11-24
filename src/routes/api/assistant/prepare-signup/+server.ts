@@ -23,7 +23,8 @@ export const POST: RequestHandler = async ({ request, fetch, getClientAddress })
 
   const body = await request.json().catch(() => null);
   try {
-    const result = await prepareSignup(body, { strapi: strapiClient, fetch });
+    // The session id stays server-side: a public caller never needs it.
+    const { sessionId: _sid, ...result } = await prepareSignup(body, { strapi: strapiClient, fetch });
     return json({ ok: true, ...result });
   } catch (e) {
     return json({ ok: false, reason: e instanceof Error ? e.message : 'invalid' }, { status: 400 });

@@ -58,6 +58,8 @@ export interface PrepareSignupResult {
   /** Behind-the-scenes studio link: edit the rikma, add/remove missions & hours, then sign up and create. */
   manageUrl?: string;
   expiresAt: string;
+  /** The pending assistant session — for a caller that must recognise its claim later (growth §10.2). */
+  sessionId: string;
 }
 
 export interface PrepareSignupOptions {
@@ -147,6 +149,7 @@ export async function prepareSignup(
     ...(opts.receive ? { receiveUrl: `${SITE}/assistant/receive/${token}` } : { signupUrl: `${SITE}/hascama?agent=${token}` }),
     ...(previewUrl ? { previewUrl } : {}),
     ...(manageUrl ? { manageUrl } : {}),
-    expiresAt: new Date(now.getTime() + ttl).toISOString()
+    expiresAt: new Date(now.getTime() + ttl).toISOString(),
+    sessionId: row.id
   };
 }

@@ -273,7 +273,8 @@ export function makePrepareSignupTool(clientIp: string, fetchFn: typeof fetch) {
       const quota = takePrepare(clientIp);
       if (!quota.ok) return { success: false, message: `Too many signups prepared from here - try again in ${quota.retryAfterSeconds}s.` };
       try {
-        const r = await prepareSignup(input, { strapi: strapiClient, fetch: fetchFn });
+        // The session id stays server-side (growth §10.2 is its only reader).
+        const { sessionId: _sid, ...r } = await prepareSignup(input, { strapi: strapiClient, fetch: fetchFn });
         return {
           success: true,
           ...r,
@@ -344,7 +345,7 @@ export const prepareForSomeoneElseTool = createTool({
     if (!quota.ok) return { success: false, message: `Too many prepared - try again in ${quota.retryAfterSeconds}s.` };
     const { forSomeoneElse: _, ...signup } = input;
     try {
-      const r = await prepareSignup(signup, deps, { tokenTtlMs: HANDOFF_TOKEN_TTL_MS, receive: who.hasAccount });
+      const { sessionId: _sid, ...r } = await prepareSignup(signup, deps, { tokenTtlMs: HANDOFF_TOKEN_TTL_MS, receive: who.hasAccount });
       if (r.manageUrl && r.previewUrl) {
         return {
           success: true,

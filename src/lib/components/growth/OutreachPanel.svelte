@@ -156,6 +156,11 @@
         {#if link}<li>{$t('growth.onboarding.manage')}: <a class="gr-link" href={link} target="_blank" rel="noopener noreferrer">{link}</a></li>{/if}
         <li class="gr-muted">{$t('growth.onboarding.expires', { date: new Date(ob.expiresAt).toLocaleDateString() })} · {ob.email}</li>
         {#if ob.hasAccount}<li class="gr-muted">{$t('growth.onboarding.hasAccount')}</li>{/if}
+        {#if ob.rikmaId}
+          <li><strong>{$t('growth.onboarding.rikmaCreated', { date: new Date(ob.rikmaCreatedAt ?? ob.claimedAt ?? ob.preparedAt).toLocaleDateString() })}</strong> · <a class="gr-link" href={`/moach/${ob.rikmaId}`}>{$t('growth.onboarding.openRikma')}</a></li>
+        {:else if ob.claimedAt}
+          <li><strong>{$t('growth.onboarding.claimed', { date: new Date(ob.claimedAt).toLocaleDateString() })}</strong></li>
+        {/if}
       </ul>
     {:else}
       <p class="gr-muted gr-small">{$t('growth.onboarding.body')}</p>

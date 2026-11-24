@@ -321,7 +321,10 @@
     "preview": "Public preview",
     "manage": "Owner's review link",
     "expires": "Valid until {{date}}",
-    "hasAccount": "This email already has a 1💗1 account: the link hands the draft to that account."
+    "hasAccount": "This email already has a 1💗1 account: the link hands the draft to that account.",
+    "claimed": "The owner took the draft into their account on {{date}}.",
+    "rikmaCreated": "The owner created their rikma on {{date}}.",
+    "openRikma": "Open the rikma"
   },
   "send": {
     "title": "Send — from your own app",
@@ -384,7 +387,9 @@
     "contacted": "Contacted",
     "response": "Response",
     "followUp": "Follow-up set",
-    "onboarding": "Review link prepared"
+    "onboarding": "Review link prepared",
+    "claimed": "The owner took the draft",
+    "rikmaCreated": "The owner created a rikma"
   },
   "intel": {
     "gaps": "Gaps in the provider network",

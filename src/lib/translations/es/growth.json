@@ -321,7 +321,10 @@
     "preview": "Vista pública",
     "manage": "Enlace de revisión del propietario",
     "expires": "Válido hasta el {{date}}",
-    "hasAccount": "Este correo ya tiene una cuenta en 1💗1: el enlace entrega el borrador a esa cuenta."
+    "hasAccount": "Este correo ya tiene una cuenta en 1💗1: el enlace entrega el borrador a esa cuenta.",
+    "claimed": "El dueño llevó el borrador a su cuenta el {{date}}.",
+    "rikmaCreated": "El dueño creó su rikma el {{date}}.",
+    "openRikma": "Abrir la rikma"
   },
   "send": {
     "title": "Enviar desde tu propia aplicación",
@@ -384,7 +387,9 @@
     "contacted": "Contactado",
     "response": "Respuesta",
     "followUp": "Seguimiento fijado",
-    "onboarding": "Enlace de revisión preparado"
+    "onboarding": "Enlace de revisión preparado",
+    "claimed": "El dueño tomó el borrador",
+    "rikmaCreated": "El dueño creó una rikma"
   },
   "intel": {
     "gaps": "Huecos en la red de proveedores",

@@ -269,3 +269,61 @@ describe('growth actions', () => {
     expect((await repo.get(id))!).toMatchObject({ followUpAt: '2026-12-01T00:00:00.000Z', nextAction: 'send menu' });
   });
 });
+
+describe('claim callback (§10.2)', () => {
+  afterEach(() => setGrowthRepositoryForTests(null));
+
+  async function prepared(stage: any = 'invitationSent') {
+    const { noteOwnerEvent } = await import('./ownerEvents');
+    const p = make('Owner Co', { email: 'o@o.co' });
+    const repo = memoryRepository([
+      {
+        ...p,
+        stage,
+        furthest: stage,
+        onboarding: { preparedAt: NOW, preparedBy: 'u1', email: 'o@o.co', expiresAt: NOW, hasAccount: false, sessionId: 's42' }
+      }
+    ]);
+    setGrowthRepositoryForTests(repo);
+    return { repo, id: p.id, noteOwnerEvent };
+  }
+
+  it('a claim moves the business to onboardingStarted, a new rikma to joined', async () => {
+    const { repo, id, noteOwnerEvent } = await prepared();
+    expect(await noteOwnerEvent('s42', { kind: 'claimed', userId: '900' })).toBe(id);
+    let p = (await repo.get(id))!;
+    expect(p.stage).toBe('onboardingStarted');
+    expect(p.onboarding?.claimedBy).toBe('900');
+    expect(p.activity.map((a) => a.kind)).toContain('claimed');
+
+    // A repeat is a no-op: no second log line.
+    await noteOwnerEvent('s42', { kind: 'claimed', userId: '900' });
+    expect((await repo.get(id))!.activity.filter((a) => a.kind === 'claimed')).toHaveLength(1);
+
+    await noteOwnerEvent('s42', { kind: 'rikmaCreated', userId: '900', rikmaId: '77' });
+    p = (await repo.get(id))!;
+    expect(p.stage).toBe('joined');
+    expect(p.onboarding?.rikmaId).toBe('77');
+  });
+
+  it('ignores sessions no prospect prepared, and never leaves a closed stage by itself', async () => {
+    const { repo, id, noteOwnerEvent } = await prepared('declined');
+    expect(await noteOwnerEvent('other', { kind: 'claimed', userId: '1' })).toBeNull();
+    expect(await noteOwnerEvent(null, { kind: 'claimed', userId: '1' })).toBeNull();
+    await noteOwnerEvent('s42', { kind: 'rikmaCreated', userId: '900', rikmaId: '77' });
+    const p = (await repo.get(id))!;
+    expect(p.stage).toBe('declined');
+    expect(p.onboarding?.rikmaId).toBe('77');
+    expect(p.activity.map((a) => a.kind)).toContain('rikmaCreated');
+  });
+
+  it('never throws into the owner path', async () => {
+    const { noteOwnerEvent } = await import('./ownerEvents');
+    setGrowthRepositoryForTests({
+      list: async () => {
+        throw new Error('strapi down');
+      }
+    } as any);
+    await expect(noteOwnerEvent('s42', { kind: 'claimed', userId: '1' })).resolves.toBeNull();
+  });
+});

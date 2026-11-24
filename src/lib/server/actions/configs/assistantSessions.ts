@@ -420,6 +420,11 @@ const materializeHandler: ActionExecutionHandler = async (params, context, { str
   );
   const finalRow = 'row' in done ? done.row : current;
 
+  // A new rikma from a draft the Growth Agent prepared: that business joined (growth §10.2).
+  if (outcome.projectId && !row.projectId) {
+    await noteGrowthOwner(row.id, { kind: 'rikmaCreated', userId: String(context.userId), rikmaId: String(outcome.projectId) });
+  }
+
   // One structured line per run for the import funnel (§12 M13): which track,
   // from the site or an agent, and how much of the draft became real.
   console.log(
@@ -831,6 +836,12 @@ export const applyAssistantSessionConfig: ActionConfig = {
   },
 };
 
+/** Growth claim callback — lazy, and never in the owner's way (it swallows its own errors). */
+async function noteGrowthOwner(sessionId: string, event: import('$lib/growth/prospect').OwnerEvent): Promise<void> {
+  const { noteOwnerEvent } = await import('$lib/server/growth/ownerEvents');
+  await noteOwnerEvent(sessionId, event);
+}
+
 // ── claimAssistantSession ───────────────────────────────────────────────────
 
 /**
@@ -854,6 +865,8 @@ const claimHandler: ActionExecutionHandler = async (_params, context, { strapi }
 
   let saved = await saveSession(strapi, row, { patch: { userId: String(context.userId), status: 'active' } }, context.fetch);
   let current = 'row' in saved ? saved.row : row;
+  // A draft the Growth Agent prepared: the business moves on by itself (growth §10.2).
+  await noteGrowthOwner(current.id, { kind: 'claimed', userId: String(context.userId) });
 
   // An order: the words they told the agent become their draft wish, which the
   // composer opens — still a draft, published only by them.
@@ -913,6 +926,7 @@ export const claimAssistantSessionConfig: ActionConfig = {
 const receiveHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { receivePreparedRikma } = await import('$lib/server/assistant/receive.js');
   const received = await receivePreparedRikma(params.t, String(context.userId), { strapi, fetch: context.fetch });
+  if (received.ok) await noteGrowthOwner(received.sessionId, { kind: 'claimed', userId: String(context.userId) });
   return { data: { received }, updateStrategy: { type: 'none' as const } };
 };
 

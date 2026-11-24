@@ -2,7 +2,7 @@
 
 > **Status (2026-11-24): Phase 1 is built (not deployed), plus MCP (§8.5).** The `/growth`
 > screens and their eight actions are in the code, and the same pipeline can be operated from
-> Claude through ten MCP tools. Phase 2 (automated discovery, demand signals, a claim
+> Claude through ten MCP tools. The claim callback (§10.2) is built too. Phase 2 (automated discovery, demand signals, a claim
 > callback) and Phase 3 (follow-up automation, analytics) are not. §10 lists the backend
 > pieces that are missing.
 
@@ -137,7 +137,7 @@ The `/growth` layout and every action's `custom` auth rule call this same functi
 - `furthest` only ever grows, so a decline still counts in the funnel.
 - Manual stage changes are allowed. **Leaving `doNotContact` requires a stated reason**, which goes into the log.
 - `declined` / `doNotContact` refuse drafting, approving, contacting, follow-ups and onboarding links (`CLOSED_DOOR`). `doNotContact` also erases the email and phone and clears drafts and links.
-- `onboardingStarted`, `joined` and `activeProvider` are set by hand in Phase 1 (see §10.2).
+- `onboardingStarted` and `joined` follow the owner by themselves (§10.2); `activeProvider` is still set by hand (§10.4).
 
 ### 8.3 Environment
 | Var | Meaning |
@@ -211,7 +211,10 @@ Customer-demand gaps ("customers ask for event services, no venues") need the co
 
 1. **The Strapi `growth-prospect` content type — built (2026-11-24).** `1.0b`: `src/api/growth-prospect/`. Scalars a list needs are columns (`uid` = the app's prospect id, unique; `name`, contact, place, `category`, `lang`, `stage` / `furthest` as enums of §8.2, `stageChangedAt`, `followUpAt`, `nextAction`, `createdByUid`, `openedAt`); research, profile, outreach, onboarding, sources, `fieldSources`, the hashed `dedupeKeys` and the activity log are JSON. The activity log stays a JSON array on the row (bounded by `withActivity`), not a separate collection: the repository contract is read-modify-write of one prospect, and nothing reads activity across prospects. Qids in `src/routes/api/send/qidsGrowth.js` (`growthProspectsSchema`, `growthProspects`, `growthProspectByUid`, `growthProspectKeys`, `growthProspectCreate`, `growthProspectUpdate`), all `serviceAdmin` in `qidsAccess.js`. `src/lib/server/growth/strapiRepo.ts` implements `ProspectRepository` over them; `GROWTH_STORE=strapi` selects it (compose default), `file` / unset keeps the file store as the fallback.
    **After deploying 1.0b — by hand in the admin:** API Tokens → the server's token: `growth-prospect` find / findOne / create / update (no delete). The Authenticated role needs **nothing** — no session ever reads it. Then in 1.0main `npm run types:update` and `npm run validate:qids`. Deploy 1.0b **before** the API image, or every /growth screen fails loudly (a GraphQL error is thrown, never shown as an empty pipeline).
-2. **A claim callback.** When a draft prepared by `prepareSignup` is claimed (the assistant session leaves `pending`), nothing tells the pipeline. The fix is to store the assistant-session id on the prospect and, when it is claimed, advance it to `joined`, from the claim path in `server/assistant/receive.ts` / the signup handler. Until then, the operator sets `onboardingStarted` / `joined` by hand.
+2. **The claim callback — built (2026-11-24).** `prepareSignup` now returns the pending session's id (kept server-side: the public callers strip it), and `growthPrepareOnboarding` stores it as `onboarding.sessionId`. `src/lib/server/growth/ownerEvents.ts` (`noteOwnerEvent`) is called from the three places the owner acts on that draft (`assistantSessions.ts`):
+   - `claimAssistantSession` (signup through the agent link) and `receivePreparedRikma` (an existing account) → `claimed`: `onboarding.claimedAt/claimedBy`, stage → `onboardingStarted`;
+   - `materializeRikmaBlueprint` creating a **new** rikma → `rikmaCreated`: `onboarding.rikmaCreatedAt/rikmaId`, stage → `joined`.
+   The rule is `applyOwnerEvent` (`lib/growth/prospect.ts`): repeats are no-ops, it is logged with `by: null` (the system), and a closed stage (`declined`) is recorded but **never left by itself** — the owner joined anyway, so the operator decides. It is best-effort: an error is logged, never thrown into the owner's signup. The business page shows "the owner took the draft" / "created their rikma" with a link to it. A link prepared before this change has no `sessionId` and still needs the manual stage.
 3. **A demand read model.** Counts of open wishes and missing-provider wishes per category and region, for §9.2.
 4. **"Active provider" signal.** Phase 1 sets it by hand. Phase 2 could derive it from the claimed rikma having at least one product and at least one proposal or sale in the last N days.
 5. **Discovery integrations** (Phase 2). These need keys and terms review: Google Places (`places/israel.ts` holds only static data today), public directories, and the 1💗1 network itself (`searchRikmasTool` / `findPartnersTool` data). Each one must plug in as a source that emits `ProspectInput` with `sourceKind` + `sourceUrl` and goes through the same dedupe. No new endpoint has been added for it yet.
@@ -229,7 +232,7 @@ Customer-demand gaps ("customers ask for event services, no venues") need the co
   - manual stages with the do-not-contact rules;
   - onboarding link through `prepareSignup`;
   - a basic network intelligence page from pipeline data.
-- **Phase 2:** automated discovery sources (§10.5), the claim callback (§10.2), demand signals (§10.3). The Strapi store (§10.1) is built.
+- **Phase 2:** automated discovery sources (§10.5), demand signals (§10.3), the active-provider signal (§10.4). Built: the Strapi store (§10.1), the claim callback (§10.2), MCP (§8.5).
 - **Phase 3:**
   - a scheduled job that lists due follow-ups (a digest for the operator; **still never sending to businesses**);
   - gap analysis against demand;
@@ -240,7 +243,7 @@ Customer-demand gaps ("customers ask for event services, no venues") need the co
 
 ```
 src/lib/growth/                 pure: types, stages, dedupe, csv, prospect, research, profile, outreach, insights, client
-src/lib/server/growth/          config, operator, repo, strapiRepo, agent
+src/lib/server/growth/          config, operator, repo, strapiRepo, agent, ownerEvents
 src/lib/server/actions/configs/growth.ts
 src/lib/components/growth/      StageChip, OriginBadge, SourceBadge, ProspectForm, CsvImport, ResearchPanel, ProfilePanel, OutreachPanel, ActivityPanel
 src/routes/(reg)/growth/        overview, discover, pipeline (?view=research|profiles|outreach|…), b/[id], intelligence, settings

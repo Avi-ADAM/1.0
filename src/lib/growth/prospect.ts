@@ -280,3 +280,35 @@ export function summarize(p: Prospect): ProspectSummary {
 export function sameHost(a: string | null, b: string | null): boolean {
   return !!a && !!b && hostKey(a) === hostKey(b);
 }
+
+export type OwnerEvent =
+  | { kind: 'claimed'; userId: string }
+  | { kind: 'rikmaCreated'; userId: string; rikmaId: string };
+
+/**
+ * The owner acted on the draft we prepared (§10.2): they took it into their
+ * account, or created their rikma from it. Their own act, so it is recorded
+ * even on a closed stage — but a closed stage is never left automatically:
+ * advance() stops there, and the operator decides. Repeats are no-ops.
+ */
+export function applyOwnerEvent(p: Prospect, e: OwnerEvent, now: string): Prospect {
+  const o = p.onboarding;
+  if (!o) return p;
+  if (e.kind === 'claimed') {
+    if (o.claimedAt) return p;
+    const n = withActivity(
+      { ...p, onboarding: { ...o, claimedAt: now, claimedBy: e.userId } },
+      { at: now, by: null, kind: 'claimed', text: `#${e.userId}` }
+    );
+    return advance(n, 'onboardingStarted', null, now);
+  }
+  if (o.rikmaCreatedAt) return p;
+  const n = withActivity(
+    {
+      ...p,
+      onboarding: { ...o, claimedAt: o.claimedAt ?? now, claimedBy: o.claimedBy ?? e.userId, rikmaCreatedAt: now, rikmaId: e.rikmaId }
+    },
+    { at: now, by: null, kind: 'rikmaCreated', text: `#${e.rikmaId}` }
+  );
+  return advance(n, 'joined', null, now);
+}

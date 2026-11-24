@@ -382,7 +382,9 @@ const prepareOnboarding: ActionExecutionHandler = async (params, context) => {
           signupUrl: r.signupUrl ?? null,
           receiveUrl: r.receiveUrl ?? null,
           expiresAt: r.expiresAt,
-          hasAccount: who.hasAccount
+          hasAccount: who.hasAccount,
+          // How the owner's claim is recognised later (ownerEvents.ts, §10.2).
+          sessionId: r.sessionId ?? null
         }
       },
       { at, by: context.userId, kind: 'onboarding', text: r.expiresAt }
