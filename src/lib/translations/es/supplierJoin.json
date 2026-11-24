@@ -77,5 +77,22 @@
     "partnership_d": "Por ejemplo, un fotógrafo y un DJ que venden un paquete y reparten los ingresos de común acuerdo.",
     "order_t": "¿Vienes a encargar algo?",
     "order_d": "Escribes lo que necesitas y los proveedores te hacen ofertas. Es el conserje."
+  },
+  "about": {
+    "title": "¿A dónde estás entrando?",
+    "lead": "1💗1 no es otro directorio de proveedores. Es una plataforma de sociedades por consenso, y un negocio de una sola persona también tiene aquí su lugar.",
+    "card_t": "La tarjeta es tu negocio aquí",
+    "card_d": "Servicios, precios, fotos y zona de servicio. Tú editas, tú decides qué se muestra, y todo sigue siendo tuyo.",
+    "wishes_t": "Clientes que escriben lo que necesitan",
+    "wishes_d": "En el concierge la gente describe lo que quiere y la plataforma lo divide en partes. La parte que encaja contigo y con tu zona te llega a ti, desde el primer día.",
+    "direct_t": "Contacto directo, sin comisión",
+    "direct_d": "El cliente que te contacta directamente es tuyo. Sin cuota de entrada y sin obligación de pagar. Quien quiere, da lo que puede.",
+    "together_t": "Trabajo conjunto, por consenso",
+    "together_d": "Cuando un cliente necesita varios proveedores a la vez, por ejemplo fotógrafo, DJ y catering, se puede ofrecer un solo paquete y repartir los ingresos. Cada reparto se fija con el consenso de todos los que participan.",
+    "grow_t": "Y si quieres, también socios",
+    "grow_d": "Tu negocio aquí es una rikma: puedes sumar personas a ella, y cada hora, recurso o dinero que aportan se convierte en una parte de la propiedad. No es obligatorio, y puedes seguir solo.",
+    "safe": "No se publica nada ni se abre ninguna cuenta hasta que firmes el acuerdo, al final.",
+    "start": "Preparar mi tarjeta",
+    "home": "Conocer 1💗1"
   }
 }

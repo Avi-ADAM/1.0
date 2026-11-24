@@ -169,6 +169,8 @@
     // The freelancer on the treadmill of the next client - not "alone vs a
     // boss" (/no-boss) but "one-off fees vs income that accumulates".
     ['a9', 'd7', '/freelance', 'growth'],
+    // A business that wants customers, not partners: the supplier card in a minute.
+    ['a10', 'd8', '/join/supplier', 'offerings'],
     // The reader the other doors quietly assume away: someone whose constraint
     // is not "which of these am I" but "will any of this take me".
     ['a7', 'd5', '/flexible-work', 'timer'],
@@ -1632,17 +1634,12 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
-  /* Six doors: only divisors of six per row (2×3, 3×2, 6×1), so no row is
+  /* Eight doors: only divisors of eight per row (2×4, 4×2), so no row is
      ever left with a lone card. */
   @media (min-width: 900px) {
     .hm-doors-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 16px;
-    }
-  }
-  @media (min-width: 1500px) {
-    .hm-doors-grid {
-      grid-template-columns: repeat(6, minmax(0, 1fr));
     }
   }
   .hm-door {

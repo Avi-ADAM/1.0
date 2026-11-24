@@ -77,5 +77,22 @@
     "partnership_d": "Say a photographer and a DJ selling one package and splitting the income by agreement.",
     "order_t": "Came to order something?",
     "order_d": "Write what you need and suppliers make offers. That's the concierge."
+  },
+  "about": {
+    "title": "Where are you stepping in?",
+    "lead": "1💗1 is not another supplier directory. It is a platform for partnerships by consent, and a one-person business has a place of its own here too.",
+    "card_t": "Your card is your business here",
+    "card_d": "Services, prices, photos and service area. You edit it, you decide what shows, and it all stays yours.",
+    "wishes_t": "Customers who write what they need",
+    "wishes_d": "In the concierge, people describe what they want and the platform breaks it into parts. A part that fits you and your area comes to you, from day one.",
+    "direct_t": "Direct contact, no commission",
+    "direct_d": "A customer who contacts you directly is yours. No joining fee and no obligation to pay. Whoever wants to gives what they can.",
+    "together_t": "Working together, by consent",
+    "together_d": "When a customer needs several suppliers at once, say a photographer, a DJ and catering, you can offer one package and split the income. Every split is set by the consent of everyone in it.",
+    "grow_t": "And if you like, partners too",
+    "grow_d": "Your business here is a rikma: you can bring people into it, and every hour, resource or sum they bring becomes a share of ownership. Optional, and you can stay on your own.",
+    "safe": "Nothing is published and no account is opened until you sign the agreement, at the end.",
+    "start": "Make my card",
+    "home": "Get to know 1💗1"
   }
 }

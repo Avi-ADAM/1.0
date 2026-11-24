@@ -82,6 +82,16 @@
     ['order', '/made-for-you']
   ];
 
+  /** "Where are you stepping in?" — one line per thing they get, in reading order. */
+  const ABOUT = ['card', 'wishes', 'direct', 'together', 'grow'];
+
+  /** @type {HTMLElement | undefined} */
+  let cardEl = $state();
+  function backToCard() {
+    cardEl?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    cardEl?.querySelector('input, textarea')?.focus({ preventScroll: true });
+  }
+
   /** The picker's value as the endpoint's service area. */
   function serviceArea() {
     const online = area.location_mode === 'online' || !!area.isOnline;
@@ -251,7 +261,7 @@
     <li>{$t('supplierJoin.steps.s3')}</li>
   </ol>
 
-  <section class="sj-card" aria-live="polite">
+  <section class="sj-card" aria-live="polite" bind:this={cardEl}>
     {#if step === 'source' || step === 'loading'}
       <div class="sj-tabs" role="tablist">
         <button type="button" role="tab" aria-selected={mode === 'url'} class:active={mode === 'url'} onclick={() => (mode = 'url')}>
@@ -348,6 +358,26 @@
   </section>
 
   {#if step === 'source'}
+    <!-- For the reader who scrolls instead of starting: what they are joining.
+         Below the card on purpose — the first screen stays the form. -->
+    <section class="sj-about" aria-labelledby="sj-about-title">
+      <h2 id="sj-about-title">{$t('supplierJoin.about.title')}</h2>
+      <p class="sj-sub">{$t('supplierJoin.about.lead')}</p>
+      <ul>
+        {#each ABOUT as key (key)}
+          <li>
+            <strong>{$t(`supplierJoin.about.${key}_t`)}</strong>
+            <span>{$t(`supplierJoin.about.${key}_d`)}</span>
+          </li>
+        {/each}
+      </ul>
+      <p class="sj-safe">{$t('supplierJoin.about.safe')}</p>
+      <div class="sj-about-actions">
+        <button type="button" class="sj-primary" onclick={backToCard}>{$t('supplierJoin.about.start')}</button>
+        <a href="/" class="sj-link" data-sveltekit-prefetch>{$t('supplierJoin.about.home')}</a>
+      </div>
+    </section>
+
     <nav class="sj-other" aria-labelledby="sj-other-title">
       <h2 id="sj-other-title">{$t('supplierJoin.other.title')}</h2>
       <ul>
@@ -399,6 +429,7 @@
   .sj-hero,
   .sj-steps,
   .sj-card,
+  .sj-about,
   .sj-other {
     max-width: 640px;
     margin-inline: auto;
@@ -651,6 +682,61 @@
     gap: 1rem;
     border-bottom: 1px solid var(--line);
     padding-bottom: 0.3rem;
+  }
+  .sj-about {
+    margin-top: 3.5rem;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .sj-about h2 {
+    font-family: 'Bellefair', 'Frank Ruhl Libre', Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(1.6rem, 4.5vw, 2.1rem);
+    line-height: 1.2;
+    text-align: center;
+  }
+  .sj-about > .sj-sub {
+    text-align: center;
+  }
+  .sj-about ul {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0;
+    display: grid;
+    gap: 0.6rem;
+  }
+  .sj-about li {
+    display: grid;
+    gap: 0.2rem;
+    padding: 0.85rem 1rem;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-inline-start: 3px solid var(--gold);
+    border-radius: 0.9rem;
+  }
+  .sj-about strong {
+    font-size: 1rem;
+  }
+  .sj-about li span {
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+  }
+  .sj-safe {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+  }
+  .sj-about-actions {
+    display: grid;
+    justify-items: center;
+    gap: 0.6rem;
+  }
+  .sj-about-actions .sj-primary {
+    margin-top: 0.25rem;
+    width: min(100%, 22rem);
+  }
+  .sj-about-actions .sj-link {
+    justify-self: center;
   }
   .sj-other {
     margin-top: 2.5rem;
