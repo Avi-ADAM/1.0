@@ -9,7 +9,10 @@ if (process.env.ADAPTER === 'vercel') {
   config = {
     kit: {
       adapter: vercel({
-        runtime: 'nodejs24.x'
+        runtime: 'nodejs24.x',
+        // Next to the VPS (Frankfurt): every SSR load calls api.1lev1.com, and from
+        // the default iad1 each call crossed the Atlantic (PLAN_VPS_ONLY §1.1).
+        regions: ['fra1']
       }),
       // The cross-site form check lives in hooks.server.js ($lib/server/csrf.js)
       // so /oauth/token can be exempt — kit's own check has no per-route escape.
