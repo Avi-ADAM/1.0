@@ -195,7 +195,8 @@
     "quality": "Bien documentado ({{value}}% verificado)",
     "contact": "Tiene un contacto público",
     "lowConfidence": "Confianza baja ({{value}}% verificado)",
-    "noResearch": "Sin investigar"
+    "noResearch": "Sin investigar",
+    "demand": "Los clientes lo piden ({{value}} deseos abiertos)"
   },
   "detail": {
     "changeStage": "Cambiar etapa…",
@@ -397,7 +398,7 @@
     "wanted": "{{category}}: {{count}} proveedores que se unieron lo nombraron como socio necesario, y no hay ninguno activo.",
     "thin": "{{category}}: {{count}} proveedores activos.",
     "thinRegion": "{{category}} en {{region}}: {{count}} proveedores activos.",
-    "rule": "A partir de los registros del propio embudo. La demanda de clientes del conserje se sumará a estas señales en la siguiente fase.",
+    "rule": "De los registros del propio embudo y de los deseos abiertos del conserje.",
     "recruitNext": "Con quién trabajar ahora",
     "coverage": "Cobertura por categoría y región",
     "inPipeline": "En el embudo",
@@ -455,5 +456,19 @@
     "self": "Es tu propio correo: el enlace es para el propietario del negocio.",
     "unverified": "No pudimos confirmar este correo ahora. Inténtalo de nuevo.",
     "generic": "Algo salió mal. Inténtalo de nuevo."
+  },
+  "demand": {
+    "title": "Lo que piden los clientes",
+    "unavailable": "No se pudo leer la demanda de los clientes ahora.",
+    "none": "No hay deseos abiertos con categoría en los últimos {{count}} días.",
+    "summary": "{{wishes}} deseos abiertos en los últimos {{days}} días; {{unansweredCount}} aún sin propuesta.",
+    "place": "Lugar",
+    "open": "Deseos abiertos",
+    "noProposal": "Aún sin propuesta",
+    "anywhere": "En cualquier lugar / en línea",
+    "privacy": "Solo recuentos: aquí nunca se muestran el texto de un deseo, su autor ni su ubicación exacta. Los deseos que pidieron no agregarse no se cuentan.",
+    "gap": "{{category}}: {{wishes}} clientes lo piden, {{active}} proveedores activos.",
+    "gapRegion": "{{category}} en {{region}}: {{wishes}} clientes lo piden, {{active}} proveedores activos.",
+    "unanswered": "{{count}} sin ninguna propuesta"
   }
 }

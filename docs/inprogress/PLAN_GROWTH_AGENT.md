@@ -2,7 +2,7 @@
 
 > **Status (2026-11-24): Phase 1 is built (not deployed), plus MCP (§8.5).** The `/growth`
 > screens and their eight actions are in the code, and the same pipeline can be operated from
-> Claude through ten MCP tools. The claim callback (§10.2) is built too. Phase 2 (automated discovery, demand signals, a claim
+> Claude through ten MCP tools. The claim callback (§10.2) and customer-demand signals (§9.2) are built too. Phase 2 (automated discovery, demand signals, a claim
 > callback) and Phase 3 (follow-up automation, analytics) are not. §10 lists the backend
 > pieces that are missing.
 
@@ -204,8 +204,16 @@ All of them: `access: ['user']`, `jwt` + `custom` operator rule, realtime scope 
   - public contact: +15.
 - The headline metric is **active coverage**, not registrations. The page says so.
 
-### 9.2 Demand signals: Phase 2
-Customer-demand gaps ("customers ask for event services, no venues") need the concierge's wish (`ratson`) categories by region. That read model does not exist as a qid yet (§10.3).
+### 9.2 Demand signals (built 2026-11-24)
+The concierge's open wishes are a recruiting signal: "customers ask for event services, and no venue is active".
+
+- **Read** (`server/growth/demand.ts`, qid `growthDemandWishes`, serviceAdmin): wishes `open | matching | negotiating`, not fulfilled (null-safe filter), created in the last 180 days, paged by 200 up to 5000, cached 5 minutes. A failed read is `null` and the page says "could not be read" — never an empty summary that reads as "nobody is asking".
+- **Privacy:** only counts leave the server. `wishFromNode` keeps category names (plus `sub_category`), the coarse `location_hint` (none for an online wish), and whether any proposal exists. Never the name, text, author or coordinates. A wish with `aggregation_opt_out` is not counted.
+- **Model** (`lib/growth/demand.ts`, pure, `demand.test.ts`): `summarizeDemand` → cells of category × place with `open` / `unanswered`; category and place match loosely (`sameCategory`, `placeReaches`; no place = everywhere).
+- **Where it shows:**
+  - `demandGaps`: a cell with ≥2 open wishes or ≥1 unanswered, and ≤1 active provider of that category reaching that place. Listed first on the network page.
+  - `priority(p, rows, demand)`: +5 per open wish and +5 more per unanswered one, capped at +25, with the reason "customers are asking (N open wishes)". Used by the pipeline sort, the network page and `growthOverviewTool`.
+  - The network page has a "what customers are asking for" table. The MCP overview returns `demand` (totals + top cells) and `demandGaps`.
 
 ## 10. Missing backend functionality (documented, not invented)
 
@@ -215,7 +223,7 @@ Customer-demand gaps ("customers ask for event services, no venues") need the co
    - `claimAssistantSession` (signup through the agent link) and `receivePreparedRikma` (an existing account) → `claimed`: `onboarding.claimedAt/claimedBy`, stage → `onboardingStarted`;
    - `materializeRikmaBlueprint` creating a **new** rikma → `rikmaCreated`: `onboarding.rikmaCreatedAt/rikmaId`, stage → `joined`.
    The rule is `applyOwnerEvent` (`lib/growth/prospect.ts`): repeats are no-ops, it is logged with `by: null` (the system), and a closed stage (`declined`) is recorded but **never left by itself** — the owner joined anyway, so the operator decides. It is best-effort: an error is logged, never thrown into the owner's signup. The business page shows "the owner took the draft" / "created their rikma" with a link to it. A link prepared before this change has no `sessionId` and still needs the manual stage.
-3. **A demand read model.** Counts of open wishes and missing-provider wishes per category and region, for §9.2.
+3. **A demand read model — built (2026-11-24),** see §9.2. Needs the server API token to have `ratson` find (other serviceAdmin wish reads already use it); `npm run validate:qids` passes for `growthDemandWishes`.
 4. **"Active provider" signal.** Phase 1 sets it by hand. Phase 2 could derive it from the claimed rikma having at least one product and at least one proposal or sale in the last N days.
 5. **Discovery integrations** (Phase 2). These need keys and terms review: Google Places (`places/israel.ts` holds only static data today), public directories, and the 1💗1 network itself (`searchRikmasTool` / `findPartnersTool` data). Each one must plug in as a source that emits `ProspectInput` with `sourceKind` + `sourceUrl` and goes through the same dedupe. No new endpoint has been added for it yet.
 
@@ -232,7 +240,7 @@ Customer-demand gaps ("customers ask for event services, no venues") need the co
   - manual stages with the do-not-contact rules;
   - onboarding link through `prepareSignup`;
   - a basic network intelligence page from pipeline data.
-- **Phase 2:** automated discovery sources (§10.5), demand signals (§10.3), the active-provider signal (§10.4). Built: the Strapi store (§10.1), the claim callback (§10.2), MCP (§8.5).
+- **Phase 2:** automated discovery sources (§10.5), the active-provider signal (§10.4). Built: the Strapi store (§10.1), the claim callback (§10.2), demand signals (§9.2), MCP (§8.5).
 - **Phase 3:**
   - a scheduled job that lists due follow-ups (a digest for the operator; **still never sending to businesses**);
   - gap analysis against demand;
@@ -242,8 +250,8 @@ Customer-demand gaps ("customers ask for event services, no venues") need the co
 ## 12. Files
 
 ```
-src/lib/growth/                 pure: types, stages, dedupe, csv, prospect, research, profile, outreach, insights, client
-src/lib/server/growth/          config, operator, repo, strapiRepo, agent, ownerEvents
+src/lib/growth/                 pure: types, stages, dedupe, csv, prospect, research, profile, outreach, insights, demand, client
+src/lib/server/growth/          config, operator, repo, strapiRepo, agent, ownerEvents, demand
 src/lib/server/actions/configs/growth.ts
 src/lib/components/growth/      StageChip, OriginBadge, SourceBadge, ProspectForm, CsvImport, ResearchPanel, ProfilePanel, OutreachPanel, ActivityPanel
 src/routes/(reg)/growth/        overview, discover, pipeline (?view=research|profiles|outreach|…), b/[id], intelligence, settings
@@ -253,6 +261,7 @@ src/mastra/tools/growthTools.ts  MCP tools (§8.5)
 ```
 
 Tests:
+- `src/lib/growth/demand.test.ts`: demand counts, privacy of the reduced row, gaps and priority.
 - `src/lib/growth/growth.test.ts`: pure rules, including the blueprint against the real `BlueprintInputSchema`.
 - `src/lib/server/growth/growth.server.test.ts`: file store, operator check, research and outreach agent, and the actions end to end on a memory store, including the do-not-contact doors.
 - `src/lib/components/growth/panels.svelte.test.ts`: the panels render.

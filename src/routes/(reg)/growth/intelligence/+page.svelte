@@ -1,23 +1,26 @@
 <script lang="ts">
   import { t } from '$lib/translations';
   import { coverage, gaps, priority } from '$lib/growth/insights';
+  import { demandGaps } from '$lib/growth/demand';
   import { isClosed } from '$lib/growth/stages';
   import type { ProspectSummary } from '$lib/growth/types';
 
   /**
    * Network intelligence (§9) from the pipeline's own data: where active
    * providers are thin, which neighbours the network keeps asking for, and
-   * who to work on next — with the reasons. Customer-demand signals from the
-   * concierge are Phase 2.
+   * who to work on next — with the reasons — and, from the concierge, where
+   * customers are already asking (open wishes, as counts only).
    */
   let { data } = $props();
   let rows = $derived<ProspectSummary[]>(data.prospects ?? []);
   let cells = $derived(coverage(rows).slice(0, 40));
   let found = $derived(gaps(rows));
+  let demand = $derived(data.demand ?? null);
+  let asked = $derived(demandGaps(rows, demand));
   let top = $derived(
     rows
       .filter((r) => !isClosed(r.stage) && r.stage !== 'activeProvider' && r.stage !== 'joined')
-      .map((r) => ({ r, p: priority(r, rows) }))
+      .map((r) => ({ r, p: priority(r, rows, demand) }))
       .sort((a, b) => b.p.score - a.p.score)
       .slice(0, 10)
   );
@@ -26,7 +29,23 @@
 <div class="gr-cols">
   <section class="sh-card gr-card" aria-labelledby="gr-gaps-h">
     <h2 id="gr-gaps-h">{$t('growth.intel.gaps')}</h2>
-    {#if !found.length}
+    {#if asked.length}
+      <ul class="gr-list">
+        {#each asked as g, i (i)}
+          <li>
+            <strong>
+              {#if g.region}
+                {$t('growth.demand.gapRegion', { category: g.category, region: g.region, wishes: g.wishes, active: g.active })}
+              {:else}
+                {$t('growth.demand.gap', { category: g.category, wishes: g.wishes, active: g.active })}
+              {/if}
+            </strong>
+            {#if g.unanswered}<span class="gr-muted"> · {$t('growth.demand.unanswered', { count: g.unanswered })}</span>{/if}
+          </li>
+        {/each}
+      </ul>
+    {/if}
+    {#if !found.length && !asked.length}
       <p class="gr-muted">{$t('growth.intel.noGaps')}</p>
     {:else}
       <ul class="gr-list">
@@ -62,6 +81,40 @@
     {/if}
   </section>
 </div>
+
+<section class="sh-card gr-card" aria-labelledby="gr-demand-h">
+  <h2 id="gr-demand-h">{$t('growth.demand.title')}</h2>
+  {#if !demand}
+    <p class="gr-muted">{$t('growth.demand.unavailable')}</p>
+  {:else if !demand.cells.length}
+    <p class="gr-muted">{$t('growth.demand.none', { count: demand.days })}</p>
+  {:else}
+    <p class="gr-muted gr-small">{$t('growth.demand.summary', { wishes: demand.wishes, unansweredCount: demand.unanswered, days: demand.days })}</p>
+    <div class="gr-table-wrap">
+      <table class="gr-table">
+        <thead>
+          <tr>
+            <th>{$t('growth.form.category')}</th>
+            <th>{$t('growth.demand.place')}</th>
+            <th>{$t('growth.demand.open')}</th>
+            <th>{$t('growth.demand.noProposal')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each demand.cells.slice(0, 30) as c (c.category + '|' + (c.place ?? ''))}
+            <tr>
+              <td>{c.category}</td>
+              <td>{c.place ?? $t('growth.demand.anywhere')}</td>
+              <td>{c.open}</td>
+              <td><strong>{c.unanswered}</strong></td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
+  {/if}
+  <p class="gr-muted gr-small">{$t('growth.demand.privacy')}</p>
+</section>
 
 <section class="sh-card gr-card" aria-labelledby="gr-cov-h">
   <h2 id="gr-cov-h">{$t('growth.intel.coverage')}</h2>

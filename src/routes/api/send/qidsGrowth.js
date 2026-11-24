@@ -45,5 +45,35 @@ export const growthQids = {
 
   'growthProspectUpdate': `mutation GrowthProspectUpdate($id: ID!, $data: GrowthProspectInput!) {
     updateGrowthProspect(id: $id, data: $data) { data { id } }
+  }`,
+
+  // Customer demand (§9.2, §10.3): open concierge wishes since $since, one page
+  // at a time. Only what a count needs — never the name, text, author or
+  // coordinates of a wish; server/growth/demand.ts reduces it to counts.
+  'growthDemandWishes': `query GrowthDemandWishes($since: DateTime!, $start: Int!, $limit: Int!) {
+    ratsons(
+      filters: {
+        # A bare ne excludes NULL rows in SQL; most wishes never set fulfilled.
+        or: [{ fulfilled: { null: true } }, { fulfilled: { eq: false } }]
+        status_ratson: { in: ["open", "matching", "negotiating"] }
+        createdAt: { gte: $since }
+      }
+      sort: ["id:asc"]
+      pagination: { start: $start, limit: $limit }
+    ) {
+      data {
+        id
+        attributes {
+          createdAt
+          isOnline
+          location_hint
+          location { location_hint }
+          sub_category
+          aggregation_opt_out
+          categories { data { attributes { name } } }
+          ratson_proposals(pagination: { limit: 1 }) { data { id } }
+        }
+      }
+    }
   }`
 };

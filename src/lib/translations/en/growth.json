@@ -195,7 +195,8 @@
     "quality": "Well sourced ({{value}}% verified)",
     "contact": "Has a public contact",
     "lowConfidence": "Low confidence ({{value}}% verified)",
-    "noResearch": "Not researched"
+    "noResearch": "Not researched",
+    "demand": "Customers are asking ({{value}} open wishes)"
   },
   "detail": {
     "changeStage": "Change stage…",
@@ -397,7 +398,7 @@
     "wanted": "{{category}}: named as a needed partner by {{count}} joined providers, and none is active.",
     "thin": "{{category}}: {{count}} active providers.",
     "thinRegion": "{{category}} in {{region}}: {{count}} active providers.",
-    "rule": "From the pipeline's own records. Customer demand from the concierge will join these signals in the next phase.",
+    "rule": "From the pipeline's own records and the concierge's open wishes.",
     "recruitNext": "Who to work on next",
     "coverage": "Coverage by category and region",
     "inPipeline": "In pipeline",
@@ -455,5 +456,19 @@
     "self": "That is your own email — the link is for the business owner.",
     "unverified": "We could not confirm this email right now. Try again.",
     "generic": "Something went wrong. Try again."
+  },
+  "demand": {
+    "title": "What customers are asking for",
+    "unavailable": "Customer demand could not be read right now.",
+    "none": "No open wishes with a category in the last {{count}} days.",
+    "summary": "{{wishes}} open wishes in the last {{days}} days; {{unansweredCount}} have no proposal yet.",
+    "place": "Place",
+    "open": "Open wishes",
+    "noProposal": "No proposal yet",
+    "anywhere": "Anywhere / online",
+    "privacy": "Counts only: a wish's text, its author and its exact location are never shown here. Wishes that opted out of aggregation are not counted.",
+    "gap": "{{category}}: {{wishes}} customers are asking, {{active}} active providers.",
+    "gapRegion": "{{category}} in {{region}}: {{wishes}} customers are asking, {{active}} active providers.",
+    "unanswered": "{{count}} without any proposal"
   }
 }

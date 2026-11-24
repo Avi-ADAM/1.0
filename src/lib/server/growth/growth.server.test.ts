@@ -327,3 +327,30 @@ describe('claim callback (§10.2)', () => {
     await expect(noteOwnerEvent('s42', { kind: 'claimed', userId: '1' })).resolves.toBeNull();
   });
 });
+
+describe('demand loader (§10.3)', () => {
+  it('walks the pages, counts, caches, and says null — not zero — when the read fails', async () => {
+    const { loadDemand, clearDemandCache } = await import('./demand');
+    clearDemandCache();
+    const page = (n: number, from: number) =>
+      Array.from({ length: n }, (_, i) => ({
+        id: String(from + i),
+        attributes: { createdAt: new Date().toISOString(), categories: { data: [{ attributes: { name: 'Venue' } }] }, ratson_proposals: { data: [] } }
+      }));
+    const execute = vi.fn(async (qid: string, v: any) => {
+      expect(qid).toBe('growthDemandWishes');
+      return { data: { ratsons: { data: v.start === 0 ? page(200, 0) : page(3, 200) } } };
+    });
+    const s = await loadDemand({ execute });
+    expect(execute).toHaveBeenCalledTimes(2);
+    expect(s?.wishes).toBe(203);
+    expect(s?.cells[0]).toMatchObject({ category: 'Venue', open: 203, unanswered: 203 });
+    await loadDemand({ execute });
+    expect(execute).toHaveBeenCalledTimes(2);
+
+    clearDemandCache();
+    const failing = { execute: vi.fn(async () => ({ errors: [{ message: 'Forbidden' }] })) };
+    expect(await loadDemand(failing)).toBeNull();
+    clearDemandCache();
+  });
+});

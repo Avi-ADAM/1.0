@@ -125,7 +125,9 @@ export const growthOverviewTool = createTool({
   description:
     'Growth Agent (platform team only): the business-acquisition pipeline at a glance - counts per step, the funnel, ' +
     'the next actions with how many businesses each one unblocks, coverage gaps (categories/regions with prospects but ' +
-    'almost no active provider, and complementary categories the network keeps asking for), and a list of businesses ' +
+    'almost no active provider, and complementary categories the network keeps asking for), customer demand from the ' +
+    "concierge's open wishes (counts per category and place, and where customers ask but no active provider answers), " +
+    'and a list of businesses ' +
     'ordered by priority with the reasons. Filter with view (research, profiles, outreach, followups, interested, joined, ' +
     'closed) and/or a text query on name, category or place. Start here; then growthGetBusinessTool for one business.',
   inputSchema: z.object({
@@ -137,18 +139,22 @@ export const growthOverviewTool = createTool({
     const op = await operator();
     if (!op.ok) return (op as Extract<typeof op, { ok: false }>).out;
     try {
-      const [{ growthRepository }, { summarize }, insights] = await Promise.all([
+      const [{ growthRepository }, { summarize }, insights, { loadDemand }, { demandGaps }, { strapiClient }] = await Promise.all([
         import('../../lib/server/growth/repo'),
         import('../../lib/growth/prospect'),
-        import('../../lib/growth/insights')
+        import('../../lib/growth/insights'),
+        import('../../lib/server/growth/demand'),
+        import('../../lib/growth/demand'),
+        import('../../lib/server/actions/index.js')
       ]);
-      const all = ((await growthRepository()?.list()) ?? []).map(summarize);
+      const [list, demand] = await Promise.all([growthRepository()?.list() ?? Promise.resolve([]), loadDemand(strapiClient, op.fetch)]);
+      const all = list.map(summarize);
       const now = Date.now();
       const q = query?.trim().toLowerCase();
       const rows = all
         .filter((p) => insights.inView(p, view ?? 'all', now))
         .filter((p) => !q || [p.name, p.category, p.city, p.region].some((v) => v?.toLowerCase().includes(q)))
-        .map((p) => ({ p, pr: insights.priority(p, all) }))
+        .map((p) => ({ p, pr: insights.priority(p, all, demand) }))
         .sort((a, b) => b.pr.score - a.pr.score || (a.p.updatedAt < b.p.updatedAt ? 1 : -1));
       const max = limit ?? 25;
       return {
@@ -159,6 +165,11 @@ export const growthOverviewTool = createTool({
         funnel: insights.funnel(all),
         nextActions: insights.nextActions(all, now),
         gaps: insights.gaps(all),
+        // Open concierge wishes as counts only; null = could not be read (not "nobody asks").
+        demand: demand
+          ? { wishes: demand.wishes, unanswered: demand.unanswered, days: demand.days, top: demand.cells.slice(0, 15) }
+          : null,
+        demandGaps: demandGaps(all, demand),
         matching: rows.length,
         businesses: rows.slice(0, max).map(({ p, pr }) => ({
           id: p.id,

@@ -29,7 +29,7 @@
       .filter((r) => !stage || r.stage === stage)
       .filter((r) => !category || r.category === category)
       .filter((r) => !needle || [r.name, r.city, r.region, r.category, r.website].some((v) => v?.toLowerCase().includes(needle)))
-      .map((r) => ({ r, p: priority(r, rows) }));
+      .map((r) => ({ r, p: priority(r, rows, data.demand) }));
     if (sort === 'priority') list.sort((a, b) => b.p.score - a.p.score);
     else if (sort === 'name') list.sort((a, b) => a.r.name.localeCompare(b.r.name));
     else list.sort((a, b) => (a.r.updatedAt < b.r.updatedAt ? 1 : -1));

@@ -9,6 +9,7 @@
 
 import { CLOSED, FUNNEL, isClosed, reached, type Stage } from './stages';
 import type { Confidence, ProspectSummary } from './types';
+import { demandFor, type DemandSummary } from './demand';
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -175,7 +176,7 @@ export interface Gap {
  *  - a category/region where we have prospects but at most one active provider;
  *  - a category the research keeps naming as complementary that has no active
  *    provider at all — the network asking for a neighbour it does not have.
- * Customer-demand gaps need the concierge's wish data (Phase 2, §9.2).
+ * Customer-demand gaps are demandGaps() in ./demand.ts (§9.2).
  */
 export function gaps(rows: ProspectSummary[]): Gap[] {
   const cells = coverage(rows);
@@ -207,7 +208,7 @@ export function gaps(rows: ProspectSummary[]): Gap[] {
 }
 
 export interface PriorityReason {
-  key: 'gap' | 'complements' | 'quality' | 'contact' | 'lowConfidence' | 'noResearch';
+  key: 'gap' | 'complements' | 'demand' | 'quality' | 'contact' | 'lowConfidence' | 'noResearch';
   value?: number | string;
 }
 
@@ -219,7 +220,12 @@ const CONF: Record<Confidence, number> = { high: 1, medium: 0.6, low: 0.25 };
  * active network beats one that does not, and well-sourced information beats
  * a guess.
  */
-export function priority(p: ProspectSummary, rows: ProspectSummary[]): { score: number; reasons: PriorityReason[] } {
+export function priority(
+  p: ProspectSummary,
+  rows: ProspectSummary[],
+  /** Open concierge wishes (§9.2): customers already asking for what this business does, where it works. */
+  demand?: DemandSummary | null
+): { score: number; reasons: PriorityReason[] } {
   const reasons: PriorityReason[] = [];
   let score = 0;
   const cat = p.category?.trim().toLowerCase();
@@ -236,6 +242,12 @@ export function priority(p: ProspectSummary, rows: ProspectSummary[]): { score: 
       score += Math.min(30, wanted * 10);
       reasons.push({ key: 'complements', value: wanted });
     }
+  }
+  const asked = demandFor(p, demand);
+  if (asked.open) {
+    // An unanswered wish weighs double: nobody in the network could answer it.
+    score += Math.min(25, (asked.open + asked.unanswered) * 5);
+    reasons.push({ key: 'demand', value: asked.open });
   }
   if (p.researchConfidence) {
     const ratio = p.totalClaims ? p.verifiedClaims / p.totalClaims : 0;
