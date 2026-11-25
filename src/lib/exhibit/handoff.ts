@@ -7,6 +7,7 @@
  * the last screen never waits on the network: without a draft the QR simply
  * points at the public /vision page.
  */
+import type { ExhibitIdea } from './types';
 
 export const DRAFT_TIMEOUT_MS = 10_000;
 
@@ -34,12 +35,28 @@ async function post(url: string, body: unknown, timeoutMs: number, fetchImpl: ty
   }
 }
 
+/**
+ * What only the stand knows about the idea, for the lead the team will read
+ * (§9 G1): `template:<key>` / `ai` / `nearest:<key>`, and the visitor's words.
+ */
+export function ideaMeta(idea: ExhibitIdea | null): { source: string | null; words: string | null } {
+  if (!idea) return { source: null, words: null };
+  const words = idea.key === 'custom' ? idea.title : null;
+  if (idea.source === 'ai') return { source: 'ai', words };
+  if (!idea.basedOn) return { source: null, words };
+  return { source: `${idea.key === 'custom' ? 'nearest' : 'template'}:${idea.basedOn}`, words };
+}
+
 export async function requestDraft(
   blueprint: unknown,
   lang: string,
-  { timeoutMs = DRAFT_TIMEOUT_MS, fetchImpl = fetch }: { timeoutMs?: number; fetchImpl?: typeof fetch } = {}
+  {
+    timeoutMs = DRAFT_TIMEOUT_MS,
+    fetchImpl = fetch,
+    meta = null
+  }: { timeoutMs?: number; fetchImpl?: typeof fetch; meta?: { source: string | null; words: string | null } | null } = {}
 ): Promise<Draft | null> {
-  const data = await post('/api/exhibit/draft', { blueprint, lang }, timeoutMs, fetchImpl);
+  const data = await post('/api/exhibit/draft', { blueprint, lang, ...(meta ? { meta } : {}) }, timeoutMs, fetchImpl);
   return data && typeof data.shareKey === 'string' && typeof data.token === 'string'
     ? { shareKey: data.shareKey, token: data.token }
     : null;

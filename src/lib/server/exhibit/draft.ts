@@ -15,6 +15,7 @@ import { blueprintToState, parseBlueprint } from '$lib/assistant/blueprint.js';
 import { createSession, setShare, type StrapiLike } from '$lib/server/assistant/session.js';
 import { mintSignupToken } from '$lib/server/assistant/signupToken.js';
 import { MAX_PUBLIC_ROWS } from '$lib/server/assistant/prepareSignup.js';
+import { cleanMeta, exhibitSourceText } from './meta';
 
 /** How long the QR keeps working — the fair, and the weeks after it. */
 export const EXHIBIT_DRAFT_DAYS = 30;
@@ -28,7 +29,9 @@ export type ExhibitDraft =
 export async function createExhibitDraft(
   raw: unknown,
   lang: unknown,
-  deps: { strapi: StrapiLike; fetch?: typeof fetch; now?: Date }
+  deps: { strapi: StrapiLike; fetch?: typeof fetch; now?: Date },
+  /** Where the idea came from and the visitor's own words (§9 G1) — kept for the lead. */
+  meta: unknown = null
 ): Promise<ExhibitDraft> {
   const bp = parseBlueprint(raw);
   if (!bp.ok) return { ok: false, reason: 'invalid' };
@@ -49,7 +52,7 @@ export async function createExhibitDraft(
       state: blueprintToState(v, { origin: 'agent' }).state,
       startedVia: 'agent',
       lang: language,
-      sourceText: `Built at the 1lev1 exhibition stand: ${v.fields.name}`,
+      sourceText: exhibitSourceText(v.fields.name, cleanMeta(meta)),
       claimEmail: null,
       claimExpiresAt: until
     },

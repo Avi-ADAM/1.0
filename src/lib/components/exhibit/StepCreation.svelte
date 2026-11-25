@@ -27,7 +27,7 @@
   import { ME } from '$lib/exhibit/sandbox.svelte';
   import { PEOPLE, colorOf, variantOf } from '$lib/exhibit/fixtures/people';
   import { sandboxToBlueprint } from '$lib/exhibit/blueprint';
-  import { handoffUrl, requestDraft, sendLead } from '$lib/exhibit/handoff';
+  import { handoffUrl, ideaMeta, requestDraft, sendLead } from '$lib/exhibit/handoff';
   import Face from './Face.svelte';
   import IdeaGlyph from './IdeaGlyph.svelte';
   import QrCode from './QrCode.svelte';
@@ -90,7 +90,7 @@
       label
     });
     const round = sandbox.round;
-    const draft = await requestDraft(blueprint, $locale);
+    const draft = await requestDraft(blueprint, $locale, { meta: ideaMeta(sandbox.idea) });
     if (!alive || round !== sandbox.round) return;
     sandbox.draft = draft;
     draftState = draft ? 'ready' : 'none';

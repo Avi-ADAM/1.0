@@ -367,3 +367,15 @@ describe('handoff', () => {
     expect(sb.draft).toBeNull();
   });
 });
+
+describe('ideaMeta', () => {
+  it('says where the idea came from, and keeps the visitor’s own words', async () => {
+    const { ideaMeta } = await import('./handoff');
+    const { ideaFromTemplate, ideaFromCustomText, ideaFromPreview } = await import('./fixtures/ideas');
+    expect(ideaMeta(ideaFromTemplate('mural'))).toEqual({ source: 'template:mural', words: null });
+    expect(ideaMeta(ideaFromCustomText('גינה על הגג', 'ceramics'))).toEqual({ source: 'nearest:ceramics', words: 'גינה על הגג' });
+    const ai = ideaFromPreview({ missions: [], resources: [], products: [], more: 0 }, 'a roof garden');
+    expect(ideaMeta(ai)).toEqual({ source: 'ai', words: 'a roof garden' });
+    expect(ideaMeta(null)).toEqual({ source: null, words: null });
+  });
+});

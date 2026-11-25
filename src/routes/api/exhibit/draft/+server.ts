@@ -2,7 +2,7 @@
  * POST /api/exhibit/draft — keep the rikma a fair visitor just built
  * (docs/inprogress/PLAN_EXHIBITION_MODE.md §7).
  *
- * Body: { blueprint, lang }. Only the stand may call it: the kiosk pass cookie
+ * Body: { blueprint, lang, meta? } — meta: { source, words }, see exhibit/meta.ts. Only the stand may call it: the kiosk pass cookie
  * is required, and the stand has a quota of its own. Returns the preview key
  * and a signup token; the kiosk turns them into the QR on its last screen.
  * Nothing exists on 1lev1 until the visitor signs (see createExhibitDraft).
@@ -27,11 +27,11 @@ export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
   const day = hour.ok ? stand.take('draft:d', PER_DAY, 24 * HOUR) : hour;
   if (!day.ok) return json({ ok: false, reason: 'busy' }, { status: 429, headers: HEADERS });
 
-  const body = (await request.json().catch(() => null)) as { blueprint?: unknown; lang?: unknown } | null;
+  const body = (await request.json().catch(() => null)) as { blueprint?: unknown; lang?: unknown; meta?: unknown } | null;
   if (!body) return json({ ok: false, reason: 'bad-request' }, { status: 400, headers: HEADERS });
 
   try {
-    const r = await createExhibitDraft(body.blueprint, body.lang, { strapi: strapiClient, fetch });
+    const r = await createExhibitDraft(body.blueprint, body.lang, { strapi: strapiClient, fetch }, body.meta);
     if (!r.ok) return json(r, { status: 400, headers: HEADERS });
     return json({ ok: true, shareKey: r.shareKey, token: r.token, expiresAt: r.expiresAt }, { headers: HEADERS });
   } catch (e) {

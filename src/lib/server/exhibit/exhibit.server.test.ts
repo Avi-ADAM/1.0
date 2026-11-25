@@ -74,6 +74,17 @@ describe('createExhibitDraft', () => {
     expect(shared?.id).toBe(r.sessionId);
   });
 
+  it('keeps where the idea came from and the visitor’s words for the lead, dropping anything malformed', async () => {
+    const strapi = fakeStrapi();
+    const r = await createExhibitDraft(blueprint, 'he', { strapi, now }, { source: 'nearest:mural', words: 'קיר  לשכונה' });
+    if (!r.ok) throw new Error('draft failed');
+    const { parseExhibitSourceText } = await import('./meta');
+    expect(parseExhibitSourceText(strapi.rows.get(r.sessionId).sourceText)).toEqual({ source: 'nearest:mural', words: 'קיר לשכונה' });
+    const r2 = await createExhibitDraft(blueprint, 'he', { strapi, now }, { source: 'evil:<x>' });
+    if (!r2.ok) throw new Error('draft failed');
+    expect(parseExhibitSourceText(strapi.rows.get(r2.sessionId).sourceText).source).toBeNull();
+  });
+
   it('refuses anything that is not an idea blueprint without partners', async () => {
     const strapi = fakeStrapi();
     expect(await createExhibitDraft({ nope: true }, 'he', { strapi, now })).toEqual({ ok: false, reason: 'invalid' });
@@ -97,7 +108,11 @@ describe('exhibitLeadParams', () => {
     missions: 4,
     open: 3,
     previewUrl: 'https://www.1lev1.com/preview/rikma/abc?ref=exhibit',
-    signupUrl: 'https://www.1lev1.com/hascama?agent=tok'
+    signupUrl: 'https://www.1lev1.com/hascama?agent=tok',
+    studioUrl: 'https://www.1lev1.com/preview/rikma/studio/tok',
+    plan: 'mission: Paint the wall · 60h × 100 = 6000 · open\nproduct: Art tours',
+    ideaSource: 'nearest:mural',
+    words: 'קיר לשכונה'
   };
 
   it('is an event lead with a task, idempotent on the draft, with the consent that happened', () => {
@@ -114,6 +129,25 @@ describe('exhibitLeadParams', () => {
       consent: { text: EXHIBIT_CONSENT_TEXT, at: now.toISOString() }
     });
     expect(p).not.toHaveProperty('phone');
+  });
+
+  it('gives the team (and Claude, through getLead) the plan, the studio, and how rough the draft is', () => {
+    const p = exhibitLeadParams('7', input, 'x', now) as any;
+    expect(p.details).toMatchObject({
+      studio: 'https://www.1lev1.com/preview/rikma/studio/tok',
+      plan: input.plan,
+      ideaSource: 'nearest:mural',
+      words: 'קיר לשכונה'
+    });
+  });
+
+  it('keeps details within the lead limit, cutting the plan first', () => {
+    const plan = Array.from({ length: 200 }, (_, i) => `mission: Part number ${i} · 10h × 100 = 1000 · open`).join('\n');
+    const p = exhibitLeadParams('7', { ...input, plan }, 'x', now) as any;
+    expect(new TextEncoder().encode(JSON.stringify(p.details)).length).toBeLessThanOrEqual(3800);
+    expect(p.details.plan.endsWith('…')).toBe(true);
+    expect(p.details.studio).toBe(input.studioUrl);
+    expect(validateLeadPayload(p, { requireConsent: true }).ok).toBe(true);
   });
 
   it('names a visitor who left only an email by its local part', () => {

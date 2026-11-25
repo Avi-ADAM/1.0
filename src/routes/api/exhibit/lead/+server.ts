@@ -19,6 +19,7 @@ import { openSignupToken } from '$lib/server/assistant/signupToken.js';
 import { loadSession } from '$lib/server/assistant/session.js';
 import { EXHIBIT_COOKIE, isExhibitPass } from '$lib/server/exhibit/pass';
 import { recordExhibitLead } from '$lib/server/exhibit/lead';
+import { parseExhibitSourceText, planSummary } from '$lib/server/exhibit/meta';
 import { RateLimiter, callerKey } from '$lib/server/translation/rateLimit';
 
 const SITE = 'https://www.1lev1.com';
@@ -63,6 +64,7 @@ export const POST: RequestHandler = async ({ request, cookies, fetch, getClientA
   );
   const idea = String(row.state?.fields?.name ?? '').trim() || 'exhibit rikma';
   const shareKey = str(body.shareKey, 200);
+  const meta = parseExhibitSourceText(row.sourceText);
   const r = await recordExhibitLead(
     {
       sessionId: row.id,
@@ -75,7 +77,11 @@ export const POST: RequestHandler = async ({ request, cookies, fetch, getClientA
       missions: missions.length,
       open: open.length,
       previewUrl: shareKey ? `${SITE}/preview/rikma/${encodeURIComponent(shareKey)}?ref=exhibit` : `${SITE}/vision?ref=exhibit`,
-      signupUrl: `${SITE}/hascama?agent=${token}`
+      signupUrl: `${SITE}/hascama?agent=${token}`,
+      studioUrl: `${SITE}/preview/rikma/studio/${token}`,
+      plan: planSummary(items),
+      ideaSource: meta.source,
+      words: meta.words
     },
     env.EXHIBIT_LABEL || '1lev1 · exhibition stand',
     fetch

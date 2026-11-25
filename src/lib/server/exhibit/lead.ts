@@ -30,7 +30,18 @@ export interface ExhibitLeadInput {
   open: number;
   previewUrl: string;
   signupUrl: string;
+  /** The studio on the same token: a team member can open and refine the draft itself. */
+  studioUrl: string;
+  /** One line per part (meta.ts planSummary). */
+  plan: string;
+  /** template:<key> · ai · nearest:<key> — how rough the draft is. */
+  ideaSource: string | null;
+  /** What the visitor typed, when they typed an idea. */
+  words: string | null;
 }
+
+/** `details` may hold 4KB (LEAD_LIMITS); the plan gives way first. */
+const DETAILS_BYTES = 3800;
 
 /** The `createLead` params — pure, so the mapping is tested. */
 export function exhibitLeadParams(
@@ -40,20 +51,33 @@ export function exhibitLeadParams(
   now: Date = new Date()
 ): Record<string, unknown> {
   const name = (d.name ?? '').trim() || (d.email ?? '').split('@')[0] || d.phone || 'exhibit visitor';
+  const details: Record<string, string | number> = {
+    idea: d.idea.slice(0, 200),
+    missions: d.missions,
+    openParts: d.open,
+    via: d.via,
+    ...(d.ideaSource ? { ideaSource: d.ideaSource } : {}),
+    ...(d.words ? { words: d.words } : {}),
+    preview: d.previewUrl,
+    studio: d.studioUrl,
+    signup: d.signupUrl,
+    plan: d.plan
+  };
+  const bytes = () => new TextEncoder().encode(JSON.stringify(details)).length;
+  if (bytes() > DETAILS_BYTES) {
+    const lines = d.plan.split('\n');
+    while (lines.length && bytes() > DETAILS_BYTES) {
+      lines.pop();
+      details.plan = lines.length ? `${lines.join('\n')}\n…` : '';
+    }
+  }
   return {
     projectId,
     name: name.slice(0, 120),
     ...(d.email ? { email: d.email } : {}),
     ...(d.phone ? { phone: d.phone } : {}),
     message: d.idea.slice(0, 500),
-    details: {
-      idea: d.idea.slice(0, 200),
-      missions: d.missions,
-      openParts: d.open,
-      via: d.via,
-      preview: d.previewUrl,
-      signup: d.signupUrl
-    },
+    details,
     source: 'event',
     sourceLabel: label.slice(0, 200),
     sourceUrl: d.previewUrl,

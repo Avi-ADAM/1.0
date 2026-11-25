@@ -140,6 +140,7 @@ export function ideaFromTemplate(key: IdeaKey): ExhibitIdea {
     title: ns(key, 'title'),
     i18n: true,
     source: 'template',
+    basedOn: key,
     missions: preview.missions.map((m) => {
       const row = missionRow.get(m.name)!;
       return { ...blank('mission', row.id, m.name, true), hours: m.hours, rate: m.rate, value: m.value, share: m.share, skills: row.skills };

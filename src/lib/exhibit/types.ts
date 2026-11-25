@@ -62,6 +62,8 @@ export interface ExhibitIdea {
   i18n: boolean;
   /** Where the parts came from: a ready template, or a live assistant draft. */
   source: 'template' | 'ai';
+  /** The ready idea whose parts answer it (a template, or the nearest one to the visitor's words). */
+  basedOn?: IdeaKey;
   missions: ExhibitTask[];
   resources: ExhibitTask[];
   products: ExhibitTask[];

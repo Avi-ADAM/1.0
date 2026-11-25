@@ -11,10 +11,11 @@ const session = {
   id: '9',
   status: 'pending',
   kind: 'rikma',
+  sourceText: 'Built at the 1lev1 exhibition stand: ציור קיר לשכונה\nsource: template:mural',
   state: {
     fields: { name: 'ציור קיר לשכונה' },
     items: [
-      { key: 'i1', group: 'rikmaMissions', label: 'a', status: 'proposed', spec: { holder: 'me' } },
+      { key: 'i1', group: 'rikmaMissions', label: 'a', status: 'proposed', spec: { holder: 'me', hours: 30, ratePerHour: 120 } },
       { key: 'i2', group: 'rikmaMissions', label: 'b', status: 'proposed', spec: { holder: 'open' } },
       { key: 'i3', group: 'rikmaResources', label: 'c', status: 'proposed', spec: { holder: 'open' } },
       { key: 'i4', group: 'products', label: 'd', status: 'proposed' }
@@ -55,8 +56,18 @@ describe('POST /api/exhibit/lead', () => {
       idea: 'ציור קיר לשכונה',
       missions: 2,
       open: 2,
-      previewUrl: 'https://www.1lev1.com/preview/rikma/k1?ref=exhibit'
+      previewUrl: 'https://www.1lev1.com/preview/rikma/k1?ref=exhibit',
+      ideaSource: 'template:mural',
+      words: null
     });
+    const sent = (record.mock.calls[0] as any)[0];
+    expect(sent.studioUrl).toBe(`https://www.1lev1.com/preview/rikma/studio/${token}`);
+    expect(sent.plan.split('\n')).toEqual([
+      'mission: a · 30h × 120 = 3600 · me',
+      'mission: b · open',
+      'resource: c · open',
+      'product: d'
+    ]);
   });
 
   it('needs consent, a way to reach them, and a live token', async () => {
