@@ -8,6 +8,8 @@
  * platform's own functions from this state (docs/tbd/PLAN_EXHIBITION_MODE.md §2.1).
  */
 import { computeMissionMatchScore, type MatchResult } from '$lib/matching/scoring';
+import { computeNegoGate, type NegoGateResult, type RoundLike, type VoteLike } from '$lib/nego/negoGate';
+import { memberShares, type MemberSharesResult } from '$lib/revenue/memberShares';
 import { ideaFromCustomText, ideaFromPreview, ideaFromTemplate } from './fixtures/ideas';
 import { closestTemplate } from './fixtures/match';
 import { PEOPLE } from './fixtures/people';
@@ -24,6 +26,20 @@ export const MAX_MY_SKILLS = 3;
 /** Beyond this the circle stops being a partnership you can picture. */
 export const MAX_INVITED = 5;
 
+/** One part's key — a mission and a resource may share an id (`m1` / `r1` never do, but keys stay explicit). */
+export const taskKey = (task: ExhibitTask) => `${task.kind}:${task.id}`;
+
+/**
+ * One partner's consent to the plan, in the platform's own shapes: the rounds
+ * of a candidacy negotiation and the votes on them. `computeNegoGate` reads
+ * these exactly as the cron finalizers read an Ask's — the visitor is the
+ * rikma proposing, the partner is the taker of the parts proposed to them.
+ */
+export interface PartnerConsent {
+  rounds: RoundLike[];
+  vots: VoteLike[];
+}
+
 export interface TaskMatch {
   personId: string;
   result: MatchResult;
@@ -38,6 +54,15 @@ export class ExhibitSandbox {
   invited = $state<string[]>([]);
   /** What the visitor brings — the visitor is a partner too, not a recruiter. */
   mySkills = $state<SkillKey[]>([]);
+  /** Partnership step: who takes which part (`taskKey` → partner id, `ME` included). */
+  assignments = $state<Record<string, string>>({});
+  /** Hours a counter-proposal changed (`taskKey` → hours). */
+  hoursOverride = $state<Record<string, number>>({});
+  /** Per partner (never `ME`): their rounds and votes on the plan. */
+  consent = $state<Record<string, PartnerConsent>>({});
+
+  /** The rikma's partners: the visitor first, then whoever they invited. */
+  circle = $derived([ME, ...this.invited]);
   /** Bumped on every reset, so components can key their local state on it. */
   round = $state(0);
 
@@ -55,6 +80,8 @@ export class ExhibitSandbox {
     if (i >= 2 && !this.idea) return false;
     // A partnership needs someone to be partners with.
     if (i >= 3 && this.invited.length === 0) return false;
+    // What the partnership creates exists only once everyone signed it.
+    if (i >= 4 && !this.allSigned) return false;
     return true;
   }
 
@@ -79,6 +106,7 @@ export class ExhibitSandbox {
     this.idea = null;
     this.invited = [];
     this.mySkills = [];
+    this.clearPlan();
     this.round++;
   }
 
@@ -100,6 +128,7 @@ export class ExhibitSandbox {
   private setIdea(idea: ExhibitIdea) {
     this.idea = idea;
     this.invited = [];
+    this.clearPlan();
     // A new idea starts a new story: later steps are unreached again.
     this.reached = Math.min(this.reached, STEPS.indexOf('idea'));
   }
@@ -112,6 +141,9 @@ export class ExhibitSandbox {
   toggleInvite(personId: string): boolean {
     if (this.isInvited(personId)) {
       this.invited = this.invited.filter((id) => id !== personId);
+      // Whatever they were to take is open again.
+      this.assignments = Object.fromEntries(Object.entries(this.assignments).filter(([, who]) => who !== personId));
+      this.consent = {};
       return true;
     }
     if (this.invited.length >= MAX_INVITED || !PEOPLE.some((p) => p.id === personId)) return false;
@@ -160,4 +192,181 @@ export class ExhibitSandbox {
       }))
       .filter((m) => m.result.qualifies);
   }
+
+  // ── Partnership ─────────────────────────────────────────────────────
+
+  private clearPlan() {
+    this.assignments = {};
+    this.hoursOverride = {};
+    this.consent = {};
+  }
+
+  hoursOf(task: ExhibitTask): number | null {
+    return this.hoursOverride[taskKey(task)] ?? task.hours;
+  }
+
+  /** What taking this part is worth: approved hours × rate, or the resource's value. */
+  valueOf(task: ExhibitTask): number {
+    if (task.kind === 'mission') return (this.hoursOf(task) ?? 0) * (task.rate ?? 0);
+    return task.value ?? 0;
+  }
+
+  ownerOf(task: ExhibitTask): string | null {
+    return this.assignments[taskKey(task)] ?? null;
+  }
+
+  /** Give a part to a partner, or (`null`, or the same partner again) leave it open. */
+  assign(task: ExhibitTask, who: string | null) {
+    const key = taskKey(task);
+    const next = { ...this.assignments };
+    if (who === null || next[key] === who || !this.circle.includes(who)) delete next[key];
+    else next[key] = who;
+    this.assignments = next;
+    this.consent = {};
+  }
+
+  /**
+   * The assistant's first draft of who takes what: every part goes to the
+   * partner whose skills fit it best (`computeMissionMatchScore`), the lighter
+   * load winning a tie, biggest parts first so the load evens out. A part
+   * nobody in the circle fits stays open — an open mission is how the rikma
+   * finds its next partner, not a gap to paper over.
+   */
+  suggestAssignment() {
+    const load: Record<string, number> = Object.fromEntries(this.circle.map((id) => [id, 0]));
+    const next: Record<string, string> = {};
+    const byValue = [...this.tasks].sort((a, b) => this.valueOf(b) - this.valueOf(a));
+    for (const task of byValue) {
+      let best: { id: string; score: number } | null = null;
+      for (const id of this.circle) {
+        const skills = id === ME ? this.mySkills : (PEOPLE.find((p) => p.id === id)?.skills ?? []);
+        const r = computeMissionMatchScore(
+          { id: task.id, skills: task.skills, roles: [], workWays: [] },
+          { skills, roles: [], workWays: [] }
+        );
+        if (!r.qualifies) continue;
+        if (!best || r.rawScore > best.score || (r.rawScore === best.score && load[id] < load[best.id])) {
+          best = { id, score: r.rawScore };
+        }
+      }
+      if (best) {
+        next[taskKey(task)] = best.id;
+        load[best.id] += this.valueOf(task);
+      }
+    }
+    // Nobody in the circle should come out empty-handed while someone else
+    // holds two parts and one of them fits them too: hand that one over.
+    for (const id of this.circle) {
+      if (Object.values(next).includes(id)) continue;
+      const theirs = this.matchesForPerson(id)
+        .filter((m) => {
+          const holder = next[taskKey(m.task)];
+          return holder && Object.values(next).filter((h) => h === holder).length >= 2;
+        })
+        .sort((a, b) => b.result.rawScore - a.result.rawScore)[0];
+      if (theirs) next[taskKey(theirs.task)] = id;
+    }
+    this.assignments = next;
+    this.consent = {};
+  }
+
+  /** Value nobody has taken yet — it stays open for the next partner. */
+  openValue = $derived(
+    this.tasks.filter((t) => !this.assignments[taskKey(t)]).reduce((sum, t) => sum + this.valueOf(t), 0)
+  );
+
+  /**
+   * Each partner's share, by the split page's own arithmetic (`memberShares`):
+   * a mission counts as a finished mission's total, a resource as a received
+   * resource's. The shares are what the plan means once it is done.
+   */
+  shares = $derived.by((): MemberSharesResult => {
+    const ref = (id: string) => ({ data: { id } });
+    const assigned = this.tasks.filter((t) => this.assignments[taskKey(t)]);
+    const row = (t: ExhibitTask) => ({
+      attributes: { total: this.valueOf(t), users_permissions_user: ref(this.assignments[taskKey(t)]) }
+    });
+    return memberShares({
+      users: this.circle.map((id) => ({ id, attributes: { username: id } })),
+      fmiData: assigned.filter((t) => t.kind === 'mission').map(row),
+      rikmashes: assigned.filter((t) => t.kind === 'resource').map(row)
+    });
+  });
+
+  /** The parts proposed to one partner. */
+  partsOf(who: string): ExhibitTask[] {
+    return this.tasks.filter((t) => this.assignments[taskKey(t)] === who);
+  }
+
+  // ── Consent ─────────────────────────────────────────────────────────
+
+  private latest(c: PartnerConsent): number {
+    return c.rounds.reduce((m, r) => Math.max(m, Number(r.ordern ?? 0)), 0);
+  }
+
+  /** Send the plan: each partner gets it, and the visitor's proposing it is their yes. */
+  proposePlan() {
+    this.consent = Object.fromEntries(
+      this.invited.map((id) => [id, { rounds: [], vots: [{ what: true, order: 0, users_permissions_user: ME }] }])
+    );
+  }
+
+  /** The partner signs the standing version. */
+  partnerSigns(who: string) {
+    const c = this.consent[who];
+    if (!c) return;
+    this.consent = { ...this.consent, [who]: { ...c, vots: [...c.vots, { what: true, order: this.latest(c), users_permissions_user: who }] } };
+  }
+
+  /** The partner counters with other hours for one of their missions — a new round. */
+  partnerCounters(who: string, task: ExhibitTask, hours: number) {
+    const c = this.consent[who];
+    if (!c) return;
+    this.hoursOverride = { ...this.hoursOverride, [taskKey(task)]: hours };
+    this.consent = {
+      ...this.consent,
+      [who]: { ...c, rounds: [...c.rounds, { ordern: this.latest(c) + 1, proposedBy: 'candidate' }] }
+    };
+  }
+
+  /** The visitor accepts the standing version. */
+  iAccept(who: string) {
+    const c = this.consent[who];
+    if (!c) return;
+    this.consent = { ...this.consent, [who]: { ...c, vots: [...c.vots, { what: true, order: this.latest(c), users_permissions_user: ME }] } };
+  }
+
+  /** The visitor counters back — a new round, proposed (and so signed) by the rikma side. */
+  iCounter(who: string, task: ExhibitTask, hours: number) {
+    const c = this.consent[who];
+    if (!c) return;
+    const next = this.latest(c) + 1;
+    this.hoursOverride = { ...this.hoursOverride, [taskKey(task)]: hours };
+    this.consent = {
+      ...this.consent,
+      [who]: {
+        rounds: [...c.rounds, { ordern: next, proposedBy: 'member' }],
+        vots: [...c.vots, { what: true, order: next, users_permissions_user: ME }]
+      }
+    };
+  }
+
+  /**
+   * Has this partner and the rikma signed the same version? The platform's
+   * gate, with `takerApplied: false`: the parts were proposed to them, so
+   * their silence is not their yes — only their own vote or counter is.
+   */
+  gateFor(who: string): NegoGateResult | null {
+    const c = this.consent[who];
+    if (!c) return null;
+    return computeNegoGate({
+      rounds: c.rounds,
+      vots: c.vots,
+      takerId: who,
+      memberIds: this.circle.filter((id) => id !== who),
+      takerApplied: false
+    });
+  }
+
+  allSigned = $derived(this.invited.length > 0 && this.invited.every((id) => this.gateFor(id)?.approvable));
 }

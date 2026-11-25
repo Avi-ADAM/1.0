@@ -172,3 +172,121 @@ describe('Connection', () => {
     expect(sb.mySkills).toEqual([]);
   });
 });
+
+describe('Partnership', () => {
+  async function planned() {
+    const mod = await import('./sandbox.svelte');
+    const sb = new mod.ExhibitSandbox();
+    sb.chooseTemplate('mural');
+    sb.toggleInvite('dana');
+    sb.toggleInvite('lior');
+    sb.toggleInvite('amir');
+    return { sb, ...mod };
+  }
+
+  it('the assistant gives each part to a partner whose skills fit it', async () => {
+    const { sb, taskKey } = await planned();
+    sb.suggestAssignment();
+    for (const task of sb.tasks) {
+      const who = sb.assignments[taskKey(task)];
+      if (!who) continue;
+      expect(sb.matchesForPerson(who).some((m) => taskKey(m.task) === taskKey(task))).toBe(true);
+    }
+    expect(sb.partsOf('dana').length).toBeGreaterThan(0);
+  });
+
+  it('leaves a part nobody in the circle fits open, and counts it as open value', async () => {
+    const { sb, taskKey } = await planned();
+    sb.toggleInvite('lior'); // the only carpenter in this circle
+    sb.suggestAssignment();
+    const scaffold = sb.tasks.find((t) => t.id === 'r1')!; // carpentry: nobody left holds it
+    expect(sb.assignments[taskKey(scaffold)]).toBeUndefined();
+    expect(sb.openValue).toBeGreaterThanOrEqual(sb.valueOf(scaffold));
+  });
+
+  it('shares follow contribution, through memberShares, and sum to 100', async () => {
+    const { sb, ME } = await planned();
+    const [m1, m2] = sb.idea!.missions;
+    sb.assign(m1, 'dana'); // 30h × 120 = 3600
+    sb.assign(m2, ME); // 60h × 100 = 6000
+    const rows = Object.fromEntries(sb.shares.rows.map((r) => [r.uid, r.p]));
+    expect(rows.dana).toBeCloseTo(37.5, 5);
+    expect(rows[ME]).toBeCloseTo(62.5, 5);
+    expect(rows.lior).toBe(0);
+    sb.assign(m2, ME); // the same partner again leaves it open
+    expect(sb.ownerOf(m2)).toBeNull();
+  });
+
+  it('un-inviting a partner opens what they held', async () => {
+    const { sb } = await planned();
+    const [m1] = sb.idea!.missions;
+    sb.assign(m1, 'dana');
+    sb.toggleInvite('dana');
+    expect(sb.ownerOf(m1)).toBeNull();
+  });
+
+  it('a proposed part is signed only by the partner’s own yes — never by their silence', async () => {
+    const { sb } = await planned();
+    sb.suggestAssignment();
+    sb.proposePlan();
+    expect(sb.gateFor('dana')?.approvable).toBe(false);
+    sb.partnerSigns('dana');
+    expect(sb.gateFor('dana')?.approvable).toBe(true);
+    expect(sb.allSigned).toBe(false);
+  });
+
+  it('a counter changes the hours and opens a new round the visitor must accept', async () => {
+    const { sb, taskKey } = await planned();
+    const m2 = sb.idea!.missions[1];
+    sb.assign(m2, 'dana');
+    sb.proposePlan();
+    const before = sb.valueOf(m2);
+    sb.partnerCounters('dana', m2, 90);
+    expect(sb.hoursOverride[taskKey(m2)]).toBe(90);
+    expect(sb.valueOf(m2)).toBeGreaterThan(before);
+    // The counter is the partner's yes; the rikma has not said yes to it yet.
+    expect(sb.gateFor('dana')).toMatchObject({ takerYes: true, hasPMyes: false, approvable: false });
+    sb.iAccept('dana');
+    expect(sb.gateFor('dana')?.approvable).toBe(true);
+  });
+
+  it('meeting halfway is the visitor’s round: the partner signs it again', async () => {
+    const { sb } = await planned();
+    const m2 = sb.idea!.missions[1];
+    sb.assign(m2, 'dana');
+    sb.proposePlan();
+    sb.partnerCounters('dana', m2, 90);
+    sb.iCounter('dana', m2, 75);
+    expect(sb.hoursOf(m2)).toBe(75);
+    expect(sb.gateFor('dana')).toMatchObject({ hasPMyes: true, takerYes: false });
+    sb.partnerSigns('dana');
+    expect(sb.gateFor('dana')?.approvable).toBe(true);
+    sb.partnerSigns('lior');
+    sb.partnerSigns('amir');
+    expect(sb.allSigned).toBe(true);
+  });
+
+  it('reset clears the plan', async () => {
+    const { sb } = await planned();
+    sb.suggestAssignment();
+    sb.proposePlan();
+    sb.reset();
+    expect(sb.assignments).toEqual({});
+    expect(sb.consent).toEqual({});
+    expect(sb.hoursOverride).toEqual({});
+  });
+});
+
+describe('the assistant leaves nobody empty-handed', () => {
+  it('hands the visitor a fitting part from a partner holding two', async () => {
+    const { ExhibitSandbox, ME } = await import('./sandbox.svelte');
+    const sb = new ExhibitSandbox();
+    sb.chooseTemplate('mural');
+    for (const id of ['dana', 'lior', 'amir']) sb.toggleInvite(id);
+    sb.toggleMySkill('community');
+    sb.toggleMySkill('marketing');
+    sb.suggestAssignment();
+    expect(sb.partsOf(ME).length).toBeGreaterThan(0);
+    for (const id of sb.circle) expect(sb.partsOf(id).length).toBeGreaterThan(0);
+  });
+});

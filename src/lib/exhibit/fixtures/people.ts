@@ -21,3 +21,14 @@ export const PEOPLE: readonly ExhibitPerson[] = [
 export function personById(id: string): ExhibitPerson | undefined {
   return PEOPLE.find((p) => p.id === id);
 }
+
+/** Which drawn face a person wears — the visitor is 0, the nine 1–9. */
+export function variantOf(id: string): number {
+  return PEOPLE.findIndex((p) => p.id === id) + 1;
+}
+
+/** A partner's colour in the ownership ring; the visitor is the kiosk's gold. */
+export function colorOf(id: string): string {
+  const p = personById(id);
+  return p ? `hsl(${p.hue} 62% 50%)` : '#d4a12a';
+}

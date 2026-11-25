@@ -21,16 +21,18 @@
    * @property {string} label - already-translated slice name.
    * @property {number} value - ₪ (or whatever unit the caller formats).
    * @property {number} pct - 0..100, the slice's share of the whole.
+   * @property {string} [color] - overrides the key's colour (a partner per slice, on /exhibit).
    *
    * @typedef {Object} Props
    * @property {PieSlice[]} slices - non-empty slices, the reader's own one first.
    * @property {(n: number) => string} format - number → display string.
    * @property {string} [ariaLabel] - one-line summary of the whole chart for AT.
    * @property {number} [size] - rendered width/height in px.
+   * @property {number} [scale] - text size multiplier, for a screen read from afar (/exhibit).
    */
 
   /** @type {Props} */
-  let { slices = [], format = (n) => String(n), ariaLabel = '', size = 132 } = $props();
+  let { slices = [], format = (n) => String(n), ariaLabel = '', size = 132, scale = 1 } = $props();
 
   /** Which slice the reader is pointing at; null ⇒ show the first (their own). */
   let hovered = $state(/** @type {string|null} */ (null));
@@ -72,6 +74,7 @@
 <div
   class="equity-pie"
   class:rtl={$isRtl}
+  style="--eq-scale:{scale}"
   dir={$isRtl ? 'rtl' : 'ltr'}
   onmouseleave={() => (hovered = null)}
   role="presentation"
@@ -90,6 +93,7 @@
           r={R}
           stroke-dasharray="{arc.len} {C - arc.len}"
           stroke-dashoffset={-arc.offset}
+          style={arc.color ? `stroke:${arc.color}` : undefined}
           role="presentation"
           onmouseenter={() => (hovered = arc.key)}
         />
@@ -119,7 +123,7 @@
           onfocus={() => (hovered = s.key)}
           onblur={() => (hovered = null)}
         >
-          <span class="swatch {s.key}" aria-hidden="true"></span>
+          <span class="swatch {s.key}" aria-hidden="true" style={s.color ? `background:${s.color}` : undefined}></span>
           <span class="name">{s.label}</span>
           <span class="num">{format(s.value)}</span>
           <span class="share">{s.pct < 0.1 && s.pct > 0 ? '<0.1' : s.pct.toFixed(1)}%</span>
@@ -224,13 +228,13 @@
     padding: 0 18%;
   }
   .center .pct {
-    font-size: 1.05rem;
+    font-size: calc(1.05rem * var(--eq-scale, 1));
     font-weight: 700;
     line-height: 1.1;
     color: var(--eq-ink-strong);
   }
   .center .who {
-    font-size: 0.6rem;
+    font-size: calc(0.6rem * var(--eq-scale, 1));
     line-height: 1.15;
     color: var(--eq-ink);
   }
@@ -252,7 +256,7 @@
     width: 100%;
     padding: 0.125rem 0.25rem;
     border-radius: 0.375rem;
-    font-size: 0.7rem;
+    font-size: calc(0.7rem * var(--eq-scale, 1));
     line-height: 1.3;
     color: var(--eq-ink);
     text-align: start;
@@ -265,8 +269,8 @@
   }
   .legend .swatch {
     flex: 0 0 auto;
-    width: 0.5rem;
-    height: 0.5rem;
+    width: calc(0.5rem * var(--eq-scale, 1));
+    height: calc(0.5rem * var(--eq-scale, 1));
     border-radius: 0.125rem;
   }
   .legend .name {
