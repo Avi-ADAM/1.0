@@ -1,5 +1,5 @@
 /**
- * The /exhibit sandbox's shapes (docs/tbd/PLAN_EXHIBITION_MODE.md §2).
+ * The /exhibit sandbox's shapes (docs/inprogress/PLAN_EXHIBITION_MODE.md §2).
  *
  * Everything the kiosk shows is computed from these by the platform's own pure
  * functions — `boardsToVisionPreview`, `computeMissionMatchScore`, and later

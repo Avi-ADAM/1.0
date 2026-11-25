@@ -1,5 +1,5 @@
 <!--
-  Step 2 · Idea (docs/tbd/PLAN_EXHIBITION_MODE.md §3.2).
+  Step 2 · Idea (docs/inprogress/PLAN_EXHIBITION_MODE.md §3.2).
 
   choose    six ready ideas and "I have my own" — click, or press 1–7;
   custom    one big field for the visitor's own words;

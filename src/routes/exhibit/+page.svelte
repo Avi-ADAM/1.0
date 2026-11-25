@@ -1,6 +1,6 @@
 <!--
   /exhibit — 1💗1 as an interactive installation for an art and makers' fair
-  (docs/tbd/PLAN_EXHIBITION_MODE.md). Full screen, mouse and keyboard, he/en,
+  (docs/inprogress/PLAN_EXHIBITION_MODE.md). Full screen, mouse and keyboard, he/en,
   no site header or footer (the root layout steps aside on this route), and a
   sandbox that lives in memory: nothing a visitor does reaches a real member.
 -->
@@ -13,7 +13,7 @@
   import StepIdea from '$lib/components/exhibit/StepIdea.svelte';
   import StepConnection from '$lib/components/exhibit/StepConnection.svelte';
   import StepPartnership from '$lib/components/exhibit/StepPartnership.svelte';
-  import StepSoon from '$lib/components/exhibit/StepSoon.svelte';
+  import StepCreation from '$lib/components/exhibit/StepCreation.svelte';
 
   let { data } = $props();
 
@@ -35,13 +35,13 @@
       {#if sandbox.step === 'welcome'}
         <StepWelcome {sandbox} />
       {:else if sandbox.step === 'idea'}
-        <StepIdea {sandbox} aiPass={data.aiPass} />
+        <StepIdea {sandbox} aiPass={data.pass} />
       {:else if sandbox.step === 'connection'}
         <StepConnection {sandbox} />
       {:else if sandbox.step === 'partnership'}
         <StepPartnership {sandbox} />
       {:else}
-        <StepSoon {sandbox} />
+        <StepCreation {sandbox} pass={data.pass} />
       {/if}
     </div>
   {/key}

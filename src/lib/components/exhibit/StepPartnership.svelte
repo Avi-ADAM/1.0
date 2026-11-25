@@ -1,5 +1,5 @@
 <!--
-  Step 4 · Partnership (docs/tbd/PLAN_EXHIBITION_MODE.md §3.4).
+  Step 4 · Partnership (docs/inprogress/PLAN_EXHIBITION_MODE.md §3.4).
 
   plan     every part of the idea is a card; under it, the circle's faces —
            a click gives the part to that partner (again: leaves it open).

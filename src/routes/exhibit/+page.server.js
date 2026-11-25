@@ -1,11 +1,12 @@
 /**
- * /exhibit — the fair kiosk (docs/tbd/PLAN_EXHIBITION_MODE.md).
+ * /exhibit — the fair kiosk (docs/inprogress/PLAN_EXHIBITION_MODE.md).
  *
  * The stand is opened once at `/exhibit?key=<EXHIBIT_KEY>`: the right key sets
  * the kiosk pass cookie (a hash, never the key) and redirects to the same
  * address without it, so the key is not left on screen or in history. With
- * the pass, a visitor's own idea goes to the live assistant; without it the
- * kiosk answers from its ready ideas. Everything else needs no server at all.
+ * the pass, a visitor's own idea goes to the live assistant and the finished
+ * rikma is kept as a draft behind the QR; without it the kiosk answers from
+ * its ready ideas and the QR points at /vision.
  */
 import { redirect } from '@sveltejs/kit';
 import { EXHIBIT_COOKIE, expectedPass, isExhibitPass, keyOpensPass } from '$lib/server/exhibit/pass';
@@ -36,7 +37,9 @@ export const load = async ({ url, cookies }) => {
   }
 
   return {
-    aiPass: isExhibitPass(cookies.get(EXHIBIT_COOKIE)),
+    // The stand's pass: the live assistant for a visitor's own idea, and the
+    // draft behind the QR on the last screen.
+    pass: isExhibitPass(cookies.get(EXHIBIT_COOKIE)),
     idleSeconds: idleSeconds(url.searchParams.get('idle')),
     fullscreen: url.searchParams.get('fs') !== '0'
   };

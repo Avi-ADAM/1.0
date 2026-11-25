@@ -290,3 +290,80 @@ describe('the assistant leaves nobody empty-handed', () => {
     for (const id of sb.circle) expect(sb.partsOf(id).length).toBeGreaterThan(0);
   });
 });
+
+describe('Creation', () => {
+  async function signed() {
+    const { ExhibitSandbox, ME } = await import('./sandbox.svelte');
+    const sb = new ExhibitSandbox();
+    sb.chooseTemplate('mural');
+    for (const id of ['dana', 'lior', 'amir']) sb.toggleInvite(id);
+    sb.toggleMySkill('community');
+    sb.suggestAssignment();
+    return { sb, ME };
+  }
+
+  it('the first sale is split by the sales page’s own preview, and adds up', async () => {
+    const { sb, ME } = await signed();
+    const { revach, rows } = sb.split;
+    expect(revach).toBe(sb.firstSale);
+    const total = rows.reduce((s, r) => s + r.x, 0);
+    expect(total).toBeCloseTo(sb.firstSale, 5);
+    // Each partner's cut follows their share of the rikma.
+    for (const r of rows) {
+      const share = sb.shares.rows.find((x) => x.uid === r.uid)!.p;
+      expect(r.x).toBeCloseTo((share / 100) * sb.firstSale, 5);
+    }
+    // The visitor holds the money, so every transfer leaves from them.
+    const me = rows.find((r) => r.uid === ME)!;
+    const handed = me.le.reduce((s, l) => s + l.amount, 0);
+    expect(handed).toBeCloseTo(sb.firstSale - me.x, 5);
+    for (const r of rows.filter((r) => r.uid !== ME)) expect(r.le).toEqual([]);
+  });
+
+  it('the blueprint keeps the invented people out: their parts are open', async () => {
+    const { sb, ME } = await signed();
+    const { sandboxToBlueprint } = await import('./blueprint');
+    const { parseBlueprint } = await import('$lib/assistant/blueprint');
+    const bp = sandboxToBlueprint(sb, { me: ME, title: 'Mural', label: (t) => t.label })!;
+    const parsed = parseBlueprint(bp);
+    expect(parsed.ok).toBe(true);
+    expect(bp.partners).toEqual([]);
+    const mine = sb.partsOf(ME).map((t) => t.id);
+    for (const m of bp.missions) expect(m.holder).toBe(mine.includes(m.ref) ? 'me' : 'open');
+    expect(bp.missions.some((m) => m.holder === 'me')).toBe(true);
+    expect(JSON.stringify(bp)).not.toMatch(/dana|lior|amir/);
+  });
+});
+
+describe('handoff', () => {
+  it('puts the token in the fragment, and falls back to /vision without a draft', async () => {
+    const { handoffUrl, tokenFromHash } = await import('./handoff');
+    const url = handoffUrl('https://www.1lev1.com', { shareKey: 'k.1', token: 'a.b-c_d' }, 'en');
+    expect(url).toBe('https://www.1lev1.com/preview/rikma/k.1?ref=exhibit&lang=en#t=a.b-c_d');
+    expect(tokenFromHash(new URL(url).hash)).toBe('a.b-c_d');
+    expect(handoffUrl('https://x', null, 'he')).toBe('https://x/vision?ref=exhibit&lang=he');
+    expect(tokenFromHash('')).toBeNull();
+  });
+
+  it('requestDraft and sendLead never throw — a failure is null / false', async () => {
+    const { requestDraft, sendLead } = await import('./handoff');
+    const fail = vi.fn(async () => Promise.reject(new Error('offline')));
+    expect(await requestDraft({}, 'he', { fetchImpl: fail as never })).toBeNull();
+    expect(await sendLead({ shareKey: 'k', token: 't' }, { email: 'a@b.co' }, 'kiosk', { fetchImpl: fail as never })).toBe(false);
+    const ok = vi.fn(async () => new Response(JSON.stringify({ ok: true, shareKey: 'k', token: 't' })));
+    expect(await requestDraft({}, 'he', { fetchImpl: ok as never })).toEqual({ shareKey: 'k', token: 't' });
+  });
+
+  it('a changed plan forgets the draft', async () => {
+    const { ExhibitSandbox } = await import('./sandbox.svelte');
+    const sb = new ExhibitSandbox();
+    sb.chooseTemplate('mural');
+    sb.toggleInvite('dana');
+    sb.draft = { shareKey: 'k', token: 't' };
+    sb.assign(sb.idea!.missions[0], 'dana');
+    expect(sb.draft).toBeNull();
+    sb.draft = { shareKey: 'k', token: 't' };
+    sb.reset();
+    expect(sb.draft).toBeNull();
+  });
+});

@@ -124,10 +124,6 @@
       "p1": "Weekend workshops"
     }
   },
-  "soon": {
-    "title": "This step is still being woven",
-    "sub": "Coming soon: {{step}}"
-  },
   "people": {
     "noa": {
       "name": "Noa",
@@ -248,5 +244,48 @@
     "silenceRule": "Silence is consent, at the rikma's pace",
     "signed": "Signed! This is your partnership.",
     "next": "See what you create"
+  },
+  "creation": {
+    "later": "Half a year later…",
+    "hours": "{{count}} hours of work approved",
+    "allDone": "Every mission done and approved",
+    "sale": "The first sale: {{product}}",
+    "saleIn": "{{amount}} came into the rikma",
+    "splitTitle": "Everyone gets what they brought",
+    "splitSub": "The money is with you, and everyone gets the part everyone signed. Transparent, no boss.",
+    "kept": "Your part: {{amount}}",
+    "gets": "{{amount}}",
+    "skip": "Skip",
+    "next": "And now?",
+    "finale": "Your next idea can become real.",
+    "scan": "Scan it: the rikma you built is waiting for you on 1💗1",
+    "scanGeneric": "Scan to continue on 1💗1",
+    "keeps": "Kept for 30 days. No commitment.",
+    "preparing": "Keeping your rikma…",
+    "qrLabel": "QR code for the rikma you built",
+    "noPhone": "No phone at hand? Leave your email and the team will get back to you",
+    "name": "Name (optional)",
+    "email": "Email",
+    "consent": "You may get back to me about this rikma",
+    "send": "Keep it for me",
+    "sent": "Saved. We'll get back to you soon 💗",
+    "error": "We couldn't save it. Try again, or scan the code.",
+    "restart": "Start again"
+  },
+  "handoff": {
+    "title": "This is the rikma you built at the fair",
+    "sub": "It is kept for you for 30 days. What would you like to do?",
+    "start": "I want to start",
+    "startSub": "A short signup, and the rikma is already waiting inside",
+    "keep": "Keep it, get back to me",
+    "keepSub": "Leave your details and the 1💗1 team will get back to you",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone (optional)",
+    "consent": "You may get back to me about this rikma",
+    "send": "Send",
+    "sent": "Got it! We'll get back to you soon 💗",
+    "error": "Something went wrong. Please try again.",
+    "expired": "The link from the fair is no longer active, but you can start from here."
   }
 }

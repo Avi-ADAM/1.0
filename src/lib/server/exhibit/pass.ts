@@ -1,5 +1,5 @@
 /**
- * The kiosk pass for /exhibit (docs/tbd/PLAN_EXHIBITION_MODE.md §2.1.5).
+ * The kiosk pass for /exhibit (docs/inprogress/PLAN_EXHIBITION_MODE.md §2.1.5).
  *
  * A fair stand is one IP address for every visitor, so the public 3-an-hour
  * limit of /api/vision-preview would starve it within minutes. The stand is

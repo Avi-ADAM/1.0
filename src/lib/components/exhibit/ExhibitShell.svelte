@@ -1,6 +1,6 @@
 <!--
   ExhibitShell — the frame of the /exhibit installation
-  (docs/tbd/PLAN_EXHIBITION_MODE.md §3.0).
+  (docs/inprogress/PLAN_EXHIBITION_MODE.md §3.0).
 
   One fixed, unscrollable screen: the living thread field behind, the home
   heart, the story's thread and the language switch on top, the current step

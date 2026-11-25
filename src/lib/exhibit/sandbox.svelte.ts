@@ -5,11 +5,12 @@
  * visitor cannot touch a real member's data and leaves nothing for the next
  * one. `reset()` is the only way back to the start, and both the home button
  * and the idle guard call it. Every figure on screen is computed here by the
- * platform's own functions from this state (docs/tbd/PLAN_EXHIBITION_MODE.md §2.1).
+ * platform's own functions from this state (docs/inprogress/PLAN_EXHIBITION_MODE.md §2.1).
  */
 import { computeMissionMatchScore, type MatchResult } from '$lib/matching/scoring';
 import { computeNegoGate, type NegoGateResult, type RoundLike, type VoteLike } from '$lib/nego/negoGate';
 import { memberShares, type MemberSharesResult } from '$lib/revenue/memberShares';
+import { splitPreview, type PreviewRow } from '$lib/revenue/splitPreview';
 import { ideaFromCustomText, ideaFromPreview, ideaFromTemplate } from './fixtures/ideas';
 import { closestTemplate } from './fixtures/match';
 import { PEOPLE } from './fixtures/people';
@@ -60,6 +61,12 @@ export class ExhibitSandbox {
   hoursOverride = $state<Record<string, number>>({});
   /** Per partner (never `ME`): their rounds and votes on the plan. */
   consent = $state<Record<string, PartnerConsent>>({});
+  /**
+   * The signed partnership, kept on 1lev1 for the visitor (§7): the preview key
+   * and the signup token behind the QR. Any change to the plan forgets it — a
+   * new signature means a new draft.
+   */
+  draft = $state<{ shareKey: string; token: string } | null>(null);
 
   /** The rikma's partners: the visitor first, then whoever they invited. */
   circle = $derived([ME, ...this.invited]);
@@ -144,6 +151,7 @@ export class ExhibitSandbox {
       // Whatever they were to take is open again.
       this.assignments = Object.fromEntries(Object.entries(this.assignments).filter(([, who]) => who !== personId));
       this.consent = {};
+    this.draft = null;
       return true;
     }
     if (this.invited.length >= MAX_INVITED || !PEOPLE.some((p) => p.id === personId)) return false;
@@ -199,6 +207,7 @@ export class ExhibitSandbox {
     this.assignments = {};
     this.hoursOverride = {};
     this.consent = {};
+    this.draft = null;
   }
 
   hoursOf(task: ExhibitTask): number | null {
@@ -223,6 +232,7 @@ export class ExhibitSandbox {
     else next[key] = who;
     this.assignments = next;
     this.consent = {};
+    this.draft = null;
   }
 
   /**
@@ -268,6 +278,7 @@ export class ExhibitSandbox {
     }
     this.assignments = next;
     this.consent = {};
+    this.draft = null;
   }
 
   /** Value nobody has taken yet — it stays open for the next partner. */
@@ -280,18 +291,42 @@ export class ExhibitSandbox {
    * a mission counts as a finished mission's total, a resource as a received
    * resource's. The shares are what the plan means once it is done.
    */
-  shares = $derived.by((): MemberSharesResult => {
+  shares = $derived.by((): MemberSharesResult => memberShares(this.contributions()));
+
+  /** The rows `memberShares` / `splitPreview` read: what each partner's done parts are worth. */
+  private contributions() {
     const ref = (id: string) => ({ data: { id } });
     const assigned = this.tasks.filter((t) => this.assignments[taskKey(t)]);
     const row = (t: ExhibitTask) => ({
       attributes: { total: this.valueOf(t), users_permissions_user: ref(this.assignments[taskKey(t)]) }
     });
-    return memberShares({
+    return {
       users: this.circle.map((id) => ({ id, attributes: { username: id } })),
       fmiData: assigned.filter((t) => t.kind === 'mission').map(row),
       rikmashes: assigned.filter((t) => t.kind === 'resource').map(row)
-    });
+    };
+  }
+
+  /**
+   * "Half a year later": the first sale. A round sum, about two fifths of the
+   * work the rikma did — big enough to be worth splitting, never a promise.
+   */
+  firstSale = $derived.by(() => {
+    const done = this.tasks.filter((t) => this.assignments[taskKey(t)]).reduce((s, t) => s + this.valueOf(t), 0);
+    return Math.max(2000, Math.round((done * 0.4) / 500) * 500);
   });
+
+  /**
+   * Who gets what from that sale, and who hands it to whom — the sales page's
+   * own preview (`splitPreview`). The visitor holds the money ("it is with
+   * me", a sovereign self-report), so every transfer starts from them.
+   */
+  split = $derived.by((): { revach: number; rows: PreviewRow[] } =>
+    splitPreview({
+      ...this.contributions(),
+      sales: [{ attributes: { in: this.firstSale, splited: false, users_permissions_user: { data: { id: ME } } } }]
+    })
+  );
 
   /** The parts proposed to one partner. */
   partsOf(who: string): ExhibitTask[] {

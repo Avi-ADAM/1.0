@@ -1,5 +1,5 @@
 <!--
-  Step 3 · Connection (docs/tbd/PLAN_EXHIBITION_MODE.md §3.3).
+  Step 3 · Connection (docs/inprogress/PLAN_EXHIBITION_MODE.md §3.3).
 
   The idea and its parts in the middle; nine invented people around them, and
   the visitor's own place among them. Pointing at a person lights threads to

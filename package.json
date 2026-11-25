@@ -142,6 +142,7 @@
     "pdfjs-dist": "5.4.296",
     "progressbar-svelte": "^1.0.0",
     "push.js": "^1.0.12",
+    "qrcode-generator": "^2.0.4",
     "runed": "^0.35.1",
     "satori": "^0.56.1",
     "socket.io-client": "^4.8.4",

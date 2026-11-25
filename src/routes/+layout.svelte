@@ -101,7 +101,7 @@ onMessage(messaging, (payload) => {
   // bar offering the same two would only sit on top of the form.
   const AUTH_ROUTES =
     /^(?:\/(?:he|en|ar|ru|es))?\/(?:login|signup|confirm-email)(?:\/|$)/;
-  // The fair kiosk (/exhibit, docs/tbd/PLAN_EXHIBITION_MODE.md) is a
+  // The fair kiosk (/exhibit, docs/inprogress/PLAN_EXHIBITION_MODE.md) is a
   // full-screen installation with its own large controls: no bar, no bot and
   // no floating accessibility button on top of it.
   const KIOSK = /^\/exhibit(?:\/|$)/;

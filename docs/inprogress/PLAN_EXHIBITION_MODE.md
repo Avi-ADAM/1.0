@@ -1,6 +1,8 @@
 # PLAN_EXHIBITION_MODE — מיצג 1💗1 ליריד אמנות ויצירה
 
-**סטטוס:** E0–E3 בנויים (2026-11-25). E4 (Creation + QR + ליד) הבא בתור.
+**סטטוס:** E0–E4 בנויים, לא נפרסו (2026-11-25). כל חמשת השלבים עובדים מקצה
+לקצה. **נשאר:** E5 (הקשחה וסקריפט Playwright בריפו), הגדרת העמדה (§8),
+ובדיקה מול Strapi אמיתי של הטיוטה, הליד ודף הטלפון.
 
 **הוחלט:** ביריד יש אינטרנט, ולכן offline אינו דרישה. ה-AI החי הוא הדרך
 הראשית לרעיון שהמבקר מקליד, והתבניות המקומיות הן רשת הביטחון: הן עונות מיד
@@ -292,7 +294,7 @@ tokens של `barbi`/`gold`, וה-service worker כמו שהוא.
 | **E4** | Creation + QR + סיום | סיבוב מלא מהפתיחה ועד חזרה אוטומטית |
 | **E5** | הקשחה | Playwright ב-1920×1080 על כל המסלול בשתי השפות; idle; נפילת רשת באמצע (התבנית עונה); `check:i18n`, `check:dir`, `check:ui-hebrew`; 60fps ב-Performance |
 
-### מה כבר בנוי (E0 + E1)
+### מה כבר בנוי (E0–E4)
 
 - `scoring.ts` ו-`negoGate.ts` הועברו ל-`$lib/matching/` ול-`$lib/nego/`,
   והנתיב הישן נשאר כ-re-export (167 בדיקות קיימות ירוקות).
@@ -376,4 +378,36 @@ tokens של `barbi`/`gold`, וה-service worker כמו שהוא.
    אליו"). `openTask: true`, כדי שמישהו בצוות ייקח אותו.
 5. טיוטה שלא נדרשה נמחקת ב-cron הקיים של `prepareSignup`.
 
-**נבנה ב-E4.** E2–E3 לא תלויים בזה.
+**נבנה ב-E4:**
+- `$lib/exhibit/blueprint.ts` (`sandboxToBlueprint`): שלב נקי, נבדק מול
+  `parseBlueprint`. האנשים הדמיוניים לא מופיעים בטיוטה.
+- `$lib/server/exhibit/draft.ts` (`createExhibitDraft`): session ממתין בלי
+  owner ובלי `claimEmail`, `setShare` ל-30 יום, token עם `name:''`, `email:''`
+  ו-`intent:'idea'` ל-30 יום. ה-claim לפי `sid` של ה-token, כמו ב-agent-sign.
+- `$lib/server/exhibit/lead.ts` (`recordExhibitLead`): `createLead` ברקמה
+  המרכזית, `source:'event'` (ערך קיים, בלי שינוי enum), `sourceLabel` מ-
+  `EXHIBIT_LABEL`, ו-`externalId: exhibit:<sid>`.
+- `POST /api/exhibit/draft` (דורש pass) ו-`POST /api/exhibit/lead` (מהעמדה
+  דורש pass; מטלפון עם מגבלה לפי כתובת).
+- ה-token נמצא ב-fragment של ה-QR (`#t=`), ולכן אף שרת לא רואה אותו. דף
+  התצוגה שומר אותו ב-sessionStorage ומוחק אותו מהכתובת.
+- `ExhibitHandoff` בראש `/preview/rikma/[shareKey]?ref=exhibit` (דרך snippet
+  `top` חדש ב-`RikmaPreview`).
+- `StepCreation`: story → split (`splitPreview`, מטבעות מהמבקר לכל שותף) →
+  finale (QR של `qrcode-generator`, שנוצר בדפדפן, שדה מייל רשות, חזרה לבד
+  אחרי 45 שניות).
+
+## 8. הגדרת העמדה (לפני היריד)
+
+1. **משתני סביבה בשרת ה-API:**
+   - `EXHIBIT_KEY`: לפחות 12 תווים. בלעדיו אין pass, ולכן אין AI חי לרעיון
+     חופשי ואין טיוטה מאחורי ה-QR. העמדה עדיין עובדת, וה-QR מוביל ל-`/vision`.
+   - `EXHIBIT_LABEL`: שם היריד כפי שיופיע בליד (ברירת מחדל: `1lev1 · exhibition stand`).
+   - `DEMO_CENTRAL_PROJECT_ID`, `DEMO_HOST_USER_ID`: כבר בשימוש בבקשות הדגמה.
+     בלעדיהם הליד לא נרשם (503 `not_configured`).
+2. **פתיחה חד-פעמית:** פותחים `https://www.1lev1.com/exhibit?key=<EXHIBIT_KEY>`
+   בדפדפן של העמדה. ה-cookie נשמר ל-30 יום, והמפתח נמחק מהכתובת.
+3. **Chrome:** `--kiosk https://www.1lev1.com/exhibit?lang=he` (אופציונלי:
+   `&idle=60..90`).
+4. **בדיקה ביום ההקמה:** לעבור את כל המסלול פעם אחת, לסרוק את ה-QR בטלפון,
+   ולוודא שהליד הגיע לרקמה המרכזית.
