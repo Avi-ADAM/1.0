@@ -8,15 +8,19 @@ const generate = vi.fn(async () => ({
 vi.mock('$lib/server/planning/seedPlan.js', () => ({ generateSeedPlan: generate }));
 vi.mock('@mastra/core/agent', () => ({ Agent: class {} }));
 vi.mock('../../../mastra/lib/createModel', () => ({ createModelChain: () => null }));
+vi.mock('$env/dynamic/private', () => ({ env: { EXHIBIT_KEY: 'fair-stand-key-2026' } }));
+
+const { expectedPass } = await import('$lib/server/exhibit/pass');
 
 const { POST } = await import('./+server');
 
 const IDEA = 'A neighbourhood bakery with sourdough bread and a weekend baking class for parents and kids.';
 
-function call(body: unknown, ip = '10.0.0.1') {
+function call(body: unknown, ip = '10.0.0.1', pass: string | null = null) {
   return POST({
     request: new Request('http://x/api/vision-preview', { method: 'POST', body: JSON.stringify(body) }),
-    getClientAddress: () => ip
+    getClientAddress: () => ip,
+    cookies: { get: () => pass ?? undefined }
   } as never);
 }
 
@@ -45,5 +49,22 @@ describe('POST /api/vision-preview', () => {
     expect(generate).toHaveBeenCalledTimes(3);
     // Another address is unaffected.
     expect((await call({ text: IDEA }, '10.0.0.4')).status).toBe(200);
+  });
+
+  it('refuses exhibit mode without the kiosk pass, before the model', async () => {
+    generate.mockClear();
+    expect((await call({ text: IDEA, mode: 'exhibit' }, '10.0.0.5')).status).toBe(403);
+    expect((await call({ text: IDEA, mode: 'exhibit' }, '10.0.0.5', 'forged')).status).toBe(403);
+    expect(generate).not.toHaveBeenCalled();
+  });
+
+  it('gives the kiosk short texts and its own quota, not the per-address one', async () => {
+    const pass = expectedPass('fair-stand-key-2026');
+    const ip = '10.0.0.6';
+    for (let i = 0; i < 5; i++) {
+      expect((await call({ text: 'A repair café', mode: 'exhibit' }, ip, pass)).status).toBe(200);
+    }
+    // Still too short even for the kiosk.
+    expect((await call({ text: 'café', mode: 'exhibit' }, ip, pass)).status).toBe(400);
   });
 });

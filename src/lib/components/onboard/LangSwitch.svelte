@@ -1,29 +1,33 @@
 <script>
-  import { lang, langUs, doesLang } from '$lib/stores/lang.js';
   import { locale } from '$lib/translations';
+  import { pickLang } from '$lib/stores/pickLang.js';
 
-  const langs = /** @type {const} */ ([
+  /** @typedef {'he'|'en'|'ar'|'ru'|'es'} LangCode */
+
+  /**
+   * `codes` limits the offer (the /exhibit kiosk shows he + en only);
+   * `big` is the kiosk's size, for a screen read from a few steps away.
+   * @type {{ codes?: LangCode[], big?: boolean }}
+   */
+  let { codes = ['he', 'en', 'ar', 'ru', 'es'], big = false } = $props();
+
+  const ALL = /** @type {const} */ ([
     { code: 'he', label: 'עב', dir: 'rtl' },
     { code: 'en', label: 'EN', dir: 'ltr' },
     { code: 'ar', label: 'عر', dir: 'rtl' },
     { code: 'ru', label: 'RU', dir: 'ltr' },
     { code: 'es', label: 'ES', dir: 'ltr' }
   ]);
+  let langs = $derived(ALL.filter((l) => codes.includes(l.code)));
 
-  /** @param {'he'|'en'|'ar'|'ru'|'es'} code */
+  /** @param {LangCode} code */
   function pick(code) {
     if ($locale === code) return;
-    lang.set(code);
-    locale.set(code);
-    langUs.set(code);
-    doesLang.set(true);
-    document.cookie =
-      `lang=${code}; path=/; expires=` + new Date(2027, 0, 1).toUTCString();
-    // `<html dir/lang>` follow `locale` from the root layout (dirOf).
+    pickLang(code);
   }
 </script>
 
-<div class="lang-switch" role="group" aria-label="language">
+<div class="lang-switch" class:big role="group" aria-label="language">
   {#each langs as l (l.code)}
     <button
       type="button"
@@ -73,6 +77,15 @@
     background: linear-gradient(135deg, #f6c34d, #c98a16);
     color: #fff;
     box-shadow: 0 1px 4px rgba(190, 24, 93, 0.18);
+  }
+  .big {
+    gap: 6px;
+    padding: 6px;
+  }
+  .big .lang-btn {
+    font-size: 22px;
+    padding: 12px 20px;
+    min-width: 64px;
   }
   .lang-btn:focus-visible {
     outline: 2px solid #e91e8c;

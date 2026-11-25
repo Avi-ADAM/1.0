@@ -1,0 +1,131 @@
+{
+  "meta": {
+    "title": "1💗1 · What would you like to create in the world?"
+  },
+  "chrome": {
+    "home": "Back to the start",
+    "progress": "The story's steps",
+    "stepOf": "Step {{current}} of {{total}}",
+    "back": "Back",
+    "next": "Continue",
+    "keysHint": "Arrows to move · Esc to restart · L for language"
+  },
+  "steps": {
+    "welcome": "Welcome",
+    "idea": "Idea",
+    "connection": "Connection",
+    "partnership": "Partnership",
+    "creation": "Creation"
+  },
+  "idle": {
+    "title": "Still here?",
+    "sub": "We'll go back to the start in {{count}} seconds",
+    "stay": "I'm here"
+  },
+  "welcome": {
+    "question": "What would you like to create in the world?",
+    "cta": "Let's create",
+    "whisper1": "One idea.",
+    "whisper2": "A few people.",
+    "whisper3": "Something made together.",
+    "pressEnter": "or press Enter"
+  },
+  "idea": {
+    "title": "Choose an idea",
+    "sub": "or tell us about your own",
+    "custom": {
+      "title": "I have my own idea",
+      "line": "A few words are enough",
+      "label": "Your idea",
+      "placeholder": "For example: a community garden on the roof",
+      "go": "Let's go",
+      "cancel": "Back to the ideas"
+    },
+    "thinking": "The 1💗1 assistant is breaking the idea into parts…",
+    "sproutTitle": "Every idea is made of parts people can take",
+    "sproutSub": "Missions, resources, and what the rikma will offer the world",
+    "legend": {
+      "mission": "Mission",
+      "resource": "Resource",
+      "product": "What we'll offer"
+    },
+    "hours": "{{count}} hours",
+    "share": "{{pct}} of the work",
+    "aiBadge": "The assistant's draft",
+    "templateNote": "The assistant found a similar idea",
+    "next": "Who could join?",
+    "again": "Another idea"
+  },
+  "ideas": {
+    "mural": {
+      "title": "A mural for the neighborhood",
+      "line": "A grey wall that becomes everyone's story",
+      "m1": "Sketch and design the wall",
+      "m2": "Paint the wall",
+      "m3": "Bring in neighbors and permits",
+      "m4": "Film and photograph it",
+      "r1": "Scaffolding and gear",
+      "r2": "Paint",
+      "p1": "Neighborhood art tours"
+    },
+    "book": {
+      "title": "An illustrated children's book",
+      "line": "A story waiting for small readers",
+      "m1": "Write the story",
+      "m2": "Illustrations",
+      "m3": "Layout and print prep",
+      "m4": "Launch and marketing",
+      "r1": "The first print run",
+      "r2": "A space for the launch",
+      "p1": "The book, in shops and online"
+    },
+    "repair": {
+      "title": "A repair café",
+      "line": "Fixing together instead of throwing away",
+      "m1": "Wood and furniture repairs",
+      "m2": "Electronics repairs",
+      "m3": "A coffee and pastry corner",
+      "m4": "Building the community",
+      "r1": "Tools",
+      "r2": "A space in the neighborhood",
+      "p1": "A monthly repair membership"
+    },
+    "fashion": {
+      "title": "An upcycled fashion line",
+      "line": "Old clothes, new lives",
+      "m1": "Design the collection",
+      "m2": "Sewing",
+      "m3": "The collection photo shoot",
+      "m4": "Online shop and marketing",
+      "r1": "Sewing machines",
+      "r2": "Collected fabric",
+      "p1": "The first collection"
+    },
+    "festival": {
+      "title": "A backyard festival",
+      "line": "One evening of music, food and neighbors",
+      "m1": "Line-up and music",
+      "m2": "Production and logistics",
+      "m3": "Food stalls",
+      "m4": "Design and promotion",
+      "r1": "A sound system",
+      "r2": "The yard",
+      "p1": "Festival tickets"
+    },
+    "ceramics": {
+      "title": "A shared ceramics studio",
+      "line": "Where hands meet clay",
+      "m1": "Teach the workshops",
+      "m2": "Set up the studio",
+      "m3": "Photos and social media",
+      "m4": "Run the community",
+      "r1": "A kiln",
+      "r2": "Clay and glazes",
+      "p1": "Weekend workshops"
+    }
+  },
+  "soon": {
+    "title": "This step is still being woven",
+    "sub": "Coming soon: {{step}}"
+  }
+}

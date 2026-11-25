@@ -83,6 +83,8 @@ export const ROUTED = {
     // The "I have a vision and need partners" track - one step before
     // /partnership: how a founder's dream becomes a working rikma.
     vision: at('/vision'),
+    // The fair kiosk (docs/tbd/PLAN_EXHIBITION_MODE.md): one full-screen page.
+    exhibit: at('/exhibit'),
     // The "looking for a venture to join" track. The homepage's discovery
     // strip keeps its own copy in `home`; this is the page behind it.
     join: at('/join'),

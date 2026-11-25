@@ -29,6 +29,9 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 /** Screens localised in stages 1–3 of PLAN_EN_READINESS. */
 const ROOTS = [
+    // The fair kiosk (PLAN_EXHIBITION_MODE): clean from its first commit.
+    'src/routes/exhibit',
+    'src/lib/components/exhibit',
     'src/routes/(reg)/concierge',
     'src/routes/(regandnon)/wish',
     'src/routes/(reg)/moach',

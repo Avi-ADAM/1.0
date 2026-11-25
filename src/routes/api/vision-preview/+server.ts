@@ -18,6 +18,13 @@
  *
  * The text is untrusted data; the seed prompt fences it and says so, and the
  * reply is parsed into plain rows, never rendered as markup.
+ *
+ * `mode: 'exhibit'` is the fair kiosk (/exhibit, PLAN_EXHIBITION_MODE §2.1):
+ * every visitor there shares one address, so a request that carries the
+ * kiosk pass cookie (`$lib/server/exhibit/pass`) skips the per-address limits
+ * for a quota of its own, and may be as short as a visitor's "a repair café".
+ * Without the pass, `exhibit` is refused outright — the public rules are not
+ * loosened for anyone else, and the kiosk answers from its templates.
  */
 
 import { json } from '@sveltejs/kit';
@@ -25,6 +32,7 @@ import type { RequestHandler } from './$types';
 import { generateSeedPlan } from '$lib/server/planning/seedPlan.js';
 import { boardsToVisionPreview, isEmptyPreview } from '$lib/vision/preview';
 import { RateLimiter, callerKey } from '$lib/server/translation/rateLimit';
+import { EXHIBIT_COOKIE, isExhibitPass } from '$lib/server/exhibit/pass';
 
 // Not exported: a +server module may export only its handlers.
 const MIN_TEXT = 60;
@@ -35,6 +43,10 @@ const DAY = 24 * HOUR;
 const PER_HOUR = 3;
 const PER_DAY = 10;
 const SITE_PER_DAY = 200;
+
+const EXHIBIT_MIN_TEXT = 8;
+const EXHIBIT_PER_HOUR = 60;
+const EXHIBIT_PER_DAY = 400;
 
 /*
  * The page's point is the split each mission starts with, which needs hours
@@ -47,8 +59,15 @@ Every "mission" row MUST carry "nhours" (a realistic total estimate) and
 for the language of the text). They are rough illustrations the founder will
 edit, so estimate rather than leave them empty.`;
 
+/* The kiosk shows the draft as a few knots around one idea, on a big screen. */
+const EXHIBIT_RULE = `## This draft is shown on an art-fair kiosk
+The text is a visitor's short idea, often only a few words. Draft one small
+board: 3 to 5 "mission" rows, 2 or 3 "resource" rows and exactly 1 "product"
+row. Every name is 2 to 5 words, in the language of the text.`;
+
 const perAddress = new RateLimiter();
 const site = new RateLimiter({ maxKeys: 10 });
+const exhibit = new RateLimiter({ maxKeys: 4 });
 const HEADERS = { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' };
 
 function refuse(reason: string, status: number, retryAfterMs = 0) {
@@ -57,8 +76,8 @@ function refuse(reason: string, status: number, retryAfterMs = 0) {
   return json({ ok: false, reason }, { status, headers });
 }
 
-export const POST: RequestHandler = async ({ request, getClientAddress }) => {
-  let body: { text?: unknown; website?: unknown };
+export const POST: RequestHandler = async ({ request, getClientAddress, cookies }) => {
+  let body: { text?: unknown; website?: unknown; mode?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -68,17 +87,27 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
   // A filled honeypot gets the same answer as a too-short text: nothing to probe.
   if (typeof body.website === 'string' && body.website.trim()) return refuse('too-short', 400);
 
+  const isExhibit = body.mode === 'exhibit';
+  if (isExhibit && !isExhibitPass(cookies.get(EXHIBIT_COOKIE))) return refuse('no-pass', 403);
+
   const text = typeof body.text === 'string' ? body.text.trim() : '';
-  if (text.length < MIN_TEXT) return refuse('too-short', 400);
+  if (text.length < (isExhibit ? EXHIBIT_MIN_TEXT : MIN_TEXT)) return refuse('too-short', 400);
   if (text.length > MAX_TEXT) return refuse('too-long', 400);
 
-  const who = callerKey(undefined, getClientAddress());
-  const hour = perAddress.take(`h:${who}`, PER_HOUR, HOUR);
-  if (!hour.ok) return refuse('rate-limited', 429, hour.retryAfterMs);
-  const day = perAddress.take(`d:${who}`, PER_DAY, DAY);
-  if (!day.ok) return refuse('rate-limited', 429, day.retryAfterMs);
-  const all = site.take('vision:all', SITE_PER_DAY, DAY);
-  if (!all.ok) return refuse('busy', 429, all.retryAfterMs);
+  if (isExhibit) {
+    const hour = exhibit.take('exhibit:h', EXHIBIT_PER_HOUR, HOUR);
+    if (!hour.ok) return refuse('busy', 429, hour.retryAfterMs);
+    const day = exhibit.take('exhibit:d', EXHIBIT_PER_DAY, DAY);
+    if (!day.ok) return refuse('busy', 429, day.retryAfterMs);
+  } else {
+    const who = callerKey(undefined, getClientAddress());
+    const hour = perAddress.take(`h:${who}`, PER_HOUR, HOUR);
+    if (!hour.ok) return refuse('rate-limited', 429, hour.retryAfterMs);
+    const day = perAddress.take(`d:${who}`, PER_DAY, DAY);
+    if (!day.ok) return refuse('rate-limited', 429, day.retryAfterMs);
+    const all = site.take('vision:all', SITE_PER_DAY, DAY);
+    if (!all.ok) return refuse('busy', 429, all.retryAfterMs);
+  }
 
   const [{ Agent }, { createModelChain }] = await Promise.all([
     import('@mastra/core/agent'),
@@ -89,7 +118,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
     const agent = new Agent({
       id: 'VisionPreviewPlanner',
       name: 'VisionPreviewPlanner',
-      instructions: `${system}\n\n${PREVIEW_RULE}`,
+      instructions: `${system}\n\n${PREVIEW_RULE}${isExhibit ? `\n\n${EXHIBIT_RULE}` : ''}`,
       model: createModelChain()
     });
     const result = await agent.generate([{ role: 'user', content: user }]);

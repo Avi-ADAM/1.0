@@ -101,8 +101,14 @@ onMessage(messaging, (payload) => {
   // bar offering the same two would only sit on top of the form.
   const AUTH_ROUTES =
     /^(?:\/(?:he|en|ar|ru|es))?\/(?:login|signup|confirm-email)(?:\/|$)/;
+  // The fair kiosk (/exhibit, docs/tbd/PLAN_EXHIBITION_MODE.md) is a
+  // full-screen installation with its own large controls: no bar, no bot and
+  // no floating accessibility button on top of it.
+  const KIOSK = /^\/exhibit(?:\/|$)/;
+  let kiosk = $derived(KIOSK.test(page.route.id ?? ''));
   let showBar = $derived(
     $showFoot &&
+      !kiosk &&
       !GROUPED.test(page.route.id ?? '') &&
       !AUTH_ROUTES.test(page.url.pathname)
   );
@@ -298,7 +304,7 @@ onMessage(messaging, (payload) => {
 <a class="skip-to-content" href="#main-content">{$t('ui.a11y.skip')}</a>
 
 <main id="main-content" tabindex="-1">
-  {#if data?.sessionExpired}
+  {#if data?.sessionExpired && !kiosk}
     <SessionExpiredBanner />
   {/if}
   <OfflineBanner />
@@ -316,13 +322,17 @@ onMessage(messaging, (payload) => {
   {#if showBar}
     <MobileFooter isAuthed={!!data?.loggedIn} />
   {/if}
-  <Bot {data} />
+  {#if !kiosk}
+    <Bot {data} />
+  {/if}
   {#if data?.loggedIn}
     <TimeEditorDialog />
   {/if}
 </main>
 
-<AccessibilityPanel />
+{#if !kiosk}
+  <AccessibilityPanel />
+{/if}
 
 <style>
   /* Off-screen until focused, then pinned to the top of the viewport. Left
