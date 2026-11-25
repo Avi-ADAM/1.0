@@ -132,7 +132,7 @@
   const locked = (/** @type {Row} */ r) => !!r.committed || !!r.createdRef;
 </script>
 
-<section class="assistant-panel flex flex-col gap-4" dir="auto">
+<section class="assistant-panel flex flex-col gap-4">
   {#if viaAgent}
     <p class="text-xs self-start px-2 py-0.5 rounded-full bg-barbi/10 border border-barbi/30">{$t('assistant.viaAgent')}</p>
   {/if}

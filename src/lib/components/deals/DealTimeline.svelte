@@ -57,7 +57,7 @@
   .dot.active { background: var(--pink-l); box-shadow: 0 0 10px var(--pink-l); }
   .dot.future { background: var(--s4); }
 
-  .tl-body  { display: flex; flex-direction: column; gap: 2px; direction: rtl; }
+  .tl-body  { display: flex; flex-direction: column; gap: 2px; }
   .tl-date  { font-size: 10px; color: var(--td); font-weight: 600; line-height: 1.4; }
   .tl-label { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.4; }
   .tl-desc  { font-size: 11px; color: var(--tm); line-height: 1.4; }

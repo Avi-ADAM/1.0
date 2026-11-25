@@ -99,7 +99,7 @@
     : 'min-h-screen'} bg-gradient-to-br from-[#1a0515] via-[#2c0b1e] to-[#120f26] text-white overflow-x-hidden font-sans"
   data-testid="rikma-public-preview"
 >
-  <div dir="auto" class="max-w-4xl mx-auto px-4 {embedded ? 'py-6 pb-10' : 'py-8 pb-24'}">
+  <div class="max-w-4xl mx-auto px-4 {embedded ? 'py-6 pb-10' : 'py-8 pb-24'}">
     <p class="mb-6 rounded-2xl border border-gold/50 bg-black/40 p-3 text-center text-sm text-white" role="note">
       <strong class="text-gold">{$t('rikmaImport.preview.banner')}</strong>
       {#if until}

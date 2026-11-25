@@ -82,7 +82,7 @@ function checkAll (a, b){
         {/if}
         </div>
 {:else}
- <div dir="rtl"   class="flex items-center justify-center aling-center">
+ <div   class="flex items-center justify-center aling-center">
    <h2 class="text-center text-barbi">{$t('nego.conf.kindOfValue')}: </h2>
     <select bind:value={kindOfb} class="round form-select appearance-none
       block

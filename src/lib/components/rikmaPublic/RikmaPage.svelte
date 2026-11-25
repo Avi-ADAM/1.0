@@ -415,7 +415,7 @@
           <img src={cover} alt="" style:object-position="{look?.media.focusX ?? 50}% {look?.media.focusY ?? 50}%" />
         </div>
       {/if}
-      <div dir="rtl" class="max-w-4xl mx-auto px-4 py-8 pb-32 relative">
+      <div class="max-w-4xl mx-auto px-4 py-8 pb-32 relative">
         {#if data.lookPreview && !lookFrame.active}
           <!-- A member looking at a proposed look before voting on it (loadRikmaPage). -->
           <div class="pp-preview-banner" role="status">

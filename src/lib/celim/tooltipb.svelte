@@ -35,7 +35,7 @@
 </span>
 
 {#if isHovered}
-	<div dir="rtl" style="top: { y + z}px; left: {x}px;" class="tooltip">{title}</div>
+	<div style="top: { y + z}px; left: {x}px;" class="tooltip">{title}</div>
 {/if}
 
 <style>

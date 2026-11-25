@@ -334,7 +334,7 @@
 
         {#if data.alld?.archived != true && data.alld != null}
             <Head title={page.data?.alld?.titleKey ? $t(page.data.alld.titleKey, page.data.alld.titleParams) : $t('pages.availResource.headi')} {description} {image} {url} />
-            <div bind:clientWidth={wid} dir="rtl" style="overflow-y:auto" class="d mb-4 sm:pt-4 w-full lg:w-1/2 mx-auto">
+            <div bind:clientWidth={wid} style="overflow-y:auto" class="d mb-4 sm:pt-4 w-full lg:w-1/2 mx-auto">
                 <!-- Discovery cross-links: back to the big picture (directories + map) -->
                 <div class="mb-3 flex justify-center">
                     <DiscoveryNav current="resources" isLoggedIn={data.tok == true} />

@@ -930,7 +930,6 @@
       <DialogContent aria-label="form" class="content">
         <div
           style="z-index: 400;"
-          dir="rtl"
           class="grid items-center justify-center text-center bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400"
         >
           <button

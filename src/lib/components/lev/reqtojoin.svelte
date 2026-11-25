@@ -604,7 +604,7 @@
   <div transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}>
     {#if masa === true}
       <DialogContent aria-label="form" class="nego d surface-dialog">
-        <div dir="rtl" class="grid items-center justify-center text-center">
+        <div class="grid items-center justify-center text-center">
           {#if loading === true}
             <Spinner size="lg" />
           {:else}
@@ -649,7 +649,7 @@
       </DialogContent>
     {:else if diunm === true}
       <DialogContent class="chat d surface-dialog" aria-label="form">
-        <div dir="rtl" class="grid items-center justify-center aling-center">
+        <div class="grid items-center justify-center aling-center">
           {#if loading === true}
             <Spinner size="lg" />
           {/if}

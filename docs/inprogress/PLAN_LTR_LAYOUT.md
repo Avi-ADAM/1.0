@@ -1,6 +1,7 @@
 # כיוון הדף לפי השפה: אנגלית, ספרדית ורוסית נבנות משמאל לימין
 
-> מצב: `inprogress/` — **שלב 0 בנוי (2026-11-19), לא נדחף**; שלבים 1–4 ו־`check:dir`
+> מצב: `inprogress/` — **שלב 0 בנוי (2026-11-19) ותוקן (2026-11-25); שלב 1 בנוי
+> (2026-11-25)** חוץ מ־1.2 (ניקוי `dir={$isRtl…}`, נדחה לסוף). שלבים 2–4 ו־`check:dir`
 > עוד לא התחילו. נכתב 2026-11-18 אחרי בדיקת האתר באנגלית:
 > טופס טיוטת הרקמה (`BlueprintReview`) ועוד הרבה טפסים נפרשים מימין לשמאל
 > גם כשהשפה `en`.
@@ -110,7 +111,11 @@
 `LangSwitch` ומ־`me/settings`; ה־`Toaster` מקבל `dir` ו־`direction:` אמיתי
 (במקום `dir:` שאינו CSS); `/guid` לא נגע ב־document בעצמו — רק עודכנה הערה.
 נבדק: SSR עם עוגיית `lang` נותן `dir="rtl"` ל־he/ar ו־`dir="ltr"` ל־en/es.
-**לא נבדק עדיין ויזואלית** — זה המבחן הידני לפני שממשיכים לשלב 1.
+**תיקון 2026-11-25:** `lang` ב־`hooks.server.js` היה משתנה **ברמת המודול**. בזמן
+שהדף מרונדר, ה־loaders שלו שולחים בקשות פנימיות ל־`/api/send` (בלי `?lang`)
+דרך אותו hook, והן דרסו אותו לפני ש־`transformPageChunk` קרא אותו — הטקסט יצא
+באנגלית תחת `<html lang="he" dir="rtl">` (נראה ב־`/availableMission/181?lang=en`).
+עכשיו `const lang` מקומי לבקשה. נבדק בדפדפן: `en` → `ltr`, `he` → `rtl`.
 
 | # | מה | איפה |
 |---|---|---|
@@ -128,7 +133,19 @@
 הופכת את הדף בלי רענון. בעברית ובערבית — אף מסך לא השתנה ויזואלית (זה הסיכון
 העיקרי של 0.3: רכיב שנשען בשקט על `body` RTL ונמצא בתוך מיכל עם `dir` אחר).
 
-### שלב 1 — `dir="rtl"` קבוע ו־`dir="auto"` על מיכלים
+### שלב 1 — `dir="rtl"` קבוע ו־`dir="auto"` על מיכלים — ✅ בנוי 2026-11-25 (חוץ מ־1.2)
+
+מה נעשה: 55 תכונות `dir="rtl"` נמחקו מ־37 קבצים (מיכלי ממשק; בעברית/ערבית זה
+no-op, כי `<html>` כבר RTL). נשארו במכוון: `main/translatehe.svelte` (עברית
+מקור), עמודת `{he}` ב־`guid/ai`, `searchtest` (דף פיתוח), וסלקטורים `[dir='rtl']`
+ב־CSS. `dir="auto"` הורד מ־7 מיכלים (`AssistantPanel`, `RikmaPreview` — שבו טקסט
+החברים כבר נושא `dir="auto"` משלו, `AgentSignup`, `InviteResultCard`, שני
+`focus-chip` בלב, `offer/[key]`); נשארו `OutreachPanel .gr-msg` (הוא הטקסט עצמו)
+ו־`ProfilePanel .gr-preview` (תצוגה מקדימה של תוכן החבר). `direction: rtl` ב־CSS
+נמחק מ־`DealTimeline`, `chat/+page` (וה־textarea קיבל `dir="auto"`) ו־`love` (3);
+`TimersCalendar` (`.fc-direction-rtl`) ו־`AuthorityBadge` (`.curved-text.rtl`)
+מותנים בכיוון — נשארו. ב־`availableMission/[id]` הומרו גם `mr-3`→`ms-3`,
+`ml-1`→`me-1`, `lg:rounded-r`→`lg:rounded-e`.
 
 1. **`dir="rtl"` / `dir='rtl'` קבוע** (88 מופעים, ~50 קבצים; הרשימה המלאה —
    `grep -rlE "dir=[\"']rtl[\"']" src --include=*.svelte`). לכל מופע להחליט:

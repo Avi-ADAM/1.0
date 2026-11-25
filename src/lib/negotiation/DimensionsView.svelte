@@ -26,7 +26,7 @@
   }
 </script>
 
-<div class="dimensions-view w-full" dir="rtl">
+<div class="dimensions-view w-full">
   {#if loading}
     <div class="flex flex-col items-center py-10 gap-3">
       <div class="relative w-12 h-12">

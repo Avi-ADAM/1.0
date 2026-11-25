@@ -171,7 +171,7 @@
   }
 </script>
 
-<section class="agent-signup" dir="auto">
+<section class="agent-signup">
   <div class="card">
     <p class="banner" role="note">{$t('home.amana.agent.banner')}</p>
     {#if prefill.intent}

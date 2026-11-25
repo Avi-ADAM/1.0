@@ -143,13 +143,13 @@ selectedrole = newSele;
 </div>
 <div style="width: 50%; margin: 0 auto;">
   
-     <div dir="rtl" class='textinput'>
+     <div class='textinput'>
   <input type="text"  id="nam" name="nam"   bind:value={missionName_value}  class='input' required>
   <label for="nam" class='label'>{$t('addnew.addNewMission.miname')}</label>
   <span class='line'></span>
 </div>
   
-   <div dir="rtl" class='textinput'>
+   <div class='textinput'>
   <input type="text"  id="des" name="des" bind:value={desM}  class='input' required>
   <label for="des" class='label'>{$t('addnew.addNewMission.sho')}</label>
   <span class='line'></span>

@@ -84,7 +84,7 @@ const outputFormat = 'HH:mm dd/MM/yy';
    </Popover.Content>
   </Popover.Root>
  </div>
- <div class="flex flex-col gap-3" dir="rtl">
+ <div class="flex flex-col gap-3">
   <SveltyPicker
                     inputClasses="form-control"
                     format="hh:ii"

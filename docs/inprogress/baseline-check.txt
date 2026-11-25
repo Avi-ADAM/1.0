@@ -1,0 +1,169 @@
+================================================================================
+BASELINE DIAGNOSTICS — captured automatically, source files NOT modified
+================================================================================
+
+================================================================================
+COMMAND 1: node scripts/audit-money-display.mjs
+================================================================================
+
+6	₪0	-	src/lib/components/lev/cards/reqtojoin.svelte	265,266,270,323,324,576
+6	₪0	-	src/lib/components/prPr/negoM.svelte	821,854,865,900,917,928
+4	₪1	M	src/lib/components/lev/cards/sugestma.svelte	297,428,439,451
+5	₪0	-	src/lib/components/lev/mashsuggest.svelte	373,375,417,425,426
+5	₪0	-	src/lib/components/main/tikunolam.svelte	81,94,108,121,134
+1	₪4	M	src/lib/components/stipend/CycleFacts.svelte	119
+4	₪0	M	src/lib/components/concierge/WishForm.svelte	2578,2602,2626,2653
+4	₪0	-	src/lib/components/prPr/open/OpenResourceCard.svelte	96,99,103,118
+4	₪0	-	src/lib/components/prPr/tasks/crtask.svelte	317,318,321,326
+3	₪0	-	src/lib/components/assistant/RikmaPreview.svelte	240,364,396
+3	₪0	M	src/lib/components/concierge/AcceptWishOffer.svelte	205,222,223
+1	₪2	-	src/lib/components/equity/EquityPie.svelte	124
+0	₪3	M	src/lib/components/equity/EquityPreview.svelte	
+1	₪2	-	src/lib/components/lev/cards/haluka.svelte	474
+3	₪0	-	src/lib/components/lev/pandingMesima.svelte	550,552,663
+3	₪0	-	src/lib/components/lev/pmas.svelte	486,488,582
+2	₪1	-	src/lib/components/lev/projectSuggestor.svelte	475,529
+2	₪1	M	src/lib/components/resource/ResourceCreator.svelte	897,1131
+0	₪3	M	src/lib/components/stipend/StipendProposeDialog.svelte	
+2	₪1	M	src/routes/(regandnon)/availiableResorce/[id]/+page.svelte	438,459
+3	₪0	-	src/routes/(regandnon)/maagad/[id]/+page.svelte	459,469,470
+1	₪1	-	src/lib/components/deals/StatsCard.svelte	30
+2	₪0	-	src/lib/components/grid/nameField.svelte	11,13
+2	₪0	M	src/lib/components/lev/cards/CustomerSaleCard.svelte	358,382
+2	₪0	-	src/lib/components/lev/cards/pending.svelte	239,432
+2	₪0	M	src/lib/components/lev/cards/pma.svelte	457,604
+2	₪0	M	src/lib/components/lev/cards/rektom.svelte	611,624
+2	₪0	-	src/lib/components/lev/cards/SaleCard.svelte	415,439
+0	₪2	M	src/lib/components/lev/cards/StipendPayCard.svelte	
+2	₪0	-	src/lib/components/lev/mesima.svelte	186,194
+2	₪0	-	src/lib/components/lev/reqtom.svelte	640,641
+1	₪1	-	src/lib/components/mail/HalukaApproved.svelte	195
+2	₪0	-	src/lib/components/main/ProductPeek.svelte	301,346
+0	₪2	-	src/lib/components/main/SplitCalculator.svelte	
+2	₪0	-	src/lib/components/offerings/UserStorefront.svelte	67,93
+2	₪0	M	src/lib/components/prPr/hamatanot.svelte	500,529
+2	₪0	-	src/lib/components/prPr/mashmam.svelte	196,224
+2	₪0	-	src/lib/components/prPr/open/OpenMissionCard.svelte	99,112
+2	₪0	-	src/lib/components/prPr/pendsM.svelte	185,194
+2	₪0	-	src/lib/components/rikmaPublic/RikmaPage.svelte	321,344
+2	₪0	M	src/lib/components/shop/OrderDetail.svelte	174,187
+0	₪2	M	src/lib/components/stipend/MissionStipendSection.svelte	
+0	₪2	M	src/lib/components/stipend/StipendTermsFields.svelte	
+2	₪0	M	src/routes/(reg)/concierge/+page.svelte	550,673
+1	₪1	M	src/routes/(reg)/moach/[projectId]/stipend/+page.svelte	413
+1	₪0	-	src/lib/celim/switch.svelte	45
+1	₪0	-	src/lib/chat/components/PartnershipGrid.svelte	16
+1	₪0	-	src/lib/components/conf/VersionHistory.svelte	85
+1	₪0	-	src/lib/components/deals/DonutChart.svelte	79
+1	₪0	M	src/lib/components/deals/ResourcePanel.svelte	28
+1	₪0	-	src/lib/components/hub/DailyBrief.svelte	165
+1	₪0	-	src/lib/components/hub/DemandMapTeaser.svelte	50
+1	₪0	M	src/lib/components/income/MyIncomeChart.svelte	174
+1	₪0	-	src/lib/components/lev/cards/SheirutHalukaCard.svelte	296
+1	₪0	-	src/lib/components/lev/cards/SiteShareIncomeCard.svelte	149
+0	₪1	M	src/lib/components/lev/cards/StipendAccruedCard.svelte	
+0	₪1	M	src/lib/components/lev/cards/StipendConfirmCard.svelte	
+0	₪1	M	src/lib/components/lev/cards/StipendDecisionCard.svelte	
+1	₪0	-	src/lib/components/lev/cards/sugestmi.svelte	212
+1	₪0	-	src/lib/components/lev/didiget.svelte	484
+1	₪0	-	src/lib/components/lev/missionInProgress.svelte	954
+1	₪0	-	src/lib/components/lev/negoArchive.svelte	193
+1	₪0	-	src/lib/components/lev/newcoinui.svelte	678
+1	₪0	-	src/lib/components/lev/ProductRequestCoin.svelte	65
+1	₪0	M	src/lib/components/lev/weget.svelte	531
+0	₪1	-	src/lib/components/mail/monthlyRecurringSale.svelte	
+0	₪1	-	src/lib/components/mail/monthlyResourceActive.svelte	
+1	₪0	M	src/lib/components/mission/MissionBackfillSummary.svelte	77
+1	₪0	-	src/lib/components/offerings/MyProductsSection.svelte	127
+1	₪0	-	src/lib/components/offerings/MyResourcesEditor.svelte	495
+1	₪0	-	src/lib/components/process/lifecycle/SaleLifecycle.svelte	188
+1	₪0	M	src/lib/components/products/MatanotPublicView.svelte	188
+1	₪0	-	src/lib/components/products/VariantsField.svelte	304
+1	₪0	M	src/lib/components/prPr/bethas.svelte	678
+1	₪0	M	src/lib/components/prPr/mission.svelte	1460
+1	₪0	-	src/lib/components/prPr/missionForm/MissionSummary.svelte	34
+1	₪0	-	src/lib/components/prPr/newOpn.svelte	85
+1	₪0	-	src/lib/components/prPr/openM.svelte	141
+0	₪1	M	src/lib/components/revenue/SiteShareDecision.svelte	
+0	₪1	M	src/lib/components/stipend/MissionStipendOffer.svelte	
+1	₪0	-	src/lib/components/userPr/Diamond.svelte	1840
+1	₪0	M	src/routes/(reg)/concierge/[id]/+page.svelte	2510
+1	₪0	M	src/routes/(reg)/me/income/+page.svelte	115
+1	₪0	M	src/routes/(reg)/me/settings/+page.svelte	254
+1	₪0	-	src/routes/(reg)/moach/[projectId]/events/[eventId]/live/+page.svelte	70
+1	₪0	-	src/routes/(reg)/moach/[projectId]/object/[type]/[id]/+page.svelte	267
+1	₪0	-	src/routes/(reg)/moach/[projectId]/sales/manage/promotions/+page.svelte	372
+1	₪0	-	src/routes/(reg)/moach/[projectId]/sales/[saleId]/+page.svelte	89
+1	₪0	-	src/routes/(reg)/moach/[projectId]/splits/[splitId]/+page.svelte	85
+1	₪0	-	src/routes/(regandnon)/availableMission/+page.svelte	207
+1	₪0	-	src/routes/(regandnon)/availiableResorce/+page.svelte	181
+1	₪0	-	src/routes/(regandnon)/gift/+page.svelte	182
+1	₪0	-	src/routes/(regandnon)/gift/[id]/+page.svelte	544
+0	₪1	M	src/routes/(regandnon)/project/[id]/support/+page.svelte	
+1	₪0	-	src/routes/(regandnon)/user/[id]/+page.svelte	209
+1	₪0	-	src/routes/its-yours/+page.svelte	233
+
+SUMMARY: files: 96, bare-number lines: 142
+EXIT CODE: 1 (non-zero due to findings)
+
+================================================================================
+COMMAND 2: npm run check
+================================================================================
+
+> check
+> svelte-kit sync && svelte-check --tsconfig ./jsconfig.json
+
+[vite-plugin-svelte] WARNING: The following packages have a svelte field in their
+package.json but no exports condition for svelte:
+  svelte-agnostic-draggable@0.2.0, svelte-accessible-dialog@2.1.3,
+  svelte-touch-to-mouse@1.0.0, svelte-tour@1.0.7, svead@0.0.4,
+  svelte-calendar@3.1.6
+
+(Full diagnostic output truncated — 1,218 errors and 1,106 warnings across 301 files.
+ Full output saved during run; tail shown below.)
+
+[TAIL of output]
+c:\Users\babay\Documents\GitHub\1.0main\src\routes\testi\+page.svelte:148:11
+Error: Object literal may only specify known properties, and '"size"' does not exist
+       in type 'Props'. (js)
+
+c:\Users\babay\Documents\GitHub\1.0main\jsconfig.json:1:1
+Warn: Cannot find type definition file for '__tests__'.
+c:\Users\babay\Documents\GitHub\1.0main\jsconfig.json:1:1
+Warn: Cannot find type definition file for 'examples'.
+
+====================================
+svelte-check found 1218 errors and 1106 warnings in 301 files
+EXIT CODE: 1
+
+================================================================================
+COMMAND 3: npm run check:i18n
+================================================================================
+
+> check:i18n
+> node scripts/check-i18n-routes.mjs
+
+✓ i18n routes OK — 87 namespaces × 5 locales, 184 route entry points, 50 route-gated.
+
+EXIT CODE: 0
+
+================================================================================
+COMMAND 4: npx vitest run src/lib/money src/lib/components/money
+================================================================================
+
+ RUN  v3.2.7 C:/Users/babay/Documents/GitHub/1.0main
+
+ ✓  unit       src/lib/money/money.test.ts        (23 tests)  34ms
+ ✓  components src/lib/components/money/Money.svelte.test.ts (10 tests) 46ms
+
+ Test Files  2 passed (2)
+      Tests  33 passed (33)
+   Start at  16:57:20
+   Duration  4.87s (transform 1.16s, setup 549ms, collect 3.44s, tests 81ms,
+             environment 1.52s, prepare 465ms)
+
+EXIT CODE: 0
+
+================================================================================
+END OF BASELINE
+================================================================================

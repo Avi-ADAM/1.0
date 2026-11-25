@@ -560,7 +560,7 @@
         disabled={!canScrollBack}
         aria-label={$t('project.kanban.back')}
       >
-        <span dir="rtl">{$t('project.kanban.back')}</span>
+        <span>{$t('project.kanban.back')}</span>
 
         <svg
           class="h-3 w-3 shrink-0"
@@ -599,7 +599,7 @@
             stroke-linejoin="round"
           />
         </svg>
-        <span dir="rtl">{$t('project.kanban.next')}</span>
+        <span>{$t('project.kanban.next')}</span>
       </button>
     {:else}
       <button

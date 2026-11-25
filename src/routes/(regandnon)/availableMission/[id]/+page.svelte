@@ -326,7 +326,6 @@
     {#if data?.alld?.attributes?.archived !== true}
       <div
         bind:clientWidth={wid}
-        dir="rtl"
         style="overflow-y:auto"
         class=" d mb-4 sm:pt-4 w-full lg:w-1/2 mx-auto"
       >
@@ -381,7 +380,7 @@
             <div class="flex flex-col leading-tight">
               <div class="sm:text-sm text-md mt-1 flex items-center">
                 <span
-                  class="text-barbi text-center mr-3 sm:text-2xl lg:text-4xl text-xl"
+                  class="text-barbi text-center ms-3 sm:text-2xl lg:text-4xl text-xl"
                   >{$t('pages.availMission.headi')}</span
                 >
               </div>
@@ -392,7 +391,7 @@
                    measured 1.01:1 on the business ramp — invisible. -->
               <Translated
                 as="span"
-                class="pn ml-1 text-lg sm:text-xl lg:text-2xl text-[color:var(--ramp-ink,#16131b)]"
+                class="pn me-1 text-lg sm:text-xl lg:text-2xl text-[color:var(--ramp-ink,#16131b)]"
                 text={sourceName}
                 hit={hitFor(sourceName)}
                 showNote={false}
@@ -424,7 +423,7 @@
           </div>
         </div>
         <div
-          class=" lg:bg-gray-700 bg-transparent rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal"
+          class=" lg:bg-gray-700 bg-transparent rounded-b lg:rounded-b-none lg:rounded-e p-4 flex flex-col justify-between leading-normal"
         >
           <div class="mb-8">
             <div class="  mb-2">

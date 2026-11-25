@@ -24,7 +24,7 @@
   }
 </script>
 
-<div class="max-w-2xl mx-auto py-10 px-4" dir="rtl">
+<div class="max-w-2xl mx-auto py-10 px-4">
   <h1 class="text-2xl font-bold mb-2">מפתחות API</h1>
   <p class="text-gray-500 mb-8 text-sm">
     השתמש במפתחות אלו לחיבור סוכן ה-AI שלך לחשבונך.

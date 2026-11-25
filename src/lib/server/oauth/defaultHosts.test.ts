@@ -27,6 +27,16 @@ describe('default redirect allowlist', () => {
     expect(isAllowedRedirectUri('http://stav-group.com/api/mcp-servers/oauth/callback')).toBe(false);
   });
 
+  it("accepts an n8n Cloud workspace's credential callback, one label deep only", () => {
+    expect(isAllowedRedirectUri('https://acme.app.n8n.cloud/rest/oauth2-credential/callback')).toBe(true);
+    expect(isAllowedRedirectUri('https://app.n8n.cloud/rest/oauth2-credential/callback')).toBe(false);
+    expect(isAllowedRedirectUri('https://a.b.app.n8n.cloud/rest/oauth2-credential/callback')).toBe(false);
+    expect(isAllowedRedirectUri('https://acme.app.n8n.cloud.evil.com/rest/oauth2-credential/callback')).toBe(false);
+    expect(isAllowedRedirectUri('http://acme.app.n8n.cloud/rest/oauth2-credential/callback')).toBe(false);
+    // n8n.cloud itself and self-hosted n8n are not covered by the default list.
+    expect(isAllowedRedirectUri('https://n8n.example.com/rest/oauth2-credential/callback')).toBe(false);
+  });
+
   it('still refuses lookalikes and deeper subdomains', () => {
     expect(isAllowedRedirectUri('https://chatgpt.com.evil.com/cb')).toBe(false);
     expect(isAllowedRedirectUri('https://a.b.chatgpt.com/cb')).toBe(false);

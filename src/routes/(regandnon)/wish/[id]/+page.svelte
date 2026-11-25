@@ -261,7 +261,7 @@
 <!-- ===================================================================
      PUBLIC WISH VIEW — /wish/[id]  (M2 · read-only · share-friendly)
      =================================================================== -->
-<div class="cp" dir="rtl">
+<div class="cp">
   <!-- ── HEADER ─────────────────────────────────────────────────────── -->
   <header class="hdr">
     <div class="hdr-logo">
@@ -563,7 +563,7 @@
 
 <!-- ── OFFER HELP MODAL ──────────────────────────────────────────────────── -->
 {#if offerOpen}
-  <div class="ofr-overlay" role="dialog" aria-modal="true" dir="rtl">
+  <div class="ofr-overlay" role="dialog" aria-modal="true">
     <div class="ofr-card">
       <button class="ofr-x" onclick={() => (offerOpen = false)} aria-label={$t('concierge.pub.close')}>✕</button>
       <div class="ofr-head">

@@ -843,7 +843,7 @@
     {/if}
   </div>
   <!---
-<table dir="rtl" >
+<table >
       <tr class="ggr">
         <th class="ggr" > </th>
         <td class="ggr">{$t('nego.original')}</td>
@@ -892,7 +892,7 @@
                                     <th>כמה שעות זה לקח לי? </th>
                                     <td>{noofhours}</td>
                                     <td>
-                                                                           <div dir="rtl" class='textinput'>
+                                                                           <div class='textinput'>
   <input type="number" placeholder="0" id="hours" name="hours"  bind:value={noofhours2} class='input' required>
   <label for="hours" class='label'>כמה שעות זה לקח לי? </label>
   <span class='line'></span>
@@ -902,7 +902,7 @@
                                     <th>כמה שווה שעה? </th>
                                     <td><Money amount={perhour} {projectId} /></td>
                                     <td>
-                                         <div dir="rtl" class='textinput'>
+                                         <div class='textinput'>
   <input type="number"  id="vallueperhour" name="vallueperhour" placeholder="0"
                                             bind:value={perhour2} class='input' required>
   <label for="vallueperhour" class='label'>כמה שווה שעה? </label>

@@ -38,7 +38,7 @@ bearer_token_env_var = "LEV1_API_KEY"`;
   // Each entry is a label (the agent) and the one line that says what to do
   // there. Kept as a list rather than prose because people scan this section
   // looking for their own tool, not reading it.
-  const OTHER_AGENTS = ['chatgpt', 'geminiCli', 'geminiEnterprise', 'codex', 'anyMcp'];
+  const OTHER_AGENTS = ['chatgpt', 'geminiCli', 'geminiEnterprise', 'codex', 'n8n', 'anyMcp'];
 
   /** Which snippet is currently showing its "copied" state. */
   let copiedKey = $state('');
@@ -155,7 +155,8 @@ bearer_token_env_var = "LEV1_API_KEY"`;
     <p class="body">{$t('mcp.othersBody')}</p>
     <ul class="bullets">
       {#each OTHER_AGENTS as key (key)}
-        <li>
+        <!-- /mcp#n8n is linked from the n8n templates and node README. -->
+        <li id={key === 'n8n' ? 'n8n' : undefined}>
           <strong>{$t(`mcp.other_${key}_name`)}</strong>
           {$t(`mcp.other_${key}_how`)}
         </li>

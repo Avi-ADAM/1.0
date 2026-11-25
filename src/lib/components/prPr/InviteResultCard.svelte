@@ -67,7 +67,7 @@
   }
 </script>
 
-<div class="fixed inset-0 z-[10001] flex items-end sm:items-center justify-center bg-black/60 p-4" dir="auto">
+<div class="fixed inset-0 z-[10001] flex items-end sm:items-center justify-center bg-black/60 p-4">
   <div
     class="w-full max-w-md rounded-2xl border border-gold bg-gradient-to-br from-black to-slate-900 p-5 text-gold shadow-xl"
     role="dialog"

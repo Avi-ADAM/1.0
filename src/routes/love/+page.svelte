@@ -298,7 +298,6 @@
     padding: 15px;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    direction: rtl;
     backdrop-filter: blur(8px);
     z-index: 10;
     min-width: 160px;
@@ -361,7 +360,6 @@
     position: relative;
     z-index: 2;
     margin-top: -20px; /* Slight overlap or pull depending on layout */
-    direction: rtl;
   }
 
   .stat-card {
@@ -414,7 +412,6 @@
     margin: 0 auto;
     text-align: center;
     color: white;
-    direction: rtl;
   }
 
   .cta-header h2 {

@@ -80,7 +80,7 @@ $effect.pre(() => {
        {#if Number(number) === Number(numberb)} 
        <p class="text-gold">{number}</p>
        {:else}
-       <div dir="rtl" class='w-1/2 mx-auto'>
+       <div class='w-1/2 mx-auto'>
         {#key datai}
        <Barb {datai} />
        {/key}
@@ -113,7 +113,7 @@ $effect.pre(() => {
   <!--    
 <RangeSlider bind:values={status} pipstep="20" float pips all="label" hoverable />
 --> 
-<div dir="rtl" class='textinput max-w-sm mx-auto'>
+<div class='textinput max-w-sm mx-auto'>
   <input
     type="number"
     id={fieldId}

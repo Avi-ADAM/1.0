@@ -518,7 +518,7 @@
   <div transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}>
     {#if masa === true}
       <DialogContent aria-label="form" class="nego d surface-dialog">
-        <div dir="rtl" class="grid items-center justify-center text-center">
+        <div class="grid items-center justify-center text-center">
           <button
             style="margin: 0 auto;"
             onclick={close}
@@ -573,7 +573,7 @@
       </DialogContent>
     {:else if chatm === true}
       <DialogContent aria-label="form" class="chat d surface-dialog">
-        <div dir="rtl" class="grid items-center justify-center text-center">
+        <div class="grid items-center justify-center text-center">
           <button
             style="margin: 0 auto;"
             onclick={close}
@@ -605,7 +605,7 @@
       </DialogContent>
     {:else}
       <DialogContent aria-label="form" class="chat d surface-dialog">
-        <div dir="rtl" class="grid items-center justify-center text-center">
+        <div class="grid items-center justify-center text-center">
           <button
             style="margin: 0 auto;"
             onclick={close}

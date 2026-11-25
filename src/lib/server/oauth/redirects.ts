@@ -10,14 +10,20 @@ import { env } from '$env/dynamic/private';
 // claude.* covers Claude web, the mobile app and Claude Code cloud sessions.
 // chatgpt.com / openai.com cover ChatGPT's custom connectors, whose callback is
 // https://chatgpt.com/connector_platform_oauth_redirect. Anything else — a
-// Gemini Enterprise tenant, an n8n instance, a self-hosted agent — is added by
+// Gemini Enterprise tenant, a self-hosted n8n, a self-hosted agent — is added by
 // the deployment through MCP_OAUTH_REDIRECT_HOSTS, which replaces this list.
+// *.app.n8n.cloud is n8n Cloud: every workspace lives on its own single label
+// (`acme.app.n8n.cloud`) and its MCP credential calls back to
+// https://<workspace>.app.n8n.cloud/rest/oauth2-credential/callback. Any n8n
+// Cloud workspace can register, exactly as any Claude or ChatGPT account can —
+// the person still signs in and approves on our consent screen
+// (PLAN_N8N_INTEGRATION N0.1).
 // stav-group.com is a partner agent platform (callback
 // https://stav-group.com/api/mcp-servers/oauth/callback, and the same path on
 // www.stav-group.com) — the two exact hosts only, no wildcard, so no other
 // subdomain of it can register.
 const DEFAULT_HOSTS =
-  'claude.ai,*.claude.ai,claude.com,*.claude.com,chatgpt.com,*.chatgpt.com,openai.com,*.openai.com,stav-group.com,www.stav-group.com';
+  'claude.ai,*.claude.ai,claude.com,*.claude.com,chatgpt.com,*.chatgpt.com,openai.com,*.openai.com,stav-group.com,www.stav-group.com,*.app.n8n.cloud';
 
 function allowedHosts(): string[] {
   return (env.MCP_OAUTH_REDIRECT_HOSTS ?? DEFAULT_HOSTS)

@@ -53,7 +53,7 @@ async function xyd () {
  <Spinner size="lg" />
  {:then data}
 
-<div dir="rtl"  style="overflow-y:auto" class=" d mb-4 mt-8 bg-surface text-surfaceInk leading-normal w-full lg:w-full">
+<div  style="overflow-y:auto" class=" d mb-4 mt-8 bg-surface text-surfaceInk leading-normal w-full lg:w-full">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-surfaceLine bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -109,7 +109,7 @@ async function xyd () {
 <div class="dd md:items-center  d full pb-2">
   <div class="body items-center d" >
   
-  <table dir="rtl" >
+  <table >
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >{$t('lev.mesima.openMission')}</h1>

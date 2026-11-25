@@ -54,10 +54,10 @@
 </span>
 
 {#if isHovered}
-	<div dir="rtl" style="top: {y}px; left: {x}px;" class="tooltip">{title}</div>
+	<div style="top: {y}px; left: {x}px;" class="tooltip">{title}</div>
 <!--
 {#if ispic}
-	<div dir="rtl" style="top: {ix}px; left: {iy}px;" class="tooltip"><button on:click={gotop}>קישור</button></div>
+	<div style="top: {ix}px; left: {iy}px;" class="tooltip"><button on:click={gotop}>קישור</button></div>
 {/if}-->
 	{/if}
 

@@ -130,7 +130,7 @@ function checkAll(a, b) {
         </div>
 {:else}
 
-<div dir="rtl" class='textinput max-w-sm mx-auto'>
+<div class='textinput max-w-sm mx-auto'>
     {#if long == false}
   <input type="text" oninput={(e)=>console.log(e)} id="des" name="des" bind:value={textb} class='input' required>
   {:else}

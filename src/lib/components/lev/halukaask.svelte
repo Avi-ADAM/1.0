@@ -386,7 +386,7 @@
 <DialogOverlay {isOpen} onDismiss={close}>
   <div transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}>
     <DialogContent class="content surface-dialog" aria-label="form">
-      <div dir="rtl" class="grid items-center justify-center aling-center">
+      <div class="grid items-center justify-center aling-center">
         <button
           onclick={close}
           style="margin: 0 auto;"

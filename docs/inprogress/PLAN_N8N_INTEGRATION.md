@@ -1,6 +1,9 @@
 # PLAN_N8N_INTEGRATION — 1lev1 בתוך n8n, כדי שיראו אותנו שם
 
-**סטטוס (2026-11-22):** תכנון בלבד, אין קוד. נכתב אחרי סקירה של שרת ה-MCP,
+**סטטוס (2026-11-24):** N0.1, N0.2 ו-N0.4 בנויים (ראו "נבנה" תחת N0), ממתינים
+ל-deploy. פתוח: N0.3, שדורש פרודקשן וחשבון n8n Cloud. N1–N4 לא התחילו.
+
+נכתב 2026-11-22 אחרי סקירה של שרת ה-MCP,
 ה-OAuth, ה-REST הציבורי (`/api/v1/r/{rikma}/…`) וה-webhooks היוצאים, ושל כללי
 ה-community nodes של n8n כפי שהם היום.
 
@@ -72,6 +75,20 @@ Tool עובד כבר היום ושווה תיעוד, אבל הוא לא מביא
 - **N0.4** לוודא ש-`instructions.ts` נכנס ל-system prompt של ה-AI Agent ב-n8n (MCP
   Client Tool לא תמיד מעביר instructions). אם לא — כלל הבית "אף פעם לא לאשר
   במקום המשתמש" צריך לשבת גם בתיאור הכלים עצמם, לא רק ב-instructions.
+
+**נבנה (2026-11-24):**
+- N0.1 — `*.app.n8n.cloud` ב-`DEFAULT_HOSTS` (`src/lib/server/oauth/redirects.ts`),
+  ובדיקה ב-`defaultHosts.test.ts`: workspace בתווית אחת מתקבל; `app.n8n.cloud` חשוף,
+  שתי תוויות, lookalike ו-http נדחים. **אזהרה ל-deploy:** אם ב-VPS מוגדר
+  `MCP_OAUTH_REDIRECT_HOSTS`, הוא *מחליף* את הרשימה ואז צריך להוסיף לו את
+  `*.app.n8n.cloud` ידנית.
+- N0.2 — שורת n8n ברשימת "סוכנים אחרים" של `McpGuide.svelte` (מופיעה גם ב-`/mcp`
+  וגם ב-`/me/settings/mcp`), עוגן `/mcp#n8n`, חמש שפות (`other_n8n_*`).
+  `other_anyMcp_name` כבר לא מזכיר את n8n.
+- N0.4 — נסגר בלי קוד: הכלל מובטח במבנה ולא בטקסט. אין כלי שמצביע, חותם על חלוקה
+  או מאשר הצעה (`toolManifest.ts`), כך שגם סוכן שלא קיבל את ה-instructions לא יכול
+  לאשר במקום המשתמש. כלי `consentWrite` כבר אומרים בתיאור שלהם שהחברים מאשרים.
+  כדאי עדיין לבדוק ב-N0.3 אם n8n מעביר instructions.
 
 ### N1 — Webhook subscriptions (צד שרת, תנאי ל-Trigger node)
 

@@ -569,7 +569,6 @@
     <div transition:fly={{ y: 450, opacity: 0.5, duration: 1000 }}>
       <DialogContent aria-label="form" class="user">
         <div
-          dir="rtl"
           class="grid items-center justify-center text-center bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400"
         >
           <button
@@ -609,7 +608,7 @@
 
   <!-- Focused-view chip: visible while a ?focus= deep-link filter is active -->
   {#if focusFilter}
-    <div class="focus-chip" dir="auto">
+    <div class="focus-chip">
       <span>{$t('lev.page.focusChip')}</span>
       <button type="button" onclick={clearFocus}>
         {$t('lev.page.showAll')}
@@ -618,7 +617,7 @@
   {:else if $dataMode !== 'full'}
     <!-- Progressive load in progress: urgent cards are on screen, the full
          dataset is still streaming in behind them -->
-    <div class="focus-chip" dir="auto" role="status">
+    <div class="focus-chip" role="status">
       <span class="loading-dot"></span>
       <span>{$t('lev.page.stillLoading')}</span>
     </div>

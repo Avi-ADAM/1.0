@@ -199,7 +199,6 @@ const cl = {
 // browser English instead of its own language. `getLanguage` now parses the
 // header by q-order against the five supported locales, and `siteLang.test.js`
 // holds that precedence down.
-let lang = 'he'; // Default language set to Hebrew
 // Appearance is two cookies: `theme` (personal|business) and `mode`
 // (light|dark|system). Both are user-writable, so both are validated here
 // before they reach the markup. `system` cannot be resolved server-side — the
@@ -326,7 +325,11 @@ function clientIp(event) {
 
 /** @type {import('@sveltejs/kit').Handle} */
 async function handleRequest({ event, resolve }) {
-  lang = getLanguage(event);
+  // Per request, never module state: the page's own loaders make internal
+  // `/api/send` requests through this same hook while it renders, and a shared
+  // `lang` was overwritten by theirs before transformPageChunk read it - the
+  // text came out English under `<html lang="he" dir="rtl">` (PLAN_LTR_LAYOUT §0).
+  const lang = getLanguage(event);
 
   event.locals.lang = lang;
   event.locals.userAgent = event.request.headers.get('accept-language');

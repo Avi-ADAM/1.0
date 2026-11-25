@@ -502,7 +502,7 @@ diunim = ` ${diu},`
           {restime}
         />
       {:else}
-      <div dir="rtl" class="grid items-center justify-center aling-center">
+      <div class="grid items-center justify-center aling-center">
         <button
           onclick={close}
           style="margin: 0 auto;"

@@ -1538,7 +1538,7 @@
               >
                 <p class="m-0 font-bold">{$trans('mission.ai.translationPreview')}</p>
                 {#if aiTranslations.he && $lang !== 'he'}
-                  <p class="m-0" dir="rtl">
+                  <p class="m-0">
                     <span class="font-medium text-[#6b5560]">עברית:</span>
                     {aiTranslations.he.replace(/<[^>]+>/g, '').slice(0, 120)}…
                   </p>
@@ -1550,7 +1550,7 @@
                   </p>
                 {/if}
                 {#if aiTranslations.ar && $lang !== 'ar'}
-                  <p class="m-0" dir="rtl">
+                  <p class="m-0">
                     <span class="font-medium text-[#6b5560]">العربية:</span>
                     {aiTranslations.ar.replace(/<[^>]+>/g, '').slice(0, 120)}…
                   </p>

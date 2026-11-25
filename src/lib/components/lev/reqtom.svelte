@@ -579,7 +579,7 @@
       </DialogContent>
     {:else if diunm === true}
       <DialogContent class="chat surface-dialog" aria-label="form">
-        <div dir="rtl" class="grid items-center justify-center aling-center">
+        <div class="grid items-center justify-center aling-center">
           <button
             onclick={close}
             style="margin: 0 auto;"

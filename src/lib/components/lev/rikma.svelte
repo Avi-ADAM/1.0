@@ -101,7 +101,7 @@ async function xyd () {
  <Spinner size="lg" />
  {:then project}
 
-<div dir="rtl" >
+<div >
 
   <div class="4">
     {#if srcP}

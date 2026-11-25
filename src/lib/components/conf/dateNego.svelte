@@ -84,7 +84,7 @@ function checkAll (a, b){
         </div>
 {:else}
 
-<div dir="rtl" class=' max-w-sm mx-auto'>
+<div class=' max-w-sm mx-auto'>
   <small>{lebel}</small>
 
     <SveltyPicker

@@ -226,7 +226,7 @@
   />
 </svelte:head>
 
-<div class="shell" dir="rtl">
+<div class="shell">
   <!-- ── Ambient background ─────────────────────────────── -->
   <div class="ambient" aria-hidden="true"></div>
 
@@ -374,7 +374,7 @@
 
     <div class="input-row">
       <div class="input-wrap">
-        <textarea
+        <textarea dir="auto"
           bind:this={textarea}
           bind:value={input}
           onkeydown={onKey}
@@ -751,7 +751,6 @@
     line-height: 1.6;
     max-height: 120px;
     overflow-y: auto;
-    direction: rtl;
   }
 
   textarea::placeholder {

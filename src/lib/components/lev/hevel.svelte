@@ -122,7 +122,7 @@ let viewBox="460 0 1000 1080"//1450
         height:100vh;
         width:100vw; top:0; left:0; z-index:-1;" bind:clientHeight="{h}" bind:clientWidth="{w}"></span>
 
-  <div dir="rtl" >
+  <div >
       <div class="middle" >
         <svg height={height} width={width} id="eARfSi12ITv1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
     viewBox="{viewBox}" shape-rendering="geometricPrecision" text-rendering="geometricPrecision">

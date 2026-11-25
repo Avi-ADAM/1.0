@@ -406,7 +406,7 @@
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
   <div transition:fly|local={{ y: 450, opacity: 0.5, duration: 1000 }}>
     <DialogContent aria-label="form" class="content surface-dialog">
-      <div dir="rtl" class="flex items-center flex-col">
+      <div class="flex items-center flex-col">
         <button
           onclick={close}
           class=" hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"

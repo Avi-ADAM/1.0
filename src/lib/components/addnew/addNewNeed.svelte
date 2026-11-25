@@ -71,32 +71,31 @@
          <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
      </svg></button>
         <div 
-        dir="rtl"   
         class="flex flex-col items-center text-center">
     <h1 
     class="text-barbi text-2xl text-center"
     >{$t('addnew.addNewNeed.adni')}</h1>    
    <div style="--the:{`var(${color})`}; width:100%;" class="flex flex-col items-center text-center">
       
-<div dir="rtl" class='textinput'>
+<div class='textinput'>
   <input         bind:value={needName}
  type='text' class='input' required>
   <label for="name" class='label'>{$t('addnew.addNewNeed.nena')}</label>
   <span class='line'></span>
 </div>
-<div dir="rtl" class='textinput'>
+<div class='textinput'>
   <input         bind:value={desN}
  type='text' class='input' required>
   <label for="name" class='label'>{$t('addnew.addNewNeed.sho')}</label>
   <span class='line'></span>
 </div>
-<div dir="rtl" class='textinput'>
+<div class='textinput'>
   <input         bind:value={linkto}
  type='text' class='input' required>
   <label for="name" class='label'>{$t('addnew.addNewNeed.blib')}</label>
   <span class='line'></span>
 </div>
- <div dir="rtl" class='textinput'>
+ <div class='textinput'>
   <input         bind:value={price}
  type="number" class='input' required>
   <label for="name" class='label'>{$t('addnew.addNewNeed.val')}</label>
@@ -104,7 +103,7 @@
 </div>
 
   
-   <div dir="rtl"  style="width:80%">
+   <div  style="width:80%">
    <h2 class="text-center text-barbi">{$t('addnew.addNewNeed.hekind')}</h2>
     <select bind:value={valued} class="round form-select appearance-none
       block

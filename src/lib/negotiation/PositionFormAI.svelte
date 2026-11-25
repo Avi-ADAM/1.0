@@ -85,7 +85,7 @@
   }
 </script>
 
-<div class="position-form-ai" dir="rtl">
+<div class="position-form-ai">
   <!-- כותרת -->
   <div class="mb-4">
     <h3 class="text-base font-bold text-gray-800">

@@ -46,7 +46,7 @@
     <button onclick={toggleDatePicker}>{startplaceholder}:</button>
   {#if showstart}
 <!---<Dateandtimeinput bind:outpot={start}/>-->
-<span dir="rtl">
+<span>
  <SveltyPicker
       placeholder={startplaceholder}
       inputClasses="form-control text-right"
@@ -61,7 +61,7 @@
 <Arrow back={dir == "ltr"}/>
     <button onclick={toggleDatePickerend}>{finnishplaceholder}:</button>
 {#if showend}
-<span dir="rtl">
+<span>
  <SveltyPicker
       placeholder={finnishplaceholder}
       inputClasses="form-control text-right"

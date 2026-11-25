@@ -32,7 +32,7 @@
   <meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
-<main class="of" dir="auto">
+<main class="of">
   {#if offer}
     <header class="of-head">
       {#if offer.provider?.pic}
