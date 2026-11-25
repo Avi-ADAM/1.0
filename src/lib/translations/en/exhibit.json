@@ -127,5 +127,87 @@
   "soon": {
     "title": "This step is still being woven",
     "sub": "Coming soon: {{step}}"
+  },
+  "people": {
+    "noa": {
+      "name": "Noa",
+      "tag": "Ceramicist and teacher"
+    },
+    "amir": {
+      "name": "Amir",
+      "tag": "Photographer and filmmaker"
+    },
+    "lior": {
+      "name": "Lior",
+      "tag": "Community builder"
+    },
+    "dana": {
+      "name": "Dana",
+      "tag": "Illustrator and painter"
+    },
+    "yossi": {
+      "name": "Yossi",
+      "tag": "A carpenter who fixes anything"
+    },
+    "rana": {
+      "name": "Rana",
+      "tag": "Chef and producer"
+    },
+    "tom": {
+      "name": "Tom",
+      "tag": "Musician"
+    },
+    "shira": {
+      "name": "Shira",
+      "tag": "Writer and marketer"
+    },
+    "michal": {
+      "name": "Michal",
+      "tag": "Fashion designer"
+    }
+  },
+  "skills": {
+    "design": "Design",
+    "illustration": "Illustration",
+    "painting": "Painting",
+    "photo": "Photography",
+    "video": "Video",
+    "music": "Music",
+    "writing": "Writing",
+    "community": "Community",
+    "events": "Events",
+    "ceramics": "Ceramics",
+    "carpentry": "Carpentry",
+    "sewing": "Sewing",
+    "cooking": "Cooking",
+    "marketing": "Marketing",
+    "tech": "Tech",
+    "fixing": "Repairs",
+    "teaching": "Teaching"
+  },
+  "connection": {
+    "title": "Find partners who complete you",
+    "sub": "Nobody is hired. Everyone brings something, and everyone is a partner.",
+    "howTo": "Hover over a person to see what fits them · click to invite",
+    "fits": "What fits {{name}}",
+    "because": "Because of: {{skills}}",
+    "nothingFits": "No part fits these skills yet",
+    "whoCan": "{{count}} people could take this",
+    "invite": "Invite {{name}} into the rikma",
+    "uninvite": "{{name}} is in the rikma · click to take back",
+    "me": {
+      "name": "You",
+      "tag": "What do you bring?",
+      "pick": "What do you bring to the rikma?",
+      "pickSub": "Choose up to 3",
+      "done": "That's what I bring",
+      "empty": "Nothing chosen yet",
+      "edit": "Change"
+    },
+    "circle": "In the rikma: {{count}} partners and you",
+    "circleEmpty": "You haven't invited anyone yet",
+    "hint": "2–4 partners is a good start",
+    "full": "The rikma is full for this step",
+    "next": "Build the partnership"
   }
 }

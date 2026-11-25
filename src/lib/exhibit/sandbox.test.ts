@@ -142,3 +142,33 @@ describe('draftIdea', () => {
     expect(await draftIdea('t', 'en', { fetchImpl: slow as never, timeoutMs: 10 })).toBeNull();
   });
 });
+
+describe('Connection', () => {
+  it('invites and un-invites, up to the circle size', async () => {
+    const { MAX_INVITED } = await import('./sandbox.svelte');
+    const sb = new ExhibitSandbox();
+    sb.chooseTemplate('festival');
+    expect(sb.toggleInvite('tom')).toBe(true);
+    expect(sb.isInvited('tom')).toBe(true);
+    expect(sb.toggleInvite('tom')).toBe(true);
+    expect(sb.isInvited('tom')).toBe(false);
+    for (const p of PEOPLE.slice(0, MAX_INVITED)) expect(sb.toggleInvite(p.id)).toBe(true);
+    expect(sb.toggleInvite(PEOPLE[MAX_INVITED].id)).toBe(false);
+    expect(sb.toggleInvite('nobody')).toBe(false);
+  });
+
+  it('the visitor is matched by what they bring', async () => {
+    const { ME, MAX_MY_SKILLS } = await import('./sandbox.svelte');
+    const sb = new ExhibitSandbox();
+    sb.chooseTemplate('festival');
+    expect(sb.matchesForPerson(ME)).toEqual([]);
+    sb.toggleMySkill('cooking');
+    expect(sb.matchesForPerson(ME).map((m) => m.task.id)).toContain('m3');
+    sb.toggleMySkill('music');
+    sb.toggleMySkill('design');
+    expect(sb.toggleMySkill('events')).toBe(false);
+    expect(sb.mySkills).toHaveLength(MAX_MY_SKILLS);
+    sb.reset();
+    expect(sb.mySkills).toEqual([]);
+  });
+});

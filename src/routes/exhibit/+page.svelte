@@ -11,6 +11,7 @@
   import ExhibitShell from '$lib/components/exhibit/ExhibitShell.svelte';
   import StepWelcome from '$lib/components/exhibit/StepWelcome.svelte';
   import StepIdea from '$lib/components/exhibit/StepIdea.svelte';
+  import StepConnection from '$lib/components/exhibit/StepConnection.svelte';
   import StepSoon from '$lib/components/exhibit/StepSoon.svelte';
 
   let { data } = $props();
@@ -34,6 +35,8 @@
         <StepWelcome {sandbox} />
       {:else if sandbox.step === 'idea'}
         <StepIdea {sandbox} aiPass={data.aiPass} />
+      {:else if sandbox.step === 'connection'}
+        <StepConnection {sandbox} />
       {:else}
         <StepSoon {sandbox} />
       {/if}

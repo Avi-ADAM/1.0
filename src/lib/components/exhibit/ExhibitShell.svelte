@@ -45,6 +45,9 @@
   function onKey(e) {
     if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
     if (isTyping(e.target)) return;
+    // While a dialog is open (a step's picker, "Still here?") the keys are its
+    // own: Esc closes it, and must not also send the visitor home.
+    if (document.querySelector('[aria-modal="true"]')) return;
     const forward = $isRtl ? 'ArrowLeft' : 'ArrowRight';
     const backward = $isRtl ? 'ArrowRight' : 'ArrowLeft';
     if (e.key === forward) {

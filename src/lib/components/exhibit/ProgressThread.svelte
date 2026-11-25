@@ -17,7 +17,7 @@
     {#each STEPS as step, i (step)}
       {@const done = i < sandbox.index}
       {@const current = i === sandbox.index}
-      {@const open = i <= sandbox.reached && (i < 2 || !!sandbox.idea)}
+      {@const open = i <= sandbox.reached && sandbox.canGo(step)}
       <li class:done class:current>
         <button
           type="button"
