@@ -319,7 +319,7 @@
                 >
                   {on ? '✓' : '?'}
                   {r.input}
-                  {#if mapsTo}<span class="maps-to">← {mapsTo}</span>{/if}
+                  {#if mapsTo}<span class="maps-to"><span class="inline-block ltr:-scale-x-100" aria-hidden="true">←</span> {mapsTo}</span>{/if}
                 </button>
               {/each}
               {#each fresh as r (r.input)}

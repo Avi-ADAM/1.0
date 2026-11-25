@@ -163,7 +163,7 @@
     </Canvas>
     <!-- אפקט מעבר עדין בין האנימציה לטקסט במובייל -->
     <div
-      class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-[#fdfbf7] to-transparent md:hidden"
+      class="absolute bottom-0 end-0 w-full h-12 bg-gradient-to-t from-[#fdfbf7] to-transparent md:hidden"
     ></div>
   </div>
 
@@ -529,7 +529,7 @@
       >
         <div class="absolute inset-0 overflow-hidden opacity-10">
           <span class="absolute text-6xl font-bold text-white">?</span>
-          <span class="absolute right-0 text-6xl font-bold text-white">?</span>
+          <span class="absolute start-0 text-6xl font-bold text-white">?</span>
         </div>
         <p
           class="text-xl sm:text-2xl mb-2 text-white font-semibold relative"

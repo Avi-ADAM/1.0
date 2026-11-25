@@ -210,8 +210,8 @@ background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
       overflow-x: auto;
       overflow-y: auto;
  
-     padding-left: 0.5em;
-     padding-right: 0.5em;
+     padding-inline-end: 0.5em;
+     padding-inline-start: 0.5em;
     }
         .full{
         height: 100vh;

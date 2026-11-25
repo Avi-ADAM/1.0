@@ -101,7 +101,7 @@
   }
   .sub { font-size: 11px; color: var(--tm); margin-top: 2px; }
 
-  .right { text-align: left; flex-shrink: 0; }
+  .right { text-align: end; flex-shrink: 0; }
   .hours  { font-size: 11px; font-weight: 700; color: var(--gold); }
   .status { font-size: 10px; margin-top: 3px; }
 </style>

@@ -159,7 +159,7 @@
         {/if}
       </header>
 
-      <div class="min-h-0 flex-1 overflow-y-auto pr-1 d">
+      <div class="min-h-0 flex-1 overflow-y-auto ps-1 d">
         <ForumInboxList forums={filteredForums} {selectedId} />
       </div>
     </aside>

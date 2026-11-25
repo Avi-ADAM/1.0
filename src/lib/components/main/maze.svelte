@@ -735,7 +735,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    text-align: right;
+    text-align: start;
     gap: 1rem;
     transition: background 0.2s;
   }

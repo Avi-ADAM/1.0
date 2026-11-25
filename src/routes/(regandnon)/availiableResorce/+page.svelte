@@ -599,7 +599,7 @@
     content: '';
     position: absolute;
     inset-block: 0;
-    left: 0;
+    inset-inline-end: 0;
     width: 45%;
     background: linear-gradient(120deg, transparent, rgba(252, 246, 186, 0.8), transparent);
     transform: translateX(-160%) skewX(-20deg);

@@ -95,7 +95,7 @@
               </span>
             {/if}
             {#if attrs.createdAt && !isNaN(new Date(attrs.createdAt).getTime())}
-              <span class="text-xs md:text-sm ml-2">
+              <span class="text-xs md:text-sm me-2">
                 {new Date(attrs.createdAt).toLocaleDateString($lang)}
               </span>
             {/if}

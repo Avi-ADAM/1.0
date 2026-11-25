@@ -535,7 +535,7 @@
       class="flex items-center p-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm"
     >
       <img
-        class="w-12 h-12 rounded-full border-2 border-[rgba(var(--glow-rgb),0.5)] mr-4 ml-4 object-cover"
+        class="w-12 h-12 rounded-full border-2 border-[rgba(var(--glow-rgb),0.5)] ms-4 me-4 object-cover"
         src={src?.length > 0
           ? src
           : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}

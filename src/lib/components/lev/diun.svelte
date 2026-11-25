@@ -190,9 +190,7 @@
           class="{compact ? 'w-9 h-9' : 'w-11 h-11 sm:w-14 sm:h-14'} rounded-full ring-2 ring-gray-700/50 hover:ring-fuchsia-500/50 object-cover transition-all duration-200"
         />
         <span
-          class="absolute -bottom-0.5 {$isRtl
-            ? '-left-0.5'
-            : '-right-0.5'} w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border-2 border-gray-800 {mypos ===
+          class="absolute -bottom-0.5 -end-0.5 w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border-2 border-gray-800 {mypos ===
           true
             ? 'bg-green-500 shadow-lg shadow-green-500/50'
             : 'bg-red-500 shadow-lg shadow-red-500/50'} transition-all duration-200"

@@ -276,7 +276,7 @@
           {#if latestRound?.name && latestRound.name !== openmissionName}
             <div class="text-xs text-gray-600 dark:text-gray-300">
               <span class="font-medium">{$trans('common.nameLabel')}:</span>
-              <span class="text-gray-400 line-through ml-1">{openmissionName}</span>
+              <span class="text-gray-400 line-through me-1">{openmissionName}</span>
               → <span class="font-semibold">{latestRound.name}</span>
             </div>
           {/if}
@@ -616,7 +616,7 @@
                     class="flex items-center text-xs text-gray-500 dark:text-gray-400"
                   >
                     <svg
-                      class="w-3 h-3 mr-1"
+                      class="w-3 h-3 ms-1"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -638,7 +638,7 @@
                     class="flex items-center text-xs text-gray-500 dark:text-gray-400"
                   >
                     <svg
-                      class="w-3 h-3 mr-1"
+                      class="w-3 h-3 ms-1"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -664,7 +664,7 @@
                       class="inline-flex items-center text-xs text-barbi hover:text-mpink font-medium transition-colors"
                     >
                       <svg
-                        class="w-3 h-3 mr-1"
+                        class="w-3 h-3 ms-1"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >

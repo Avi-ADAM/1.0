@@ -282,7 +282,7 @@
           <div class="status-icon">✓</div>
           <div class="status-text">
             {$t('deals.requestSettled.text')}
-            <a class="deal-link" href="/deals/{data.dealId}">{$t('deals.requestSettled.open')} ←</a>
+            <a class="deal-link" href="/deals/{data.dealId}">{$t('deals.requestSettled.open')} <span class="inline-block ltr:-scale-x-100" aria-hidden="true">←</span></a>
           </div>
         </div>
       {:else if data.kind === 'buy'}
@@ -573,7 +573,7 @@
   .chat-overlay {
     position: fixed;
     bottom: 24px;
-    right: 24px;
+    inset-inline-start: 24px;
     width: 340px;
     height: 500px;
     background: var(--s1, #fff);
@@ -588,7 +588,7 @@
   .chat-overlay-close {
     position: absolute;
     top: 8px;
-    left: 8px;
+    inset-inline-end: 8px;
     background: none;
     border: none;
     font-size: 16px;
@@ -601,7 +601,7 @@
   }
   .chat-overlay-close:hover { background: var(--s2, #f3f4f6); }
   @media (max-width: 600px) {
-    .chat-overlay { width: 100%; bottom: 0; right: 0; border-radius: 16px 16px 0 0; height: 60vh; }
+    .chat-overlay { width: 100%; bottom: 0; inset-inline-start: 0; border-radius: 16px 16px 0 0; height: 60vh; }
     .chat-overlay-close { top: 10px; }
   }
 

@@ -93,6 +93,7 @@
     {/if}
 
     <p class="sh-section-label">{$t('growth.profile.preview')}</p>
+    <!-- dir-ok: a preview of the business profile in the language it was written in -->
     <article class="gr-preview" dir="auto">
       <div class="gr-between"><h3>{d.title.value}</h3><OriginBadge origin={d.title.origin} /></div>
       {#if d.categories.value.length}

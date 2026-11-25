@@ -153,7 +153,7 @@
   .notif-pip {
     position: absolute;
     top: 6px;
-    left: 6px;
+    inset-inline-end: 6px;
     width: 7px;
     height: 7px;
     border-radius: 50%;

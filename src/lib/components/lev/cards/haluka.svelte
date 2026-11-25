@@ -651,7 +651,7 @@
                     : 'bg-gray-50/50 dark:bg-gray-800/50'}"
                 >
                   <td
-                    class="p-3 font-bold text-barbi dark:text-pink-400 border-r border-gray-200 dark:border-gray-700"
+                    class="p-3 font-bold text-barbi dark:text-pink-400 border-s border-gray-200 dark:border-gray-700"
                     >{$nameOf(user)}</td
                   >
                   <td class="p-3 font-mono text-gray-800 dark:text-gray-200"
@@ -676,7 +676,7 @@
                     {user.meca > 0 ? user.meca.toFixed(2) : '-'}
                   </td>
                   <td
-                    class="p-3 text-xs border-l border-gray-200 dark:border-gray-700"
+                    class="p-3 text-xs border-e border-gray-200 dark:border-gray-700"
                   >
                     {#if user.le && user.le.length > 0}
                       <div class="flex flex-wrap gap-1 justify-center">
@@ -704,7 +704,7 @@
                   class="bg-gradient-to-br from-amber-50 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/20"
                 >
                   <td
-                    class="p-3 font-bold text-amber-700 dark:text-amber-300 border-r border-amber-200 dark:border-amber-700"
+                    class="p-3 font-bold text-amber-700 dark:text-amber-300 border-s border-amber-200 dark:border-amber-700"
                   >
                     <div class="flex items-center justify-center gap-2">
                       {#if platformLogo}
@@ -733,7 +733,7 @@
                     >{siteShareAmount.toFixed(2)}</td
                   >
                   <td
-                    class="p-3 text-xs border-l border-amber-200 dark:border-amber-700 text-amber-700 dark:text-amber-300 font-semibold"
+                    class="p-3 text-xs border-e border-amber-200 dark:border-amber-700 text-amber-700 dark:text-amber-300 font-semibold"
                     >{siteShareStatus}</td
                   >
                 </tr>

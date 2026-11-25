@@ -126,7 +126,7 @@
   }
   .total-label { font-size: 11px; color: var(--gold); font-weight: 700; }
   .total-value { font-size: 24px; font-weight: 800; color: var(--gold-l); }
-  .sym { font-size: 14px; margin-left: 3px; }
+  .sym { font-size: 14px; margin-inline-end: 3px; }
 
   .rows {}
   .row {

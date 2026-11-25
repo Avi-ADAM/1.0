@@ -1,8 +1,8 @@
 # כיוון הדף לפי השפה: אנגלית, ספרדית ורוסית נבנות משמאל לימין
 
-> מצב: `inprogress/` — **שלב 0 בנוי (2026-11-19) ותוקן (2026-11-25); שלב 1 בנוי
-> (2026-11-25)** חוץ מ־1.2 (ניקוי `dir={$isRtl…}`, נדחה לסוף). שלבים 2–4 ו־`check:dir`
-> עוד לא התחילו. נכתב 2026-11-18 אחרי בדיקת האתר באנגלית:
+> מצב: `done/` — **הושלם 2026-11-25.** שלבים 0–4 בנויים; `npm run check:dir` מכסה
+> את כל `src/lib` + `src/routes` (838 קבצים) ואת ה־CSS הגלובלי. 1.2 הוחלט במכוון
+> **לא** לבצע (ראו שם). נכתב 2026-11-18 אחרי בדיקת האתר באנגלית:
 > טופס טיוטת הרקמה (`BlueprintReview`) ועוד הרבה טפסים נפרשים מימין לשמאל
 > גם כשהשפה `en`.
 >
@@ -156,7 +156,12 @@ no-op, כי `<html>` כבר RTL). נשארו במכוון: `main/translatehe.sve
    - קבצים שכבר מתים (`.dead`, `.unused`, `.backup`) — לא לגעת.
    - קבצי בדיקה (`*.test.ts`) ו־`service-worker.js` — לבדוק מה הם בודקים/מייצרים;
      לא לשנות בלי סיבה.
-2. **`dir={$isRtl ? 'rtl' : 'ltr'}` מקומי** (~220 קבצים): אחרי שלב 0 הם מיותרים.
+2. **הוחלט לא לבצע (2026-11-25).** ברכיב בודד אי אפשר לדעת אם רכיב־הורה עוטף
+   אותו ב־`dir="ltr"` — כרטיסי הלב, למשל, מרונדרים גם בתוך תצוגת המטבעות
+   (`newcoinui`, כולה `dir="ltr"`), ושם ה־`dir={$isRtl…}` שלהם הוא מה שמחזיר אותם
+   לעברית. בכל מקום אחר הוא שווה ל־`<html dir>` ולכן לא מזיק. מחיקה גורפת = סיכון
+   בלי תועלת. הנוסח המקורי:
+   **`dir={$isRtl ? 'rtl' : 'ltr'}` מקומי** (~220 קבצים): אחרי שלב 0 הם מיותרים.
    למחוק **רק** כשהם על מיכל ממשק שלא יוצא מהעץ. **להשאיר** כשהרכיב מרונדר
    מחוץ ל־`<html>` הרגיל — `Portal`ים ל־body, דיאלוגים של bits-ui, toasts,
    iframe — כי שם הם עדיין חלק מהעץ אבל כדאי לוודא; אם יורשים נכון — למחוק.
@@ -168,7 +173,21 @@ no-op, כי `<html>` כבר RTL). נשארו במכוון: `main/translatehe.sve
 4. **`direction: rtl` ב־CSS של רכיבים** (`AuthorityBadge`, `TimersCalendar`,
    `DealTimeline`, `chat/+page`, `love/+page`): להחליף בירושה או ב־`:dir(rtl)`.
 
-### שלב 2 — המסכים שלקוח אנגלי פוגש ראשון (P0)
+### שלב 2 — המסכים שלקוח אנגלי פוגש ראשון (P0) — ✅ בנוי 2026-11-25
+
+מה נעשה: המרה **שומרת־עברית** — ב־RTL הצד `left` הוא ה־end, אז `ml→me`, `mr→ms`,
+`left-→end-`, `text-right→text-start`, `rounded-r→rounded-s`, `rounded-tl→rounded-se`,
+`margin-left:→margin-inline-end:`, `left:→inset-inline-end:`, `text-align: right→start`,
+`space-x-reverse→rtl:space-x-reverse`. בעברית הפיקסלים זהים (נמדד: `ms-3` נותן
+`margin-right: 12px` ב־he, `margin-left: 12px` ב־en); באנגלית — המראה. 56 המרות
+בכל המסכים של 2.1–2.6 (רובם כבר היו לוגיים). לא הומרו: מרכוז (`1/2`, `50%`),
+`auto`, `@keyframes`, כללים שהסלקטור שלהם כבר מציין כיוון (`faq`), והמתגים
+ב־`chooser`/`objectChooser` ושדה ה־URL ב־`baci` שיושבים בתוך `dir="ltr"` — אלה
+מסומנים `dir-ok`. חיצי "קדימה" שנכתבו לעברית (`←` ב־`deals`, `onboard/provider/review`,
+`deals/request/[id]`) קיבלו `ltr:-scale-x-100`; `→` ב־`IncomingWishCard` קיבל
+`rtl:-scale-x-100` (זה **כן** משנה את העברית — החץ הצביע אחורה). חיצי "חזרה"
+(`← back` ב־`deals/offers/*`) נשארו: נכונים באנגלית, ובעברית זו החלטה נפרדת.
+`scripts/check-dir.mjs` (`npm run check:dir`) מחזיק את כל המסכים האלה ב־`ROOTS`.
 
 סדר לפי מה שמשתמש חדש באנגלית רואה. לכל מסך: לפתוח ב־`?lang=en`, לתקן כל
 עיצוב פיזי לעיצוב לוגי, לפתוח שוב ב־`he` ולוודא שלא נשבר.
@@ -182,14 +201,52 @@ no-op, כי `<html>` כבר RTL). נשארו במכוון: `main/translatehe.sve
 | 2.5 | דפים ציבוריים | `rikmaPublic/RikmaPage.svelte`, `availableMission/[id]`, `availiableResorce/[id]`, `user/[id]`, `faq`, `about` |
 | 2.6 | רכיבי בסיס שכל טופס משתמש בהם | `src/lib/celim/ui/**` (`dateandtimeinput`, `daterange`, `dialog`, `input/textInput`, `richText`), `celim/tooltip*.svelte`, `celim/switch.svelte` |
 
-### שלב 3 — הלב, המוח ומסכי העבודה (P1)
+### שלב 3 — הלב, המוח ומסכי העבודה (P1) — ✅ בנוי 2026-11-25
+
+מה נעשה: 151 המרות (אותו מיפוי שומר־עברית כמו שלב 2) ב־~60 קבצים תחת
+`lev/**`, `prPr/**`, `chat/components`, `negotiation`, `conf`, `timers`. **טבלת
+"הקבצים הכבדים" למעלה הייתה שגויה:** הספירה תפסה מחלקות מותאמות כמו `pl-card-name`,
+`pl-badge`, `pe-quick` (קידומת pipeline/lifecycle) כ־`pl-` של Tailwind —
+`ProcessLifecycle`, `SaleLifecycle`, `pipeline`, `products`, `PresenceBar` נקיים
+בפועל. הממיר וה־checker מכירים עכשיו רק ערכי Tailwind אמיתיים (מספר, `px`, `auto`,
+`full`, שבר, `[…]`).
+
+ארבע מלכודות שנמצאו ונשמרו:
+- **תת־עץ `dir="ltr"`** — שם `start` הוא שמאל גם בעברית, אז המרה משנה את העברית.
+  נשארו פיזיים: כל `newcoinui` (המטבעות), `levchat`, הפילטרים ב־`cards`, הבלוקים
+  ב־`RikmaApiPanel` (`direction: ltr; text-align: left`). ב־`betaha` ה־`dir="ltr"`
+  הוזז מה־`<td>` אל התוכן, כדי שהגבול של התא יתהפך עם שאר השורה.
+- **טרנרי שכבר תלוי כיוון** (`$isRtl ? 'left-4' : 'right-4'`) — המרת שני הצדדים
+  שוברת את האנגלית; כווצו לערך לוגי אחד: `diun` (`-end-0.5`), `missionInProgress`
+  (`end-4`), `Myacts` (`start-0`, `ps-4 pe-3`).
+- **החלפת מחלקות לפי כיוון** — כפתורי `.next`/`.perv` בדק הלב מוחלפים ב־markup לפי
+  `$isRtl`, אז ה־CSS שלהם נשאר פיזי (`dir-ok`).
+- **גרפים** — `prPr/gantt`, `prPr/graph` לא הומרו ומוחרגים ב־`SKIP` של ה־checker.
+
+`check:dir` מכיר עכשיו תת־עצי `dir="ltr"` (ואת המחלקות שבתוכם) וכללי CSS עם
+`direction: ltr`, ומכסה 318 קבצים. נבדק: כל 70 הרכיבים שהשתנו מתקמפלים ב־Vite,
+`npm run check` ללא שגיאות חדשות (1220 = הבסיס). המסכים דורשים התחברות — **לא
+נבדקו ויזואלית**; בעברית ההמרה זהה לפי הגדרה, אבל כדאי מעבר בעין באנגלית על הלב.
 
 לפי טבלת הקבצים הכבדים למעלה: `process/lifecycle/*Lifecycle.svelte`,
 `moach/[projectId]/sales/manage/**`, `prPr/**` (`betaha`, `negoM`, `Kanbanboard`,
 `mission`, `whowhat`, `bethas`), `moach/PresenceBar`, `lev/**` וכרטיסי
 `lev/cards/**`, `chat/components/**`, `negotiation/**`, `conf/**`, `timers/**`.
 
-### שלב 4 — השאר (P2)
+### שלב 4 — השאר (P2) — ✅ בנוי 2026-11-25
+
+מה נעשה: 123 המרות ב־42 קבצים (גם כאן ה־"169 קבצים" היה ספירה מנופחת), ועוד
+14 ב־`app.postcss` (פינות מודאל, blockquote של TipTap, רקעים). מלכודות:
+- טרנרי לפי שפה שכבר היה נכון: `Bot` (`end-4`, `end-3`), `ProductPeek` (`end-2`),
+  `DemoRequest` (`end-3`).
+- **קוד שנכתב LTR־קודם** — שם `left` היה "start" ולא "end", אז המיפוי שומר־העברית
+  היה הופך אותו: `gift/[id]` (שכבר החזיק `rtl:` variants) → `ms-auto` וחץ עם
+  `ltr:-scale-x-100`; רכיבי ה־shadcn `ui/dialog` → `sm:text-start` ו־`end-4` לכפתור
+  הסגירה. **זה כן משנה את העברית**: כותרת הדיאלוג מיושרת לימין וה־✕ עובר לשמאל —
+  כמו שהיה צריך מלכתחילה.
+- `check:dir` מדלג במכוון על: גרפים (`prPr/gantt`, `prPr/graph`), מיילים
+  (`components/mail` — לפי שפת הנמען), `translatehe` ו־`guid/ai` (עברית במכוון),
+  `searchtest` (דף פיתוח). שני `dir="auto"` ב־growth יושבים על הטקסט עצמו (`dir-ok`).
 
 כל קובץ שנותר ב־169 (`main/**`, `bot/Bot`, `migration-dashboard`, `love`, …).
 דפי פיתוח/בדיקה (`searchtest`, `migration-dashboard`) — רק אם זול.
@@ -227,7 +284,9 @@ no-op, כי `<html>` כבר RTL). נשארו במכוון: `main/translatehe.sve
 
 ---
 
-## שמירה שזה לא חוזר: `npm run check:dir`
+## שמירה שזה לא חוזר: `npm run check:dir` — ✅ בנוי 2026-11-25
+
+(`dir-ok` מכסה את השורה שלו ואת השורה שאחריו בלבד.)
 
 סקריפט חדש `scripts/check-dir.mjs` במבנה של `scripts/check-ui-hebrew.mjs`
 (רשימת `ROOTS` של מסכים שכבר נוקו; מסך נכנס לרשימה כשהוא גמור). נכשל על:
@@ -260,7 +319,14 @@ no-op, כי `<html>` כבר RTL). נשארו במכוון: `main/translatehe.sve
   (`mobileFooter`), דק הכרטיסים בלב, תפריטים נפתחים (`left-0` שהיה צריך להיות
   `end-0`).
 
-## הגדרת "גמור"
+## הגדרת "גמור" — ✅ התקיימה 2026-11-25
+
+כל חמש השפות מקבלות `dir` מה־SSR (נבדק he/en); אין `direction: rtl` גלובלי;
+`check:dir` עובר על כל האתר; `dir="rtl"` קבוע נשאר רק בקבצים המוחרגים. עברית זהה
+לפי הגדרת ההמרה (נמדד: `ms-3` = `margin-right: 12px` ב־he), חוץ מהשינויים
+המכוונים שצוינו (חץ `IncomingWishCard`, דיאלוג shadcn). `/gift` ו־`/availableMission`
+נבדקו בדפדפן בשתי השפות, בלי גלילה אופקית. **לא נבדקו בעין** המסכים שדורשים
+התחברות (הלב, המוח, הטיימרים) — כולם מתקמפלים, וכדאי מעבר אנגלי עליהם.
 
 - כל 5 השפות מקבלות `dir` נכון מה־SSR; אין `direction: rtl` גלובלי.
 - `check:dir` עובר על כל המסכים של שלבים 2–3, והם ב־`ROOTS`.

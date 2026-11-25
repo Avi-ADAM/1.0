@@ -187,8 +187,8 @@ justify-content: center;
 text-align: center; 
   margin-top: -11vh;  
 padding-top: 8px;
-padding-right: 25px;
-padding-left: 25px;
+padding-inline-start: 25px;
+padding-inline-end: 25px;
 margin-bottom: 8vh;
 }
 

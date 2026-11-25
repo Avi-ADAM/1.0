@@ -93,7 +93,7 @@ function login () {
 
 {#if isAuthed}
 {#if $showFoot}
-<main class="h-screen min-w-screen absolute top-0 left-0">
+<main class="h-screen min-w-screen absolute top-0 end-0">
   <Foot un={data.un} idL={data.uid}/>
   <Tour TourTip={TourTip}></Tour>
     </main>
@@ -112,13 +112,13 @@ function login () {
 <style>
    .ww2{
       top: calc(100% - 105px);
-      right: calc(100% - 55px);
+      inset-inline-start: calc(100% - 55px);
             width: 50px;
       height: 50px;
    }
     .ww3{
       top: calc(100% - 35px);
-      right: calc(100% - 35px);
+      inset-inline-start: calc(100% - 35px);
             width: 25px;
       height: 25px;
         box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
@@ -126,7 +126,7 @@ function login () {
    }
     .ww1{
       top: calc(100% - 55px);
-      right: calc(100% - 105px);
+      inset-inline-start: calc(100% - 105px);
             width: 50px;
       height: 50px;
     }

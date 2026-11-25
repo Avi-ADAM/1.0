@@ -1025,7 +1025,7 @@
   :global(.svelte-dialog-overlay) {
     position: fixed;
     top: 0;
-    left: 0;
+    inset-inline-end: 0;
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
@@ -1045,7 +1045,7 @@
   .close-button {
     position: absolute;
     top: 1rem;
-    right: 1rem;
+    inset-inline-start: 1rem;
     background: transparent;
     border: none;
     color: #fff;

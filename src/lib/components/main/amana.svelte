@@ -827,7 +827,7 @@
     height: 500px;
     background: radial-gradient(circle, #ff00ae, transparent);
     top: -250px;
-    right: -250px;
+    inset-inline-start: -250px;
     animation-delay: 0s;
     filter: blur(80px) brightness(1.2);
   }
@@ -837,7 +837,7 @@
     height: 450px;
     background: radial-gradient(circle, #ffb800, transparent);
     bottom: -200px;
-    left: -200px;
+    inset-inline-end: -200px;
     animation-delay: 7s;
     filter: blur(80px) brightness(1.3);
     animation:
@@ -932,7 +932,7 @@
   .premium-close-btn {
     position: absolute;
     top: 1.25rem;
-    left: 1.25rem;
+    inset-inline-end: 1.25rem;
     z-index: 100;
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1445,8 +1445,8 @@
     content: '';
     position: absolute;
     top: 50%;
-    left: 0;
-    right: 0;
+    inset-inline-end: 0;
+    inset-inline-start: 0;
     height: 1px;
     background: linear-gradient(
       90deg,
@@ -1476,7 +1476,7 @@
     line-height: 1.8;
     font-size: 1rem;
     margin: 0;
-    text-align: right;
+    text-align: start;
   }
 
   .agreement-text :global(strong) {
@@ -1591,7 +1591,7 @@
 
   .info-text ul {
     margin: 0.5rem 0 0 0;
-    padding-right: 1.2rem;
+    padding-inline-start: 1.2rem;
     list-style-type: disc;
   }
 
@@ -1691,7 +1691,7 @@
   .globe-wrapper {
     position: fixed;
     bottom: 0;
-    right: 0;
+    inset-inline-start: 0;
     width: 150vw;
     height: 50vw;
 

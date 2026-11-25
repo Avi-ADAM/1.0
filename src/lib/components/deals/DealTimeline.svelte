@@ -25,12 +25,12 @@
 <style>
   .timeline {
     position: relative;
-    padding-right: 20px;
+    padding-inline-start: 20px;
   }
   .timeline::before {
     content: '';
     position: absolute;
-    right: 8px;
+    inset-inline-start: 8px;
     top: 8px;
     bottom: 8px;
     width: 1px;
@@ -39,14 +39,14 @@
 
   .item {
     position: relative;
-    padding-right: 24px;
+    padding-inline-start: 24px;
     padding-bottom: 24px;
   }
   .item:last-child { padding-bottom: 0; }
 
   .dot {
     position: absolute;
-    right: -4px;
+    inset-inline-start: -4px;
     top: 4px;
     width: 9px;
     height: 9px;

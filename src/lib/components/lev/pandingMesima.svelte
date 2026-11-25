@@ -698,15 +698,15 @@
     z-index: 1000;
     padding: 15px;
     margin: 0px;
-    margin-right: 25px;
+    margin-inline-start: 25px;
 
     height: 70vh;
     width: fit-content;
     margin-top: 30vh;
     border-radius: 5%;
     overflow-y: auto;
-    border-top-right-radius: 2%;
-    border-bottom-right-radius: 2%;
+    border-start-start-radius: 2%;
+    border-end-start-radius: 2%;
   }
 
   :global([data-svelte-dialog-overlay].overlay) {
@@ -736,14 +736,14 @@
 
       z-index: 1000;
       padding: 15px;
-      margin-right: 25px;
+      margin-inline-start: 25px;
       margin: 0px;
       margin-top: 20vh;
       height: 80vh;
       max-width: 100vw;
       border-radius: 5%;
-      border-top-right-radius: 2%;
-      border-bottom-right-radius: 2%;
+      border-start-start-radius: 2%;
+      border-end-start-radius: 2%;
     }
 
     :global([data-svelte-dialog-overlay].overlay) {

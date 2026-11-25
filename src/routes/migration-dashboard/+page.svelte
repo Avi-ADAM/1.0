@@ -309,19 +309,19 @@
           <table class="min-w-full divide-y divide-gray-200">
             <thead>
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-end text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Action Key
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-end text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
                   QIDS
                 </th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Action System
                 </th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Total
                 </th>
               </tr>
@@ -343,13 +343,13 @@
                       </span>
                     {/if}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-start text-gray-500">
                     {data.qids}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-start text-gray-500">
                     {data.action}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-gray-900">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-start font-medium text-gray-900">
                     {data.qids + data.action}
                   </td>
                 </tr>

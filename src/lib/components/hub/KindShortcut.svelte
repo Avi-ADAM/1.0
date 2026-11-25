@@ -16,7 +16,7 @@
 >
   {#if badge > 0}
     <span
-      class="absolute top-2 left-2 flex items-center justify-center min-w-[20px] h-5 px-1.5
+      class="absolute top-2 end-2 flex items-center justify-center min-w-[20px] h-5 px-1.5
              rounded-full bg-red-500 text-white text-[10px] font-bold"
     >{badge}</span>
   {/if}

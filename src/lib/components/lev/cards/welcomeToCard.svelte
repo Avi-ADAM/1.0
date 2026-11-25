@@ -209,7 +209,7 @@ z-index: 9999;"
 .confetti-container {
   position: absolute;
   top: 0;
-  left: 0;
+  inset-inline-end: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
@@ -245,7 +245,7 @@ z-index: 9999;"
 }
 
 .sparkle-container {
-  margin-right: 1.5rem;
+  margin-inline-start: 1.5rem;
 }
 
 .sparkle-svg {
@@ -472,7 +472,7 @@ z-index: 9999;"
   }
   
   .sparkle-container {
-    margin-right: 0;
+    margin-inline-start: 0;
     margin-bottom: 1rem;
   }
   

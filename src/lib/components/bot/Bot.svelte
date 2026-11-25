@@ -161,9 +161,7 @@
 {#if !isOnChatPage}
   <div
     dir={$isRtl ? 'rtl' : 'ltr'}
-    class="fixed bottom-[var(--rail-bottom,5rem)] sm:bottom-12 {$locale == 'he' || $locale == 'ar'
-      ? 'left-4'
-      : 'right-4'} z-50"
+    class="fixed bottom-[var(--rail-bottom,5rem)] sm:bottom-12 end-4 z-50"
   >
     <!-- The float loop runs forever, so it answers to the same motion setting
          the 3D scene does: a visitor who paused motion, or asked the OS for
@@ -184,10 +182,7 @@
       <div
         in:fly={{ y: 20, duration: 300 }}
         out:fly={{ y: 20, duration: 300 }}
-        class="absolute sm:bottom-20 bottom-5 {$locale == 'he' ||
-        $locale == 'ar'
-          ? 'left-3'
-          : 'right-3'} bot-panel sm:w-80 w-[75vw] bg-gold shadow-teal-500 rounded-xl shadow-2xl flex flex-col overflow-hidden"
+        class="absolute sm:bottom-20 bottom-5 end-3 bot-panel sm:w-80 w-[75vw] bg-gold shadow-teal-500 rounded-xl shadow-2xl flex flex-col overflow-hidden"
       >
         <div
           class="p-4 bg-liteGoldTobr shadow-lg flex justify-between items-center"

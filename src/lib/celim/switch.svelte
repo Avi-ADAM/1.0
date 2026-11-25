@@ -116,12 +116,12 @@
   }
 
   .s--multi label:first-of-type {
-    padding-right: 5em;
+    padding-inline-start: 5em;
   }
 
   .s--multi label:last-child {
-    margin-left: -5em;
-    padding-left: 5em;
+    margin-inline-end: -5em;
+    padding-inline-end: 5em;
   }
 
   .s--multi:focus-within label:first-of-type:after {
@@ -148,7 +148,7 @@
     height: 1.2em;
     background: #fff;
     top: 0.2em;
-    right: 1.2em;
+    inset-inline-start: 1.2em;
     transition: transform 0.3s;
   }
 

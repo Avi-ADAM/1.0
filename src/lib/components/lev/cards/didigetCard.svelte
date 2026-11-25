@@ -151,7 +151,7 @@
           />
           {#if sendcon}
             <span
-              class="absolute -bottom-1 -right-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white border-2 border-white dark:border-gray-800 shadow"
+              class="absolute -bottom-1 -start-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white border-2 border-white dark:border-gray-800 shadow"
               title={kind == 'send'
                 ? $t('lev.cards.didiget.confirmedTransfer')
                 : $t('lev.cards.didiget.senderConfirmed', { name: sendname, amount })}
@@ -166,7 +166,7 @@
             </span>
           {:else}
             <span
-              class="absolute -bottom-1 -right-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-700 text-white border-2 border-white dark:border-gray-800 shadow"
+              class="absolute -bottom-1 -start-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-700 text-white border-2 border-white dark:border-gray-800 shadow"
               title={$t('lev.cards.didiget.senderPendingBadge')}
               aria-label={$t('lev.cards.didiget.senderPendingBadge')}
             >
@@ -215,7 +215,7 @@
           />
           {#if confirmed}
             <span
-              class="absolute -bottom-1 -right-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white border-2 border-white dark:border-gray-800 shadow"
+              class="absolute -bottom-1 -start-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white border-2 border-white dark:border-gray-800 shadow"
               title={$t('lev.cards.didiget.receiverConfirmedBadge')}
               aria-label={$t('lev.cards.didiget.receiverConfirmedBadge')}
             >
@@ -228,7 +228,7 @@
             </span>
           {:else}
             <span
-              class="absolute -bottom-1 -right-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-700 text-white border-2 border-white dark:border-gray-800 shadow"
+              class="absolute -bottom-1 -start-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-700 text-white border-2 border-white dark:border-gray-800 shadow"
               title={$t('lev.cards.didiget.receiverPendingBadge')}
               aria-label={$t('lev.cards.didiget.receiverPendingBadge')}
             >

@@ -246,7 +246,7 @@
       </div>
       <!-- Price Calculation -->
       <div
-        class="text-base sm:text-lg text-gray-800 dark:text-gray-200 flex items-center space-x-2 space-x-reverse"
+        class="text-base sm:text-lg text-gray-800 dark:text-gray-200 flex items-center space-x-2 rtl:space-x-reverse"
       >
         <img
           style="width:2.5rem;"

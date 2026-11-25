@@ -111,7 +111,7 @@
     font-family: var(--font-mono, monospace);
     display: block;
     margin: 0;
-    text-align: right;
+    text-align: start;
   }
 
   .ml-title {
@@ -120,7 +120,7 @@
     color: var(--text, #ffffff);
     line-height: 1.45;
     margin: 0;
-    text-align: right;
+    text-align: start;
   }
 
   .missions-container {
@@ -140,7 +140,7 @@
     justify-content: space-between;
     cursor: pointer;
     transition: all 0.2s ease;
-    text-align: right;
+    text-align: start;
     color: inherit;
   }
 

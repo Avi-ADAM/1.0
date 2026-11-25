@@ -1272,7 +1272,7 @@
   .stale-banner {
     position: fixed;
     top: 0;
-    left: 0;
+    inset-inline-end: 0;
     width: 100%;
     z-index: 800;
     text-align: center;
@@ -1317,7 +1317,7 @@
   .whole {
     position: absolute;
     top: 0;
-    left: 0;
+    inset-inline-end: 0;
     min-width: 99.9vw;
     min-height: 100vh;
     z-index: 100;
@@ -1573,7 +1573,7 @@
       transparent 20%
     );
     top: -20%;
-    left: -15%;
+    inset-inline-end: -15%;
   }
 
   /* פינה ימין-תחתון — מקביל לשמאל-עליון */
@@ -1584,7 +1584,7 @@
       transparent 20%
     );
     bottom: -20%;
-    right: -15%;
+    inset-inline-start: -15%;
   }
 
   /* כדורים סימטריים נוספים: ימין-עליון ושמאל-תחתון */
@@ -1607,7 +1607,7 @@
       transparent 60%
     );
     top: -15%;
-    right: -10%;
+    inset-inline-start: -10%;
     animation: orb-float 28s infinite alternate ease-in-out;
     animation-delay: -6s;
   }
@@ -1620,7 +1620,7 @@
       transparent 60%
     );
     bottom: -15%;
-    left: -10%;
+    inset-inline-end: -10%;
     animation: orb-float 30s infinite alternate-reverse ease-in-out;
     animation-delay: -18s;
   }

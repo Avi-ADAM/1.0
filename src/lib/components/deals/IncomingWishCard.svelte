@@ -114,7 +114,7 @@
   </div>
 
   <button class="cta" onclick={(e) => { e.stopPropagation(); openOffer(); }}>
-    {$t('deals.inviteRespond')} →
+    {$t('deals.inviteRespond')} <span class="inline-block rtl:-scale-x-100" aria-hidden="true">→</span>
   </button>
 </div>
 

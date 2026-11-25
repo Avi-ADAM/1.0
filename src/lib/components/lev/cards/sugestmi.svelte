@@ -397,7 +397,7 @@
       {/if}
       {#if hearotMeyuchadot && hearotMeyuchadot !== 'undefined' && hearotMeyuchadot !== 'null'}
         <div
-          class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border-l-4 border-blue-400 prose dark:prose-invert max-w-none"
+          class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border-e-4 border-blue-400 prose dark:prose-invert max-w-none"
         >
           <RichText outpot={hearotMeyuchadot} editable={false} />
         </div>

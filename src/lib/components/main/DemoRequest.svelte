@@ -180,7 +180,7 @@
         type="button"
         onclick={() => (open = false)}
         aria-label={$t('demo.close')}
-        class="absolute top-3 {$isRtl ? 'left-3' : 'right-3'} w-8 h-8 rounded-full bg-white/70 text-barbi hover:bg-barbi hover:text-gold transition-colors flex items-center justify-center shadow"
+        class="absolute top-3 end-3 w-8 h-8 rounded-full bg-white/70 text-barbi hover:bg-barbi hover:text-gold transition-colors flex items-center justify-center shadow"
       >
         ✕
       </button>

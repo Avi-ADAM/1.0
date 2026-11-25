@@ -1207,11 +1207,11 @@
   .bc-input-url {
     min-height: 48px;
     padding: 10px 16px 10px 44px;
-    text-align: left;
+    text-align: left; /* dir-ok: the URL field is dir="ltr" in every locale */
   }
   .bc-url-icon {
     position: absolute;
-    left: 14px;
+    left: 14px; /* dir-ok: sits in the ltr URL field */
     top: 14px;
     color: var(--bc-muted);
     pointer-events: none;
@@ -1724,7 +1724,7 @@
   .bc-confetti {
     position: fixed;
     top: -50px;
-    left: 0;
+    inset-inline-end: 0;
     height: 100vh;
     width: 100vw;
     display: flex;

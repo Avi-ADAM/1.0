@@ -36,7 +36,7 @@
     <!-- Project Badge -->
     {#if buble.projectSrc}
       <div
-        class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-2 border-white shadow-sm overflow-hidden bg-white"
+        class="absolute -bottom-1 -start-1 w-6 h-6 rounded-full border-2 border-white shadow-sm overflow-hidden bg-white"
       >
         <img
           src={buble.projectSrc}
@@ -61,7 +61,7 @@
 
   <!-- Indicator for total -->
   <div
-    class="absolute -top-2 -left-2 bg-barbi text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-sm z-10 border border-white/50"
+    class="absolute -top-2 -end-2 bg-barbi text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-sm z-10 border border-white/50"
   >
     <Money amount={buble.total} projectId={buble.projectId} />
   </div>

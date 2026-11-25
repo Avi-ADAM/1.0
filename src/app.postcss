@@ -329,8 +329,8 @@ textarea::-webkit-resizer {
   }
 }
 .modal-bar {
-  border-bottom-left-radius: 0.5rem;
-  border-bottom-right-radius: 0.5rem;
+  border-end-end-radius: 0.5rem;
+  border-end-start-radius: 0.5rem;
 }
 .modal-button:hover {
   background-color: #2f855a !important;
@@ -338,8 +338,8 @@ textarea::-webkit-resizer {
 }
 .modal-time {
   background-color: #2f855a;
-  border-top-left-radius: 0.5rem;
-  border-top-right-radius: 0.5rem;
+  border-start-end-radius: 0.5rem;
+  border-start-start-radius: 0.5rem;
   font-weight: 300;
 }
 .info {
@@ -554,8 +554,8 @@ ul {
   margin-bottom: 18px;
   padding: 15px;
   font-size: 22px;
-  border-left: solid var(--mturk);
-  border-right: solid var(--mturk);
+  border-inline-end: solid var(--mturk);
+  border-inline-start: solid var(--mturk);
 }
 
 .tiptap blockquote:before {
@@ -565,10 +565,10 @@ ul {
   line-height: 42px;
   color: #fff;
   background: #ddd;
-  float: left;
+  float: inline-end;
   position: relative;
   border-radius: 25px;
-  margin-right: 0.5em;
+  margin-inline-start: 0.5em;
   vertical-align: -0.4em;
 
   /** define it as a block element **/
@@ -1372,7 +1372,7 @@ body::before {
 	height: 100vh;
 	position: absolute;
 	top: 0;
-	left: 10vw;
+	inset-inline-end: 10vw;
 	z-index: -1;
 	background: radial-gradient(
 		50% 50% at 50% 50%,
@@ -1442,7 +1442,7 @@ button:focus:not(:focus-visible) {
     width: 40px;
     position: absolute;
     top: calc(100% - 48px);
-    right: calc(100% - 44px);
+    inset-inline-start: calc(100% - 44px);
     border: 1px solid red;
     border-radius: 25%;
     padding: 7px 6px;
@@ -1462,7 +1462,7 @@ button:focus:not(:focus-visible) {
     width: 40px;
     position: absolute;
     top: calc(100% - 48px);
-    left: calc(100% - 44px);
+    inset-inline-end: calc(100% - 44px);
     border: 1px solid var(--barbi-pink);
     border-radius: 25%;
     padding: 7px 6px ;
@@ -1474,7 +1474,7 @@ button:focus:not(:focus-visible) {
   width: 60px;
   position: absolute;
   top: calc(90% - 48px);
-  right: calc(90% - 64px);
+  inset-inline-start: calc(90% - 64px);
   border: 1px solid red;
   border-radius: 25%;
   padding: 9px 16px;
@@ -1494,7 +1494,7 @@ button:focus:not(:focus-visible) {
   width: 60px;
   position: absolute;
   top: calc(90% - 48px);
-  left: calc(90% - 64px);
+  inset-inline-end: calc(90% - 64px);
   border: 1px solid var(--barbi-pink);
   border-radius: 25%;
   padding: 9px 16px;
@@ -1581,7 +1581,7 @@ button:focus:not(:focus-visible) {
   z-index: 999 !important;
   position: fixed !important;
   top: 0 !important;
-  left: 0 !important;
+  inset-inline-end: 0 !important;
   height: 100%;
   width: 100vw;
   display: grid;

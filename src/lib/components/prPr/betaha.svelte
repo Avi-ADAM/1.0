@@ -55,9 +55,9 @@
       {#if isonly == false}
         <thead>
           <tr class="bg-gradient-to-r from-purple-600 to-pink-600 sticky top-0 z-20">
-            <th class="px-6 py-4 text-white font-bold border-r border-purple-400"></th>
+            <th class="px-6 py-4 text-white font-bold border-s border-purple-400"></th>
             {#each bmiData as data, i}
-              <th class="px-6 py-4 text-white font-bold text-3xl border-r border-purple-400 last:border-r-0">
+              <th class="px-6 py-4 text-white font-bold text-3xl border-s border-purple-400 last:border-s-0">
                 {i + 1}
               </th>
             {/each}
@@ -68,17 +68,17 @@
       <tbody class="divide-y divide-surfaceLine">
         <!-- Name Row -->
         <tr class="bg-gradient-to-r from-purple-500 to-pink-500 text-white sticky z-10" style:top={isonly == true ? "0px" : "77px"}>
-          <td class="px-6 py-4 font-bold text-lg border-r border-purple-300 bg-purple-600">{$t('moach.tables.name')}</td>
+          <td class="px-6 py-4 font-bold text-lg border-s border-purple-300 bg-purple-600">{$t('moach.tables.name')}</td>
           {#each bmiData as data, i}
-            <td class="px-6 py-4 font-bold text-lg border-r border-purple-300 last:border-r-0">{data.attributes.name}</td>
+            <td class="px-6 py-4 font-bold text-lg border-s border-purple-300 last:border-s-0">{data.attributes.name}</td>
           {/each}
         </tr>
 
         <!-- Description Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200">
-          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$t('moach.tables.description')}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-s border-surfaceLine">{$t('moach.tables.description')}</td>
           {#each bmiData as data, i}
-            <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0">
+            <td class="px-6 py-4 border-s border-surfaceLine last:border-s-0">
               <div class="max-w-xs">
                 {#if data.attributes.descrip !== undefined && data.attributes.descrip !== "undefined" && data.attributes.descrip !== null && data.attributes.descrip !== "" && data.attributes.descrip !== "null" }
                   <RichText outpot={data.attributes.descrip} editable={false}/>
@@ -90,9 +90,9 @@
 
         <!-- Execution Date Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200">
-          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$t('moach.tables.executionDate')}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-s border-surfaceLine">{$t('moach.tables.executionDate')}</td>
           {#each bmiData as data, i}
-            <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0">
+            <td class="px-6 py-4 border-s border-surfaceLine last:border-s-0">
               {#if data.attributes.Sqadualed !== undefined}
                 <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                   {data.attributes.Sqadualed}
@@ -104,9 +104,9 @@
 
         <!-- Public Links Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200">
-          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$t('moach.tables.publicLinks')}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-s border-surfaceLine">{$t('moach.tables.publicLinks')}</td>
           {#each bmiData as data, i}
-            <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0">
+            <td class="px-6 py-4 border-s border-surfaceLine last:border-s-0">
               {#if data.attributes.publicklinks !== undefined && data.attributes.publicklinks !== "undefined" && data.attributes.publicklinks !== null && data.attributes.publicklinks !== "" && data.attributes.publicklinks !== "null"}
                 <a target="_blank" rel="noreferrer" href="{data.attributes.publicklinks}" 
                    class="inline-flex items-center px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 rounded-lg transition-colors duration-200 font-medium">
@@ -122,9 +122,9 @@
 
         <!-- Special Notes Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200">
-          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$t('moach.tables.rikmaNotes')}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-s border-surfaceLine">{$t('moach.tables.rikmaNotes')}</td>
           {#each bmiData as data, i}
-            <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0">
+            <td class="px-6 py-4 border-s border-surfaceLine last:border-s-0">
               {#if data.attributes.hearotMeyuchadot !== undefined && data.attributes.hearotMeyuchadot !== "undefined" && data.attributes.hearotMeyuchadot !== null && data.attributes.hearotMeyuchadot !== "" && data.attributes.hearotMeyuchadot !== "null"}
                 <div class="max-w-xs">
                   <RichText outpot={data.attributes.hearotMeyuchadot} editable={false}/>
@@ -136,9 +136,9 @@
 
         <!-- Private Links Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200">
-          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$t('moach.tables.rikmaLinks')}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-s border-surfaceLine">{$t('moach.tables.rikmaLinks')}</td>
           {#each bmiData as data, i}
-            <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0">
+            <td class="px-6 py-4 border-s border-surfaceLine last:border-s-0">
               {#if data.attributes.privatlinks !== undefined && data.attributes.privatlinks !== "undefined" && data.attributes.privatlinks !== null && data.attributes.privatlinks !== "" && data.attributes.privatlinks !== "null"}
                 <a rel="noreferrer" target="_blank" href="{data.attributes.privatlinks}"
                    class="inline-flex items-center px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-lg transition-colors duration-200 font-medium">
@@ -154,9 +154,9 @@
 
         <!-- Hours Required Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200" id="hoursD">
-          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$t('moach.tables.estimatedHours')}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-s border-surfaceLine">{$t('moach.tables.estimatedHours')}</td>
           {#each bmiData as data, i}
-            <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0">
+            <td class="px-6 py-4 border-s border-surfaceLine last:border-s-0">
               {#if data.attributes.hoursassinged > 0}
                 <span class="inline-flex items-center px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">
                   <svg class="w-4 h-4 me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -171,9 +171,9 @@
 
         <!-- Hourly Rate Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200" id="vallueperhourN">
-          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$t('moach.tables.hourlyRate')}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-s border-surfaceLine">{$t('moach.tables.hourlyRate')}</td>
           {#each bmiData as data, i}
-            <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0">
+            <td class="px-6 py-4 border-s border-surfaceLine last:border-s-0">
               {#if data.attributes.perhour > 0}
                 <span class="inline-flex items-center px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-medium">
                   <svg class="w-4 h-4 me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -188,9 +188,9 @@
 
         <!-- Total Value Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200 bg-gradient-to-r from-green-50 to-emerald-50">
-          <td class="px-6 py-4 font-bold text-gray-800 bg-gradient-to-r from-green-200 to-emerald-200 border-r border-surfaceLine">{$t('moach.tables.totalMissionValue')}</td>
+          <td class="px-6 py-4 font-bold text-gray-800 bg-gradient-to-r from-green-200 to-emerald-200 border-s border-surfaceLine">{$t('moach.tables.totalMissionValue')}</td>
           {#each bmiData as data, i}
-            <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0">
+            <td class="px-6 py-4 border-s border-surfaceLine last:border-s-0">
               {#if data.attributes.perhour > 0 && data.attributes.hoursassinged > 0}
                 <span class="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-lg font-bold text-lg">
                   <svg class="w-5 h-5 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -207,10 +207,10 @@
 
         <!-- Progress Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200" id="total">
-          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$t('moach.tables.alreadyCompleted')}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-s border-surfaceLine">{$t('moach.tables.alreadyCompleted')}</td>
           {#each bmiData as data, i}
-            <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0" dir="ltr">
-              <div class="flex flex-col items-center space-y-2">
+            <td class="px-6 py-4 border-s border-surfaceLine last:border-s-0">
+              <div class="flex flex-col items-center space-y-2" dir="ltr">
                 <span class="text-sm font-medium text-surfaceMuted">
                   {`${data.attributes.howmanyhoursalready ? Math.round((data.attributes.howmanyhoursalready + Number.EPSILON) * 100) / 100 : 0} / ${data.attributes.hoursassinged}`}
                 </span>
@@ -230,9 +230,9 @@
 
         <!-- User Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200">
-          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$t('moach.tables.performedBy')}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-s border-surfaceLine">{$t('moach.tables.performedBy')}</td>
           {#each bmiData as data, i}
-            <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0">
+            <td class="px-6 py-4 border-s border-surfaceLine last:border-s-0">
               <a rel="noreferrer" target="_blank" href="/user/{data.attributes.users_permissions_user.data.id}"
                  class="inline-flex items-center px-3 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg transition-colors duration-200 font-medium">
                 <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -254,9 +254,9 @@
 
         <!-- Actions Row -->
         <tr class="bg-gradient-to-r from-purple-600 to-pink-600 sticky bottom-0 z-10">
-          <td class="px-6 py-4 font-bold text-white text-lg border-r border-purple-300">{$t('moach.tables.options')}</td>
+          <td class="px-6 py-4 font-bold text-white text-lg border-s border-purple-300">{$t('moach.tables.options')}</td>
           {#each bmiData as data, i}
-            <td class="px-6 py-4 border-r border-purple-300 last:border-r-0">
+            <td class="px-6 py-4 border-s border-purple-300 last:border-s-0">
               <div class="flex justify-center space-x-2">
                 <button
                   class="bg-surface hover:bg-surface2 text-purple-600 p-3 rounded-full shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105"

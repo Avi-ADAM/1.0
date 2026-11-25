@@ -75,7 +75,7 @@
     color: var(--text);
   }
 
-  .value-col { text-align: left; }
+  .value-col { text-align: end; }
 
   .value {
     font-size: 15px;

@@ -325,7 +325,7 @@
     width: 60vw;
     height: 60vw;
     top: -20%;
-    left: -15%;
+    inset-inline-end: -15%;
     opacity: 0.6;
     background: radial-gradient(circle, var(--barbi-pink, #ff0092) 0%, transparent 20%);
     animation: drift 25s infinite alternate ease-in-out;
@@ -346,7 +346,7 @@
   }
   .bg-orb-tr {
     top: -15%;
-    right: -10%;
+    inset-inline-start: -10%;
     --orb-c: hsla(210, 100%, 65%, 0.8);
     background: radial-gradient(circle, var(--orb-c) 0%, transparent 60%);
     animation:
@@ -355,7 +355,7 @@
   }
   .bg-orb-bl {
     bottom: -15%;
-    left: -10%;
+    inset-inline-end: -10%;
     --orb-c: hsla(280, 100%, 65%, 0.7);
     background: radial-gradient(circle, var(--orb-c) 0%, transparent 60%);
     animation:

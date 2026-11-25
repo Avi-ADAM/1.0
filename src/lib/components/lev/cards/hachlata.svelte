@@ -600,7 +600,7 @@
     {:else if kind !== 'sheirutpends' && kind !== 'pic' && kind !== 'askwants' && !currentValue && !newValue}
       <!-- Loading state for text-based kinds before data arrives -->
       <div class="flex items-center justify-center py-6 text-gray-400 dark:text-gray-500">
-        <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none">
+        <svg class="animate-spin h-5 w-5 ms-2" viewBox="0 0 24 24" fill="none">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
         </svg>

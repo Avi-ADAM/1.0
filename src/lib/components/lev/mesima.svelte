@@ -54,7 +54,7 @@ async function xyd () {
  {:then data}
 
 <div  style="overflow-y:auto" class=" d mb-4 mt-8 bg-surface text-surfaceInk leading-normal w-full lg:w-full">
- <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
+ <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-e text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-surfaceLine bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
       <div class="relative flex items-center space-x-1">
@@ -63,13 +63,13 @@ async function xyd () {
          </div>
          <div class="flex flex-col leading-tight">
             <div class="sm:text-sm text-md mt-1 flex items-center">
-               <span class="text-barbi text-center mr-3 sm:text-2xl text-sm">{$t('lev.mesima.suggestedMission')}</span>
+               <span class="text-barbi text-center ms-3 sm:text-2xl text-sm">{$t('lev.mesima.suggestedMission')}</span>
             </div>
-            <span style=" text-shadow: 1px 1px white;" class="pn ml-1 text-sm sm:text-lg text-barbi ">{data.project.data.attributes.projectName}</span>
+            <span style=" text-shadow: 1px 1px white;" class="pn me-1 text-sm sm:text-lg text-barbi ">{data.project.data.attributes.projectName}</span>
          </div>
          </div>
          </div>
-  <div  class=" bg-surface rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
+  <div  class=" bg-surface rounded-b lg:rounded-b-none lg:rounded-s p-4 flex flex-col justify-between leading-normal">
     <div  class="mb-8">
          <p style="line-height: 1;" class="text-sm text-surfaceMuted flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
@@ -110,7 +110,7 @@ async function xyd () {
   <div class="body items-center d" >
   
   <table >
-    <caption class="sm:text-right md:text-center text-right ">  
+    <caption class="sm:text-start md:text-center text-start ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >{$t('lev.mesima.openMission')}</h1>
     </caption>
@@ -254,8 +254,8 @@ background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
       overflow-x: auto;
       overflow-y: auto;
  
-     padding-left: 0.5em;
-     padding-right: 0.5em;
+     padding-inline-end: 0.5em;
+     padding-inline-start: 0.5em;
     }
         .full{
         height: 100%;

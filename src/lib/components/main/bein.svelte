@@ -385,7 +385,7 @@
     height: 520px;
     background: radial-gradient(circle, #ffd700, #daa520);
     top: -130px;
-    left: -110px;
+    inset-inline-end: -110px;
     animation-delay: 0s;
   }
   .blob-pink {
@@ -393,7 +393,7 @@
     height: 420px;
     background: radial-gradient(circle, #ff69b4, #e91e8c);
     bottom: -90px;
-    right: -90px;
+    inset-inline-start: -90px;
     animation-delay: -5s;
   }
   .blob-cream {
@@ -600,8 +600,8 @@
   .card-shim {
     position: absolute;
     top: 0;
-    left: 8%;
-    right: 8%;
+    inset-inline-end: 8%;
+    inset-inline-start: 8%;
     height: 2px;
     background: linear-gradient(
       90deg,

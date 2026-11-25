@@ -617,7 +617,7 @@
           <div
             onmouseenter={() => hover($t('common.notes'))}
             onmouseleave={() => hover('0')}
-            class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm text-gray-700 dark:text-gray-300 italic border-l-4 border-gray-300 dark:border-gray-500 max-h-24 overflow-y-auto"
+            class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm text-gray-700 dark:text-gray-300 italic border-e-4 border-gray-300 dark:border-gray-500 max-h-24 overflow-y-auto"
           >
             {hearotMeyuchadot}
           </div>

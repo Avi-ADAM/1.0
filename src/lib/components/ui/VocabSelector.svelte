@@ -249,7 +249,7 @@
 </script>
 
 <div
-  class="vocab-selector-container max-w-full text-right sm:text-right"
+  class="vocab-selector-container max-w-full text-start sm:text-start"
   dir={$isRtl ? 'rtl' : 'ltr'}
   style="--the:var({color});"
 >

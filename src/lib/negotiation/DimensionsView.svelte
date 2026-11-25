@@ -56,7 +56,7 @@
         >
           <!-- כותרת הממד - תמיד גלויה -->
           <button
-            class="w-full flex items-center justify-between p-4 text-right hover:bg-gray-50 transition-colors"
+            class="w-full flex items-center justify-between p-4 text-start hover:bg-gray-50 transition-colors"
             onclick={() => toggleDimension(dim.id)}
           >
             <div class="flex-1 min-w-0">
@@ -71,7 +71,7 @@
                 <span class="truncate">{dim.rightLabel}</span>
               </div>
             </div>
-            <div class="shrink-0 mr-3">
+            <div class="shrink-0 ms-3">
               <span
                 class="text-gray-400 text-lg transition-transform duration-200 inline-block"
                 style="transform: rotate({isOpen ? '90deg' : '0deg'})">›</span

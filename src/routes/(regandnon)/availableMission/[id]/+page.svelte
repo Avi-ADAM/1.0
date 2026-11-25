@@ -355,7 +355,7 @@
             </div>
           </div>
         {/if}
-        <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
+        <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-e text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
     </div>-->
         <div
           class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre"
@@ -423,7 +423,7 @@
           </div>
         </div>
         <div
-          class=" lg:bg-gray-700 bg-transparent rounded-b lg:rounded-b-none lg:rounded-e p-4 flex flex-col justify-between leading-normal"
+          class=" lg:bg-gray-700 bg-transparent rounded-b lg:rounded-b-none lg:rounded-s p-4 flex flex-col justify-between leading-normal"
         >
           <div class="mb-8">
             <div class="  mb-2">

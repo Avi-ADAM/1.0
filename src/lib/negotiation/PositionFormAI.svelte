@@ -172,7 +172,7 @@
                     style="width:{dim.score}%"
                   ></div>
                 </div>
-                <span class="text-xs text-violet-600 w-20 text-left truncate"
+                <span class="text-xs text-violet-600 w-20 text-end truncate"
                   >{dim.stance}</span
                 >
               </div>
@@ -191,7 +191,7 @@
             {#each aiAnalysis.suggestedClarifications as q}
               <button
                 onclick={() => applySuggestion(q)}
-                class="w-full text-right text-xs text-violet-700 bg-white border border-violet-200 rounded-lg px-3 py-2 hover:bg-violet-100 transition-colors"
+                class="w-full text-start text-xs text-violet-700 bg-white border border-violet-200 rounded-lg px-3 py-2 hover:bg-violet-100 transition-colors"
               >
                 + {q}
               </button>

@@ -457,7 +457,7 @@
           'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
         alt="user"
       />
-      <div class="ml-4 mr-4 flex-1 overflow-hidden">
+      <div class="me-4 ms-4 flex-1 overflow-hidden">
         <p
           class="text-gray-900 dark:text-white font-bold text-sm mb-1 truncate"
         >

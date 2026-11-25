@@ -293,7 +293,7 @@
   .legend {
     position: absolute;
     bottom: 20px;
-    right: 20px;
+    inset-inline-start: 20px;
     background: rgba(255, 255, 255, 0.85);
     padding: 15px;
     border-radius: 12px;
@@ -552,7 +552,7 @@
     }
     .legend {
       bottom: 30px;
-      right: 30px;
+      inset-inline-start: 30px;
     }
   }
 

@@ -455,7 +455,7 @@
                 >
                   <EntityIcon kind="waiting" size={17} />
                   <span>{$t('offerings.page.pendingRequest')}</span>
-                  <span class="mr-auto rtl:ml-auto rtl:mr-0">←</span>
+                  <span class="ms-auto inline-block ltr:-scale-x-100" aria-hidden="true">←</span>
                 </a>
               {/if}
               <div class="flex flex-wrap items-center gap-4">

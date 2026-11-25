@@ -916,7 +916,7 @@
   .close-button {
     position: absolute;
     top: 1rem;
-    right: 1rem;
+    inset-inline-start: 1rem;
     background: transparent;
     border: none;
     color: #fff;

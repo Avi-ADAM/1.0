@@ -244,7 +244,7 @@
     white-space: nowrap; /* Keeps the content on a single line */
     margin: 10px auto 0 auto; /* Gives that scrolling effect as the typing happens */
     letter-spacing: normal; /* Adjust as needed */
-    /* border-left: .15em solid orange; The typwriter cursor */
+    /* border-inline-end: .15em solid orange; The typwriter cursor */
     visibility: hidden;
     animation:
       cssAnimation 0s 1.5s forwards,
@@ -257,7 +257,7 @@
     white-space: nowrap; /* Keeps the content on a single line */
     margin: 0 auto; /* Gives that scrolling effect as the typing happens */
     letter-spacing: normal; /* Adjust as needed */
-    /*  border-left: .15em solid orange; The typwriter cursor */
+    /*  border-inline-end: .15em solid orange; The typwriter cursor */
     visibility: hidden;
     animation:
       cssAnimation 0s 5s forwards,
@@ -271,7 +271,7 @@
     white-space: nowrap; /* Keeps the content on a single line */
     margin: 0 auto; /* Gives that scrolling effect as the typing happens */
     letter-spacing: normal; /* Adjust as needed */
-    /* border-left: .15em solid orange;  The typwriter cursor */
+    /* border-inline-end: .15em solid orange;  The typwriter cursor */
     visibility: hidden;
     animation:
       cssAnimation 0s 8.5s forwards,

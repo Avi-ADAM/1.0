@@ -359,18 +359,18 @@
                         </div>
                         <div class="flex flex-col leading-tight">
                             <div class="sm:text-sm text-md mt-1 flex items-center">
-                                <span class="text-barbi text-center mr-3 sm:text-2xl lg:text-4xl text-xl">{$t('pages.availResource.headi')}</span>
+                                <span class="text-barbi text-center ms-3 sm:text-2xl lg:text-4xl text-xl">{$t('pages.availResource.headi')}</span>
                             </div>
                             {#if projectName}
                                 <Translated
                                     as="span"
-                                    class="pn ml-1 text-lg sm:text-xl lg:text-2xl text-[color:var(--ramp-ink,#16131b)]"
+                                    class="pn me-1 text-lg sm:text-xl lg:text-2xl text-[color:var(--ramp-ink,#16131b)]"
                                     text={projectName}
                                     hit={tr.hitFor(projectName)}
                                     showNote={false}
                                 />
                             {:else}
-                                <span class="pn ml-1 text-lg sm:text-xl lg:text-2xl text-[color:var(--ramp-ink,#16131b)]">{sourceName}</span>
+                                <span class="pn me-1 text-lg sm:text-xl lg:text-2xl text-[color:var(--ramp-ink,#16131b)]">{sourceName}</span>
                             {/if}
                         </div>
                     </div>
@@ -385,7 +385,7 @@
                         {/if}
                     </div>
                 </div>
-                <div class="lg:bg-gray-700 bg-transparent rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
+                <div class="lg:bg-gray-700 bg-transparent rounded-b lg:rounded-b-none lg:rounded-s p-4 flex flex-col justify-between leading-normal">
                     <div class="mb-8">
                         <div class="mb-2">
                             <div class="flex flex-row justify-between">

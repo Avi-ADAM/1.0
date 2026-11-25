@@ -125,12 +125,12 @@
 
   /* Bot content stays near avatar on the right */
   .message-row:not(.user) .content {
-    margin-left: 0;
+    margin-inline-end: 0;
   }
 
   /* User content stays near avatar on the left */
   .message-row.user .content {
-    margin-right: 0;
+    margin-inline-start: 0;
   }
 
   .bubble {
@@ -152,7 +152,7 @@
       #3a2e08 100%
     );
     border: 1px solid rgba(212, 175, 55, 0.45);
-    border-bottom-right-radius: 4px; /* Tail on the right */
+    border-end-start-radius: 4px; /* tail at the start side */
     box-shadow:
       0 4px 18px rgba(0, 0, 0, 0.25),
       inset 0 1px 0 rgba(212, 175, 55, 0.2),
@@ -168,7 +168,7 @@
     ); /* liteGoldTobr */
     color: #2c384a; /* bluesun */
     border: 1px solid rgba(184, 134, 11, 0.4);
-    border-bottom-left-radius: 4px; /* Tail on the left */
+    border-end-end-radius: 4px; /* tail at the end side */
     box-shadow: 0 4px 20px rgba(184, 134, 11, 0.2);
   }
 
@@ -180,11 +180,11 @@
   }
 
   .message-row.user .timestamp {
-    text-align: left;
+    text-align: end;
   }
 
   .message-row:not(.user) .timestamp {
-    text-align: right;
+    text-align: start;
   }
 
   @keyframes fadeUp {

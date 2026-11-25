@@ -67,7 +67,7 @@ onMount(()=>{
     {#each sheirutim?.data as datai, i}
     {@const data = datai.attributes}
     <div dir={$isRtl ? 'rtl' : 'ltr'}  style="overflow-y:auto" class="lg:w-1/2 d mb-4 pt-4 w-full d mx-auto" >
-    <div  class=" bg-gray-700  rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal ">
+    <div  class=" bg-gray-700  rounded-b lg:rounded-b-none lg:rounded-s p-4 flex flex-col justify-between leading-normal ">
          <div  class="mb-8">
               <div class="  mb-2 text-start">
         <div class="flex flex-row justify-between">

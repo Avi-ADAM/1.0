@@ -361,7 +361,7 @@
   
   <style>
     :global(.fc-direction-rtl) {
-      direction: rtl;
+      direction: rtl; /* dir-ok: FullCalendar adds this class only in an RTL calendar */
     }
     
     :global(.fc-toolbar-title) {

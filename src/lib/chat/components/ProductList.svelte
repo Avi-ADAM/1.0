@@ -147,7 +147,7 @@
     font-size: 10px;
     color: var(--text-3, #a0aec0);
     font-family: var(--font-mono, monospace);
-    text-align: right;
+    text-align: start;
   }
 
   .pl-title {
@@ -155,7 +155,7 @@
     font-weight: 600;
     color: var(--text, #ffffff);
     line-height: 1.45;
-    text-align: right;
+    text-align: start;
   }
 
   .products-container {
@@ -175,7 +175,7 @@
     justify-content: space-between;
     cursor: pointer;
     transition: all 0.2s ease;
-    text-align: right;
+    text-align: start;
     color: inherit;
   }
 
@@ -210,7 +210,7 @@
     font-weight: 600;
     color: rgba(212, 175, 55, 0.9);
     flex-shrink: 0;
-    margin-right: 8px;
+    margin-inline-start: 8px;
   }
 
   .sale-form-wrapper {
@@ -225,7 +225,7 @@
     color: var(--text-3, #a0aec0);
     cursor: pointer;
     font-size: 12px;
-    text-align: right;
+    text-align: start;
     padding: 4px 0;
   }
 
@@ -237,13 +237,13 @@
     font-size: 15px;
     font-weight: 600;
     color: var(--text, #ffffff);
-    text-align: right;
+    text-align: start;
   }
 
   .selected-project-name {
     font-size: 11px;
     color: var(--text-3, #a0aec0);
-    text-align: right;
+    text-align: start;
     margin-bottom: 8px;
   }
 

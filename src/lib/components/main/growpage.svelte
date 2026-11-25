@@ -183,7 +183,7 @@
 {/snippet}
 
 <!-- Mobile lang selector (floating) -->
-<div class="md:hidden fixed top-16 left-2 z-[699] flex flex-col gap-1">
+<div class="md:hidden fixed top-16 end-2 z-[699] flex flex-col gap-1">
   {@render utilityNav()}
 </div>
 
@@ -222,7 +222,7 @@
       {#each NAV as item (item.id)}
         <button
           type="button"
-          class="{item.wide ? 'hidden xl:block' : ''} whitespace-nowrap hover:text-amber-600 transition-colors relative after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-amber-500 hover:after:w-full after:transition-all"
+          class="{item.wide ? 'hidden xl:block' : ''} whitespace-nowrap hover:text-amber-600 transition-colors relative after:absolute after:bottom-[-4px] after:end-0 after:w-0 after:h-0.5 after:bg-amber-500 hover:after:w-full after:transition-all"
           onclick={() => scrollToId(item.id)}>{$t(`grow.nav.${item.key}`)}</button
         >
       {/each}
@@ -499,7 +499,7 @@
       <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
         <!-- r1 -->
         <div
-          class="md:col-span-3 bg-white/80 backdrop-blur-sm border border-emerald-100 rounded-[2.5rem] rounded-tr-xl rounded-bl-xl p-8 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300 flex flex-col justify-between"
+          class="md:col-span-3 bg-white/80 backdrop-blur-sm border border-emerald-100 rounded-[2.5rem] rounded-ss-xl rounded-ee-xl p-8 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300 flex flex-col justify-between"
         >
           <div>
             <div
@@ -536,7 +536,7 @@
 
         <!-- r2 -->
         <div
-          class="md:col-span-3 bg-white/80 backdrop-blur-sm border border-emerald-100 rounded-[2.5rem] rounded-tl-xl rounded-br-xl p-8 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300 flex flex-col justify-between"
+          class="md:col-span-3 bg-white/80 backdrop-blur-sm border border-emerald-100 rounded-[2.5rem] rounded-se-xl rounded-es-xl p-8 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300 flex flex-col justify-between"
         >
           <div>
             <div
@@ -568,7 +568,7 @@
 
         <!-- r3 -->
         <div
-          class="md:col-span-2 bg-white/80 backdrop-blur-sm border border-emerald-100 rounded-[2.5rem] rounded-tr-xl rounded-bl-xl p-8 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300 flex flex-col justify-between"
+          class="md:col-span-2 bg-white/80 backdrop-blur-sm border border-emerald-100 rounded-[2.5rem] rounded-ss-xl rounded-ee-xl p-8 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300 flex flex-col justify-between"
         >
           <div>
             <div
@@ -600,7 +600,7 @@
 
         <!-- r4 -->
         <div
-          class="md:col-span-2 bg-white/80 backdrop-blur-sm border border-emerald-100 rounded-[2.5rem] rounded-tl-xl rounded-br-xl p-8 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300 flex flex-col justify-between"
+          class="md:col-span-2 bg-white/80 backdrop-blur-sm border border-emerald-100 rounded-[2.5rem] rounded-se-xl rounded-es-xl p-8 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300 flex flex-col justify-between"
         >
           <div>
             <div
@@ -632,7 +632,7 @@
 
         <!-- r5 (Nervous system highlighted layout) -->
         <div
-          class="md:col-span-2 bg-gradient-to-br from-amber-100 to-amber-50 border border-amber-300/60 rounded-[2.5rem] rounded-tr-xl rounded-bl-xl p-8 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+          class="md:col-span-2 bg-gradient-to-br from-amber-100 to-amber-50 border border-amber-300/60 rounded-[2.5rem] rounded-ss-xl rounded-ee-xl p-8 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between"
         >
           <div>
             <div
@@ -664,7 +664,7 @@
 
         <!-- Full width statement -->
         <div
-          class="md:col-span-6 bg-emerald-800 text-amber-50 rounded-[2.5rem] rounded-tl-xl rounded-br-xl p-6 sm:p-8 shadow-lg flex flex-col md:flex-row items-center gap-6 justify-between border border-emerald-900"
+          class="md:col-span-6 bg-emerald-800 text-amber-50 rounded-[2.5rem] rounded-se-xl rounded-es-xl p-6 sm:p-8 shadow-lg flex flex-col md:flex-row items-center gap-6 justify-between border border-emerald-900"
         >
           <p
             class="text-lg font-medium leading-relaxed max-w-4xl text-center md:text-start"
@@ -803,7 +803,7 @@
       </div>
 
       <p
-        class="text-center text-emerald-700 font-semibold text-base sm:text-lg mt-8 bg-emerald-50/60 border border-emerald-100 inline-block px-6 py-2.5 rounded-full mx-auto left-0 right-0"
+        class="text-center text-emerald-700 font-semibold text-base sm:text-lg mt-8 bg-emerald-50/60 border border-emerald-100 inline-block px-6 py-2.5 rounded-full mx-auto end-0 start-0"
       >
         {$t('grow.paths.note')}
       </p>

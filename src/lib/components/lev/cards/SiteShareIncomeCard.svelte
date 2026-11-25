@@ -213,7 +213,7 @@
               >
               {#if String(u.id) === String(buble.myid)}
                 <span
-                  class="mr-auto text-[9px] bg-yellow-200 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 px-2 py-0.5 rounded-full font-bold"
+                  class="ms-auto text-[9px] bg-yellow-200 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 px-2 py-0.5 rounded-full font-bold"
                   >{$t('lev.revenue.siteShareIncomeCard.you')}</span
                 >
               {/if}

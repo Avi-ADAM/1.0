@@ -496,8 +496,8 @@ id: ${pendId}
     border: 1px solid var(--lturk);
     width: 250px;
     height: 30px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-inline-end: 10px;
+    padding-inline-start: 10px;
   }
 
   input[type='text']:focus {
@@ -514,8 +514,8 @@ id: ${pendId}
     width: 250px;
     height: 30px;
     color: red;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-inline-end: 10px;
+    padding-inline-start: 10px;
   }
 
   /* חיווי: אישור (✓ ירוק) */
@@ -543,15 +543,15 @@ id: ${pendId}
     z-index: 1000;
     padding: 15px;
     margin: 0px;
-    margin-right: 25px;
+    margin-inline-start: 25px;
 
     height: 70vh;
     width: fit-content;
     margin-top: 30vh;
     border-radius: 5%;
     overflow-y: auto;
-    border-top-right-radius: 2%;
-    border-bottom-right-radius: 2%;
+    border-start-start-radius: 2%;
+    border-end-start-radius: 2%;
   }
   :global([data-svelte-dialog-overlay].overlay) {
     z-index: 1000;
@@ -571,14 +571,14 @@ id: ${pendId}
       overflow-y: auto;
       z-index: 1000;
       padding: 15px;
-      margin-right: 25px;
+      margin-inline-start: 25px;
       margin: 0px;
       margin-top: 20vh;
       height: 80vh;
       width: fit-content;
       border-radius: 5%;
-      border-top-right-radius: 2%;
-      border-bottom-right-radius: 2%;
+      border-start-start-radius: 2%;
+      border-end-start-radius: 2%;
     }
     :global([data-svelte-dialog-overlay].overlay) {
       z-index: 1000;

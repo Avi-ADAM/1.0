@@ -29,7 +29,7 @@ function hover(){
 <div bind:clientWidth={wid} class=" overflow-auto md:items-center border-2 border-gold rounded d">
        
     <div  style="overflow-y:auto" class=" d mb-4 pt-4 w-full  mx-auto">
-    <div  class=" bg-gray-700  rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal ">
+    <div  class=" bg-gray-700  rounded-b lg:rounded-b-none lg:rounded-s p-4 flex flex-col justify-between leading-normal ">
          <div  class="mb-8">
               <div class="  mb-2 text-start">
         <div class="flex flex-row justify-between">

@@ -291,7 +291,7 @@
         <div class="flex justify-center items-center w-full relative">
           <!-- Back button - positioned at top left -->
           <button
-            class="absolute left-0 sm:left-4 top-0 flex items-center border border-gold gap-1 text-gold hover:text-white hover:bg-white/10 rounded-full p-2 transition-colors rtl:flex-row-reverse"
+            class="absolute end-0 sm:end-4 top-0 flex items-center border border-gold gap-1 text-gold hover:text-white hover:bg-white/10 rounded-full p-2 transition-colors rtl:flex-row-reverse"
             onclick={backToProjects}
             title={$t('moach.layout.back')}
           >
@@ -314,7 +314,7 @@
 
           <!-- Help button - top right -->
           <button
-            class="absolute right-0 sm:right-4 top-0 flex items-center justify-center w-8 h-8 rounded-full border border-gold text-gold hover:bg-gold hover:text-barbi transition-colors font-bold text-sm"
+            class="absolute start-0 sm:start-4 top-0 flex items-center justify-center w-8 h-8 rounded-full border border-gold text-gold hover:bg-gold hover:text-barbi transition-colors font-bold text-sm"
             onclick={startGuide}
             title={$t('moach.tour.helpBtn')}
             aria-label={$t('moach.tour.helpBtn')}
@@ -501,12 +501,12 @@
                 {#if isViewing}
                   <!-- Viewing now (presence) — deliberately not green: green is a running timer. -->
                   <span
-                    class="absolute -bottom-0.5 -left-0.5 h-3 w-3 rounded-full bg-sky-400 border-2 border-slate-900"
+                    class="absolute -bottom-0.5 -end-0.5 h-3 w-3 rounded-full bg-sky-400 border-2 border-slate-900"
                     aria-hidden="true"
                   ></span>
                 {/if}
                 {#if hasActiveTimer}
-                  <span class="absolute -top-1 -right-1 flex h-4 w-4">
+                  <span class="absolute -top-1 -start-1 flex h-4 w-4">
                     <span
                       class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"
                     ></span>
@@ -560,7 +560,7 @@
                 {$t(`moach.layout.${group.label}`)}
                 {#if badge > 0}
                   <span
-                    class="absolute -top-1 -right-1 min-w-5 h-5 px-1 flex items-center justify-center rounded-full bg-barbi text-gold text-xs font-bold ring-2 ring-white shadow-lg animate-pulse"
+                    class="absolute -top-1 -start-1 min-w-5 h-5 px-1 flex items-center justify-center rounded-full bg-barbi text-gold text-xs font-bold ring-2 ring-white shadow-lg animate-pulse"
                     title={$t(`moach.layout.${group.label}`)}
                   >
                     {badge}
@@ -625,7 +625,7 @@
     min-height: 100vh;
     position: fixed;
     top: 0;
-    left: 0;
+    inset-inline-end: 0;
   }
 
   .moach-layout :global(.sv) {

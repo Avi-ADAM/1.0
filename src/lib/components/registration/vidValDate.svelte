@@ -62,8 +62,8 @@ function increment() {
   width: 400px;
 text-align: center;  
 padding-top: 8px;
-padding-right: 25px;
-padding-left: 25px;
+padding-inline-start: 25px;
+padding-inline-end: 25px;
 }
     .button-in{
     grid-column: 1/4;

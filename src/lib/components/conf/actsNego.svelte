@@ -552,7 +552,7 @@
   .label {
     font-size: 15px;
     position: absolute;
-    right: 0;
+    inset-inline-start: 0;
     top: 22px;
     transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
     pointer-events: none;

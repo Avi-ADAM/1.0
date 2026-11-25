@@ -695,9 +695,7 @@
       >
         <button
           onclick={close}
-          class="absolute top-4 {$locale === 'he' || $locale === 'ar'
-            ? 'left-4'
-            : 'right-4'} text-surfaceMuted hover:text-surfaceInk"
+          class="absolute top-4 end-4 text-surfaceMuted hover:text-surfaceInk"
         >
           {$t('lev.missionInProgress.cancel')}
         </button>
@@ -719,7 +717,7 @@
                   type="file"
                   bind:files={what}
                   class="mt-1 block w-full text-sm text-surfaceMuted
-                        file:mr-4 file:py-2 file:px-4
+                        file:ms-4 file:py-2 file:px-4
                         file:rounded-lg file:border-0
                         file:text-sm file:font-semibold
                         file:bg-gold file:text-barbi
@@ -800,7 +798,7 @@
             </div>
 
             <!-- Task list -->
-            <div class="space-y-2 max-h-[55vh] overflow-y-auto pr-1">
+            <div class="space-y-2 max-h-[55vh] overflow-y-auto ps-1">
               {#each localTasks as task, i}
                 <div
                   class="bg-surface rounded-xl border border-surfaceLine shadow-sm overflow-hidden"

@@ -94,7 +94,7 @@
     .right {
         position: absolute;
         top: 50px;
-        right: 50px;
+        inset-inline-start: 50px;
         height: 50px;
         width: 50px;
         z-index: 14;
@@ -104,7 +104,7 @@
     .left{
          position: absolute;
         top: 50px;
-        left: 50px;
+        inset-inline-end: 50px;
          height: 50px;
                  width: 50px;
                          z-index: 14;

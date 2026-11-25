@@ -762,7 +762,7 @@
     .y{
          position : absolute;
     top : 95%;
-    left: 0% ;
+    inset-inline-end: 0% ;
     
     width: 100%;
     height: 87px;
@@ -773,7 +773,7 @@
 .z{
     position : absolute;
     bottom : -45px;
-    left: 0% ;
+    inset-inline-end: 0% ;
     
     width: 100%;
     height: 100%;

@@ -3,7 +3,7 @@
  *
  * Pure (no store) so the server can stamp `<html dir>` in `transformPageChunk`
  * and the client can keep it in sync from the root layout with the same answer.
- * See docs/inprogress/PLAN_LTR_LAYOUT.md.
+ * See docs/done/PLAN_LTR_LAYOUT.md.
  */
 
 /** Locales that read right-to-left. Every other supported locale is LTR. */

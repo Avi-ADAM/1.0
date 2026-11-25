@@ -66,7 +66,7 @@
         <span class="quick-title">{$t('deals.quick_sales_center')}</span>
         <span class="quick-hint">{$t('deals.quick_sales_center_hint')}</span>
       </span>
-      <span class="quick-arrow">←</span>
+      <span class="quick-arrow inline-block ltr:-scale-x-100">←</span>
     </a>
     <a href="/concierge" class="quick-card quick-card--pink">
       <span class="quick-icon"><EntityIcon kind="service" size={20} /></span>
@@ -74,7 +74,7 @@
         <span class="quick-title">{$t('deals.quick_concierge')}</span>
         <span class="quick-hint">{$t('deals.quick_concierge_hint')}</span>
       </span>
-      <span class="quick-arrow">←</span>
+      <span class="quick-arrow inline-block ltr:-scale-x-100">←</span>
     </a>
     <!-- Someone approached you directly: write them a wish (PLAN_DIRECT_OFFER). -->
     <a href="/deals/offers" class="quick-card quick-card--gold">
@@ -83,7 +83,7 @@
         <span class="quick-title">{$t('directOffer.entry.deals')}</span>
         <span class="quick-hint">{$t('directOffer.entry.dealsHint')}</span>
       </span>
-      <span class="quick-arrow">←</span>
+      <span class="quick-arrow inline-block ltr:-scale-x-100">←</span>
     </a>
   </div>
 
@@ -360,8 +360,8 @@
     content: '';
     position: absolute;
     bottom: 0;
-    left: 0;
-    right: 0;
+    inset-inline-end: 0;
+    inset-inline-start: 0;
     height: 2px;
     background: linear-gradient(90deg, var(--gold), var(--pink));
   }

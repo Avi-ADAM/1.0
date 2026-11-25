@@ -304,8 +304,8 @@
     overflow-y: auto;
     max-height: 100vh;
     width: 96vw;
-    padding-left: 0.5em;
-    padding-right: 0.5em;
+    padding-inline-end: 0.5em;
+    padding-inline-start: 0.5em;
   }
 
   table,

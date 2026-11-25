@@ -870,8 +870,8 @@
     content: '';
     position: absolute;
     top: 0;
-    left: 0;
-    right: 0;
+    inset-inline-end: 0;
+    inset-inline-start: 0;
     bottom: 0;
     background: linear-gradient(
       135deg,
@@ -1044,7 +1044,7 @@
   .next {
     position: absolute;
     top: calc(50% - 14px);
-    left: calc(100% - 50px);
+    left: calc(100% - 50px); /* dir-ok: the markup swaps .next/.perv by $isRtl */
     height: 30px;
     width: 50px;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -1055,7 +1055,7 @@
   .perv {
     position: absolute;
     top: calc(50% - 14px);
-    right: calc(100% - 50px);
+    right: calc(100% - 50px); /* dir-ok: the markup swaps .next/.perv by $isRtl */
     height: 30px;
     width: 50px;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -1076,14 +1076,14 @@
     .next {
       position: absolute;
       top: calc(50% - 35px);
-      left: calc(100% - 90px);
+      left: calc(100% - 90px); /* dir-ok: the markup swaps .next/.perv by $isRtl */
       height: 70px;
       width: 90px;
     }
     .perv {
       position: absolute;
       top: calc(50% - 35px);
-      right: calc(100% - 90px);
+      right: calc(100% - 90px); /* dir-ok: the markup swaps .next/.perv by $isRtl */
       height: 70px;
       width: 90px;
     }

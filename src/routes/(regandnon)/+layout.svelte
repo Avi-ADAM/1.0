@@ -56,7 +56,7 @@
 </script>
 
 {#if $showFoot}
-  <main class="h-screen min-w-screen absolute top-0 left-0">
+  <main class="h-screen min-w-screen absolute top-0 end-0">
     <Foot un={data?.un} idL={data?.uid} />
   </main>
 {/if}

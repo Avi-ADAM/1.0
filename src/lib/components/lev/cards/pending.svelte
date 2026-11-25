@@ -336,7 +336,7 @@
       {/if}
       {#if hearotMeyuchadot}
         <div
-          class="p-3 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-600 rounded-r-lg text-gray-700 dark:text-gray-300 text-sm"
+          class="p-3 bg-yellow-50 dark:bg-yellow-900/20 border-e-4 border-yellow-400 dark:border-yellow-600 rounded-s-lg text-gray-700 dark:text-gray-300 text-sm"
         >
           <RichText outpot={hearotMeyuchadot} editable={false} />
         </div>

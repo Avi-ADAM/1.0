@@ -673,7 +673,7 @@
     font-size: 10px;
     color: var(--text-3);
     font-family: var(--font-mono);
-    padding-right: 2px;
+    padding-inline-start: 2px;
   }
 
   .chips {
@@ -714,8 +714,8 @@
   .chips.quick {
     margin-bottom: 8px;
     max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
+    margin-inline-end: auto;
+    margin-inline-start: auto;
   }
 
   .input-row {

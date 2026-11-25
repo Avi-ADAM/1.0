@@ -49,7 +49,7 @@
 <span>
  <SveltyPicker
       placeholder={startplaceholder}
-      inputClasses="form-control text-right"
+      inputClasses="form-control text-start"
       format=" hh:ii dd/mm/yyyy"
       bind:value={start}
     ></SveltyPicker>
@@ -64,7 +64,7 @@
 <span>
  <SveltyPicker
       placeholder={finnishplaceholder}
-      inputClasses="form-control text-right"
+      inputClasses="form-control text-start"
       format=" hh:ii dd/mm/yyyy"
       bind:value={finnish}
       startDate={start}

@@ -563,8 +563,8 @@
     -moz-border-radius: 20px;
     border-radius: 20px;
     border: 1px solid var(--lturk);
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-inline-end: 10px;
+    padding-inline-start: 10px;
   }
 
   input[type='text']:focus {
@@ -579,8 +579,8 @@
     border-radius: 20px;
     border: 2px dashed var(--lturk);
     color: red;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-inline-end: 10px;
+    padding-inline-start: 10px;
   }
   .add {
     color: var(--barbi-pink);

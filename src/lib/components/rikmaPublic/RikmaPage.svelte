@@ -303,7 +303,7 @@
         </button>
       {:else}
         <div class="glass-panel mt-4 animate-fade-in relative">
-          <button class="absolute top-2 right-2 text-white/50 hover:text-white" onclick={() => (show = false)}>
+          <button class="absolute top-2 start-2 text-white/50 hover:text-white" onclick={() => (show = false)}>
             <Close />
           </button>
 
@@ -572,8 +572,8 @@
           <div
             class="mb-10 mx-2 p-6 rounded-2xl bg-gradient-to-r from-pink-900/80 to-purple-900/80 border border-gold/40 shadow-[0_0_15px_rgba(255,0,174,0.3)] text-center relative overflow-hidden"
           >
-            <div class="absolute top-0 right-0 w-20 h-20 bg-gold/20 rounded-full blur-2xl"></div>
-            <div class="absolute bottom-0 left-0 w-20 h-20 bg-barbi/20 rounded-full blur-2xl"></div>
+            <div class="absolute top-0 start-0 w-20 h-20 bg-gold/20 rounded-full blur-2xl"></div>
+            <div class="absolute bottom-0 end-0 w-20 h-20 bg-barbi/20 rounded-full blur-2xl"></div>
 
             <h2
               class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-l from-gold via-white to-gold mb-2"

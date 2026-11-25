@@ -28,6 +28,7 @@ SvelteKit + Svelte 5 app, npm, Node 22.
 | `npm run check:script` | Flags words that mix alphabets (a Cyrillic `г` inside a Hebrew word, …). |
 | `npm run check:translatable` | Verifies the UGC translation manifest (`src/lib/translation/fields.js`) against the generated Strapi schema. |
 | `npm run check:ui-hebrew` | Fails on Hebrew typed straight into `.svelte` markup on the screens localised so far (see i18n section). |
+| `npm run check:dir` | Fails on direction-bound layout (`dir="rtl"`, `ml-`/`text-right`, `margin-left:`) anywhere in `src/` — layout is logical start/end, direction comes from `<html dir>` (see i18n section). |
 
 Tests are colocated (`*.test.ts` / `*.integration.test.ts` / `*.pbt.test.ts`
 property-based via fast-check) and run on the `happy-dom`/`jsdom` environment.
@@ -152,6 +153,22 @@ routes listed there.
 > clean; a single finished component in a folder that is not clean yet goes in
 > `FILES`. It now covers 186 components in 21 roots plus eight
 > single files.
+
+**Direction is not text.** The text goes through `$t()`; the layout direction
+comes from `<html dir>` alone, set by the server from the locale (`dirOf` in
+`src/lib/translations/dir.js`) — `he`/`ar` RTL, `en`/`es`/`ru` LTR. So a
+component never writes `dir="rtl"`, and styles only in logical terms:
+`ms-/me-/ps-/pe-`, `start-/end-`, `text-start/end`, `rounded-s/e`,
+`margin-inline-start`, `inset-inline-end`, `text-align: start`. A forward arrow
+written for Hebrew (`←`) gets `ltr:-scale-x-100`. `dir="auto"` goes only on the
+element holding a member's text, never on a container; `dir="ltr"` stays on
+URLs, emails, code. A deliberate exception carries a `dir-ok: <why>` comment.
+Inside a `dir="ltr"` subtree (the coin view, code blocks) `start` is left even in
+Hebrew, so physical styling there is correct and stays. A ternary that already
+branches on `$isRtl`/`$locale` collapses to one logical value instead of being
+converted on both sides. `npm run check:dir` holds the whole site to this
+(`docs/done/PLAN_LTR_LAYOUT.md`); charts, mail and the deliberately-Hebrew
+screens are in its `SKIP`.
 
 Interpolation is `$t('ns.key', { count })` against `"… {{count}} …"`. A few
 older call sites substitute by hand instead — `$t(k).replace('{restime}', v)` —

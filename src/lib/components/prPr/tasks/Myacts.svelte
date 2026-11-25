@@ -446,13 +446,11 @@
   >
     <!-- Priority stripe -->
     <div
-      class="absolute {dir === 'rtl'
-        ? 'right-0'
-        : 'left-0'} top-0 bottom-0 w-1 {cfg.dot}"
+      class="absolute start-0 top-0 bottom-0 w-1 {cfg.dot}"
     ></div>
 
     <!-- Card body -->
-    <div class="{dir === 'rtl' ? 'pr-4 pl-3' : 'pl-4 pr-3'} pt-4 pb-3">
+    <div class="ps-4 pe-3 pt-4 pb-3">
       <!-- ── Top row: title + badges ── -->
       <div class="flex items-start justify-between gap-2">
         <div class="flex-1 min-w-0">

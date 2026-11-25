@@ -222,10 +222,7 @@
   class="relative rounded-3xl border-4 border-gold/80 bg-bluesun shadow-2xl overflow-hidden"
 >
   <span
-    class="absolute top-2 z-10 bg-gold text-bluesun text-xs font-bold px-2 py-0.5 rounded-full shadow {$locale ===
-      'he' || $locale === 'ar'
-      ? 'left-2'
-      : 'right-2'}"
+    class="absolute top-2 z-10 bg-gold text-bluesun text-xs font-bold px-2 py-0.5 rounded-full shadow end-2"
   >
     {$t('home.peek.badge')}
   </span>

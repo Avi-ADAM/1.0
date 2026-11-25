@@ -480,7 +480,7 @@
   .nego-modal-close {
     position: absolute;
     top: 0.75rem;
-    right: 0.75rem;
+    inset-inline-start: 0.75rem;
     font-size: 1.25rem;
     color: var(--barbi-pink);
     background: none;

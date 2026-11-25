@@ -331,7 +331,7 @@ onMessage(messaging, (payload) => {
   .skip-to-content {
     position: fixed;
     top: -100px;
-    left: 1rem;
+    inset-inline-end: 1rem;
     z-index: 10000;
     padding: 0.6rem 1rem;
     border-radius: 0 0 0.5rem 0.5rem;
@@ -359,8 +359,8 @@ onMessage(messaging, (payload) => {
   .nav-progress-track {
     position: fixed;
     top: 0;
-    left: 0;
-    right: 0;
+    inset-inline-end: 0;
+    inset-inline-start: 0;
     z-index: 9999;
     height: 3px;
     background: transparent;

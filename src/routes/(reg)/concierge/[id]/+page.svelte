@@ -4921,8 +4921,8 @@
   }
   .harmony-counter {
     margin-top: 14px;
-    left: 0;
-    right: 0;
+    inset-inline-end: 0;
+    inset-inline-start: 0;
     text-align: center;
   }
   .hc-lbl {

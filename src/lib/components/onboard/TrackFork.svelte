@@ -141,7 +141,7 @@
     border-radius: 22px;
     cursor: pointer;
     transition: all 0.22s ease;
-    text-align: right;
+    text-align: start;
     display: flex;
     flex-direction: column;
     gap: 5px;

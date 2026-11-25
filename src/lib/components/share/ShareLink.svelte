@@ -97,7 +97,7 @@
     margin-top: 0;
   }
   .share-link :global(aside.container > div) {
-    margin-left: 0;
+    margin-inline-end: 0;
   }
   /* A row, not the library's column: seven icons stacked vertically run off
      the bottom of the viewport (and under the mobile nav bar) wherever the

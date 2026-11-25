@@ -322,7 +322,7 @@
     padding: 1rem;
     background: white;
     border-radius: 4px;
-    border-left: 4px solid #3b82f6;
+    border-inline-end: 4px solid #3b82f6;
   }
 
   .notification-header {

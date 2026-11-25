@@ -190,6 +190,7 @@
     <!-- 3. send, by the operator -->
     {#if o?.approved}
       <h3>{$t('growth.send.title')}</h3>
+      <!-- dir-ok: this element is the message text itself, not a layout box -->
       <div class="gr-msg" dir="auto">{finalText}</div>
       {#if !link}<p class="gr-muted gr-small">{$t('growth.send.noLink')}</p>{/if}
       <div class="gr-row">

@@ -474,7 +474,7 @@
           class="flex items-center text-sm lg:text-base text-gray-700 dark:text-gray-300 bg-blue-50 dark:bg-blue-900/20 px-3 py-2 rounded-lg w-fit border border-blue-100 dark:border-blue-800/50"
         >
           <img
-            class="w-5 lg:w-6 ml-2 rtl:mr-2"
+            class="w-5 lg:w-6 me-2 rtl:ms-2"
             src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
             alt="calendar"
           />

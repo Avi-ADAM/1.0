@@ -139,7 +139,7 @@
   .stats-bg-glow {
     position: absolute;
     top: -20%;
-    right: -10%;
+    inset-inline-start: -10%;
     width: 60%;
     height: 80%;
     background: radial-gradient(circle, var(--accent) 0%, transparent 70%);

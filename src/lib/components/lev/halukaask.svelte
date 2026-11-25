@@ -486,8 +486,8 @@
     border: 1px solid var(--lturk);
     width: 250px;
     height: 30px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-inline-end: 10px;
+    padding-inline-start: 10px;
   }
 
   input[type='text']:focus {
@@ -504,8 +504,8 @@
     width: 250px;
     height: 30px;
     color: red;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-inline-end: 10px;
+    padding-inline-start: 10px;
   }
 
   :global([data-svelte-dialog-overlay].overlay) {
