@@ -31,6 +31,18 @@ export interface McpContext {
   keyProjects?: string[];
   /** Strapi api-key record id of an external MCP caller (rate limits, audit). */
   keyId?: string;
+  /**
+   * Where the call came from when it is not an API key — `webmcp` = a browser
+   * agent calling the tools the open page registered (PLAN_WEBMCP). Logged in
+   * the audit line; the guard treats it exactly like an external key.
+   */
+  channel?: 'webmcp';
+  /**
+   * Rate-limit identity when there is no key: a browser agent gets its own
+   * bucket (`webmcp:user:<id>` / `webmcp:ip:<addr>`), so it cannot drain the
+   * quota of the same person's MCP key.
+   */
+  rateKey?: string;
   /** Optional: last mission search result for disambiguation */
   lastMissionSearch?: {
     filter?: string;

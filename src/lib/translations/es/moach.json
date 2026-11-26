@@ -187,7 +187,8 @@
     "docs": "Info compartida",
     "events": "Eventos",
     "services": "Servicios",
-    "vote": "Votación"
+    "vote": "Votación",
+    "context": "Trabajar con IA"
   },
   "create": {
     "mission": "Crear una misión",

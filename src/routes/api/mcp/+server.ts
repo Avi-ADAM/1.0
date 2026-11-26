@@ -35,6 +35,7 @@ import { growthMcpEnabled } from '../../../mastra/tools/growthTools';
 import { normalizeApiKeyScopes } from '$lib/server/apiKeys';
 import { fetchUserLang, resolveMcpLang } from '$lib/server/mcp/lang';
 import { mcpAppResources, mcpUiMeta } from '$lib/server/mcp/apps';
+import { rikmaPrompts, rikmaResourceHandlers, worldAvailable } from '$lib/server/mcp/rikmaWorldServer';
 
 // --- Public Tools for Unauthenticated Users ---
 
@@ -379,7 +380,13 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
             // Interactive views (MCP Apps) for the tools that name one — only for a
             // signed-in caller, the only one who has those tools. A host without
             // MCP Apps support ignores them and reads the text result.
-            ...(user ? { appResources: mcpAppResources(getMcpContext()?.lang) } : {})
+            ...(user ? { appResources: mcpAppResources(getMcpContext()?.lang) } : {}),
+            // "Connect your agent to this rikma" for clients that start from a
+            // prompt or attach resources (PLAN_AGENT_WORK AW2): answered by the
+            // same wrapped tools, so only when this caller has them.
+            ...(user && worldAvailable(toolsToExpose)
+                ? { prompts: rikmaPrompts(toolsToExpose), resources: rikmaResourceHandlers(toolsToExpose) }
+                : {})
         });
     } catch (e: any) {
         console.error("MCPServer Init Error:", e);

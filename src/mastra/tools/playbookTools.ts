@@ -79,7 +79,12 @@ export const getPlaybookTool = createTool({
       if (!general || (roleId && !role)) {
         const d: any = await (getProjectDetailsTool as any).execute({ projectId: pid }, {}).catch(() => null);
         outline = playbookOutline({
-          roleName: roleId && !role ? (list.find((p) => p.roleId === String(roleId))?.roleName ?? 'this role') : null,
+          roleName:
+            roleId && !role
+              ? (list.find((p) => p.roleId === String(roleId))?.roleName ??
+                (d?.roleIds ?? []).find((r: any) => r.id === String(roleId))?.name ??
+                'this role')
+              : null,
           restimeLabel: d?.restime ? restimeLabel(d.restime, 'en') : null,
           values: d?.values ?? [],
           roles: d?.roles ?? [],

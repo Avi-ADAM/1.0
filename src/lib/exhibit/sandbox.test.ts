@@ -195,6 +195,46 @@ describe('Partnership', () => {
     expect(sb.partsOf('dana').length).toBeGreaterThan(0);
   });
 
+  it('a thread between a person and a part invites them and gives them the part', async () => {
+    const { sb, taskKey } = await planned();
+    const outsider = PEOPLE.map((p) => p.id).find((id) => !sb.isInvited(id) && sb.matchesForPerson(id).length)!;
+    const [fit, other] = sb.matchesForPerson(outsider).map((m) => m.task);
+    expect(sb.connect(outsider, fit)).toBe(true);
+    expect(sb.isInvited(outsider)).toBe(true);
+    expect(sb.ownerOf(fit)).toBe(outsider);
+    // A second part for the same person keeps the first.
+    if (other) {
+      sb.connect(outsider, other);
+      expect(sb.ownerOf(fit)).toBe(outsider);
+      expect(sb.ownerOf(other)).toBe(outsider);
+      sb.disconnect(other);
+      expect(taskKey(sb.partsOf(outsider)[0])).toBe(taskKey(fit));
+    }
+    // Cutting their only thread takes them out of the circle again.
+    sb.disconnect(fit);
+    expect(sb.ownerOf(fit)).toBeNull();
+    expect(sb.isInvited(outsider)).toBe(false);
+  });
+
+  it('handing a part to someone else drops a partner who held only it', async () => {
+    const { sb } = await planned();
+    const task = sb.matchesForPerson('dana')[0].task;
+    const rival = sb.matchesForTask(task).map((m) => m.personId).find((id) => id !== 'dana')!;
+    sb.connect('dana', task);
+    sb.connect(rival, task);
+    expect(sb.ownerOf(task)).toBe(rival);
+    expect(sb.isInvited('dana')).toBe(false);
+  });
+
+  it('a full circle takes no new thread', async () => {
+    const { sb, MAX_INVITED } = await planned();
+    const outside = PEOPLE.map((p) => p.id).filter((id) => !sb.isInvited(id));
+    while (sb.invited.length < MAX_INVITED) sb.toggleInvite(outside.shift()!);
+    const next = outside.find((id) => sb.matchesForPerson(id).length)!;
+    expect(sb.connect(next, sb.matchesForPerson(next)[0].task)).toBe(false);
+    expect(sb.isInvited(next)).toBe(false);
+  });
+
   it('leaves a part nobody in the circle fits open, and counts it as open value', async () => {
     const { sb, taskKey } = await planned();
     sb.toggleInvite('lior'); // the only carpenter in this circle
@@ -349,7 +389,7 @@ describe('handoff', () => {
     const { requestDraft, sendLead } = await import('./handoff');
     const fail = vi.fn(async () => Promise.reject(new Error('offline')));
     expect(await requestDraft({}, 'he', { fetchImpl: fail as never })).toBeNull();
-    expect(await sendLead({ shareKey: 'k', token: 't' }, { email: 'a@b.co' }, 'kiosk', { fetchImpl: fail as never })).toBe(false);
+    expect(await sendLead({ shareKey: 'k', token: 't' }, { email: 'a@b.co' }, 'kiosk', { fetchImpl: fail as never })).toEqual({ ok: false, mailed: false });
     const ok = vi.fn(async () => new Response(JSON.stringify({ ok: true, shareKey: 'k', token: 't' })));
     expect(await requestDraft({}, 'he', { fetchImpl: ok as never })).toEqual({ shareKey: 'k', token: 't' });
   });

@@ -120,10 +120,16 @@
       return { id: String(r.uid), x: $isRtl ? sw - x : x };
     })
   );
-  const holderAt = () => ({ x: sw / 2, y: sh * 0.2 });
+  // The holder hangs from the top and the partners stand on the bottom, both
+  // measured: placed by a fraction of the height, the cards spilled past the
+  // scene on a short screen and covered the button below it.
+  let holderH = $state(0);
+  let payeeH = $state(0);
+  const HOLDER_TOP = 14;
+  const holderAt = () => ({ x: sw / 2, y: HOLDER_TOP + holderH / 2 });
   const pathTo = (/** @type {number} */ x) => {
     const h = holderAt();
-    const y = sh * 0.66;
+    const y = sh - payeeH + 4;
     return `M ${h.x} ${h.y} C ${h.x} ${(h.y + y) / 2}, ${x} ${(h.y + y) / 2}, ${x} ${y}`;
   };
 
@@ -132,15 +138,17 @@
   let name = $state('');
   let agreed = $state(false);
   let sendState = $state(/** @type {'idle' | 'sending' | 'sent' | 'error'} */ ('idle'));
+  let mailed = $state(false);
 
   async function send(/** @type {SubmitEvent} */ e) {
     e.preventDefault();
     if (!sandbox.draft || !agreed || !email.trim() || sendState === 'sending') return;
     sendState = 'sending';
-    const ok = await sendLead(sandbox.draft, { name: name.trim(), email: email.trim() }, 'kiosk');
+    const r = await sendLead(sandbox.draft, { name: name.trim(), email: email.trim() }, 'kiosk');
     if (!alive) return;
-    sendState = ok ? 'sent' : 'error';
-    if (ok) {
+    mailed = r.mailed;
+    sendState = r.ok ? 'sent' : 'error';
+    if (r.ok) {
       // A public screen: the next visitor must not see this one's address.
       email = '';
       name = '';
@@ -240,7 +248,7 @@
             {/each}
           </svg>
 
-          <div class="holder" style="transform: translate(-50%, -50%) translateY({sh * 0.2}px)">
+          <div class="holder" bind:clientHeight={holderH} style="transform: translate(-50%, {HOLDER_TOP}px)">
             <span class="holder-sum">{money(sandbox.firstSale)}</span>
             <span class="holder-what" dir="auto">{product}</span>
           </div>
@@ -250,7 +258,8 @@
             <div
               class="payee"
               class:me={id === ME}
-              style="transform: translate(-50%, 0) translate({(row[i]?.x ?? sw / 2) - sw / 2}px, {sh * 0.62}px); --c:{colorOf(id)}"
+              bind:clientHeight={payeeH}
+              style="transform: translate(calc(-50% + {(row[i]?.x ?? sw / 2) - sw / 2}px), 0); --c:{colorOf(id)}"
               in:fly={{ y: 20, duration: 400, delay: 200 + i * 120 }}
             >
               <span class="payee-face"><Face hue={hueOf(id)} variant={variantOf(id)} me={id === ME} /></span>
@@ -283,7 +292,7 @@
           <form class="keep-form" onsubmit={send}>
             <p class="no-phone">{$t('exhibit.creation.noPhone')}</p>
             {#if sendState === 'sent'}
-              <p class="sent" in:fade>{$t('exhibit.creation.sent')}</p>
+              <p class="sent" in:fade>{mailed ? $t('exhibit.creation.sentMailed') : $t('exhibit.creation.sent')}</p>
             {:else}
               <div class="fields">
                 <input
@@ -505,7 +514,7 @@
   /* ── split ──────────────────────────────────────────────────────── */
   .split {
     display: grid;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto minmax(0, 1fr) auto;
     gap: 0.5rem;
     min-height: 0;
   }
@@ -535,15 +544,20 @@
   .holder,
   .payee {
     position: absolute;
-    top: 0;
     left: 50%;
+  }
+  .holder {
+    top: 0;
+  }
+  .payee {
+    bottom: 0;
   }
   .holder {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: clamp(200px, 14vw, 260px);
+    width: clamp(150px, min(14vw, 26vh), 260px);
     aspect-ratio: 1;
     border-radius: 50%;
     background: radial-gradient(circle, #fffaf0 55%, #f6e3a6);
@@ -566,8 +580,8 @@
     flex-direction: column;
     align-items: center;
     gap: 0.2rem;
-    width: clamp(170px, 12vw, 230px);
-    padding: 0.9rem 0.8rem;
+    width: clamp(160px, 12vw, 230px);
+    padding: clamp(0.5rem, 1.3vh, 0.9rem) 0.8rem;
     border-radius: 1.4rem;
     background: rgba(255, 255, 255, 0.92);
     border: 3px solid var(--c);
@@ -577,8 +591,8 @@
     background: linear-gradient(180deg, #fff7df, #fff);
   }
   .payee-face {
-    width: 70px;
-    height: 70px;
+    width: clamp(48px, 7vh, 70px);
+    height: clamp(48px, 7vh, 70px);
   }
   .payee-name {
     font-size: clamp(1.1rem, 1.25vw, 1.5rem);
@@ -595,6 +609,8 @@
     color: var(--ex-ink-soft);
   }
   .bar {
+    position: relative;
+    z-index: 2;
     display: flex;
     justify-content: space-between;
     align-items: center;

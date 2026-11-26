@@ -123,7 +123,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress, cookies 
     });
     const result = await agent.generate([{ role: 'user', content: user }]);
     return result.text ?? '';
-  });
+  }, { minLength: isExhibit ? EXHIBIT_MIN_TEXT : MIN_TEXT });
 
   const preview = boardsToVisionPreview(seed.boards);
   if (isEmptyPreview(preview)) return refuse('empty', 422);

@@ -126,6 +126,8 @@ export const ROUTED = {
     rikmaCode: at(/\/moach\/[^/]+\/code/, '/me'),
     // The rikma's shared library — one route, one namespace, nowhere else.
     rikmaDocs: at(/\/moach\/[^/]+\/docs/),
+    // The rikma's context tab — playbooks, what an agent sees, connecting one (PLAN_AGENT_WORK AW2).
+    rikmaContext: at(/\/moach\/[^/]+\/context/),
     // The "connect your AI agent" guide, plus the banner that points at it from
     // the settings page — both live under /me, so one gate covers them.
     // Plus its public copy at /mcp — the connector's documentation URL.

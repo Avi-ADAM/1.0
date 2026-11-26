@@ -184,13 +184,15 @@
   "connection": {
     "title": "Find partners who complete you",
     "sub": "Nobody is hired. Everyone brings something, and everyone is a partner.",
-    "howTo": "Hover over a person to see what fits them · click to invite",
+    "howTo": "Нажмите на человека или на часть · нити покажут, что подходит",
+    "pickPart": "Нажмите на подсвеченную часть, чтобы соединить · клик по фону отменяет",
+    "pickPerson": "Нажмите на одного из подсвеченных, чтобы соединить · клик по фону отменяет",
     "fits": "What fits {{name}}",
     "because": "Because of: {{skills}}",
     "nothingFits": "No part fits these skills yet",
     "whoCan": "{{count}} people could take this",
-    "invite": "Invite {{name}} into the rikma",
-    "uninvite": "{{name}} is in the rikma · click to take back",
+    "invite": "{{name}} · нажмите, чтобы увидеть, что подходит",
+    "uninvite": "{{name}} в рикме · нажмите, чтобы увидеть, что подходит",
     "me": {
       "name": "You",
       "tag": "What do you bring?",
@@ -203,6 +205,7 @@
     "circle": "In the rikma: {{count}} partners and you",
     "circleEmpty": "You haven't invited anyone yet",
     "hint": "2–4 partners is a good start",
+    "taken": "{{count}} из {{total}} частей уже нашли партнёра",
     "full": "The rikma is full for this step",
     "next": "Build the partnership"
   },
@@ -263,14 +266,15 @@
     "keeps": "Kept for 30 days. No commitment.",
     "preparing": "Keeping your rikma…",
     "qrLabel": "QR code for the rikma you built",
-    "noPhone": "No phone at hand? Leave your email and the team will get back to you",
+    "noPhone": "No phone at hand? Leave your email and we will send you the idea",
     "name": "Name (optional)",
     "email": "Email",
-    "consent": "You may get back to me about this rikma",
-    "send": "Keep it for me",
+    "consent": "Send me the idea, and you may get back to me about it",
+    "send": "Send it to me",
     "sent": "Saved. We'll get back to you soon 💗",
     "error": "We couldn't save it. Try again, or scan the code.",
-    "restart": "Start again"
+    "restart": "Start again",
+    "sentMailed": "Sent! The idea and its link are waiting in your inbox 💗"
   },
   "handoff": {
     "title": "This is the rikma you built at the fair",
@@ -286,6 +290,7 @@
     "send": "Send",
     "sent": "Got it! We'll get back to you soon 💗",
     "error": "Something went wrong. Please try again.",
-    "expired": "The link from the fair is no longer active, but you can start from here."
+    "expired": "The link from the fair is no longer active, but you can start from here.",
+    "sentMailed": "Got it! We've also sent you the link by email 💗"
   }
 }

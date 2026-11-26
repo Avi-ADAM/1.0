@@ -801,6 +801,8 @@
       {/each}
     </div>
 
+    <p class="hm-body hm-agents-note">{$t('home.platform.agentsNote')}</p>
+
     <a href="/shop" class="hm-shop-strip" data-sveltekit-prefetch>
       <span class="hm-icon hm-shop-strip-icon"><EntityIcon kind="store" size={22} /></span>
       <span class="hm-shop-strip-body">
@@ -2296,6 +2298,11 @@
     margin-top: 10px;
     margin-inline-start: 6px;
     font-size: 14px;
+  }
+  .hm-agents-note {
+    max-width: 68ch;
+    margin: 24px auto 0;
+    text-align: center;
   }
   .hm-shop-strip {
     display: flex;

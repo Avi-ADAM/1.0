@@ -478,7 +478,12 @@ async function handleRequest({ event, resolve }) {
     }));
   } else if (event.url.pathname.startsWith('/api')) {
     const origin = event.request.headers.get('origin');
-    const corsAllowed = origin && allowedCorsOrigins().includes(origin.replace(/\/+$/, ''));
+    // /api/webmcp acts with the session cookie for the page's own agent; a
+    // credentialed CORS answer would hand it to every allowed origin (PLAN_WEBMCP §3.3).
+    const corsAllowed =
+      origin &&
+      !event.url.pathname.startsWith('/api/webmcp') &&
+      allowedCorsOrigins().includes(origin.replace(/\/+$/, ''));
 
     // Answer preflights here — API routes don't declare OPTIONS handlers.
     if (corsAllowed && event.request.method === 'OPTIONS') {

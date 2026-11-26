@@ -29,6 +29,8 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 /** Screens localised in stages 1–3 of PLAN_EN_READINESS. */
 const ROOTS = [
+    // The rikma's context tab (PLAN_AGENT_WORK AW2): clean from its first commit.
+    'src/routes/(reg)/moach/[projectId]/context',
     // The fair kiosk (PLAN_EXHIBITION_MODE): clean from its first commit.
     'src/routes/exhibit',
     'src/lib/components/exhibit',

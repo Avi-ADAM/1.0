@@ -10,6 +10,11 @@
  * From the stand (`via: 'kiosk'`) the pass cookie is required, since every
  * visitor shares its address; from a phone the address is the visitor's own,
  * and a small per-address limit is enough.
+ *
+ * When an email was given, the visitor also gets the idea and its link by
+ * mail (`visitorMail.ts`) — once per draft and address, sent after the answer
+ * so a slow SMTP never holds the stand. `mailed` says it went out to be sent;
+ * `EXHIBIT_MAILS_ENABLED=false` turns it off.
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
@@ -21,13 +26,18 @@ import { EXHIBIT_COOKIE, isExhibitPass } from '$lib/server/exhibit/pass';
 import { recordExhibitLead } from '$lib/server/exhibit/lead';
 import { parseExhibitSourceText, planSummary } from '$lib/server/exhibit/meta';
 import { RateLimiter, callerKey } from '$lib/server/translation/rateLimit';
+import { buildExhibitMail, ExhibitMailThrottle } from '$lib/server/exhibit/visitorMail';
+import { sendMailSafe } from '$lib/server/mailer.js';
+import { handoffUrl } from '$lib/exhibit/handoff';
 
 const SITE = 'https://www.1lev1.com';
 const HOUR = 60 * 60 * 1000;
 const perAddress = new RateLimiter();
 const stand = new RateLimiter({ maxKeys: 4 });
 const HEADERS = { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' };
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL = /^[^\s@<>()",;:]+@[^\s@<>()",;:]+\.[^\s@<>()",;:]+$/;
+const mails = new ExhibitMailThrottle();
+const mailsOn = () => (env.EXHIBIT_MAILS_ENABLED ?? process.env.EXHIBIT_MAILS_ENABLED) !== 'false';
 
 const refuse = (reason: string, status: number) => json({ ok: false, reason }, { status, headers: HEADERS });
 const str = (v: unknown, max: number) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
@@ -87,5 +97,17 @@ export const POST: RequestHandler = async ({ request, cookies, fetch, getClientA
     fetch
   );
   if (!r.ok) return refuse(r.reason ?? 'error', r.reason === 'not_configured' ? 503 : 502);
-  return json({ ok: true }, { headers: HEADERS });
+
+  let mailed = false;
+  if (email && mailsOn() && mails.take(row.id, email)) {
+    const url = shareKey
+      ? handoffUrl(SITE, { shareKey, token }, p.lang || 'he')
+      : `${SITE}/hascama?agent=${token}`;
+    const mail = buildExhibitMail({ name: name || null, lang: p.lang, idea, url });
+    mailed = true;
+    void sendMailSafe({ to: email, subject: mail.subject, html: mail.html, text: mail.text, fromName: '1lev1' }).catch(
+      (e: unknown) => console.error('[exhibit] visitor mail failed:', e)
+    );
+  }
+  return json({ ok: true, mailed }, { headers: HEADERS });
 };

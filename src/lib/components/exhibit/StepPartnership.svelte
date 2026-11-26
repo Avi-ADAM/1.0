@@ -96,6 +96,11 @@
   );
   let anyAssigned = $derived(Object.keys(sandbox.assignments).length > 0);
 
+  // The ring takes what the side panel has left after its title and legend,
+  // so on a short screen it shrinks instead of pushing past the buttons.
+  let winH = $state(1080);
+  let pieSize = $derived(Math.round(Math.max(120, Math.min(260, winH * 0.24))));
+
   // ── Plan ──────────────────────────────────────────────────────────────
   function suggest() {
     sandbox.suggestAssignment();
@@ -198,6 +203,8 @@
   };
 </script>
 
+<svelte:window bind:innerHeight={winH} />
+
 <section class="part">
   <header>
     {#if phase === 'plan'}
@@ -281,25 +288,6 @@
           {/each}
         </ul>
 
-        {#if counterOpen && counter}
-          <div class="counter" transition:fly={{ y: 30, duration: 350 }}>
-            <p class="tip">
-              {$t('exhibit.partnership.counterTip', {
-                name: nameOf(counter.who),
-                from: formatSharePct(counter.from),
-                to: formatSharePct(counter.to)
-              })}
-            </p>
-            <div class="row">
-              <button type="button" class="ex-btn ex-btn-ghost" onclick={meetHalfway}>
-                {$t('exhibit.partnership.meet', { hours: counter.mid })}
-              </button>
-              <button type="button" class="ex-btn ex-btn-primary" use:focusOnMount onclick={acceptCounter}>
-                {$t('exhibit.partnership.accept')}
-              </button>
-            </div>
-          </div>
-        {/if}
       {/if}
     </div>
 
@@ -307,7 +295,7 @@
       <h2>{$t('exhibit.partnership.pieTitle')}</h2>
       {#if slices.length}
         <div class="pie">
-          <EquityPie {slices} format={money} size={260} scale={1.75} ariaLabel={$t('exhibit.partnership.pieAria')} />
+          <EquityPie {slices} format={money} size={pieSize} scale={pieSize < 200 ? 1.45 : 1.75} ariaLabel={$t('exhibit.partnership.pieAria')} />
         </div>
       {:else}
         <p class="pie-empty">{$t('exhibit.partnership.pieEmpty')}</p>
@@ -345,8 +333,25 @@
         {$t('exhibit.partnership.next')}
         <span class="ltr:-scale-x-100 inline-block" aria-hidden="true">←</span>
       </button>
-    {:else}
-      <span></span>
+    {:else if counterOpen && counter}
+      <!-- The counter-proposal lives in the bar, so its buttons are always on screen. -->
+          <div class="counter" in:fly={{ y: 30, duration: 350 }}>
+            <p class="tip">
+              {$t('exhibit.partnership.counterTip', {
+                name: nameOf(counter.who),
+                from: formatSharePct(counter.from),
+                to: formatSharePct(counter.to)
+              })}
+            </p>
+            <div class="row">
+              <button type="button" class="ex-btn ex-btn-ghost" onclick={meetHalfway}>
+                {$t('exhibit.partnership.meet', { hours: counter.mid })}
+              </button>
+              <button type="button" class="ex-btn ex-btn-primary" use:focusOnMount onclick={acceptCounter}>
+                {$t('exhibit.partnership.accept')}
+              </button>
+            </div>
+          </div>
     {/if}
   </footer>
 </section>
@@ -354,10 +359,18 @@
 <style>
   .part {
     display: grid;
+    /* minmax(0, …): a bare 1fr grows with its content and pushed the cards
+       and the ring over the buttons on a short screen. */
+    /* The whole step scrolls when it is taller than the screen (a counter-
+       proposal, a short laptop); the bar sticks to the bottom, so its buttons
+       never hide behind the cards or the ring. */
     grid-template-rows: auto 1fr auto;
     gap: clamp(0.5rem, 1.5vh, 1.5rem);
     min-height: 0;
-    padding: 0 clamp(1.5rem, 3vw, 4rem) clamp(0.5rem, 1.2vh, 1.25rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    padding: 0 clamp(1.5rem, 3vw, 4rem);
   }
   header {
     text-align: center;
@@ -374,11 +387,9 @@
     display: grid;
     grid-template-columns: 1fr clamp(380px, 27vw, 520px);
     gap: clamp(1.25rem, 2.5vw, 3rem);
-    min-height: 0;
   }
   .main {
     position: relative;
-    min-height: 0;
     display: grid;
     align-content: center;
   }
@@ -395,8 +406,8 @@
   .task {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
-    padding: 1rem 1.1rem;
+    gap: 0.25rem;
+    padding: clamp(0.6rem, 1.4vh, 1rem) 1.1rem;
     border-radius: 1.4rem;
     background: rgba(255, 255, 255, 0.88);
     border: 3px dashed var(--ex-gold-soft);
@@ -438,12 +449,12 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.45rem;
-    margin-top: 0.4rem;
+    gap: 0.35rem;
+    margin-top: 0.3rem;
   }
   .owner {
     position: relative;
-    width: clamp(46px, 3vw, 58px);
+    width: clamp(40px, 2.7vw, 58px);
     aspect-ratio: 1;
     padding: 0;
     border-radius: 50%;
@@ -488,14 +499,14 @@
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 1.1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+    gap: clamp(0.6rem, 1vw, 1.1rem);
   }
   .answer {
     display: flex;
-    gap: 1rem;
+    gap: 0.85rem;
     align-items: flex-start;
-    padding: 1.1rem 1.2rem;
+    padding: clamp(0.7rem, 1.4vh, 1.1rem) 1.1rem;
     border-radius: 1.6rem;
     background: rgba(255, 255, 255, 0.9);
     border: 3px solid var(--ex-gold-soft);
@@ -511,7 +522,7 @@
   }
   .face {
     flex: 0 0 auto;
-    width: clamp(64px, 4.4vw, 84px);
+    width: clamp(52px, 3.8vw, 84px);
     aspect-ratio: 1;
     border-radius: 50%;
     border: 3px solid #fff;
@@ -569,8 +580,10 @@
     color: var(--ex-ink-soft);
   }
   .counter {
-    margin-top: 1.25rem;
-    padding: 1.25rem 1.5rem;
+    flex: 1;
+    flex-direction: row !important;
+    align-items: center;
+    padding: 0.9rem 1.5rem;
     border-radius: 1.6rem;
     background: linear-gradient(135deg, var(--ex-blush), #fff);
     border: 3px solid var(--ex-pink);
@@ -579,6 +592,7 @@
     gap: 1rem;
   }
   .tip {
+    flex: 1;
     margin: 0;
     font-size: clamp(1.1rem, 1.3vw, 1.6rem);
     font-weight: 600;
@@ -594,9 +608,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    padding: 1.5rem;
+    justify-content: safe center;
+    gap: 0.75rem;
+    padding: clamp(0.75rem, 2vh, 1.5rem);
     border-radius: 2rem;
     background: rgba(255, 255, 255, 0.7);
     border: 3px solid var(--ex-gold-soft);
@@ -616,6 +630,8 @@
   }
   .pie :global(.legend) {
     width: 100%;
+    /* The pie's row layout grows the legend to 11rem; stacked, that is dead height. */
+    flex: 0 0 auto;
   }
   .pie-empty,
   .open-value {
@@ -627,11 +643,18 @@
 
   /* ── bar ────────────────────────────────────────────────────────── */
   .bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 2rem;
-    min-height: 90px;
+    padding: 0.6rem 0 clamp(0.5rem, 1.2vh, 1.25rem);
+    background: linear-gradient(to bottom, rgba(255, 250, 242, 0), var(--ex-cream) 35%);
+  }
+  .bar:empty {
+    display: none;
   }
   .assist {
     display: flex;

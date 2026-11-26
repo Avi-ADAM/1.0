@@ -112,6 +112,18 @@ export interface ApiKeyScopes {
   ops?: string[];
 }
 
+/**
+ * "Connect your agent to this rikma" (PLAN_AGENT_WORK AW2): an MCP key that
+ * reaches one rikma only. One per (member, rikma) — re-minting replaces it, the
+ * same way the CLI's `MCP` key replaces itself. The scope is the object shape,
+ * never a flat array: a flat array on a rikma key is read as op scopes by the
+ * public APIs, and a `{ projects }` object passes none of them.
+ */
+export function mcpRikmaKey(projectId: string): { name: string; scopes: ApiKeyScopes } {
+  const pid = String(projectId);
+  return { name: `MCP · rikma ${pid}`, scopes: { projects: [pid] } };
+}
+
 export function normalizeApiKeyScopes(raw: unknown): ApiKeyScopes | null {
   if (raw == null) return null;
   if (Array.isArray(raw)) {

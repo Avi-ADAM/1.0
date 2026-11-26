@@ -196,6 +196,13 @@ describe('generateSeedPlan', () => {
     expect(generate).not.toHaveBeenCalled();
   });
 
+  it('plans from a short text when the caller lowers the floor (the fair kiosk)', async () => {
+    const generate = vi.fn(async () => JSON.stringify(cafePlan));
+    const plan = await generateSeedPlan('A repair café', generate, { minLength: 8 });
+    expect(plan.boards).toHaveLength(1);
+    expect(generate).toHaveBeenCalledOnce();
+  });
+
   it('survives a model failure — onboarding must not lose the rikma over a plan', async () => {
     const plan = await generateSeedPlan(text, async () => {
       throw new Error('model exploded');

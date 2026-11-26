@@ -1,0 +1,103 @@
+{
+  "title": "What agents know about the rikma",
+  "intro": "When a member connects an AI agent to the rikma, this is what it is handed: who we are, what is happening now, and how work is done here. Members write the playbooks, and a change to them goes through the rikma like any other proposal.",
+  "roles": {
+    "label": "Area",
+    "all": "Whole rikma"
+  },
+  "playbook": {
+    "heading": "Playbooks",
+    "explain": "What the data cannot say: how things are done here, why, and what we don't do. Every member's agents read them, so a change takes effect only by consent.",
+    "generalHeading": "The rikma's playbook",
+    "roleHeading": "Role playbook",
+    "generalTitle": "The rikma's playbook",
+    "roleTitle": "{{role}} playbook",
+    "none": "The rikma has no playbook yet. Write the first one; suggested sections are already in it.",
+    "noneRole": "This role has no playbook yet.",
+    "propose": "Propose a new text",
+    "write": "Write the first one",
+    "titleLabel": "Title",
+    "bodyLabel": "The whole text",
+    "consentNote": "The text opens as a proposal to every member of the rikma. Your signature is already on it; it takes effect when everyone approves, or by silence when the rikma's clock runs out. A newer proposal for the same playbook replaces this one.",
+    "soloNote": "You are the rikma's only member, so the text takes effect at once.",
+    "send": "Send to the rikma",
+    "sending": "Sending…",
+    "cancel": "Cancel",
+    "sent": "Sent to the members. If nobody responds, silence approves it on {{when}}.",
+    "applied": "The playbook was updated.",
+    "unchanged": "That is exactly what it already says. Nothing was proposed.",
+    "failed": "The proposal was not sent. Try again.",
+    "tooLong": "A playbook is limited to {{count}} characters.",
+    "updated": "updated {{when}}",
+    "unavailable": "We couldn't read the playbooks right now."
+  },
+  "sections": {
+    "general": {
+      "does": "What the rikma does and why",
+      "whom": "Who to turn to for what",
+      "decisions": "How decisions are made here",
+      "hours": "Hours and money",
+      "dont": "What we don't do"
+    },
+    "role": {
+      "how": "How {{role}} works here",
+      "promise": "What may be promised without a vote, and what needs one",
+      "tools": "Tools, channels and where things live",
+      "examples": "Examples of good work",
+      "dontTouch": "What not to touch"
+    }
+  },
+  "proposals": {
+    "heading": "Open proposals",
+    "signed": "{{count}} signed",
+    "silence": "silence approves on {{when}}",
+    "vote": "Read and sign"
+  },
+  "connect": {
+    "heading": "Connect an agent",
+    "explain": "A key that reaches this rikma only: the agent will not see your other rikmas. It acts as you, and nothing it prepares is signed without you.",
+    "button": "Create an agent key",
+    "again": "Create a new key",
+    "busy": "Creating…",
+    "confirm": "If you already created a key for this rikma, the old one will stop working. Continue?",
+    "failed": "We couldn't create a key. Try again.",
+    "once": "The key is shown only once. Copy it now.",
+    "claudeCode": "Claude Code: one terminal command",
+    "json": "Another agent: MCP server settings",
+    "copy": "Copy",
+    "copied": "Copied",
+    "prompt": "In a new conversation, pick the work-in-rikma prompt and the agent starts with the rikma's context already loaded.",
+    "replaces": "Creating a new key revokes the previous one.",
+    "noGit": "Never save the key in a file that goes into git.",
+    "personal": {
+      "title": "Your own connection: all your rikmas",
+      "explain": "The usual way. One connection for your agent, reaching every rikma you belong to, with each one's context. On claude.ai it is one click, with no key to copy.",
+      "claudeAi": "Connect to claude.ai",
+      "guide": "The full guide for every agent",
+      "cli": "Claude Code and other agents: one terminal command",
+      "thisRikma": "To have the agent work in this rikma, pick the work-in-rikma prompt with rikma {{id}}, or simply ask it to work there."
+    },
+    "scoped": {
+      "title": "Or: a key for this rikma only"
+    }
+  },
+  "preview": {
+    "heading": "What the agent sees",
+    "explain": "This is the answer an agent with a key for this rikma gets when it starts working here, with no focus.",
+    "explainRole": "This is the answer an agent gets when it works in the {{role}} role.",
+    "show": "Show the full answer",
+    "unavailable": "Parts not read right now: {{parts}}",
+    "failed": "We couldn't assemble the context right now.",
+    "denied": "The context is not available to a key for this rikma."
+  },
+  "draft": {
+    "button": "✨ Draft with AI",
+    "busy": "Writing a draft…",
+    "undo": "Back to the previous text",
+    "hint": "The draft is written from what is already known about the rikma and what you wrote. Nothing is saved until you send.",
+    "questions": "Open questions in the draft (marked ❓): {{count}}. Answer or delete them before sending.",
+    "rateLimited": "You've reached the number of drafts for this hour. Try again later.",
+    "denied": "A draft can't be prepared for this rikma.",
+    "failed": "The draft wasn't written. Try again."
+  }
+}

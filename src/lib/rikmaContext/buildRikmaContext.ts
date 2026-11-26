@@ -120,7 +120,8 @@ export function shapeGeneral(details: any) {
     links: details.links ?? {},
     restime: details.restime ?? null,
     members: capList(details.members, 30),
-    roles: arr(details.roles),
+    // With ids when the details carry them — an agent needs the id to focus on a role.
+    roles: arr(details.roleIds).length ? arr(details.roleIds) : arr(details.roles),
     counts: {
       openMissions: count('openMissions'),
       missionsInProgress: count('missionsInProgress'),

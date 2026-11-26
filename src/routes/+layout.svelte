@@ -47,6 +47,7 @@ onMessage(messaging, (payload) => {
   import { forumStore } from '$lib/stores/forumStore';
   import { MoneyState, provideMoney, ensureRates } from '$lib/money/context.svelte';
   import { ensureVocab } from '$lib/translation/vocab.svelte';
+  import { syncWebMcp } from '$lib/webmcp/sync';
 
   /**
    * @typedef {Object} Props
@@ -76,6 +77,15 @@ onMessage(messaging, (payload) => {
   });
   onMount(() => {
     void ensureRates(money);
+  });
+
+  // WebMCP (PLAN_WEBMCP): the tools this page offers a browser agent. A no-op
+  // unless the browser has document.modelContext and the server has WEBMCP on.
+  $effect(() => {
+    if (!browser) return;
+    const path = page.url.pathname;
+    const signedIn = !!data?.loggedIn;
+    void syncWebMcp(path, signedIn);
   });
 
   // Skills / roles / work-ways / values for ar·ru·es readers come from the

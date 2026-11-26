@@ -64,6 +64,8 @@ describe('POST /api/vision-preview', () => {
     for (let i = 0; i < 5; i++) {
       expect((await call({ text: 'A repair café', mode: 'exhibit' }, ip, pass)).status).toBe(200);
     }
+    // The planner is told the kiosk's floor, or it would drop a short idea as empty (422).
+    expect(generate).toHaveBeenLastCalledWith('A repair café', expect.any(Function), { minLength: 8 });
     // Still too short even for the kiosk.
     expect((await call({ text: 'café', mode: 'exhibit' }, ip, pass)).status).toBe(400);
   });

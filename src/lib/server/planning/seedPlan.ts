@@ -232,14 +232,17 @@ export function buildSeedPrompt(businessText: string, projectName?: string): str
  *
  * @param generate  injected so the caller owns the model choice (and so this is
  *                  testable without a network)
+ * @param options.minLength  shortest text worth a model call (default 50, a
+ *                  business description). The fair kiosk drafts from a few
+ *                  words, so it passes its own, lower floor.
  */
 export async function generateSeedPlan(
   businessText: string,
   generate: (system: string, user: string) => Promise<string>,
-  options: { projectName?: string; siteUsed?: string | null } = {}
+  options: { projectName?: string; siteUsed?: string | null; minLength?: number } = {}
 ): Promise<SeedPlan> {
   const text = (businessText ?? '').trim();
-  if (text.length < 50) return { ...EMPTY_SEED_PLAN, siteUsed: options.siteUsed ?? null };
+  if (text.length < (options.minLength ?? 50)) return { ...EMPTY_SEED_PLAN, siteUsed: options.siteUsed ?? null };
 
   try {
     const reply = await generate(buildSystemPrompt(), buildSeedPrompt(text, options.projectName));

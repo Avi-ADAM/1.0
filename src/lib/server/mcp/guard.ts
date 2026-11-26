@@ -234,6 +234,7 @@ export function wrapMcpTool<T extends { id: string }>(
         audit({
           keyId: ctx?.keyId,
           userId: ctx?.userId,
+          ...(ctx?.channel ? { channel: ctx.channel } : {}),
           tool: inner.id,
           tier: policy.tier,
           projectId: input?.projectId,
@@ -244,7 +245,7 @@ export function wrapMcpTool<T extends { id: string }>(
         });
 
       if (!ctx?.isInternalBot) {
-        const limit = consume(ctx?.keyId || `user:${ctx?.userId ?? 'anon'}`, bucket);
+        const limit = consume(ctx?.keyId || ctx?.rateKey || `user:${ctx?.userId ?? 'anon'}`, bucket);
         if (!limit.ok) {
           const retryAfterSeconds = limit.retryAfterSeconds ?? 1;
           record('rateLimited', { bucket });

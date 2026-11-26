@@ -2,7 +2,7 @@
 
 import { json, error }      from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { generateApiKey }   from '$lib/server/apiKeys';
+import { generateApiKey, mcpRikmaKey } from '$lib/server/apiKeys';
 import { webhookSecretForKey } from '$lib/server/webhooks/secret';
 import { invalidateWebhookTargets } from '$lib/server/webhooks/targets';
 import { normalizeOrigin, publicLeadKeyRefusal } from '$lib/server/leadsApi';
@@ -126,8 +126,13 @@ export const POST: RequestHandler = async ({ request, cookies, locals }) => {
   //    (rikma, user), re-created in place.
   //  - the rikma API page: { projectId, name, scopes[], callbackUrl } ⇒ a named
   //    key per connected system, so a rikma can have several.
-  const explicitScopes = bodyIn?.scopes != null;
-  const scopes = explicitScopes ? normalizeScopes(bodyIn.scopes) : SALES_API_SCOPES;
+  //  - the rikma's context tab: { projectId, purpose: 'mcp' } ⇒ an MCP key that
+  //    reaches this rikma only (PLAN_AGENT_WORK AW2). Name and scope are fixed
+  //    here, never taken from the body.
+  const mcpKey = bodyIn?.purpose === 'mcp' ? (projectId ? mcpRikmaKey(projectId) : null) : undefined;
+  if (mcpKey === null) throw error(400, 'An MCP rikma key needs a projectId');
+  const explicitScopes = !mcpKey && bodyIn?.scopes != null;
+  const scopes: unknown = mcpKey ? mcpKey.scopes : explicitScopes ? normalizeScopes(bodyIn.scopes) : SALES_API_SCOPES;
   const callbackUrl = normalizeCallbackUrl(bodyIn?.callbackUrl);
   // Origins at creation: a public form key is useless (and refused) without them.
   if (bodyIn?.allowedOrigins != null && !Array.isArray(bodyIn.allowedOrigins)) {
@@ -136,12 +141,17 @@ export const POST: RequestHandler = async ({ request, cookies, locals }) => {
   const rawOrigins: unknown[] = bodyIn?.allowedOrigins ?? [];
   const allowedOrigins = [...new Set(rawOrigins.map(normalizeOrigin))];
   if (allowedOrigins.includes(null)) throw error(400, 'allowedOrigins must be http(s) site addresses');
-  const publicRefusal = publicLeadKeyRefusal(scopes, allowedOrigins as string[]);
+  if (mcpKey && (callbackUrl || allowedOrigins.length)) {
+    throw error(400, 'An MCP rikma key carries no callback or origins');
+  }
+  const publicRefusal = mcpKey ? null : publicLeadKeyRefusal(scopes as string[], allowedOrigins as string[]);
   if (publicRefusal) throw error(400, publicRefusal);
 
-  const name = projectId
-    ? (explicitScopes ? String(bodyIn?.name ?? '').trim() : SALES_API_KEY_NAME)
-    : bodyIn?.name;
+  const name = mcpKey
+    ? mcpKey.name
+    : projectId
+      ? (explicitScopes ? String(bodyIn?.name ?? '').trim() : SALES_API_KEY_NAME)
+      : bodyIn?.name;
   if (!name?.trim()) throw error(400, 'name is required');
 
   if (projectId) {

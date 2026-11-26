@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "1💗1 · Profitable Partnerships: Missions, Hours, Profit Split",
-    "description": "Build a partnership network with no boss and no upfront capital: post open missions and resources, log your hours, decide by consensus, split profits by real contribution."
+    "description": "Build a partnership network with no boss and no upfront capital, where AI agents work too: post open missions and resources, log your hours, decide by consensus, split profits by real contribution."
   },
   "hero": {
     "h1": "Manage a partnership and split profits by what each partner actually contributed",
@@ -259,7 +259,8 @@
     "telegram_t": "Control from Telegram",
     "telegram_d": "Start timers, get notifications and take actions straight from the Telegram bot - no need to open your computer.",
     "aiBot_t": "AI assistant & agents (MCP)",
-    "aiBot_d": "A built-in bot that navigates, opens tasks and sums up the situation for you. You can even connect external AI agents to operate the rikma via MCP.",
+    "aiBot_d": "A built-in bot that navigates, opens tasks and sums up the situation for you. And you connect your own agent (Claude, ChatGPT) to the rikma: it gets the whole context of a task from it, what was done before and what comes next, reports when it is done, and a person verifies.",
+    "agentsNote": "Today an AI agent does much of what we once looked for a partner to do. But someone still has to bring the problem, someone has to run the agent, and someone has to check that it really works. A rikma is where the three of them meet, and each one gets a share by what they gave.",
     "transparency_t": "Transparency & decisions by agreement",
     "transparency_d": "Every action and decision is logged in real time, and resolutions pass through voting and consensus with a defined 'decision time'."
   },

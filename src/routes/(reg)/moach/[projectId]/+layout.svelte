@@ -179,7 +179,10 @@
     // 'docs' = the rikma's shared library (PLAN_RIKMA_SHARED_INFO). It sits
     // beside 'main' because it is the rikma's own material — what it holds and
     // refers to — rather than work moving through it.
-    { id: 'main', label: 'main', tabs: ['main', 'docs'] },
+    // 'context' = what agents are handed about this rikma: the playbooks members
+    // wrote and the door to connect one (PLAN_AGENT_WORK AW2) — the rikma's own
+    // material too, read by machines.
+    { id: 'main', label: 'main', tabs: ['main', 'docs', 'context'] },
     { id: 'work', label: 'work', tabs: ['progress', 'acts', 'kanban', 'gantt', 'timers', 'shifts'] },
     // 'api' = how work reaches this rikma from systems outside it — the same
     // group as the flows work moves along once it is here.

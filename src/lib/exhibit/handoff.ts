@@ -67,14 +67,15 @@ export async function sendLead(
   contact: { name?: string; email?: string; phone?: string },
   via: 'kiosk' | 'phone',
   { timeoutMs = DRAFT_TIMEOUT_MS, fetchImpl = fetch }: { timeoutMs?: number; fetchImpl?: typeof fetch } = {}
-): Promise<boolean> {
+): Promise<{ ok: boolean; mailed: boolean }> {
   const data = await post(
     '/api/exhibit/lead',
     { t: draft.token, shareKey: draft.shareKey, ...contact, consent: true, via },
     timeoutMs,
     fetchImpl
   );
-  return !!data;
+  // `mailed`: the server sent the idea and its link to the address given.
+  return { ok: !!data, mailed: !!data?.mailed };
 }
 
 /**

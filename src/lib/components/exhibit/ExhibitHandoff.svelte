@@ -29,6 +29,7 @@
   let phone = $state('');
   let agreed = $state(false);
   let sendState = $state(/** @type {'idle' | 'sending' | 'sent' | 'error'} */ ('idle'));
+  let mailed = $state(false);
 
   onMount(() => {
     const key = `exhibit.t.${shareKey}`;
@@ -54,8 +55,9 @@
     e.preventDefault();
     if (!token || !agreed || (!email.trim() && !phone.trim()) || sendState === 'sending') return;
     sendState = 'sending';
-    const ok = await sendLead({ shareKey, token }, { name: name.trim(), email: email.trim(), phone: phone.trim() }, 'phone');
-    sendState = ok ? 'sent' : 'error';
+    const r = await sendLead({ shareKey, token }, { name: name.trim(), email: email.trim(), phone: phone.trim() }, 'phone');
+    mailed = r.mailed;
+    sendState = r.ok ? 'sent' : 'error';
   }
 
   const field =
@@ -89,7 +91,7 @@
 
         {#if open}
           {#if sendState === 'sent'}
-            <p class="mt-4 text-lg font-bold text-gold">{$t('exhibit.handoff.sent')}</p>
+            <p class="mt-4 text-lg font-bold text-gold">{mailed ? $t('exhibit.handoff.sentMailed') : $t('exhibit.handoff.sent')}</p>
           {:else}
             <form class="mt-4 flex flex-col gap-3 text-start" onsubmit={send}>
               <input class={field} bind:value={name} placeholder={$t('exhibit.handoff.name')} aria-label={$t('exhibit.handoff.name')} autocomplete="name" dir="auto" />

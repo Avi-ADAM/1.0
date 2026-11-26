@@ -5,6 +5,8 @@ vi.mock('$env/dynamic/private', () => ({
 }));
 
 const record = vi.fn(async () => ({ ok: true }));
+const mail = vi.fn(async (_m: any) => ({ ok: true }));
+vi.mock('$lib/server/mailer.js', () => ({ sendMailSafe: mail }));
 vi.mock('$lib/server/exhibit/lead', () => ({ recordExhibitLead: record }));
 
 const session = {
@@ -43,7 +45,10 @@ function call(body: unknown, pass: string | null = null) {
 }
 
 describe('POST /api/exhibit/lead', () => {
-  beforeEach(() => record.mockClear());
+  beforeEach(() => {
+    record.mockClear();
+    mail.mockClear();
+  });
 
   it('records one lead for the draft the token names, with its open parts counted', async () => {
     const res = await call({ t: token, name: 'נועם', email: 'Noam@Example.com', consent: true, via: 'phone', shareKey: 'k1' });
@@ -87,5 +92,25 @@ describe('POST /api/exhibit/lead', () => {
     load.mockResolvedValueOnce({ ...session, status: 'applied' });
     expect((await call({ t: token, email: 'a@b.co', consent: true, via: 'phone' })).status).toBe(400);
     expect(record).not.toHaveBeenCalled();
+  });
+
+  it('mails the visitor the idea and its link, once per draft and address', async () => {
+    const res = await call({ t: token, name: 'דנה', email: 'dana@example.com', consent: true, via: 'phone', shareKey: 'k2' });
+    expect(await res.json()).toMatchObject({ ok: true, mailed: true });
+    expect(mail).toHaveBeenCalledTimes(1);
+    const m = (mail.mock.calls[0] as any)[0];
+    expect(m.to).toBe('dana@example.com');
+    expect(m.subject).toContain('ציור קיר לשכונה');
+    expect(m.text).toContain(`https://www.1lev1.com/preview/rikma/k2?ref=exhibit&lang=he#t=${token}`);
+
+    const again = await call({ t: token, email: 'dana@example.com', consent: true, via: 'phone', shareKey: 'k2' });
+    expect(await again.json()).toMatchObject({ ok: true, mailed: false });
+    expect(mail).toHaveBeenCalledTimes(1);
+  });
+
+  it('a phone number alone sends no mail', async () => {
+    const res = await call({ t: token, phone: '0501234567', consent: true, via: 'phone' });
+    expect(await res.json()).toMatchObject({ ok: true, mailed: false });
+    expect(mail).not.toHaveBeenCalled();
   });
 });

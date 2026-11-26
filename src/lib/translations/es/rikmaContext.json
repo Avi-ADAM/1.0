@@ -1,0 +1,103 @@
+{
+  "title": "Lo que los agentes saben de la rikma",
+  "intro": "Cuando un miembro conecta un agente de IA a la rikma, esto es lo que recibe: quiénes somos, qué pasa ahora y cómo se trabaja aquí. Los manuales los escriben los miembros, y un cambio en ellos pasa por la rikma como cualquier propuesta.",
+  "roles": {
+    "label": "Área",
+    "all": "Toda la rikma"
+  },
+  "playbook": {
+    "heading": "Manuales de trabajo",
+    "explain": "Lo que los datos no dicen: cómo se hacen aquí las cosas, por qué y qué no hacemos. Los agentes de todos los miembros los leen, así que un cambio entra solo con consentimiento.",
+    "generalHeading": "El manual de la rikma",
+    "roleHeading": "Manual del rol",
+    "generalTitle": "El manual de la rikma",
+    "roleTitle": "Manual de {{role}}",
+    "none": "La rikma aún no tiene manual. Escribe el primero; las secciones sugeridas ya están dentro.",
+    "noneRole": "Este rol aún no tiene manual.",
+    "propose": "Proponer un nuevo texto",
+    "write": "Escribir el primero",
+    "titleLabel": "Título",
+    "bodyLabel": "El texto completo",
+    "consentNote": "El texto se abre como propuesta a todos los miembros de la rikma. Tu firma ya está en él; entra cuando todos aprueben, o por silencio cuando se acabe el reloj de la rikma. Una propuesta más nueva para el mismo manual reemplaza a esta.",
+    "soloNote": "Eres el único miembro de la rikma, así que el texto entra de inmediato.",
+    "send": "Enviar a la rikma",
+    "sending": "Enviando…",
+    "cancel": "Cancelar",
+    "sent": "Enviada a los miembros. Si nadie responde, el silencio la aprueba el {{when}}.",
+    "applied": "El manual se actualizó.",
+    "unchanged": "Eso es exactamente lo que ya dice. No se propuso nada.",
+    "failed": "La propuesta no se envió. Inténtalo de nuevo.",
+    "tooLong": "Un manual está limitado a {{count}} caracteres.",
+    "updated": "actualizado {{when}}",
+    "unavailable": "No pudimos leer los manuales ahora."
+  },
+  "sections": {
+    "general": {
+      "does": "Qué hace la rikma y por qué",
+      "whom": "A quién acudir para qué",
+      "decisions": "Cómo se decide aquí",
+      "hours": "Horas y dinero",
+      "dont": "Lo que no hacemos"
+    },
+    "role": {
+      "how": "Cómo se trabaja en {{role}}",
+      "promise": "Qué se puede prometer sin votación y qué necesita una",
+      "tools": "Herramientas, canales y dónde está cada cosa",
+      "examples": "Ejemplos de buen trabajo",
+      "dontTouch": "Lo que no se toca"
+    }
+  },
+  "proposals": {
+    "heading": "Propuestas abiertas",
+    "signed": "{{count}} firmaron",
+    "silence": "el silencio la aprueba el {{when}}",
+    "vote": "Leer y firmar"
+  },
+  "connect": {
+    "heading": "Conectar un agente",
+    "explain": "Una clave que llega solo a esta rikma: el agente no verá tus otras rikmas. Actúa en tu nombre, y nada de lo que prepara se firma sin ti.",
+    "button": "Crear una clave para el agente",
+    "again": "Crear una clave nueva",
+    "busy": "Creando…",
+    "confirm": "Si ya creaste una clave para esta rikma, la anterior dejará de funcionar. ¿Continuar?",
+    "failed": "No pudimos crear la clave. Inténtalo de nuevo.",
+    "once": "La clave se muestra una sola vez. Cópiala ahora.",
+    "claudeCode": "Claude Code: un comando en la terminal",
+    "json": "Otro agente: configuración del servidor MCP",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "prompt": "En una conversación nueva, elige el prompt work-in-rikma y el agente empieza con el contexto de la rikma ya cargado.",
+    "replaces": "Crear una clave nueva revoca la anterior.",
+    "noGit": "Nunca guardes la clave en un archivo que entre en git.",
+    "personal": {
+      "title": "Tu propia conexión: todas tus rikmas",
+      "explain": "La forma habitual. Una sola conexión para tu agente, que llega a todas las rikmas de las que eres miembro, con el contexto de cada una. En claude.ai es un clic, sin clave que copiar.",
+      "claudeAi": "Conectar con claude.ai",
+      "guide": "La guía completa para cada agente",
+      "cli": "Claude Code y otros agentes: un comando en la terminal",
+      "thisRikma": "Para que el agente trabaje en esta rikma, elige el prompt work-in-rikma con la rikma {{id}}, o simplemente pídele que trabaje en ella."
+    },
+    "scoped": {
+      "title": "O bien: una clave solo para esta rikma"
+    }
+  },
+  "preview": {
+    "heading": "Lo que ve el agente",
+    "explain": "Esta es la respuesta que recibe un agente con una clave de esta rikma cuando empieza a trabajar aquí, sin foco.",
+    "explainRole": "Esta es la respuesta que recibe un agente cuando trabaja en el rol {{role}}.",
+    "show": "Mostrar la respuesta completa",
+    "unavailable": "Partes que no se leyeron ahora: {{parts}}",
+    "failed": "No pudimos armar el contexto ahora.",
+    "denied": "El contexto no está disponible para una clave de esta rikma."
+  },
+  "draft": {
+    "button": "✨ Borrador con IA",
+    "busy": "Escribiendo un borrador…",
+    "undo": "Volver al texto anterior",
+    "hint": "El borrador se escribe con lo que ya se sabe de la rikma y lo que escribiste. No se guarda nada hasta que envíes.",
+    "questions": "Preguntas abiertas en el borrador (marcadas con ❓): {{count}}. Respóndelas o bórralas antes de enviar.",
+    "rateLimited": "Llegaste al número de borradores de esta hora. Inténtalo más tarde.",
+    "denied": "No se puede preparar un borrador para esta rikma.",
+    "failed": "El borrador no se escribió. Inténtalo de nuevo."
+  }
+}

@@ -58,6 +58,7 @@ export interface ProjectDetails {
   codeLicense?: { license: string | null; openYears: number | null } | null;
   members?: string[];
   roles?: string[];
+  roleIds?: Array<{ id: string; name: string }>;
   openMissions?: { id: string; name: string }[];
   missionsInProgress?: { id: string; name: string; holder: string | null }[];
   openResources?: { id: string; name: string; kind: string | null }[];
@@ -118,6 +119,11 @@ export function shapeProjectDetails(project: any, userId: string): ProjectDetail
       : null,
     members: memberRows.map((u) => u.attributes?.username ?? `#${u.id}`),
     roles: rows(a.tafkidims).map((r) => r.attributes?.roleDescription).filter(Boolean),
+    // The same roles with their ids: roleId is what getRikmaContextTool,
+    // getPlaybookTool and the work-in-rikma prompt take (PLAN_AGENT_WORK AW2).
+    roleIds: rows(a.tafkidims)
+      .filter((r) => r.attributes?.roleDescription)
+      .map((r) => ({ id: String(r.id), name: r.attributes.roleDescription })),
     openMissions: rows(a.open_missions).map((m) => ({ id: String(m.id), name: m.attributes?.name ?? '' })),
     missionsInProgress: rows(a.mesimabetahaliches).map((m) => ({
       id: String(m.id),

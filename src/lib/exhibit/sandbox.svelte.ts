@@ -281,6 +281,35 @@ export class ExhibitSandbox {
     this.draft = null;
   }
 
+  /**
+   * The Connection step's handshake: the visitor draws a thread between a
+   * person and a part. Joining the rikma is that thread — someone not in the
+   * circle yet is invited by it. Returns false when the circle is full.
+   * The Partnership step can still move every part.
+   */
+  connect(personId: string, task: ExhibitTask): boolean {
+    if (personId !== ME && !this.isInvited(personId) && !this.toggleInvite(personId)) return false;
+    const was = this.ownerOf(task);
+    if (was === personId) return true;
+    this.assign(task, personId);
+    if (was) this.leaveIfEmptyHanded(was);
+    return true;
+  }
+
+  /** Cut the thread to a part; a partner left holding nothing leaves the circle with it. */
+  disconnect(task: ExhibitTask) {
+    const was = this.ownerOf(task);
+    if (!was) return;
+    this.assign(task, null);
+    this.leaveIfEmptyHanded(was);
+  }
+
+  private leaveIfEmptyHanded(personId: string) {
+    if (personId === ME || !this.isInvited(personId)) return;
+    if (this.tasks.some((t) => this.assignments[taskKey(t)] === personId)) return;
+    this.toggleInvite(personId);
+  }
+
   /** Value nobody has taken yet — it stays open for the next partner. */
   openValue = $derived(
     this.tasks.filter((t) => !this.assignments[taskKey(t)]).reduce((sum, t) => sum + this.valueOf(t), 0)

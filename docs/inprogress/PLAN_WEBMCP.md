@@ -1,7 +1,8 @@
 # תכנית — WebMCP: האתר עצמו כספק כלים לסוכנים בדפדפן
 
-> נכתב: 2026-10-22. **שום דבר מזה לא בנוי.** תחום שמשתנה מחודש לחודש, ולכן §1
-> מתעד מה נבדק ומתי, וכל שלב נפתח בבדיקה מחדש של המפרט.
+> נכתב: 2026-10-22. **עודכן 2026-11-26: W1 + W2 (בלי דיאלוג האישור) בנויים מאחורי
+> `WEBMCP` — ראו §8.** תחום שמשתנה מחודש לחודש, ולכן §1 מתעד מה נבדק ומתי, וכל שלב
+> נפתח בבדיקה מחדש של המפרט.
 > משלים את [PLAN_MCP_TOOLS_V2.md](../inprogress/PLAN_MCP_TOOLS_V2.md) (השרת המרוחק
 > `/api/mcp`), [PLAN_MCP_OAUTH.md](../done/PLAN_MCP_OAUTH.md),
 > [PLAN_CHAT_MEMORY.md](../done/PLAN_CHAT_MEMORY.md) ו-
@@ -232,3 +233,51 @@ PLAN_CONCIERGE_EXTERNAL_SOURCES (E4). תנאים: #25660 מוזג ל-main ושו
   `ai` הקטן, כמו ב-MCP.
 - **אין צרכנים.** סביר שבחודשים הראשונים התנועה תהיה כמעט אפס. לכן W1–W2 קטנים,
   מאחורי דגל, ומדידה ב-audit לפני W3+.
+
+---
+
+## 8. מצב — 2026-11-26
+
+### 8.1 בדיקה מחודשת של §1
+
+| נושא | מה השתנה מאז 2026-10-22 |
+|---|---|
+| Chrome | **עדיין origin trial** (מ-149; דף התיעוד עודכן ב-7 באוקטובר, דף ה-imperative API ב-26 בנובמבר). לא נמצא שחרור יציב לכל המשתמשים. מקומית: `chrome://flags/#enable-webmcp-testing` |
+| מפרט | טיוטה של 24 בנובמבר 2026. `document.modelContext` בלבד (`navigator` לא מוזכר). `registerTool` מחזיר `Promise`; `execute(input, { signal })`, התוצאה מסודרת ל-JSON (מחרוזת או אובייקט — **לא** מעטפת `{content:[…]}`). שם כלי: 1–128 תווים, `[A-Za-z0-9_.-]`. `inputSchema` חייב להיות אובייקט |
+| הינטים | `readOnlyHint`, `untrustedContentHint`, `consequentialHint`, ו-`debugging` (Chrome 156). `outputSchema` מ-Chrome 159; `waitForToolsUntil()` מ-160 |
+| Claude in Chrome | **עדיין לא צורך WebMCP** — בקשת הפיצ'ר פתוחה. הדרך לבדוק מ-Claude Code: Chrome DevTools MCP עם `--categoryExperimentalWebmcp` (`list_webmcp_tools`, `execute_webmcp_tool`), Chrome 150+ עם הדגל |
+| Permissions-Policy | `tools`, ברירת מחדל `self` — **לא** הוספנו `tools=(self)` לכותרת: זו כבר ברירת המחדל, ודפדפן שלא מכיר את הפיצ'ר מדפיס אזהרה בכל דף |
+
+### 8.2 מה בנוי
+
+- **`src/lib/server/webmcp/surfaces.ts`** (טהור) — המשטחים של §3.1 ותקרת השכבות. בשלב
+  הזה `consentWrite`/`communicate` **לא** מוצעים בכלל עד שיש דיאלוג אישור (W2b);
+  `read` = קריאה + `prepare` טהור, `on` = + `prepare` + `selfWrite` (טיימר).
+- **`src/lib/server/webmcp/index.ts`** — `webmcpMode()`, `describeSurface()` (zod → JSON
+  Schema, הינטים, `defaults.projectId` מה-URL), `callWebMcpTool()` (הכלי חייב להיות
+  במשטח של הדף, ולידציה מול הסכמה, `setMcpContext({channel:'webmcp', rateKey})` בלי
+  `isInternalBot`, ואז אותו `wrapMcpTool`).
+- **`/api/webmcp`** — `GET ?path=` (רשימת הכלים) ו-`POST {tool,input,path}`. same-origin
+  בלבד (`sameOrigin.ts`), JSON בלבד, 64KB, 404 כשהדגל כבוי, מוחרג מ-CORS ב-`hooks.server.js`.
+  **סטייה מ-§3.3:** נתיב אחד במקום `/api/webmcp/call`, והרשימה נשלפת מהלקוח ולא מה-`load()`
+  של ה-layout — דפדפן בלי WebMCP לא שולח אף בקשה.
+- **`guard.ts` / `mcpContext.ts`** — `channel` בשורת ה-audit, ודלי קצב נפרד
+  `webmcp:user:<id>` / `webmcp:ip:<addr>`.
+- **`src/lib/webmcp/modelContext.ts`** (המגע היחיד ב-API, fallback ל-`navigator` ול-`unregisterTool`)
+  ו-**`sync.ts`** — רישום מחדש בכל ניווט מ-`+layout.svelte`, ביטול ב-`abort()`.
+- בדיקות: `surfaces.test.ts`, `index.test.ts`, `sync.test.ts`. נבדק חי מול `localhost:5173`:
+  אורח מקבל 4 כלים, `searchCatalogTool` רץ, קריאה חוצת-אתר ו"כלי חבר" לאורח → 403.
+
+### 8.3 להפעלה
+
+1. בשרת: `WEBMCP=read` (מומלץ להתחלה) או `on`. ב-Vercel וב-VPS (`$env/dynamic/private`).
+2. בדיקה מקומית: Chrome עם `chrome://flags/#enable-webmcp-testing`, או Chrome DevTools MCP
+   עם `--categoryExperimentalWebmcp` מ-Claude Code.
+3. בפרודקשן לכל המשתמשים של Chrome 149+: להירשם ל-origin trial ולשים את הטוקן —
+   **עוד לא בנוי** (meta של §3.6).
+4. למדוד: `[mcp-audit]` עם `"channel":"webmcp"` ב-Axiom (רק כתיבות/AI/סירובים נרשמים).
+
+### 8.4 הבא
+
+W0 ידני בדפדפן אמיתי → W2b דיאלוג אישור + `webmcp.json` ×5 → meta של origin trial → W3 טפסים
+הצהרתיים → W4.

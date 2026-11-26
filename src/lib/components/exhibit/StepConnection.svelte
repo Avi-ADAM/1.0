@@ -2,30 +2,43 @@
   Step 3 · Connection (docs/inprogress/PLAN_EXHIBITION_MODE.md §3.3).
 
   The idea and its parts in the middle; nine invented people around them, and
-  the visitor's own place among them. Pointing at a person lights threads to
-  the parts they could take and says why — the skills that matched, from
-  `computeMissionMatchScore`, the platform's own matching. Pointing at a part
-  lights everyone who could take it. A click invites (or takes it back).
+  the visitor's own place among them. Clicking a person picks them and keeps
+  threads lit to the parts they could take, with why — the skills that
+  matched, from `computeMissionMatchScore`, the platform's own matching.
+  Clicking a lit part then ties it: the thread turns gold, the part gets a ✓,
+  and the person joins the rikma (they may take a second part; a click on a
+  gold one cuts it). The same from a part: pick it, and a click on one of the
+  people lit for it ties them. A click on the background lets the pick go.
 
   The point it makes: nobody is hired here. The visitor is a node in the same
   circle and says what they bring, exactly as the people they invite do.
-  Keys: 1–9 invite, 0 opens "what do you bring".
+  Keys: 1–9 pick a person, 0 the visitor ("what do you bring" the first
+  time), Escape lets go.
 -->
 <script>
   import { fade, scale } from 'svelte/transition';
   import { t, isRtl } from '$lib/translations';
   import { PEOPLE } from '$lib/exhibit/fixtures/people';
   import { SKILLS } from '$lib/exhibit/types';
-  import { ME, MAX_INVITED, MAX_MY_SKILLS } from '$lib/exhibit/sandbox.svelte';
+  import { ME, MAX_MY_SKILLS } from '$lib/exhibit/sandbox.svelte';
   import PersonOrb from './PersonOrb.svelte';
   import IdeaGlyph from './IdeaGlyph.svelte';
 
   /** @type {{ sandbox: import('$lib/exhibit/sandbox.svelte').ExhibitSandbox }} */
   let { sandbox } = $props();
 
-  /** Who / what the visitor is pointing at — only one at a time. */
-  let activePerson = $state(/** @type {string | null} */ (null));
-  let activePart = $state(/** @type {string | null} */ (null));
+  /**
+   * A click picks one side of a thread — a person or a part — and it stays
+   * picked, its matches drawn, until the other side is clicked (that draws
+   * the thread) or the background is (that lets go). Hovering only previews,
+   * and only while nothing is picked.
+   * @typedef {{ kind: 'person' | 'part', id: string }} Pick
+   */
+  let picked = $state(/** @type {Pick | null} */ (null));
+  let hovered = $state(/** @type {Pick | null} */ (null));
+  let focus = $derived(picked ?? hovered);
+  let activePerson = $derived(focus?.kind === 'person' ? focus.id : null);
+  let activePart = $derived(focus?.kind === 'part' ? focus.id : null);
   let picking = $state(false);
   let fullNote = $state(false);
 
@@ -95,26 +108,31 @@
   ].map((s) => $t(`exhibit.skills.${s}`)));
 
   let lines = $derived.by(() => {
-    /** @type {{ d: string, kind: 'lit' | 'bond', key: string }[]} */
+    /** @type {{ d: string, kind: 'lit' | 'bond' | 'loose', key: string }[]} */
     const out = [];
-    for (const id of sandbox.invited) {
+    // Each partner's thread lands on the part they took; someone in the
+    // circle with no part yet hangs a loose thread to the idea itself.
+    const members = sandbox.mySkills.length ? [ME, ...sandbox.invited] : sandbox.invited;
+    for (const id of members) {
       const n = nodeAt(id);
-      if (n) out.push({ d: thread(n, { x: 0, y: 0 }), kind: 'bond', key: `bond:${id}` });
+      if (!n) continue;
+      const mine = parts.filter((p) => sandbox.assignments[p.key] === id);
+      if (!mine.length) out.push({ d: thread(n, { x: 0, y: 0 }), kind: 'loose', key: `loose:${id}` });
+      for (const p of mine) out.push({ d: thread(n, p), kind: 'bond', key: `bond:${id}:${p.key}` });
     }
-    if (sandbox.mySkills.length) {
-      const n = nodeAt(ME);
-      if (n) out.push({ d: thread(n, { x: 0, y: 0 }), kind: 'bond', key: 'bond:me' });
-    }
+    // A thread already drawn stays gold; only the ones still to choose are lit.
     if (activePerson) {
       const n = nodeAt(activePerson);
       for (const m of personMatches) {
         const p = partAt(partKey(m.task));
-        if (n && p) out.push({ d: thread(n, p), kind: 'lit', key: `lit:${activePerson}:${p.key}` });
+        if (n && p && sandbox.assignments[p.key] !== activePerson)
+          out.push({ d: thread(n, p), kind: 'lit', key: `lit:${activePerson}:${p.key}` });
       }
     }
     if (activePart) {
       const p = partAt(activePart);
       for (const id of partMatches) {
+        if (sandbox.assignments[activePart] === id) continue;
         const n = nodeAt(id);
         if (n && p) out.push({ d: thread(p, n), kind: 'lit', key: `lit:${activePart}:${id}` });
       }
@@ -123,15 +141,70 @@
   });
 
   // ── Actions ───────────────────────────────────────────────────────────
-  function invite(/** @type {string} */ id) {
-    const ok = sandbox.toggleInvite(id);
-    fullNote = !ok && sandbox.invited.length >= MAX_INVITED;
+  /** Draw (or, when it is already there, cut) the thread between a person and a part. */
+  function tie(/** @type {string} */ person, /** @type {string} */ key) {
+    const p = partAt(key);
+    if (!p) return false;
+    if (sandbox.ownerOf(p.task) === person) {
+      sandbox.disconnect(p.task);
+      fullNote = false;
+      return true;
+    }
+    const ok = sandbox.connect(person, p.task);
+    fullNote = !ok;
+    return ok;
   }
 
-  function point(/** @type {string | null} */ person, /** @type {string | null} */ part = null) {
-    activePerson = person;
-    activePart = part;
+  /** A click on a person: the other side of a picked part, or a pick of its own. */
+  function clickPerson(/** @type {string} */ id) {
+    if (id === ME && !sandbox.mySkills.length) {
+      picking = true;
+      return;
+    }
+    if (picked?.kind === 'part' && litPeople.has(id)) {
+      // The part found its partner — the pick is done.
+      if (tie(id, picked.id)) picked = null;
+      return;
+    }
+    picked = picked?.kind === 'person' && picked.id === id ? null : { kind: 'person', id };
+    fullNote = false;
   }
+
+  /** A click on a part: the other side of a picked person (who may take one or two), or a pick of its own. */
+  function clickPart(/** @type {string} */ key) {
+    if (picked?.kind === 'person' && (litParts.has(key) || sandbox.assignments[key] === picked.id)) {
+      tie(picked.id, key);
+      return;
+    }
+    picked = picked?.kind === 'part' && picked.id === key ? null : { kind: 'part', id: key };
+    fullNote = false;
+  }
+
+  /** A click anywhere that is not a person, a part or the centre lets the pick go. */
+  function clickAway(/** @type {MouseEvent} */ e) {
+    if (picking) return;
+    const el = /** @type {HTMLElement} */ (e.target);
+    if (el.closest?.('.person, .chip, .core, .picker-wrap')) return;
+    picked = null;
+  }
+
+  /** What the visitor brings decides what fits them: drop a part that no longer does. */
+  function closePicker() {
+    picking = false;
+    const fits = new Set(sandbox.matchesForPerson(ME).map((m) => partKey(m.task)));
+    for (const task of sandbox.tasks) {
+      if (sandbox.ownerOf(task) === ME && !fits.has(partKey(task))) sandbox.disconnect(task);
+    }
+    // Straight on to choosing: the visitor's matches stay drawn.
+    picked = sandbox.mySkills.length ? { kind: 'person', id: ME } : null;
+  }
+
+  let takenCount = $derived(sandbox.tasks.filter((task) => sandbox.ownerOf(task)).length);
+
+  /** Hover previews only while nothing is picked. */
+  const hover = (/** @type {Pick | null} */ h) => {
+    hovered = h;
+  };
 
   /** @param {KeyboardEvent} e */
   function onKey(e) {
@@ -139,19 +212,22 @@
     if (picking) {
       if (e.key === 'Escape') {
         e.preventDefault();
-        picking = false;
+        closePicker();
       }
+      return;
+    }
+    if (e.key === 'Escape') {
+      picked = null;
       return;
     }
     const n = Number(e.key);
     if (!Number.isInteger(n) || e.key === ' ') return;
     if (n === 0) {
       e.preventDefault();
-      picking = true;
+      clickPerson(ME);
     } else if (n <= PEOPLE.length) {
       e.preventDefault();
-      invite(PEOPLE[n - 1].id);
-      point(PEOPLE[n - 1].id);
+      clickPerson(PEOPLE[n - 1].id);
     }
   }
 
@@ -163,7 +239,9 @@
 
 <svelte:window onkeydown={onKey} />
 
-<section class="conn">
+<!-- The click-away is a mouse nicety; Escape does the same from the keyboard. -->
+<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
+<section class="conn" onclick={clickAway}>
   <header>
     <h1 class="ex-display">{$t('exhibit.connection.title')}</h1>
     <p class="sub">{$t('exhibit.connection.sub')}</p>
@@ -195,6 +273,9 @@
                 : $t('exhibit.connection.nothingFits')}
             </span>
           {/if}
+          {#if picked && activePerson === ME}
+            <button type="button" class="edit-me" onclick={() => (picking = true)}>{$t('exhibit.connection.me.edit')}</button>
+          {/if}
         {:else if activePart}
           {@const p = partAt(activePart)}
           {#if p}
@@ -210,19 +291,29 @@
 
       <ul class="parts">
         {#each parts as p (p.key)}
+          {@const owner = sandbox.ownerOf(p.task)}
           <li style="transform: translate(calc(-50% + {p.x}px), calc(-50% + {p.y}px))">
             <button
               type="button"
               class="chip {p.task.kind}"
-              class:lit={litParts.has(p.key) || activePart === p.key}
-              class:dim={(activePerson && !litParts.has(p.key)) || (activePart && activePart !== p.key)}
-              onpointerenter={() => point(null, p.key)}
-              onpointerleave={() => point(null)}
-              onfocus={() => point(null, p.key)}
-              onblur={() => point(null)}
+              class:taken={!!owner}
+              class:lit={(litParts.has(p.key) && owner !== activePerson) || activePart === p.key}
+              class:mine={!!activePerson && owner === activePerson}
+              class:picked={picked?.kind === 'part' && picked.id === p.key}
+              class:dim={(activePerson && !litParts.has(p.key) && owner !== activePerson) ||
+                (activePart && activePart !== p.key)}
+              aria-pressed={picked?.kind === 'part' && picked.id === p.key}
+              onclick={() => clickPart(p.key)}
+              onpointerenter={() => hover({ kind: 'part', id: p.key })}
+              onpointerleave={() => hover(null)}
+              onfocus={() => hover({ kind: 'part', id: p.key })}
+              onblur={() => hover(null)}
               dir="auto"
             >
-              {label(p.task)}
+              <span class="chip-label">{label(p.task)}</span>
+              {#if owner}
+                <span class="chip-owner" in:fade={{ duration: 250 }}>✓ {personName(owner)}</span>
+              {/if}
             </button>
           </li>
         {/each}
@@ -236,15 +327,15 @@
               <button
                 type="button"
                 class="person"
-                aria-pressed={sandbox.isInvited(n.id)}
+                aria-pressed={picked?.kind === 'person' && picked.id === n.id}
                 aria-label={sandbox.isInvited(n.id)
                   ? $t('exhibit.connection.uninvite', { name: personName(n.id) })
                   : $t('exhibit.connection.invite', { name: personName(n.id) })}
-                onclick={() => invite(n.id)}
-                onpointerenter={() => point(n.id)}
-                onpointerleave={() => point(null)}
-                onfocus={() => point(n.id)}
-                onblur={() => point(null)}
+                onclick={() => clickPerson(n.id)}
+                onpointerenter={() => hover({ kind: 'person', id: n.id })}
+                onpointerleave={() => hover(null)}
+                onfocus={() => hover({ kind: 'person', id: n.id })}
+                onblur={() => hover(null)}
               >
                 <PersonOrb
                   hue={person.hue}
@@ -261,11 +352,12 @@
               <button
                 type="button"
                 class="person"
-                onclick={() => (picking = true)}
-                onpointerenter={() => point(ME)}
-                onpointerleave={() => point(null)}
-                onfocus={() => point(ME)}
-                onblur={() => point(null)}
+                aria-pressed={picked?.kind === 'person' && picked.id === ME}
+                onclick={() => clickPerson(ME)}
+                onpointerenter={() => hover({ kind: 'person', id: ME })}
+                onpointerleave={() => hover(null)}
+                onfocus={() => hover({ kind: 'person', id: ME })}
+                onblur={() => hover(null)}
               >
                 <PersonOrb
                   hue={45}
@@ -291,9 +383,14 @@
     <p class="circle" aria-live="polite">
       {#if fullNote}
         {$t('exhibit.connection.full')}
+      {:else if picked && (picked.kind === 'person' ? personMatches.length : partMatches.length)}
+        <!-- What the next click does, while one side of a thread is picked. -->
+        <span class="next-move" in:fade={{ duration: 200 }}>
+          {$t(picked.kind === 'person' ? 'exhibit.connection.pickPart' : 'exhibit.connection.pickPerson')}
+        </span>
       {:else if sandbox.invited.length}
         {$t('exhibit.connection.circle', { count: sandbox.invited.length })}
-        <span class="hint">· {$t('exhibit.connection.hint')}</span>
+        <span class="hint">· {$t('exhibit.connection.taken', { count: takenCount, total: sandbox.tasks.length })}</span>
       {:else}
         {$t('exhibit.connection.circleEmpty')}
         <span class="hint">· {$t('exhibit.connection.hint')}</span>
@@ -338,7 +435,7 @@
             </li>
           {/each}
         </ul>
-        <button type="button" class="ex-btn ex-btn-primary" use:focusOnMount onclick={() => (picking = false)}>
+        <button type="button" class="ex-btn ex-btn-primary" use:focusOnMount onclick={closePicker}>
           {$t('exhibit.connection.me.done')}
         </button>
       </div>
@@ -387,6 +484,12 @@
     stroke-dasharray: 1;
     stroke-dashoffset: 1;
     animation: draw 700ms ease-out forwards;
+  }
+  .thread.loose {
+    stroke: var(--ex-gold);
+    stroke-width: 2.5;
+    stroke-dasharray: 0.02 0.025;
+    opacity: 0.7;
   }
   .thread.lit {
     stroke: var(--ex-pink);
@@ -480,22 +583,75 @@
     font-weight: 700;
     color: var(--ex-ink);
     line-height: 1.2;
-    cursor: default;
+    cursor: pointer;
     transition:
       opacity 250ms ease,
       transform 250ms ease,
       box-shadow 250ms ease;
   }
+  .chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+    border-style: dashed;
+  }
   .chip.resource {
     border-color: var(--ex-gold);
     border-radius: 0.6rem;
+  }
+  /* A part someone took: solid, filled, and says who. */
+  .chip.taken {
+    border-style: solid;
+    background: #fde8ef;
+    box-shadow: 0 6px 18px rgba(184, 0, 105, 0.16);
+  }
+  .chip.resource.taken {
+    background: #fbf0cf;
+    box-shadow: 0 6px 18px rgba(154, 111, 12, 0.18);
+  }
+  .chip-owner {
+    font-size: 0.8em;
+    font-weight: 800;
+    color: var(--ex-pink-deep);
+  }
+  .chip.resource .chip-owner {
+    color: #8a610a;
   }
   .chip.lit {
     transform: scale(1.1);
     box-shadow: 0 0 0 8px rgba(226, 18, 122, 0.14);
   }
+  /* The picked part, and the parts the picked person already holds: gold. */
+  .chip.picked {
+    transform: scale(1.12);
+    border-style: solid;
+    box-shadow:
+      0 0 0 4px var(--ex-gold),
+      0 0 0 12px rgba(212, 161, 42, 0.18);
+  }
+  .chip.mine {
+    transform: scale(1.06);
+    border-color: var(--ex-gold);
+    box-shadow: 0 0 0 6px rgba(212, 161, 42, 0.22);
+  }
   .chip.dim {
     opacity: 0.35;
+  }
+  .next-move {
+    color: var(--ex-pink-deep);
+  }
+  .edit-me {
+    margin-top: 0.2rem;
+    padding: 0.2em 0.9em;
+    border-radius: 999px;
+    border: 2px solid var(--ex-gold);
+    background: #fff;
+    font: inherit;
+    font-size: clamp(0.85rem, 0.95vw, 1.1rem);
+    font-weight: 700;
+    color: var(--ex-ink);
+    cursor: pointer;
   }
   .person {
     background: none;

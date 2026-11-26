@@ -187,7 +187,8 @@
     "docs": "Shared info",
     "events": "Events",
     "services": "Services",
-    "vote": "Vote"
+    "vote": "Vote",
+    "context": "Working with AI"
   },
   "create": {
     "mission": "Create Mission",

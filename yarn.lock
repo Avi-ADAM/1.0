@@ -8977,7 +8977,7 @@ push.js@^1.0.12:
   resolved "https://registry.npmjs.org/push.js/-/push.js-1.0.12.tgz"
   integrity sha512-Mo/zkrPD58hcbMvC/9WveUPGz0PJ4T5UwQJP6DnMYbyxe7b1xM/9qqmJTMmDcprbZjCtLzf9wWtek7gA8O9QBw==
 
-qrcode-generator@2.0.4:
+qrcode-generator@^2.0.4:
   version "2.0.4"
   resolved "https://registry.npmjs.org/qrcode-generator/-/qrcode-generator-2.0.4.tgz"
   integrity sha512-mZSiP6RnbHl4xL2Ap5HfkjLnmxfKcPWpWe/c+5XxCuetEenqmNFf1FH/ftXPCtFG5/TDobjsjz6sSNL0Sr8Z9g==
