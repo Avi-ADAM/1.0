@@ -344,7 +344,7 @@ mock/מתוכננת** (M3–M9 ב‑`PLAN_CONCIERGE.md`). לנסח הבטחה **
 - hreflang קיים — לוודא שכולל `/guid`, `/concierge` וכל השפות.
 - sitemap (`svelte-sitemap`) — לכלול עמודים ציבוריים, להחריג `test-*`.
 - Core Web Vitals: ה‑3D מסכן LCP/CLS — lazy‑load, ממדים קבועים למדיה, `loading="lazy"`, frameloop מבוקש.
-- `static/llms.text` כבר קיים — לעדכן שיתאר את המוצר/פיצ'רים (טוב גם ל‑AI‑SEO).
+- `static/llms.txt` כבר קיים — לעדכן שיתאר את המוצר/פיצ'רים (טוב גם ל‑AI‑SEO).
 
 ---
 

@@ -10,6 +10,11 @@ import { resolveEventIdentity } from '$lib/server/identity.js';
 import { log, requestId } from '$lib/server/log.js';
 import { csrfRejection } from '$lib/server/csrf.js';
 import { buildSeoFallbacks } from '$lib/server/seoFallback.js';
+import heHome from '$lib/translations/he/home.json';
+import enHome from '$lib/translations/en/home.json';
+import arHome from '$lib/translations/ar/home.json';
+import ruHome from '$lib/translations/ru/home.json';
+import esHome from '$lib/translations/es/home.json';
 import { dirOf } from '$lib/translations/dir.js';
 import { allowedCorsOrigins } from '$lib/server/corsOrigins.js';
 import { dev } from '$app/environment';
@@ -152,31 +157,25 @@ const manifestLink = {
 
 /* Site-wide <title>/description fallbacks, one per locale.
  *
- * They describe what 1lev1 actually is — a platform for running fair
- * partnerships (rikmot): open missions and resources, logged hours, decisions
- * by consensus, transparent profit splits. The old copy sold the "worldwide
- * consensus for freedom and security" declaration, which now lives on its own
- * site (agreement.1lev1.com); keep that out of this app's metadata.
+ * They are the homepage's own title and description (`home.meta` in each
+ * locale's home.json), read from the same JSON so the two cannot drift apart:
+ * they used to be a second hand-kept copy here that had already diverged. The
+ * story they tell is one circle with two ways in - a customer's request or a
+ * founder's dream - turning into a rikma that decides by consent, the
+ * customer included, and splits profit by contribution. The old copy sold
+ * the "worldwide consensus for freedom and security" declaration, which now
+ * lives on its own site (agreement.1lev1.com); keep that out of this app's
+ * metadata.
  *
- * Only pages that declare no <title> of their own fall back to these — see the
- * placement note in app.html. Titles are kept near 50–60 characters and
- * descriptions near 110–160, which is what search results actually render.
+ * Only pages that declare no <title> of their own fall back to these - see the
+ * placement note in app.html. Titles are kept near 50-70 characters and
+ * descriptions near 110-170, which is what search results actually render.
  */
-const desc = {
-  he: '1💗1 היא פלטפורמה לשותפויות משתלמות: רקמת שותפים ללא בוס וללא הון התחלתי, משימות ומשאבים פתוחים, תיעוד שעות, החלטות בהסכמה וחלוקת רווחים שקופה לפי תרומה.',
-  en: '1💗1 is a platform for profitable partnerships: build a network with no boss and no upfront capital, publish open missions and resources, log hours, decide by consensus, split profits by contribution.',
-  ar: '1💗1 منصة للشراكات المربحة: شبكة شركاء بلا مدير وبلا رأس مال، مهام وموارد مفتوحة، تسجيل الساعات، قرارات بالتوافق، وتقاسم شفاف للأرباح حسب المساهمة.',
-  ru: '1💗1 - платформа выгодных партнёрств: сеть без начальника и стартового капитала, открытые задачи и ресурсы, учёт часов, решения по согласию и прозрачный раздел прибыли по вкладу.',
-  es: '1💗1 es una plataforma de asociaciones rentables: una red sin jefe ni capital inicial, misiones y recursos abiertos, registro de horas, decisiones por consenso y reparto transparente de beneficios.'
-};
-
-const title = {
-  he: '1💗1 · שותפויות משתלמות: משימות, שעות וחלוקת רווחים',
-  en: '1💗1 · Profitable Partnerships: Missions, Hours, Profit Split',
-  ar: '1💗1 · شراكات مربحة: مهام وساعات وتقاسم الأرباح',
-  ru: '1💗1 · Выгодные партнёрства: задачи, часы и доля прибыли',
-  es: '1💗1 · Asociaciones rentables: misiones, horas y reparto'
-};
+const homeMeta = { he: heHome.meta, en: enHome.meta, ar: arHome.meta, ru: ruHome.meta, es: esHome.meta };
+/** @type {Record<string, string>} */
+const desc = Object.fromEntries(Object.entries(homeMeta).map(([l, m]) => [l, m.description]));
+/** @type {Record<string, string>} */
+const title = Object.fromEntries(Object.entries(homeMeta).map(([l, m]) => [l, m.title]));
 
 // Public address of the site, used to build og:url. Not derived from
 // event.url.origin: behind the proxy that is an internal host.

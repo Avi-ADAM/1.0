@@ -410,7 +410,7 @@
 
 #### T5.1 — SEO
 - sitemap כולל: `decision` (noindex! פרטי), `mission`, `resource`, `consensus`,
-  `how`; מחריג `(dev)`. hreflang + OG לדפים החדשים. עדכון `static/llms.text`
+  `how`; מחריג `(dev)`. hreflang + OG לדפים החדשים. עדכון `static/llms.txt`
   לתיאור הגלגל ושלוש הדלתות.
 
 #### T5.2 — אנליטיקס שני המשפכים

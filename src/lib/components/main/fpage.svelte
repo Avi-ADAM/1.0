@@ -418,7 +418,7 @@
         />
       </svg>
 
-      <p class="hm-lead">{$t('home.summary.s1')}</p>
+      <p class="hm-lead">{$t('home.hero.lead')}</p>
 
       <div class="hm-cta-row">
         <a href={regHref} class="hm-btn hm-btn-primary hm-btn-lg">

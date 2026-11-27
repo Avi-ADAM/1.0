@@ -1,0 +1,60 @@
+# 1💗1 (1lev1)
+
+> 1lev1 is one circle with two ways in: from a customer's request or a founder's dream, a rikma (a decentralized partnership) forms around it, and everyone in it, the customer included, decides together by consent and shares the profit by what each one contributed.
+
+In Hebrew: 1💗1 הוא מעגל אחד עם שתי כניסות: מבקשה של לקוחה או מחלום של יזם נרקמת שותפות, ובה כולם, גם הלקוחה, מחליטים יחד בהסכמה.
+
+Short form: profitable partnerships by consent, from a request or a dream.
+
+## The idea in three steps
+
+1. **A request or a dream.** Usually it starts with a customer who describes, in her own words, something she needs that does not exist yet. It can also start with a founder who wakes up with an idea.
+2. **A rikma forms around it.** The concierge breaks a request into its parts (missions for work, resources for equipment, money, services or space), and the people who can provide them join as partners. A founder's dream is broken down the same way. There is no boss and no employees, only partners.
+3. **Everything closes by consent, the customer included.** Decisions are made by consensus. Instead of a "no" there is negotiation: anyone can counter with a more precise version until both sides sign the same one. Every open proposal has the rikma's response time; silence when it runs out means consent to the last version on the table. A customer co-signs who joins the deal she pays for and what she pays for it.
+
+The result is an economy where what gets made is what someone actually wants, and the split is fair because everyone agreed to it.
+
+## How the idea grew
+
+- **Consent first.** The site began as a consent page: people creating together by mutual agreement.
+- **Then partnerships.** The emphasis moved to business: decentralized partnerships, called rikmas, that create together by consent.
+- **Now demand first.** Instead of making things and then trying to sell them, work starts from a request. The concierge builds partnerships out of what customers want, and the same consent machinery now covers the customer too.
+
+Descriptions that stop at "a consensus-based partnership platform" describe the second stage only.
+
+## Vocabulary
+
+- **Rikma** (Hebrew רקמה, plural rikmas): the partnership. The word means living tissue and also embroidery. In the API and data model it is called a "project".
+- **Mission**: equity-bearing work a partner takes on; hours are logged and approved by the rikma.
+- **Resource**: something a partner brings, such as equipment, money, a service or a space.
+- **Wish**: a request in the concierge.
+- **Restime**: the rikma's consent clock.
+
+## What the platform does
+
+- Concierge: a customer's request is broken into missions and resources, and a partnership forms around it; providers receive matching requests as warm leads.
+- Customers co-sign the deal they pay for.
+- Profit and equity split by actual contribution (time, money, equipment, knowledge), not half and half.
+- Consensus decisions with negotiation and no outright rejection; silence within the response time is consent.
+- Open missions and resources that anyone can join, turning work hours into ownership.
+- Hour logging and timers, sales, profit splits, Kanban, Gantt and process boards.
+- An AI assistant, and MCP access so external agents can work in a rikma on a member's behalf.
+
+## Joining
+
+Free to start a rikma and invite partners. Joining takes one step: signing a short agreement to act by consent, creating, working and resolving disagreements only by mutual agreement.
+
+## Pages
+
+- [Home](https://1lev1.com/): the circle, the profit-split formula, the concierge
+- [Made for you, the concierge](https://1lev1.com/made-for-you): asking for something that does not exist yet
+- [Why](https://1lev1.com/why) and [Vision](https://1lev1.com/vision): the reasoning behind the platform
+- [No boss](https://1lev1.com/no-boss): a partnership instead of employment
+- [Negotiation](https://1lev1.com/negotiation): how consent works without a veto
+- [The agreement](https://1lev1.com/hascama): the consent every member signs
+- [FAQ](https://1lev1.com/faq)
+- [MCP for agents](https://1lev1.com/mcp)
+
+## Contact
+
+baruch@1lev1.com
