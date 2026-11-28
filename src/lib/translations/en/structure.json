@@ -1,0 +1,123 @@
+{
+  "meta": {
+    "title": "1💗1 · How it all connects: from a request to a rikma, income and split",
+    "description": "An animated map of 1💗1: customer and request, founder and dream, rikma, missions and resources, product, income and a split by contribution. See how it connects and where you come in."
+  },
+  "hero": {
+    "eyebrow": "◈ The map of a rikma ◈",
+    "h1": "How it all connects",
+    "sub": "A request or a dream, a rikma of partners, work and resources, a product, income and the split. This is the circle from the inside, and at the foot of the page: where you step onto it."
+  },
+  "graph": {
+    "aria": "A map of what 1💗1 is made of and how it connects",
+    "consent": "All by consent"
+  },
+  "entry": "Way in",
+  "story": {
+    "choose": "Where to start",
+    "request": "Start from a request",
+    "dream": "Start from a dream"
+  },
+  "nodes": {
+    "customer": {
+      "label": "Customer",
+      "desc": "Someone who needs something that does not exist yet. She does not pick from a shelf: she asks, and she co-signs the deal she pays for."
+    },
+    "wish": {
+      "label": "Request",
+      "desc": "What the customer wrote in the concierge, in her own words. The concierge breaks it into missions and resources."
+    },
+    "founder": {
+      "label": "Founder",
+      "desc": "Someone who wakes up with an idea and wants partners to build it with, without upfront capital and without hiring employees."
+    },
+    "dream": {
+      "label": "Dream",
+      "desc": "The founder's idea. It opens as a rikma, with a list of what is missing to make it real."
+    },
+    "rikma": {
+      "label": "Rikma",
+      "desc": "The partnership itself. No boss and no employees, only partners who decide together."
+    },
+    "mission": {
+      "label": "Mission",
+      "desc": "Work a partner takes on. Hours are logged with a timer and approved by the rikma. This is where someone joining an existing rikma comes in."
+    },
+    "resource": {
+      "label": "Resource",
+      "desc": "Something a partner brings: equipment, money, a service or a space."
+    },
+    "product": {
+      "label": "Product",
+      "desc": "What the rikma gives its customers: a product, a service or an experience."
+    },
+    "contribution": {
+      "label": "Contribution",
+      "desc": "Everything each partner gave: time, money, equipment and knowledge. Their share of the profit comes from it."
+    },
+    "sale": {
+      "label": "Income",
+      "desc": "Money coming in from a customer. It counts only once whoever holds the money confirms receiving it."
+    },
+    "split": {
+      "label": "Split",
+      "desc": "The profit is divided between the partners by what each one contributed, not half and half. The split closes by consent too."
+    },
+    "consent": {
+      "label": "Consent",
+      "desc": "The frame around everything. You approve, talk it through or counter with a more precise version, and there is no outright \"no\". Silence until the rikma's time runs out means yes to the last version on the table."
+    }
+  },
+  "steps": {
+    "request1": "A customer says, in her own words, what she needs.",
+    "request2": "The concierge breaks the request into parts, and a rikma of people who can provide them forms around it.",
+    "dream1": "A founder wakes up with a dream.",
+    "dream2": "They open a rikma and writes down what is missing to make it real.",
+    "s3": "Each part is a mission (work) or a resource (equipment, money, a service, a space). Whoever takes one becomes a partner.",
+    "s4": "Approved hours and the resources given are recorded as each partner's contribution.",
+    "s5": "What gets built is a product. A customer co-signs the deal and pays, and that is the income.",
+    "s6": "The income is split between the partners by what each one contributed.",
+    "s7": "Every step on the way closes by consent, the customer's included. From there the rikma goes on to the next request."
+  },
+  "controls": {
+    "play": "Play",
+    "pause": "Pause",
+    "prev": "Back",
+    "next": "Next",
+    "step": "Step {{current}} of {{total}}",
+    "hint": "Tap any box to read about it."
+  },
+  "glossary": {
+    "title": "Every box, in words",
+    "sub": "The same map, as a list."
+  },
+  "doors": {
+    "title": "Where do you come in?",
+    "sub": "Four ways onto the same circle.",
+    "customer": {
+      "title": "I have a request",
+      "desc": "Say what you need, and the group that makes it happen forms around your request.",
+      "cta": "To the concierge"
+    },
+    "founder": {
+      "title": "I have a dream",
+      "desc": "Open a rikma, write down what is missing, and find partners who get a share of what they build.",
+      "cta": "For founders"
+    },
+    "partner": {
+      "title": "I want to join",
+      "desc": "Take a mission or bring a resource in an existing rikma, and your hours turn into ownership.",
+      "cta": "Open missions and resources"
+    },
+    "supplier": {
+      "title": "I have something to give",
+      "desc": "Businesses and service providers receive requests that match exactly what they offer.",
+      "cta": "Join as a supplier"
+    }
+  },
+  "cta": {
+    "title": "Ready to step onto the circle?",
+    "sub": "Opening a rikma and inviting partners is free.",
+    "button": "Start now"
+  }
+}

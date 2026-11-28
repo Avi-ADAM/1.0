@@ -77,6 +77,8 @@ export const ROUTED = {
     // The "instead of a boss" track page. Its own copy only - the teaser that
     // points at it from the homepage lives in `home`, which loads everywhere.
     noboss: at('/no-boss'),
+    // "How it all connects": the animated map of a rikma's objects (/structure).
+    structure: at('/structure'),
     // The "I already have a partnership" track. The hook and the calculator
     // stay on the homepage in `home`; only the depth behind them is gated.
     partnership: at('/partnership'),

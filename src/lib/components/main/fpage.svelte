@@ -923,6 +923,7 @@
       <a href="/shop" data-sveltekit-prefetch>{$t('home.nav.shop')}</a>
       <a href="/its-yours" data-sveltekit-prefetch>{$t('home.nav.itsYours')}</a>
       <a href="/why" data-sveltekit-prefetch>{$t('home.nav.why')}</a>
+      <a href="/structure" data-sveltekit-prefetch>{$t('home.nav.structure')}</a>
       {#if $lang == 'he'}
         <a href="https://agreement.1lev1.com" target="_blank" rel="noopener">{$t('home.nav.about')}</a>
       {/if}

@@ -1,0 +1,123 @@
+{
+  "meta": {
+    "title": "1💗1 · Cómo se conecta todo: de un pedido a una rikma, ingreso y reparto",
+    "description": "Un mapa animado de 1💗1: clienta y pedido, fundador y sueño, rikma, misiones y recursos, producto, ingreso y reparto por aporte. Mira cómo se conecta todo y por dónde entras."
+  },
+  "hero": {
+    "eyebrow": "◈ El mapa de una rikma ◈",
+    "h1": "Cómo se conecta todo",
+    "sub": "Un pedido o un sueño, una rikma de socios, trabajo y recursos, un producto, ingresos y el reparto. Así se ve el círculo por dentro, y al pie de la página: por dónde te subes a él."
+  },
+  "graph": {
+    "aria": "Un mapa de lo que forma 1💗1 y cómo se conecta",
+    "consent": "Todo por consenso"
+  },
+  "entry": "Entrada",
+  "story": {
+    "choose": "Por dónde empezar",
+    "request": "Empezar por un pedido",
+    "dream": "Empezar por un sueño"
+  },
+  "nodes": {
+    "customer": {
+      "label": "Clienta",
+      "desc": "Alguien que necesita algo que aún no existe. No elige de un estante: lo pide, y firma ella misma el trato que paga."
+    },
+    "wish": {
+      "label": "Pedido",
+      "desc": "Lo que la clienta escribió en el conserje, con sus palabras. El conserje lo divide en misiones y recursos."
+    },
+    "founder": {
+      "label": "Fundador",
+      "desc": "Alguien que se despierta con una idea y quiere socios para hacerla realidad, sin capital inicial y sin contratar empleados."
+    },
+    "dream": {
+      "label": "Sueño",
+      "desc": "La idea del fundador. Se abre como una rikma, con la lista de lo que falta para hacerla realidad."
+    },
+    "rikma": {
+      "label": "Rikma",
+      "desc": "La sociedad misma. No hay jefe ni empleados, solo socios que deciden juntos."
+    },
+    "mission": {
+      "label": "Misión",
+      "desc": "Trabajo que asume un socio. Las horas se registran con un temporizador y la rikma las aprueba. Por aquí entra quien quiere unirse a una rikma existente."
+    },
+    "resource": {
+      "label": "Recurso",
+      "desc": "Algo que aporta un socio: equipo, dinero, un servicio o un espacio."
+    },
+    "product": {
+      "label": "Producto",
+      "desc": "Lo que la rikma da a sus clientes: un producto, un servicio o una experiencia."
+    },
+    "contribution": {
+      "label": "Aporte",
+      "desc": "Todo lo que dio cada socio: tiempo, dinero, equipo y conocimiento. De ahí sale su parte del beneficio."
+    },
+    "sale": {
+      "label": "Ingreso",
+      "desc": "Dinero que entra de una clienta. Solo cuenta cuando quien tiene el dinero confirma que lo recibió."
+    },
+    "split": {
+      "label": "Reparto",
+      "desc": "El beneficio se reparte entre los socios según lo que aportó cada uno, no a medias. El reparto también se cierra por consenso."
+    },
+    "consent": {
+      "label": "Consenso",
+      "desc": "El marco de todo. Apruebas, lo conversas o propones una versión más precisa, y no existe un \"no\" absoluto. Callar hasta que se acaba el tiempo que fijó la rikma es aceptar la última versión sobre la mesa."
+    }
+  },
+  "steps": {
+    "request1": "Una clienta cuenta con sus palabras lo que necesita.",
+    "request2": "El conserje divide el pedido en partes, y a su alrededor se forma una rikma de personas que pueden aportarlas.",
+    "dream1": "Un fundador se despierta con un sueño.",
+    "dream2": "Abre una rikma y escribe lo que falta para hacerlo realidad.",
+    "s3": "Cada parte es una misión (trabajo) o un recurso (equipo, dinero, un servicio, un espacio). Quien toma una se vuelve socio.",
+    "s4": "Las horas aprobadas y los recursos aportados se registran como el aporte de cada socio.",
+    "s5": "Lo que se construye es un producto. Una clienta firma el trato y paga, y ese es el ingreso.",
+    "s6": "El ingreso se reparte entre los socios según lo que aportó cada uno.",
+    "s7": "Y cada paso del camino se cierra por consenso, también con la clienta. Desde ahí la rikma sigue al próximo pedido."
+  },
+  "controls": {
+    "play": "Reproducir",
+    "pause": "Pausa",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "step": "Paso {{current}} de {{total}}",
+    "hint": "Toca cualquier recuadro para leer sobre él."
+  },
+  "glossary": {
+    "title": "Cada recuadro, en palabras",
+    "sub": "El mismo mapa, como lista."
+  },
+  "doors": {
+    "title": "¿Por dónde entras?",
+    "sub": "Cuatro entradas al mismo círculo.",
+    "customer": {
+      "title": "Tengo un pedido",
+      "desc": "Cuenta lo que necesitas, y alrededor de tu pedido se forma el grupo que lo hace realidad.",
+      "cta": "Al conserje"
+    },
+    "founder": {
+      "title": "Tengo un sueño",
+      "desc": "Abre una rikma, escribe lo que falta y encuentra socios que reciben una parte de lo que construyen.",
+      "cta": "Para fundadores"
+    },
+    "partner": {
+      "title": "Quiero unirme",
+      "desc": "Toma una misión o aporta un recurso en una rikma existente, y tus horas se convierten en propiedad.",
+      "cta": "Misiones y recursos abiertos"
+    },
+    "supplier": {
+      "title": "Tengo algo que dar",
+      "desc": "Negocios y proveedores de servicios reciben pedidos que encajan justo con lo que ofrecen.",
+      "cta": "Unirme como proveedor"
+    }
+  },
+  "cta": {
+    "title": "¿Listo para subirte al círculo?",
+    "sub": "Abrir una rikma e invitar socios es gratis.",
+    "button": "Empezar ahora"
+  }
+}
