@@ -184,8 +184,21 @@
         {#if node.entry}
           <span class="sm-entry">{$t('structure.entry')}</span>
         {/if}
-        <EntityIcon kind={node.icon} size={15} />
-        <span class="sm-label">{$t(`structure.nodes.${node.key}.label`)}</span>
+        <span class="sm-title">
+          <EntityIcon kind={node.icon} size={15} />
+          <span class="sm-label">{$t(`structure.nodes.${node.key}.label`)}</span>
+        </span>
+        {#if node.people}
+          <span class="sm-people">
+            {#each node.people as who (who)}
+              <span class="sm-who sm-who-{who}"
+                >{node.people.length === 1
+                  ? $t(`structure.partners.${who}`)
+                  : $t(`structure.partners.${who}Short`)}</span
+              >
+            {/each}
+          </span>
+        {/if}
       </button>
     {/each}
   </figure>
@@ -329,9 +342,10 @@
   .sm-node {
     position: absolute;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.3rem;
+    gap: 0.1rem;
     padding-inline: 0.3rem;
     border: 2px solid color-mix(in srgb, var(--sm-gold) 70%, transparent);
     border-radius: 0.75rem;
@@ -365,6 +379,43 @@
   .sm-node:focus-visible {
     outline: 3px solid var(--sm-accent);
     outline-offset: 2px;
+  }
+  .sm-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    max-width: 100%;
+  }
+  /* Partner A and partner B: one colour each, so the eye follows them from
+     the mission and the resource into the contribution and the split. */
+  .sm-people {
+    display: inline-flex;
+    gap: 0.2rem;
+  }
+  .sm-who {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--who);
+    font-size: 0.62rem;
+    font-weight: 700;
+    line-height: 1.25;
+    white-space: nowrap;
+  }
+  .sm-who::before {
+    content: '';
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--who);
+  }
+  .sm-who-a {
+    --who: var(--sm-accent);
+  }
+  .sm-who-b {
+    --who: #0d9488;
   }
   .sm-label {
     white-space: nowrap;

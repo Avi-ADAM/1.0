@@ -13,6 +13,12 @@
     "consent": "All by consent"
   },
   "entry": "Way in",
+  "partners": {
+    "a": "Partner A",
+    "aShort": "A",
+    "b": "Partner B",
+    "bShort": "B"
+  },
   "story": {
     "choose": "Where to start",
     "request": "Start from a request",
@@ -38,6 +44,10 @@
     "rikma": {
       "label": "Rikma",
       "desc": "The partnership itself. No boss and no employees, only partners who decide together."
+    },
+    "partners": {
+      "label": "Partner A, partner B",
+      "desc": "Partner A took a mission and partner B brought a resource. Neither is the other's boss or employee: both are partners in the rikma, and each gets a share of the profit by what they gave."
     },
     "mission": {
       "label": "Mission",
@@ -73,10 +83,10 @@
     "request2": "The concierge breaks the request into parts, and a rikma of people who can provide them forms around it.",
     "dream1": "A founder wakes up with a dream.",
     "dream2": "They open a rikma and writes down what is missing to make it real.",
-    "s3": "Each part is a mission (work) or a resource (equipment, money, a service, a space). Whoever takes one becomes a partner.",
-    "s4": "Approved hours and the resources given are recorded as each partner's contribution.",
+    "s3": "Each part is a mission (work) or a resource (equipment, money, a service, a space). Partner A takes the mission, partner B brings the resource, and both become partners in the rikma.",
+    "s4": "Partner A's approved hours and the resource partner B gave are recorded as each one's contribution.",
     "s5": "What gets built is a product. A customer co-signs the deal and pays, and that is the income.",
-    "s6": "The income is split between the partners by what each one contributed.",
+    "s6": "The income is split between partner A and partner B by what each one contributed, not half and half.",
     "s7": "Every step on the way closes by consent, the customer's included. From there the rikma goes on to the next request."
   },
   "controls": {

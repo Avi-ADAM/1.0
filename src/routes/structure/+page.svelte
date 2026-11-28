@@ -34,7 +34,16 @@
   );
 
   /** @type {{ key: string, icon: import('$lib/celim/icons/entityIcons').EntityIconKind }[]} */
-  const GLOSSARY = [...NODES.map((n) => ({ key: n.key, icon: n.icon })), { key: 'consent', icon: 'signed' }];
+  // The map's boxes in order, with the two partners after the rikma they
+  // belong to, and the consent frame last.
+  const GLOSSARY = [
+    ...NODES.flatMap((n) =>
+      n.key === 'rikma'
+        ? [{ key: n.key, icon: n.icon }, { key: 'partners', icon: /** @type {const} */ ('members') }]
+        : [{ key: n.key, icon: n.icon }]
+    ),
+    { key: 'consent', icon: /** @type {const} */ ('signed') }
+  ];
 
   const card = 'bg-cyan-50/60 dark:bg-surface2 border-2 border-gold/60 rounded-xl px-4 py-3 shadow-sm text-start';
   const h2 = 'text-rose-700 dark:text-gold font-bold text-2xl sm:text-xl mb-2 text-center';

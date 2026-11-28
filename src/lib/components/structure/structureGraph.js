@@ -21,7 +21,7 @@
 export const VIEW_H = 122;
 
 /** Half a box's height, in the same units. */
-export const HALF_H = 5.2;
+export const HALF_H = 6;
 
 /**
  * @typedef {{
@@ -30,23 +30,30 @@ export const HALF_H = 5.2;
  *   x: number,
  *   y: number,
  *   w: number,
- *   entry?: boolean
+ *   entry?: boolean,
+ *   people?: ('a' | 'b')[]
  * }} MapNode
  */
 
-/** @type {MapNode[]} */
+/**
+ * `people` carries the partnership itself onto the map: partner A takes the
+ * mission, partner B brings the resource, and both colours meet again in the
+ * contribution and in the split - two people, no boss, each paid by what they
+ * gave.
+ * @type {MapNode[]}
+ */
 export const NODES = [
   { key: 'founder', icon: 'opportunity', x: 20, y: 8, w: 26, entry: true },
   { key: 'customer', icon: 'person', x: 80, y: 8, w: 26, entry: true },
   { key: 'dream', icon: 'wish', x: 20, y: 26, w: 26 },
   { key: 'wish', icon: 'concierge', x: 80, y: 26, w: 26 },
   { key: 'rikma', icon: 'rikma', x: 50, y: 46, w: 36 },
-  { key: 'mission', icon: 'mission', x: 19, y: 68, w: 26, entry: true },
-  { key: 'resource', icon: 'resource', x: 50, y: 68, w: 26 },
+  { key: 'mission', icon: 'mission', x: 19, y: 68, w: 26, entry: true, people: ['a'] },
+  { key: 'resource', icon: 'resource', x: 50, y: 68, w: 26, people: ['b'] },
   { key: 'product', icon: 'product', x: 81, y: 68, w: 26 },
-  { key: 'contribution', icon: 'offerings', x: 33, y: 90, w: 28 },
+  { key: 'contribution', icon: 'offerings', x: 33, y: 90, w: 28, people: ['a', 'b'] },
   { key: 'sale', icon: 'money', x: 81, y: 90, w: 26 },
-  { key: 'split', icon: 'split', x: 50, y: 110, w: 30 }
+  { key: 'split', icon: 'split', x: 50, y: 110, w: 30, people: ['a', 'b'] }
 ];
 
 /** The consent frame drawn around everything after the two ways in. */

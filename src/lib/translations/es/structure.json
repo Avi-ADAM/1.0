@@ -13,6 +13,12 @@
     "consent": "Todo por consenso"
   },
   "entry": "Entrada",
+  "partners": {
+    "a": "Socio A",
+    "aShort": "A",
+    "b": "Socio B",
+    "bShort": "B"
+  },
   "story": {
     "choose": "Por dónde empezar",
     "request": "Empezar por un pedido",
@@ -38,6 +44,10 @@
     "rikma": {
       "label": "Rikma",
       "desc": "La sociedad misma. No hay jefe ni empleados, solo socios que deciden juntos."
+    },
+    "partners": {
+      "label": "Socio A, socio B",
+      "desc": "El socio A tomó una misión y el socio B aportó un recurso. Ninguno es jefe ni empleado del otro: los dos son socios de la rikma, y cada uno recibe una parte del beneficio según lo que dio."
     },
     "mission": {
       "label": "Misión",
@@ -73,10 +83,10 @@
     "request2": "El conserje divide el pedido en partes, y a su alrededor se forma una rikma de personas que pueden aportarlas.",
     "dream1": "Un fundador se despierta con un sueño.",
     "dream2": "Abre una rikma y escribe lo que falta para hacerlo realidad.",
-    "s3": "Cada parte es una misión (trabajo) o un recurso (equipo, dinero, un servicio, un espacio). Quien toma una se vuelve socio.",
-    "s4": "Las horas aprobadas y los recursos aportados se registran como el aporte de cada socio.",
+    "s3": "Cada parte es una misión (trabajo) o un recurso (equipo, dinero, un servicio, un espacio). El socio A toma la misión, el socio B aporta el recurso, y los dos se vuelven socios de la rikma.",
+    "s4": "Las horas aprobadas del socio A y el recurso que aportó el socio B se registran como el aporte de cada uno.",
     "s5": "Lo que se construye es un producto. Una clienta firma el trato y paga, y ese es el ingreso.",
-    "s6": "El ingreso se reparte entre los socios según lo que aportó cada uno.",
+    "s6": "El ingreso se reparte entre el socio A y el socio B según lo que aportó cada uno, no a medias.",
     "s7": "Y cada paso del camino se cierra por consenso, también con la clienta. Desde ahí la rikma sigue al próximo pedido."
   },
   "controls": {

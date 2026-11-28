@@ -49,7 +49,7 @@ describe('structure map', () => {
 
   it.each(LOCALES)('has every string in %s', (l) => {
     const d = load(l);
-    for (const k of [...nodeKeys, 'consent']) {
+    for (const k of [...nodeKeys, 'partners', 'consent']) {
       expect(d.nodes[k]?.label, `${l} nodes.${k}.label`).toBeTruthy();
       expect(d.nodes[k]?.desc, `${l} nodes.${k}.desc`).toBeTruthy();
     }
@@ -58,6 +58,9 @@ describe('structure map', () => {
     for (const door of DOORS)
       for (const f of ['title', 'desc', 'cta'])
         expect(d.doors[door.key]?.[f], `${l} doors.${door.key}.${f}`).toBeTruthy();
+    for (const n of NODES)
+      for (const who of n.people ?? [])
+        expect(d.partners[n.people!.length === 1 ? who : `${who}Short`], `${l} partners.${who}`).toBeTruthy();
     expect(d.controls.step).toContain('{{current}}');
     expect(d.controls.step).toContain('{{total}}');
   });
